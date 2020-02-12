@@ -1,0 +1,103 @@
+﻿<Window x:Class="SakuraLauncher.CreateTunnelWindow" mc:Ignorable="d"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.FontSize="15"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}" 
+        TextElement.FontWeight="Regular"
+        TextOptions.TextRenderingMode="Auto"
+        TextOptions.TextFormattingMode="Ideal" 
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Background="{StaticResource MaterialDesignPaper}"
+        Title="新建穿透隧道" Height="450" Width="800" 
+        Closed="Window_Closed" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="280"/>
+        </Grid.ColumnDefinitions>
+        <DockPanel Margin="16,16,0,16">
+            <Button DockPanel.Dock="Bottom" Margin="0,8,0,0" Style="{StaticResource MaterialDesignFlatButton}" Click="ButtonReload_Click" Width="96" HorizontalAlignment="Right">
+                <Button.Resources>
+                    <Style TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignCircularProgressBar}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Loading.Value}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Resources>
+                <StackPanel Orientation="Horizontal">
+                    <ProgressBar Value="0" IsIndeterminate="True" Foreground="White" Margin="0,0,8,0"/>
+                    <TextBlock VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Loading.Value}" Value="False">
+                                        <Setter Property="Text" Value="刷新"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+            </Button>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <materialDesign:Card Margin="0,0,8,0">
+                    <StackPanel>
+                        <ListView ItemsSource="{Binding Listening}" SelectionMode="Single" Name="listening">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="类型" DisplayMemberBinding="{Binding Protocol}" />
+                                    <GridViewColumn Header="监听地址" DisplayMemberBinding="{Binding Address}" />
+                                    <GridViewColumn Header="监听端口" DisplayMemberBinding="{Binding Port}" />
+                                    <GridViewColumn Header="PID" DisplayMemberBinding="{Binding PID}" />
+                                    <GridViewColumn Header="进程名" DisplayMemberBinding="{Binding ProcessName}" />
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </StackPanel>
+                </materialDesign:Card>
+            </ScrollViewer>
+        </DockPanel>
+        <StackPanel Grid.Column="1">
+            <materialDesign:Card Margin="8,16,16,16" Padding="8">
+                <StackPanel>
+                    <TextBox materialDesign:HintAssist.Hint="隧道名称" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding ProxyName.Value}"/>
+                    <TextBox materialDesign:HintAssist.Hint="远程端口" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding RemotePort.Value}"/>
+                    <ComboBox Name="server" Width="224" Margin="8" materialDesign:HintAssist.Hint="服务器" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ItemsSource="{Binding Servers}"/>
+                </StackPanel>
+            </materialDesign:Card>
+            <Button Margin="8,0,16,0" Style="{StaticResource MaterialDesignRaisedDarkButton}" Click="ButtonCreate_Click">
+                <Button.Resources>
+                    <Style TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignCircularProgressBar}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Creating.Value}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Resources>
+                <StackPanel Orientation="Horizontal">
+                    <ProgressBar Value="0" IsIndeterminate="True" Foreground="White" Margin="0,0,8,0"/>
+                    <TextBlock VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="创建"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Creating.Value}" Value="True">
+                                        <Setter Property="Text" Value="创建中"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>

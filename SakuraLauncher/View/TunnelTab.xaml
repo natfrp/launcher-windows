@@ -1,0 +1,117 @@
+﻿<UserControl x:Class="SakuraLauncher.View.TunnelTab" mc:Ignorable="d"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:Data="clr-namespace:SakuraLauncher.Data"
+             d:DesignWidth="690" d:DesignHeight="600">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" IsEnabled="{Binding LoggedIn.Value}">
+        <ScrollViewer.Template>
+            <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Rectangle x:Name="Corner" Grid.Column="1" Fill="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Grid.Row="1"/>
+                    <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="False" CanVerticallyScroll="False" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Grid.Column="0" Margin="{TemplateBinding Padding}" Grid.Row="0"/>
+                    <ScrollBar x:Name="PART_VerticalScrollBar" AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow" Grid.Column="1" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" Grid.Row="0" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportHeight}" Margin="0,20,0,0"/>
+                </Grid>
+            </ControlTemplate>
+        </ScrollViewer.Template>
+        <StackPanel>
+            <TextBlock Foreground="#DDFFFFFF" FontSize="26" Margin="24,0,0,0">
+                <TextBlock.Resources>
+                    <Style TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignCircularProgressBar}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding LoggingIn.Value}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Resources>
+                <ProgressBar Value="0" IsIndeterminate="True" Foreground="White" Margin="0,0,8,0"/>
+                <Run>
+                    <Run.Style>
+                        <Style TargetType="Run">
+                            <Setter Property="Text" Value="隧道"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding LoggingIn.Value}" Value="True">
+                                    <Setter Property="Text" Value="加载中..."/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Run.Style>
+                </Run>
+            </TextBlock>
+            <ListView ItemsSource="{Binding Tunnels}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="{x:Null}" BorderBrush="{x:Null}" Margin="8,0,0,0">
+                <ListView.Resources>
+                    <DataTemplate DataType="{x:Type Data:FakeTunnel}">
+                        <Border CornerRadius="2" Width="256" Height="128" BorderThickness="4" Opacity="0.5" BorderBrush="White">
+                            <Button Width="192" Height="88" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Center" VerticalAlignment="Center" Click="ButtonAddListener_Click">
+                                <materialDesign:PackIcon Kind="AddCircleOutline" RenderTransformOrigin="0.5,0.5" Foreground="White">
+                                    <materialDesign:PackIcon.RenderTransform>
+                                        <ScaleTransform ScaleX="3" ScaleY="3"/>
+                                    </materialDesign:PackIcon.RenderTransform>
+                                </materialDesign:PackIcon>
+                            </Button>
+                        </Border>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type Data:Tunnel}">
+                        <Border CornerRadius="2" Width="256" Height="128">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0.5,1">
+                                    <GradientStop Color="#f953c6" Offset="0"/>
+                                    <GradientStop Color="#b91d73" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="16" RenderingBias="Quality" ShadowDepth="4" Opacity="0.3"/>
+                            </Border.Effect>
+                            <DockPanel LastChildFill="False">
+                                <DockPanel DockPanel.Dock="Top" Margin="16" LastChildFill="False">
+                                    <TextBlock Foreground="White" FontSize="22" Text="{Binding Name}" TextWrapping="Wrap" MaxWidth="180"/>
+                                    <ToggleButton DockPanel.Dock="Right" IsChecked="{Binding Enabled}"/>
+                                </DockPanel>
+                                <StackPanel DockPanel.Dock="Bottom" Margin="16">
+                                    <DockPanel LastChildFill="False" Grid.Row="1">
+                                        <TextBlock DockPanel.Dock="Left" Grid.Row="0" Foreground="White" FontSize="14" Margin="0,0,0,4">
+                                            #<Run Text="{Binding ServerID}"></Run>
+                                            <Run Text="{Binding ServerName}"></Run>
+                                        </TextBlock>
+                                    </DockPanel>
+                                    <DockPanel LastChildFill="False" Grid.Row="1">
+                                        <TextBlock DockPanel.Dock="Left" FontSize="13" Foreground="White" Opacity="0.8">
+                                            <Run Text="{Binding RemotePort}"></Run>
+                                            →
+                                            <Run Text="{Binding LocalAddress}"></Run>
+                                        </TextBlock>
+                                        <TextBlock DockPanel.Dock="Right" Foreground="White" FontSize="13" Text="{Binding Type}"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListView.Resources>
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Margin" Value="16"/>
+                        <Setter Property="Padding" Value="0"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1000
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SakuraLauncher", "SakuraLauncher\SakuraLauncher.csproj", "{D47FAF57-F12E-4052-B69D-4FFD227D36FF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D47FAF57-F12E-4052-B69D-4FFD227D36FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D47FAF57-F12E-4052-B69D-4FFD227D36FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D47FAF57-F12E-4052-B69D-4FFD227D36FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D47FAF57-F12E-4052-B69D-4FFD227D36FF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3FB38F30-55BC-4226-97BF-13002FEA921B}
+	EndGlobalSection
+EndGlobal

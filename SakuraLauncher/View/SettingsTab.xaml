@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="SakuraLauncher.View.SettingsTab" mc:Ignorable="d"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             d:DesignHeight="315" d:DesignWidth="580">
+    <StackPanel>
+        <TextBlock Foreground="#DDFFFFFF" FontSize="26" Margin="24,0,0,0">设置</TextBlock>
+        <StackPanel Orientation="Horizontal" Margin="24,24,24,16">
+            <ToggleButton IsChecked="{Binding AutoRun.Value}" Checked="ToggleButtonAutoRun_Checked" Unchecked="ToggleButtonAutoRun_Unchecked"/>
+            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">开机启动</TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16" Margin="16,0,8,0">访问密钥:</TextBlock>
+            <TextBox Text="{Binding UserToken.Value}" MinWidth="256" FontSize="16" IsEnabled="{Binding CanEditToken}" />
+            <Button Margin="16,0,0,0" Click="Button_Click">
+                <Button.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding LoggingIn.Value}" Value="True">
+                                <Setter Property="Foreground" Value="White"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                    <Style TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignCircularProgressBar}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding LoggingIn.Value}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Resources>
+                <StackPanel Orientation="Horizontal">
+                    <ProgressBar Value="0" IsIndeterminate="True" Foreground="White" Margin="0,0,8,0"/>
+                    <TextBlock VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="登录"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding LoggingIn.Value}" Value="True">
+                                        <Setter Property="Text" Value="登录中"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding LoggedIn.Value}" Value="True">
+                                        <Setter Property="Text" Value="退出"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </StackPanel>
+</UserControl>
