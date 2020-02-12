@@ -26,6 +26,8 @@ namespace SakuraLauncher
 
         public Prop<bool> Loading { get; set; } = new Prop<bool>();
 
+        public bool Created = false;
+
         public ObservableCollection<ServerData> Servers => MainWindow.Instance.Servers;
         public ObservableCollection<ListeningData> Listening { get; set; } = new ObservableCollection<ListeningData>();
 
@@ -116,6 +118,7 @@ namespace SakuraLauncher
                 {
                     return;
                 }
+                Created = true;
                 if(MessageBox.Show(json["msg"] + "\n\n是否继续创建?", "创建成功", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
                 {
                     Dispatcher.Invoke(() =>
@@ -145,8 +148,11 @@ namespace SakuraLauncher
 
         private void Window_Closed(object sender, System.EventArgs e)
         {
-            MainWindow.Instance.LoggedIn.Value = false;
-            MainWindow.Instance.TryLogin();
+            if(Created)
+            {
+                MainWindow.Instance.LoggedIn.Value = false;
+                MainWindow.Instance.TryLogin();
+            }
         }
 
         private void Listening_SelectionChanged(object sender, SelectionChangedEventArgs e)

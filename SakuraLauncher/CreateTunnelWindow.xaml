@@ -77,11 +77,15 @@
                     <TextBox materialDesign:HintAssist.Hint="隧道名称" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding ProxyName.Value}"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
+                            <ColumnDefinition Width="100"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <TextBox materialDesign:HintAssist.Hint="隧道类型" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding Protocol.Value}"/>
-                        <TextBox Grid.Column="1" materialDesign:HintAssist.Hint="远程端口" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding RemotePort.Value}"/>
+                        <ComboBox Margin="8" materialDesign:HintAssist.Hint="隧道类型" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Text="{Binding Protocol.Value}" IsEditable="True">
+                            <ComboBoxItem>TCP</ComboBoxItem>
+                            <ComboBoxItem>UDP</ComboBoxItem>
+                            <ComboBoxItem>XTCP</ComboBoxItem>
+                        </ComboBox>
+                        <TextBox Grid.Column="1" materialDesign:HintAssist.Hint="远程端口(0随机)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding RemotePort.Value}"/>
                     </Grid>
                     <ComboBox Name="server" Width="224" Margin="8" materialDesign:HintAssist.Hint="服务器" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ItemsSource="{Binding Servers}"/>
                 </StackPanel>
