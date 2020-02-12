@@ -61,16 +61,6 @@ namespace SakuraLauncher.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
-        /// </summary>
-        internal static byte[] frpc {
-            get {
-                object obj = ResourceManager.GetObject("frpc", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
         ///   查找类似                     GNU AFFERO GENERAL PUBLIC LICENSE
         ///                       Version 3, 19 November 2007
         ///

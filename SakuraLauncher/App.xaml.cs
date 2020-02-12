@@ -174,14 +174,8 @@ namespace SakuraLauncher
         {
             if(!File.Exists(Tunnel.ClientPath))
             {
-                if(MessageBox.Show("未找到 frpc.exe, 是否自动写出此文件?\n若写入操作被杀毒软件拦截, 请允许本次操作.", "Oops", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
-                {
-                    File.WriteAllBytes(Tunnel.ClientPath, SakuraLauncher.Properties.Resources.frpc);
-                }
-                if(!File.Exists(Tunnel.ClientPath))
-                {
-                    Environment.Exit(0);
-                }
+                MessageBox.Show("未找到 frpc.exe, 请尝试重新下载客户端.", "Oops", MessageBoxButton.OK, MessageBoxImage.Error);
+                Environment.Exit(0);
             }
             var minimize = false;
             foreach(var a in e.Args)
