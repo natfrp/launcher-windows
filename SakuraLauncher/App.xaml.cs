@@ -207,5 +207,9 @@ namespace SakuraLauncher
                 MessageBox.Show("请不要重复开启 SakuraFrp 客户端. 如果想运行多个实例请将软件复制到其他目录.", "Oops", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
+        private void TrayMenu_Show(object sender, RoutedEventArgs e) => MainWindow.Show();
+
+        private void TrayMenu_Exit(object sender, RoutedEventArgs e) => MainWindow.Close();
     }
 }

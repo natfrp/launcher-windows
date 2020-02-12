@@ -40,6 +40,12 @@
                 <GradientStop Color="#353535" Offset="1"/>
             </LinearGradientBrush>
             <!--#endregion-->
+
+
+            <ContextMenu x:Key="TrayMenu" Placement="MousePoint">
+                <MenuItem Header="显示主窗口" Style="{StaticResource MaterialDesignMenuItem}" Click="TrayMenu_Show"/>
+                <MenuItem Header="退出" Style="{StaticResource MaterialDesignMenuItem}" Click="TrayMenu_Exit"/>
+            </ContextMenu>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
