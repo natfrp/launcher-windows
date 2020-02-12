@@ -16,9 +16,13 @@ namespace SakuraLauncher
     /// </summary>
     public partial class CreateTunnelWindow : Window
     {
-        public Prop<string> ProxyName { get; set; } = new Prop<string>("");
         public Prop<bool> Creating { get; set; } = new Prop<bool>();
         public Prop<int> RemotePort { get; set; } = new Prop<int>();
+        public Prop<string> ProxyName { get; set; } = new Prop<string>("");
+        public Prop<string> Protocol { get; set; } = new Prop<string>("");
+
+        public Prop<int> LocalPort { get; set; } = new Prop<int>();
+        public Prop<string> LocalAddress { get; set; } = new Prop<string>("");
 
         public Prop<bool> Loading { get; set; } = new Prop<bool>();
 
@@ -88,11 +92,6 @@ namespace SakuraLauncher
             {
                 return;
             }
-            if(!(listening.SelectedItem is ListeningData l))
-            {
-                MessageBox.Show("请先选择一个监听项目再创建隧道", "Oops", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
             if(ProxyName.Value.Length < 3)
             {
                 MessageBox.Show("隧道名称太短", "Oops", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -104,9 +103,9 @@ namespace SakuraLauncher
                 return;
             }
             Creating.Value = true;
-            App.ApiRequest("adduserproxy", new StringBuilder("proxytype=").Append(l.Protocol)
-                .Append("&localaddr=").Append(l.Address == "0.0.0.0" ? "127.0.0.1" : l.Address)
-                .Append("&localport=").Append(l.Port)
+            App.ApiRequest("adduserproxy", new StringBuilder("proxytype=").Append(Protocol.Value)
+                .Append("&localaddr=").Append(LocalAddress.Value)
+                .Append("&localport=").Append(LocalPort.Value)
                 .Append("&proxyname=").Append(ProxyName.Value)
                 .Append("&nodeid=").Append(s.ID)
                 .Append("&remoteport=").Append(RemotePort.Value).ToString()).ContinueWith(t =>
@@ -148,6 +147,16 @@ namespace SakuraLauncher
         {
             MainWindow.Instance.LoggedIn.Value = false;
             MainWindow.Instance.TryLogin();
+        }
+
+        private void Listening_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(e.AddedItems.Count == 1 && e.AddedItems[0] is ListeningData l)
+            {
+                Protocol.Value = l.Protocol;
+                LocalPort.Value = int.Parse(l.Port);
+                LocalAddress.Value = l.Address == "0.0.0.0" ? "127.0.0.1" : l.Address;
+            }
         }
     }
 }
