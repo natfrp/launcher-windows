@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.ComponentModel;
@@ -57,6 +58,7 @@ namespace SakuraLauncher
         }
         private Tunnel _currentListener = null;
 
+        public List<string> AutoStart = null;
         public ObservableCollection<ITunnel> Tunnels { get; set; } = new ObservableCollection<ITunnel>();
         public ObservableCollection<ServerData> Servers { get; set; } = new ObservableCollection<ServerData>();
 
@@ -88,6 +90,10 @@ namespace SakuraLauncher
                 {
                     UserToken.Value = json["token"];
                 }
+                if(json.ContainsKey("enable_tunnels") && json["enable_tunnels"] is List<object> enable_tunnels)
+                {
+                    AutoStart = enable_tunnels.Select(s => s.ToString()).ToList();
+                }
                 if(json.ContainsKey("loggedin") && json["loggedin"])
                 {
                     TryLogin();
@@ -98,7 +104,7 @@ namespace SakuraLauncher
             #endregion
 
             DataContext = this;
-            
+
             SwitchTab(LoggedIn.Value || LoggingIn.Value ? 0 : 2);
         }
 
@@ -114,10 +120,11 @@ namespace SakuraLauncher
             {
                 { "version", CONFIG_VERSION },
                 { "token", UserToken.Value.Trim() },
-                { "loggedin", LoggedIn.Value }
+                { "loggedin", LoggedIn.Value },
+                { "enable_tunnels", Tunnels.Where(t => t.IsReal && t.Real.Enabled).Select(t => t.Real.Name) }
             }));
         }
-
+        
         public void TryLogin()
         {
             LoggingIn.Value = true;
@@ -152,7 +159,7 @@ namespace SakuraLauncher
                         foreach(Dictionary<string, object> j in tunnels["proxy"])
                         {
                             // 全 员 字 符 串
-                            Tunnels.Add(new Tunnel()
+                            var tunnel = new Tunnel()
                             {
                                 Name = j["proxyname"] as string,
                                 Type = (j["proxytype"] as string).ToUpper(),
@@ -160,7 +167,26 @@ namespace SakuraLauncher
                                 RemotePort = j["remoteport"] as string,
                                 ServerName = j["servername"] as string,
                                 LocalAddress = j["localaddr"] as string + ":" + j["localport"] as string
-                            });
+                            };
+                            tunnel.PropertyChanged += (s, e) =>
+                            {
+                                if(e.PropertyName == "Enabled")
+                                {
+                                    Save();
+                                }
+                            };
+                            Tunnels.Add(tunnel);
+                        }
+                        if(AutoStart != null)
+                        {
+                            foreach(var tunnel in Tunnels)
+                            {
+                                if(tunnel.IsReal && AutoStart.Contains(tunnel.Real.Name))
+                                {
+                                    tunnel.Real.Enabled = true;
+                                }
+                            }
+                            AutoStart = null;
                         }
                         Tunnels.Add(new FakeTunnel());
                     });
@@ -172,6 +198,7 @@ namespace SakuraLauncher
 
         private void Window_Closed(object sender, EventArgs e)
         {
+            ConfigPath = null;
             foreach(var l in Tunnels)
             {
                 if(l.IsReal)
