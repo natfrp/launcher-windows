@@ -94,11 +94,6 @@ namespace SakuraLauncher
             {
                 return;
             }
-            if(ProxyName.Value.Length < 3)
-            {
-                MessageBox.Show("隧道名称太短", "Oops", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
             if(!(server.SelectedItem is ServerData s))
             {
                 MessageBox.Show("请选择穿透服务器", "Oops", MessageBoxButton.OK, MessageBoxImage.Error);

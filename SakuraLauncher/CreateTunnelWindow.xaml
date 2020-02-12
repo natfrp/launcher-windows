@@ -74,7 +74,7 @@
                         <TextBox materialDesign:HintAssist.Hint="本地IP" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding LocalAddress.Value}"/>
                         <TextBox Grid.Column="1" materialDesign:HintAssist.Hint="端口" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding LocalPort.Value}"/>
                     </Grid>
-                    <TextBox materialDesign:HintAssist.Hint="隧道名称" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding ProxyName.Value}"/>
+                    <TextBox materialDesign:HintAssist.Hint="隧道名称(留空随机)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding ProxyName.Value}"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="100"/>

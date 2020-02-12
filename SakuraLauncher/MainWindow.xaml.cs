@@ -155,6 +155,21 @@ namespace SakuraLauncher
                                 Name = j["name"] as string
                             });
                         }
+                        if(AutoStart == null)
+                        {
+                            AutoStart = new List<string>();
+                            foreach(var tunnel in Tunnels)
+                            {
+                                if(tunnel.IsReal)
+                                {
+                                    if(tunnel.Real.Enabled)
+                                    {
+                                        AutoStart.Add(tunnel.Real.Name);
+                                    }
+                                    tunnel.Real.Stop();
+                                }
+                            }
+                        }
                         Tunnels.Clear();
                         foreach(Dictionary<string, object> j in tunnels["proxy"])
                         {
