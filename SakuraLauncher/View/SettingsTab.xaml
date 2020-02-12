@@ -10,6 +10,10 @@
             <ToggleButton IsChecked="{Binding AutoRun.Value}" Checked="ToggleButtonAutoRun_Checked" Unchecked="ToggleButtonAutoRun_Unchecked"/>
             <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">开机启动</TextBlock>
         </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="24,0,24,16">
+            <ToggleButton IsChecked="{Binding SuppressInfo.Value}"/>
+            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">关闭连接提示</TextBlock>
+        </StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16" Margin="16,0,8,0">访问密钥:</TextBlock>
             <TextBox Text="{Binding UserToken.Value}" MinWidth="256" FontSize="16" IsEnabled="{Binding CanEditToken}" />

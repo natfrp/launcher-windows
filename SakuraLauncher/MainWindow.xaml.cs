@@ -36,6 +36,7 @@ namespace SakuraLauncher
         public bool CanEditToken => !LoggingIn.Value && !LoggedIn.Value;
 
         public Prop<bool> AutoRun { get; set; } = new Prop<bool>();
+        public Prop<bool> SuppressInfo { get; set; } = new Prop<bool>();
         public Prop<bool> LoggedIn { get; set; } = new Prop<bool>();
         public Prop<bool> LoggingIn { get; set; } = new Prop<bool>();
         public Prop<string> UserToken { get; set; } = new Prop<string>();
@@ -90,6 +91,10 @@ namespace SakuraLauncher
                 {
                     UserToken.Value = json["token"];
                 }
+                if(json.ContainsKey("suppressinfo") && json["suppressinfo"])
+                {
+                    SuppressInfo.Value = true;
+                }
                 if(json.ContainsKey("enable_tunnels") && json["enable_tunnels"] is List<object> enable_tunnels)
                 {
                     AutoStart = enable_tunnels.Select(s => s.ToString()).ToList();
@@ -104,6 +109,7 @@ namespace SakuraLauncher
             #endregion
 
             DataContext = this;
+            SuppressInfo.PropertyChanged += (s, e) => Save();
 
             SwitchTab(LoggedIn.Value || LoggingIn.Value ? 0 : 2);
         }
@@ -120,6 +126,7 @@ namespace SakuraLauncher
             {
                 { "version", CONFIG_VERSION },
                 { "token", UserToken.Value.Trim() },
+                { "suppressinfo", SuppressInfo.Value },
                 { "loggedin", LoggedIn.Value },
                 { "enable_tunnels", Tunnels.Where(t => t.IsReal && t.Real.Enabled).Select(t => t.Real.Name) }
             }));

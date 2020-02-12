@@ -20,7 +20,7 @@ namespace SakuraLauncher.View
              BrushText = new SolidColorBrush(Colors.Silver);
 
         private readonly MainWindow Main = null;
-
+        
         public string failedData = "";
 
         public LogTab(MainWindow main)
@@ -45,7 +45,7 @@ namespace SakuraLauncher.View
             {
                 if(failedData != "")
                 {
-                    if(Main.IsVisible)
+                    if(Main.IsVisible && !Main.SuppressInfo.Value)
                     {
                         MessageBox.Show(failedData, "日志", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
