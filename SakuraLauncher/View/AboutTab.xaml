@@ -16,6 +16,8 @@
                 <LineBreak/>
                 <LineBreak/>
                 <Run FontSize="15" Text="版权所有 © 2020 iDea Leaper"/>
+                <LineBreak/>
+                <Run FontSize="15">https://github.com/fengberd/SakuraFrpLauncher</Run>
             </TextBlock>
         </StackPanel>
         <Border Padding="8" BorderBrush="#FFAAAAAA" Background="#33000000" BorderThickness="2" Margin="16,16,16,16">
