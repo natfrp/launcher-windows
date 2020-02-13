@@ -65,6 +65,8 @@ namespace SakuraLauncher
         public ObservableCollection<ITunnel> Tunnels { get; set; } = new ObservableCollection<ITunnel>();
         public ObservableCollection<ServerData> Servers { get; set; } = new ObservableCollection<ServerData>();
 
+        public int LogoIndex = 0;
+
         public MainWindow(bool autorun)
         {
             Instance = this;
@@ -93,7 +95,11 @@ namespace SakuraLauncher
                 {
                     UserToken.Value = json["token"];
                 }
-                if(json.ContainsKey("suppressinfo") && json["suppressinfo"])
+                if(json.ContainsKey("logo"))
+                {
+                    SetLogo((int)json["logo"]);
+                }
+                if(json.ContainsKey("LogoIndex") && json["suppressinfo"])
                 {
                     SuppressInfo.Value = true;
                 }
@@ -127,6 +133,7 @@ namespace SakuraLauncher
             File.WriteAllText(ConfigPath, JSON.ToNiceJSON(new Dictionary<string, object>()
             {
                 { "version", CONFIG_VERSION },
+                { "logo", LogoIndex },
                 { "token", UserToken.Value.Trim() },
                 { "suppressinfo", SuppressInfo.Value },
                 { "loggedin", LoggedIn.Value },
@@ -220,6 +227,24 @@ namespace SakuraLauncher
             });
         }
 
+        public void SetLogo(int index)
+        {
+            switch(index)
+            {
+            case 1:
+                logo.Background = new ImageBrush(new BitmapImage(new Uri("pack://application:,,,/Resources/debian.png")));
+                break;
+            case 2:
+                logo.Background = new ImageBrush(new BitmapImage(new Uri("pack://application:,,,/Resources/fishcake.png")));
+                break;
+            default:
+                logo.Background = new ImageBrush(new BitmapImage(new Uri("pack://application:,,,/Resources/logo.png")));
+                break;
+            }
+            LogoIndex = index;
+            Save();
+        }
+
         private void Window_Closed(object sender, EventArgs e)
         {
             ConfigPath = null;
@@ -240,7 +265,26 @@ namespace SakuraLauncher
 
         private void ButtonHide_Click(object sender, RoutedEventArgs e) => Hide();
 
-        private void ButtonClose_Click(object sender, RoutedEventArgs e) => Close();
+        private void ButtonClose_Click(object sender, RoutedEventArgs e)
+        {
+            if(MessageBox.Show("确定要退出程序吗?\n退出后隧道会被关闭.", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Asterisk) == MessageBoxResult.OK)
+            {
+                Close();
+            }
+        }
+
+        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            switch(e.ClickCount)
+            {
+            case 3:
+                SetLogo(1);
+                break;
+            case 5:
+                SetLogo(2);
+                break;
+            }
+        }
 
         private void TrayIcon_TrayLeftMouseUp(object sender, RoutedEventArgs e)
         {
@@ -282,19 +326,5 @@ namespace SakuraLauncher
         public void RaisePropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
         #endregion
-        
-        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            var border = sender as Border;
-            switch(e.ClickCount)
-            {
-            case 3:
-                border.Background = new ImageBrush(new BitmapImage(new Uri("pack://application:,,,/Resources/debian.png")));
-                break;
-            case 4:
-                border.Background = new ImageBrush(new BitmapImage(new Uri("pack://application:,,,/Resources/fishcake.png")));
-                break;
-            }
-        }
     }
 }

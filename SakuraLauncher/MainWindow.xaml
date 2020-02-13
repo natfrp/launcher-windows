@@ -89,7 +89,7 @@
         </Grid.ColumnDefinitions>
         <Border CornerRadius="3,0,0,3" Background="{StaticResource Background_SidePanel}">
             <StackPanel>
-                <Border Margin="0,24,0,24" Width="120" Height="120" CornerRadius="180" MouseLeftButtonDown="Border_MouseLeftButtonDown">
+                <Border x:Name="logo" Margin="0,24,0,24" Width="120" Height="120" CornerRadius="180" MouseLeftButtonDown="Border_MouseLeftButtonDown">
                     <Border.Background>
                         <ImageBrush Stretch="Fill" ImageSource="Resources/logo.png"/>
                     </Border.Background>

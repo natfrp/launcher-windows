@@ -187,7 +187,7 @@ namespace SakuraLauncher
                 }
             }
             AppMutex = new Mutex(true, "SakuraLauncher_" + Md5(Path.GetFullPath("config.json")), out bool created);
-            AutoRunFile = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + "\\SakuraLauncher_" + Md5(ExecutablePath) + ".lnk";
+            AutoRunFile = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\SakuraLauncher_" + Md5(ExecutablePath) + ".lnk";
             if(created)
             {
                 MainWindow = new MainWindow(File.Exists(AutoRunFile));
