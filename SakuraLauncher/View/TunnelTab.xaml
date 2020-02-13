@@ -74,28 +74,59 @@
                             <Border.Effect>
                                 <DropShadowEffect BlurRadius="16" RenderingBias="Quality" ShadowDepth="4" Opacity="0.3"/>
                             </Border.Effect>
-                            <DockPanel LastChildFill="False">
-                                <DockPanel DockPanel.Dock="Top" Margin="16" LastChildFill="False">
-                                    <TextBlock Foreground="White" FontSize="22" Text="{Binding Name}" TextWrapping="Wrap" MaxWidth="180"/>
-                                    <ToggleButton DockPanel.Dock="Right" IsChecked="{Binding Enabled}"/>
-                                </DockPanel>
-                                <StackPanel DockPanel.Dock="Bottom" Margin="16">
-                                    <DockPanel LastChildFill="False" Grid.Row="1">
-                                        <TextBlock DockPanel.Dock="Left" Grid.Row="0" Foreground="White" FontSize="14" Margin="0,0,0,4">
+                            <Grid>
+                                <Button VerticalAlignment="Top" HorizontalAlignment="Right" Width="16" Height="16" Margin="0,4,4,0" Foreground="White" Panel.ZIndex="666" Click="ButtonDelete_Click" Opacity="0">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignIconForegroundButton}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsMouseOver, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Border}}}" Value="True">
+                                                    <DataTrigger.EnterActions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation Duration="00:00:00.2" Storyboard.TargetProperty="Opacity" To="0.8"/>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </DataTrigger.EnterActions>
+                                                    <DataTrigger.ExitActions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation Duration="00:00:00.2" Storyboard.TargetProperty="Opacity" To="0"/>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </DataTrigger.ExitActions>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                    <materialDesign:PackIcon Kind="Close" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                        <materialDesign:PackIcon.RenderTransform>
+                                            <ScaleTransform ScaleX="0.7" ScaleY="0.7"/>
+                                        </materialDesign:PackIcon.RenderTransform>
+                                    </materialDesign:PackIcon>
+                                </Button>
+                                <DockPanel LastChildFill="False">
+                                    <DockPanel DockPanel.Dock="Top" Margin="16" LastChildFill="False">
+                                        <TextBlock Foreground="White" FontSize="22" Text="{Binding Name}" TextWrapping="Wrap" MaxWidth="180"/>
+                                        <ToggleButton DockPanel.Dock="Right" IsChecked="{Binding Enabled}"/>
+                                    </DockPanel>
+                                    <StackPanel DockPanel.Dock="Bottom" Margin="16">
+                                        <DockPanel LastChildFill="False" Grid.Row="1">
+                                            <TextBlock DockPanel.Dock="Left" Grid.Row="0" Foreground="White" FontSize="14" Margin="0,0,0,4">
                                             #<Run Text="{Binding ServerID}"></Run>
                                             <Run Text="{Binding ServerName}"></Run>
-                                        </TextBlock>
-                                    </DockPanel>
-                                    <DockPanel LastChildFill="False" Grid.Row="1">
-                                        <TextBlock DockPanel.Dock="Left" FontSize="13" Foreground="White" Opacity="0.8">
+                                            </TextBlock>
+                                        </DockPanel>
+                                        <DockPanel LastChildFill="False" Grid.Row="1">
+                                            <TextBlock DockPanel.Dock="Left" FontSize="13" Foreground="White" Opacity="0.8">
                                             <Run Text="{Binding RemotePort}"></Run>
                                             →
                                             <Run Text="{Binding LocalAddress}"></Run>
-                                        </TextBlock>
-                                        <TextBlock DockPanel.Dock="Right" Foreground="White" FontSize="13" Text="{Binding Type}"/>
-                                    </DockPanel>
-                                </StackPanel>
-                            </DockPanel>
+                                            </TextBlock>
+                                            <TextBlock DockPanel.Dock="Right" Foreground="White" FontSize="13" Text="{Binding Type}"/>
+                                        </DockPanel>
+                                    </StackPanel>
+                                </DockPanel>
+                            </Grid>
                         </Border>
                     </DataTemplate>
                 </ListView.Resources>
