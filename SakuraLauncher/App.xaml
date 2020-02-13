@@ -40,11 +40,11 @@
                 <GradientStop Color="#005366" Offset="1"/>
             </LinearGradientBrush>
 
-            <Color x:Key="TabGradient_Start">#05DBF2</Color>
-            <Color x:Key="TabGradient_Middle">#05AFF2</Color>
-            <Color x:Key="TabGradient_End">#214999</Color>
-            <Color x:Key="TabGradient_EndMiddle">#EE214999</Color>
-            <Color x:Key="TabGradient_EndTransparent">#00214999</Color>
+            <Color x:Key="TabGradient_Start">#34e89e</Color>
+            <Color x:Key="TabGradient_Middle">#259f79</Color>
+            <Color x:Key="TabGradient_End">#0f6043</Color>
+            <Color x:Key="TabGradient_EndMiddle">#ee0f6043</Color>
+            <Color x:Key="TabGradient_EndTransparent">#000f6043</Color>
             <!--#endregion-->
 
             <!--#region Menu-->
