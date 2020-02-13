@@ -9,14 +9,6 @@ namespace SakuraLauncher.Data
     {
         public static string ClientPath = "frpc.exe";
 
-        public static void LogOutput(object sender, DataReceivedEventArgs e)
-        {
-            if(e.Data != null)
-            {
-                MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.Log(e.Data.Replace("\r", "").Replace("\n", "")));
-            }
-        }
-
         public bool IsReal => true;
         public Tunnel Real => this;
 
@@ -53,6 +45,14 @@ namespace SakuraLauncher.Data
         public string LocalAddress { get; set; }
 
         public Process BaseProcess = null;
+
+        public void LogOutput(object sender, DataReceivedEventArgs e)
+        {
+            if(e.Data != null)
+            {
+                MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.Log(Name, e.Data.Replace("\r", "").Replace("\n", "")));
+            }
+        }
 
         public void Start()
         {

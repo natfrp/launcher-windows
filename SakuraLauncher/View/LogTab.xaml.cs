@@ -17,10 +17,11 @@ namespace SakuraLauncher.View
              BrushWarning = new SolidColorBrush(Colors.Orange),
              BrushError = new SolidColorBrush(Color.FromRgb(220, 80, 54)),
              BrushTime = new SolidColorBrush(Color.FromRgb(80, 141, 220)),
-             BrushText = new SolidColorBrush(Colors.Silver);
+             BrushText = new SolidColorBrush(Colors.Silver),
+             BrushTunnel = new SolidColorBrush(Colors.Wheat);
 
         private readonly MainWindow Main = null;
-        
+
         public string failedData = "";
 
         public LogTab(MainWindow main)
@@ -29,12 +30,13 @@ namespace SakuraLauncher.View
             DataContext = Main = main;
         }
 
-        public void Log(string raw)
+        public void Log(string tunnel, string raw)
         {
             if(TextBlockLog.Inlines.Count != 0)
             {
                 AddLineBreak();
             }
+            AddRun(tunnel + " ", BrushTunnel);
             var match = LogPattern.Match(raw);
             if(!match.Success)
             {
@@ -43,6 +45,7 @@ namespace SakuraLauncher.View
             }
             else
             {
+                AddRun(match.Groups["Time"].Value + " ", BrushTime);
                 if(failedData != "")
                 {
                     if(Main.IsVisible && !Main.SuppressInfo.Value)

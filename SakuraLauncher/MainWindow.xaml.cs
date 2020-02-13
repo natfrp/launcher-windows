@@ -114,7 +114,7 @@ namespace SakuraLauncher
             SwitchTab(LoggedIn.Value || LoggingIn.Value ? 0 : 2);
         }
 
-        public void Log(string raw) => (Tabs[1] as LogTab).Log(raw);
+        public void Log(string tunnel,string raw) => (Tabs[1] as LogTab).Log(tunnel, raw);
 
         public void Save()
         {

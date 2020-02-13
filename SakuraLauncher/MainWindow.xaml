@@ -18,22 +18,22 @@
     </WindowChrome.WindowChrome>
     <Window.Resources>
         <LinearGradientBrush x:Key="TabGradientTransparent" StartPoint="0,0" EndPoint="0,0">
-            <GradientStop Color="#34e89e" Offset="0.02"/>
-            <GradientStop Color="#259f79" Offset="0.02"/>
-            <GradientStop Color="#0f6043" Offset="0.1"/>
-            <GradientStop Color="#0f6043" Offset="0.5"/>
-            <GradientStop Color="#000f6043" Offset="1"/>
+            <GradientStop Color="{StaticResource TabGradient_Start}" Offset="0.02"/>
+            <GradientStop Color="{StaticResource TabGradient_Middle}" Offset="0.02"/>
+            <GradientStop Color="{StaticResource TabGradient_End}" Offset="0.1"/>
+            <GradientStop Color="{StaticResource TabGradient_End}" Offset="0.5"/>
+            <GradientStop Color="{StaticResource TabGradient_EndTransparent}" Offset="1"/>
             <GradientStop Color="Transparent" Offset="1"/>
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="TabGradientSelected" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Color="#34e89e" Offset="0.1"/>
-            <GradientStop Color="#259f79" Offset="0.1"/>
-            <GradientStop Color="#0f6043" Offset="0.4"/>
-            <GradientStop Color="#000f6043" Offset="1"/>
+            <GradientStop Color="{StaticResource TabGradient_Start}" Offset="0.1"/>
+            <GradientStop Color="{StaticResource TabGradient_Middle}" Offset="0.1"/>
+            <GradientStop Color="{StaticResource TabGradient_End}" Offset="0.4"/>
+            <GradientStop Color="{StaticResource TabGradient_EndTransparent}" Offset="1"/>
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="TabGradientHover" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Color="#ee0f6043" Offset="0.5" />
-            <GradientStop Color="#000f6043" Offset="1"/>
+            <GradientStop Color="{StaticResource TabGradient_EndMiddle}" Offset="0.5" />
+            <GradientStop Color="{StaticResource TabGradient_EndTransparent}" Offset="1"/>
         </LinearGradientBrush>
         <Storyboard x:Key="TabDeactiveAnimation">
             <PointAnimation Duration="00:00:00.1" Storyboard.TargetProperty="(Background).(LinearGradientBrush.EndPoint)" From="1,0" To="0,0" />
@@ -42,7 +42,7 @@
             <DoubleAnimation Duration="00:00:00.25" Storyboard.TargetProperty="(Background).(LinearGradientBrush.GradientStops)[0].(GradientStop.Offset)" From="0" To="0.02" />
             <DoubleAnimation Duration="00:00:00.25" Storyboard.TargetProperty="(Background).(LinearGradientBrush.GradientStops)[1].(GradientStop.Offset)" From="0" To="0.02" />
             <DoubleAnimation Duration="00:00:00.25" Storyboard.TargetProperty="(Background).(LinearGradientBrush.GradientStops)[2].(GradientStop.Offset)" From="0.02" To="0.1" />
-            <ColorAnimation Duration="00:00:00.25" Storyboard.TargetProperty="(Background).(LinearGradientBrush.GradientStops)[3].(GradientStop.Color)" From="#000f6043" To="#0f6043" />
+            <ColorAnimation Duration="00:00:00.25" Storyboard.TargetProperty="(Background).(LinearGradientBrush.GradientStops)[3].(GradientStop.Color)" From="{StaticResource TabGradient_EndTransparent}" To="{StaticResource TabGradient_End}" />
         </Storyboard>
         <Storyboard x:Key="TabHideAnimation" Completed="StoryboardTabHideAnimation_Completed">
             <DoubleAnimationUsingKeyFrames Duration="00:00:00.15" Storyboard.TargetProperty="Opacity">
@@ -87,18 +87,15 @@
             <ColumnDefinition Width="180"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Border CornerRadius="3,0,0,3">
-            <Border.Background>
-                <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
-                    <GradientStop Color="#485563" Offset="0"/>
-                    <GradientStop Color="#29323c" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
+        <Border CornerRadius="3,0,0,3" Background="{StaticResource Background_SidePanel}">
             <StackPanel>
                 <Border Margin="0,24,0,24" Width="120" Height="120" CornerRadius="180">
                     <Border.Background>
                         <ImageBrush Stretch="Fill" ImageSource="Resources/logo.png"/>
                     </Border.Background>
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="16" Opacity="0.6" ShadowDepth="4"/>
+                    </Border.Effect>
                 </Border>
                 <Button Tag="0" Click="ButtonTab_Click">
                     <Button.Style>
@@ -242,13 +239,7 @@
                 </Button>
             </StackPanel>
         </Border>
-        <Border Grid.Column="1" CornerRadius="0,3,3,0">
-            <Border.Background>
-                <LinearGradientBrush EndPoint="1,1" StartPoint="0,0">
-                    <GradientStop Color="#434343" Offset="0"/>
-                    <GradientStop Color="#111111" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
+        <Border Grid.Column="1" CornerRadius="0,3,3,0" Background="{StaticResource Background_MainPanel}">
             <Grid Grid.Column="1">
                 <Border Name="tabContents" Margin="0,24,0,0" RenderTransformOrigin="0.5,0.5">
                     <Border.RenderTransform>

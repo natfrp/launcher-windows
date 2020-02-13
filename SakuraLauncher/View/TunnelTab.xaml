@@ -64,13 +64,7 @@
                         </Border>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type Data:Tunnel}">
-                        <Border CornerRadius="2" Width="256" Height="128">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="0.5,1">
-                                    <GradientStop Color="#f953c6" Offset="0"/>
-                                    <GradientStop Color="#b91d73" Offset="1"/>
-                                </LinearGradientBrush>
-                            </Border.Background>
+                        <Border CornerRadius="2" Width="256" Height="128" Background="{StaticResource Background_Tunnel}">
                             <Border.Effect>
                                 <DropShadowEffect BlurRadius="16" RenderingBias="Quality" ShadowDepth="4" Opacity="0.3"/>
                             </Border.Effect>

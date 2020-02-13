@@ -8,8 +8,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Green.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Red.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Blue.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <!--#endregion-->
 
@@ -26,26 +26,33 @@
             </Style>
             <!--#endregion-->
 
-            <!--#region Listener Color-->
-            <LinearGradientBrush x:Key="ListenerColor_Active" StartPoint="0,0" EndPoint="0.5,1">
-                <GradientStop Color="#29bce7" Offset="0"/>
-                <GradientStop Color="#019fd9" Offset="1"/>
+            <!--#region Color-->
+            <LinearGradientBrush x:Key="Background_SidePanel" StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#1F5966" Offset="0"/>
+                <GradientStop Color="#0F2C33" Offset="1"/>
             </LinearGradientBrush>
-            <LinearGradientBrush x:Key="ListenerColor_Error" StartPoint="0,0" EndPoint="0.5,1">
-                <GradientStop Color="#f96c6c" Offset="0"/>
-                <GradientStop Color="#da4d4d" Offset="1"/>
+            <LinearGradientBrush x:Key="Background_MainPanel" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#0F2C33" Offset="0"/>
+                <GradientStop Color="#00151A" Offset="1"/>
             </LinearGradientBrush>
-            <LinearGradientBrush x:Key="ListenerColor_Disabled" StartPoint="0,0" EndPoint="0.5,1">
-                <GradientStop Color="#707070" Offset="0"/>
-                <GradientStop Color="#353535" Offset="1"/>
+            <LinearGradientBrush x:Key="Background_Tunnel" StartPoint="0,0" EndPoint="0.5,1">
+                <GradientStop Color="#0092B3" Offset="0"/>
+                <GradientStop Color="#005366" Offset="1"/>
             </LinearGradientBrush>
+
+            <Color x:Key="TabGradient_Start">#05DBF2</Color>
+            <Color x:Key="TabGradient_Middle">#05AFF2</Color>
+            <Color x:Key="TabGradient_End">#214999</Color>
+            <Color x:Key="TabGradient_EndMiddle">#EE214999</Color>
+            <Color x:Key="TabGradient_EndTransparent">#00214999</Color>
             <!--#endregion-->
 
-
+            <!--#region Menu-->
             <ContextMenu x:Key="TrayMenu" Placement="MousePoint">
                 <MenuItem Header="显示主窗口" Style="{StaticResource MaterialDesignMenuItem}" Click="TrayMenu_Show"/>
                 <MenuItem Header="退出" Style="{StaticResource MaterialDesignMenuItem}" Click="TrayMenu_Exit"/>
             </ContextMenu>
+            <!--#endregion-->
         </ResourceDictionary>
     </Application.Resources>
 </Application>
