@@ -89,12 +89,12 @@
         </Grid.ColumnDefinitions>
         <Border CornerRadius="3,0,0,3" Background="{StaticResource Background_SidePanel}">
             <StackPanel>
-                <Border Margin="0,24,0,24" Width="120" Height="120" CornerRadius="180">
+                <Border Margin="0,24,0,24" Width="120" Height="120" CornerRadius="180" MouseLeftButtonDown="Border_MouseLeftButtonDown">
                     <Border.Background>
                         <ImageBrush Stretch="Fill" ImageSource="Resources/logo.png"/>
                     </Border.Background>
                     <Border.Effect>
-                        <DropShadowEffect BlurRadius="16" Opacity="0.6" ShadowDepth="4"/>
+                        <DropShadowEffect BlurRadius="16" Opacity="0.5" ShadowDepth="4"/>
                     </Border.Effect>
                 </Border>
                 <Button Tag="0" Click="ButtonTab_Click">

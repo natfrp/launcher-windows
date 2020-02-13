@@ -8,23 +8,15 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Blue.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Teal.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Teal.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <!--#endregion-->
 
             <!--#region Toggle Button Override-->
-            <Style TargetType="ToggleButton" BasedOn="{StaticResource MaterialDesignSwitchToggleButton}">
-                <Setter Property="Cursor" Value="Hand"></Setter>
-                <Setter Property="HorizontalAlignment" Value="Left"></Setter>
-                <Setter Property="RenderTransform">
-                    <Setter.Value>
-                        <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
-                    </Setter.Value>
-                </Setter>
-                <Setter Property="RenderTransformOrigin" Value="0.5,0.5"></Setter>
-            </Style>
             <!--#endregion-->
+
+            <!--  UyBWIEkgUCDphY0g6ImyCjxSZXNvdXJjZURpY3Rpb25hcnkgeDpLZXk9IkdPTEQiPgoJPExpbmVhckdyYWRpZW50QnJ1c2ggeDpLZXk9IkJhY2tncm91bmRfU2lkZVBhbmVsIiBTdGFydFBvaW50PSIwLDAiIEVuZFBvaW50PSIwLDEiPgoJCTxHcmFkaWVudFN0b3AgQ29sb3I9IiNmNWQ2OGEiIE9mZnNldD0iMCIvPgoJCTxHcmFkaWVudFN0b3AgQ29sb3I9IiNiZDg0M2MiIE9mZnNldD0iMSIvPgoJPC9MaW5lYXJHcmFkaWVudEJydXNoPgoJPExpbmVhckdyYWRpZW50QnJ1c2ggeDpLZXk9IkJhY2tncm91bmRfTWFpblBhbmVsIiBTdGFydFBvaW50PSIwLDAiIEVuZFBvaW50PSIxLDEiPgoJCTxHcmFkaWVudFN0b3AgQ29sb3I9IiMzYjNiM2IiIE9mZnNldD0iMCIvPgoJCTxHcmFkaWVudFN0b3AgQ29sb3I9IiMxMTExMTEiIE9mZnNldD0iMSIvPgoJPC9MaW5lYXJHcmFkaWVudEJydXNoPgoJPExpbmVhckdyYWRpZW50QnJ1c2ggeDpLZXk9IkJhY2tncm91bmRfVHVubmVsIiBTdGFydFBvaW50PSIwLDAiIEVuZFBvaW50PSIwLjUsMSI+CgkJPEdyYWRpZW50U3RvcCBDb2xvcj0iI2ZjY2M3ZSIgT2Zmc2V0PSIwIi8+CgkJPEdyYWRpZW50U3RvcCBDb2xvcj0iI2JlODUzZCIgT2Zmc2V0PSIxIi8+Cgk8L0xpbmVhckdyYWRpZW50QnJ1c2g+CgoJPENvbG9yIHg6S2V5PSJUYWJHcmFkaWVudF9TdGFydCI+I2ZlZTI2ZDwvQ29sb3I+Cgk8Q29sb3IgeDpLZXk9IlRhYkdyYWRpZW50X01pZGRsZSI+I2U2YTcyYzwvQ29sb3I+Cgk8Q29sb3IgeDpLZXk9IlRhYkdyYWRpZW50X0VuZCI+IzY2ZmVlMjZkPC9Db2xvcj4KCTxDb2xvciB4OktleT0iVGFiR3JhZGllbnRfRW5kTWlkZGxlIj4jZWVmZWUyNmQ8L0NvbG9yPgoJPENvbG9yIHg6S2V5PSJUYWJHcmFkaWVudF9FbmRUcmFuc3BhcmVudCI+IzAwZmVlMjZkPC9Db2xvcj4KPC9SZXNvdXJjZURpY3Rpb25hcnk+ -->
 
             <!--#region Color-->
             <LinearGradientBrush x:Key="Background_SidePanel" StartPoint="0,0" EndPoint="0,1">

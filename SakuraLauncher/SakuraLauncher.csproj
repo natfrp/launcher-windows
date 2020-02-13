@@ -205,6 +205,12 @@
   <ItemGroup>
     <None Include="Resources\frpc.exe" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\debian.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\fishcake.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

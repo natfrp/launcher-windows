@@ -16,6 +16,8 @@ using MaterialDesignThemes.Wpf;
 using SakuraLauncher.View;
 using SakuraLauncher.Data;
 using SakuraLauncher.Helper;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace SakuraLauncher
 {
@@ -114,7 +116,7 @@ namespace SakuraLauncher
             SwitchTab(LoggedIn.Value || LoggingIn.Value ? 0 : 2);
         }
 
-        public void Log(string tunnel,string raw) => (Tabs[1] as LogTab).Log(tunnel, raw);
+        public void Log(string tunnel, string raw) => (Tabs[1] as LogTab).Log(tunnel, raw);
 
         public void Save()
         {
@@ -131,7 +133,7 @@ namespace SakuraLauncher
                 { "enable_tunnels", Tunnels.Where(t => t.IsReal && t.Real.Enabled).Select(t => t.Real.Name) }
             }));
         }
-        
+
         public void TryLogin()
         {
             LoggingIn.Value = true;
@@ -143,10 +145,10 @@ namespace SakuraLauncher
                     LoggingIn.Value = false;
                     return;
                 }
-                Dispatcher.Invoke(() => App.ApiRequest("showserverlist", "showall").ContinueWith(t_ =>
+                Dispatcher.Invoke(() => App.ApiRequest("showserverlist", "showall").ContinueWith(t2 =>
                 {
                     LoggingIn.Value = false;
-                    var servers = t_.Result;
+                    var servers = t2.Result;
                     if(servers == null)
                     {
                         return;
@@ -280,5 +282,19 @@ namespace SakuraLauncher
         public void RaisePropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
         #endregion
+        
+        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var border = sender as Border;
+            switch(e.ClickCount)
+            {
+            case 3:
+                border.Background = new ImageBrush(new BitmapImage(new Uri("pack://application:,,,/Resources/debian.png")));
+                break;
+            case 4:
+                border.Background = new ImageBrush(new BitmapImage(new Uri("pack://application:,,,/Resources/fishcake.png")));
+                break;
+            }
+        }
     }
 }
