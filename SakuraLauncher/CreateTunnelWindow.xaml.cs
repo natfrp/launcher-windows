@@ -26,8 +26,6 @@ namespace SakuraLauncher
 
         public Prop<bool> Loading { get; set; } = new Prop<bool>();
 
-        public bool Created = false;
-
         public ObservableCollection<ServerData> Servers => MainWindow.Instance.Servers;
         public ObservableCollection<ListeningData> Listening { get; set; } = new ObservableCollection<ListeningData>();
 
@@ -113,7 +111,15 @@ namespace SakuraLauncher
                 {
                     return;
                 }
-                Created = true;
+                Dispatcher.Invoke(() => MainWindow.Instance.AddTunnel(new Tunnel()
+                {
+                    Name = json["tunnel"]["proxyname"] as string,
+                    Type = (json["tunnel"]["proxytype"] as string).ToUpper(),
+                    ServerID = json["tunnel"]["serverid"].ToString(),
+                    RemotePort = json["tunnel"]["remoteport"].ToString(),
+                    ServerName = json["tunnel"]["servername"] as string,
+                    LocalAddress = json["tunnel"]["localaddress"] as string
+                }, true));
                 if(MessageBox.Show(json["msg"] + "\n\n是否继续创建?", "创建成功", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
                 {
                     Dispatcher.Invoke(() =>
@@ -125,10 +131,7 @@ namespace SakuraLauncher
                 }
                 else
                 {
-                    Dispatcher.Invoke(() =>
-                    {
-                        Close();
-                    });
+                    Dispatcher.Invoke(Close);
                 }
             });
         }
@@ -138,15 +141,6 @@ namespace SakuraLauncher
             if(!Loading.Value)
             {
                 LoadListeningList();
-            }
-        }
-
-        private void Window_Closed(object sender, System.EventArgs e)
-        {
-            if(Created)
-            {
-                MainWindow.Instance.LoggedIn.Value = false;
-                MainWindow.Instance.TryLogin();
             }
         }
 

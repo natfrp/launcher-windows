@@ -34,6 +34,7 @@ namespace SakuraLauncher.View
                     {
                         return;
                     }
+                    tunnel.Stop();
                     Main.Tunnels.Remove(tunnel);
                 }));
             }

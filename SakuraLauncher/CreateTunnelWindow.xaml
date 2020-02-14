@@ -12,7 +12,7 @@
         FontFamily="{DynamicResource MaterialDesignFont}"
         Background="{StaticResource MaterialDesignPaper}"
         Title="新建穿透隧道" Height="450" Width="800" 
-        Closed="Window_Closed" WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>

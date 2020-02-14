@@ -190,7 +190,7 @@ namespace SakuraLauncher
                         foreach(Dictionary<string, object> j in tunnels["proxy"])
                         {
                             // 全 员 字 符 串
-                            var tunnel = new Tunnel()
+                            AddTunnel(new Tunnel()
                             {
                                 Name = j["proxyname"] as string,
                                 Type = (j["proxytype"] as string).ToUpper(),
@@ -198,15 +198,7 @@ namespace SakuraLauncher
                                 RemotePort = j["remoteport"] as string,
                                 ServerName = j["servername"] as string,
                                 LocalAddress = j["localaddr"] as string + ":" + j["localport"] as string
-                            };
-                            tunnel.PropertyChanged += (s, e) =>
-                            {
-                                if(e.PropertyName == "Enabled")
-                                {
-                                    Save();
-                                }
-                            };
-                            Tunnels.Add(tunnel);
+                            });
                         }
                         if(AutoStart != null)
                         {
@@ -225,6 +217,25 @@ namespace SakuraLauncher
                     Save();
                 }));
             });
+        }
+
+        public void AddTunnel(Tunnel t,bool insert = false)
+        {
+            t.PropertyChanged += (s, e) =>
+            {
+                if(e.PropertyName == "Enabled")
+                {
+                    Save();
+                }
+            };
+            if(insert)
+            {
+                Tunnels.Insert(Tunnels.Count - 1, t);
+            }
+            else
+            {
+                Tunnels.Add(t);
+            }
         }
 
         public void SetLogo(int index)
