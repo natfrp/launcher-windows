@@ -3,6 +3,7 @@ using System.Windows;
 using System.Threading;
 using System.Diagnostics;
 using System.Windows.Controls;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 
@@ -52,8 +53,12 @@ namespace SakuraLauncher
             {
                 if(e.Data != null)
                 {
-                    var tokens = Regex.Split(e.Data.Trim(), "\\s+");
-                    if(tokens.Length > 4 && tokens[3] == "LISTENING" && (tokens[0] == "TCP" || tokens[0] == "UDP"))
+                    var tokens = new List<string>(Regex.Split(e.Data.Trim(), "\\s+"));
+                    if(tokens[0] == "UDP" && tokens.Count > 3 && tokens[2] == "*:*")
+                    {
+                        tokens.Insert(3, "LISTENING");
+                    }
+                    if((tokens[0] == "TCP" || tokens[0] == "UDP") && tokens.Count > 4 && tokens[3] == "LISTENING")
                     {
                         var pname = "[拒绝访问]";
                         try
