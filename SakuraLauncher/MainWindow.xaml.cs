@@ -99,7 +99,7 @@ namespace SakuraLauncher
                 {
                     SetLogo((int)json["logo"]);
                 }
-                if(json.ContainsKey("LogoIndex") && json["suppressinfo"])
+                if(json.ContainsKey("suppressinfo") && json["suppressinfo"])
                 {
                     SuppressInfo.Value = true;
                 }
