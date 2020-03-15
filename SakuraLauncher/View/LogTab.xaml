@@ -7,9 +7,14 @@
              d:DesignHeight="315" d:DesignWidth="580"
              FontFamily="{DynamicResource MaterialDesignFont}">
     <DockPanel>
-        <TextBlock DockPanel.Dock="Top" Foreground="#DDFFFFFF" FontSize="26" Margin="24,0,0,0">日志</TextBlock>
-        <Border Padding="8" BorderBrush="#FFAAAAAA" Background="#33000000" BorderThickness="2" Margin="16,16,16,16">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid DockPanel.Dock="Top">
+            <TextBlock Foreground="#DDFFFFFF" FontSize="26" Margin="24,0,0,0">日志</TextBlock>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,16,0">
+                <Button Style="{StaticResource MaterialDesignFlatButton}" HorizontalAlignment="Right" Click="ButtonClear_Click" Content="清空"/>
+            </StackPanel>
+        </Grid>
+        <Border Padding="8" BorderBrush="#FFAAAAAA" Background="#33000000" BorderThickness="2" Margin="16,8,16,16">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Name="ScrollViewerLog">
                 <Helper:SelectableTextBlock x:Name="TextBlockLog" TextWrapping="WrapWithOverflow" FontFamily="Consolas"/>
             </ScrollViewer>
         </Border>

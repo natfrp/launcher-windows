@@ -32,6 +32,7 @@ namespace SakuraLauncher.View
 
         public void Log(string tunnel, string raw)
         {
+            bool bottom = ScrollViewerLog.ScrollableHeight - ScrollViewerLog.VerticalOffset < 1;
             if(TextBlockLog.Inlines.Count != 0)
             {
                 AddLineBreak();
@@ -42,6 +43,9 @@ namespace SakuraLauncher.View
             {
                 failedData += raw + "\n";
                 AddRun(raw, BrushText);
+                AddRun("", BrushText); // Dirty Patch
+                AddRun("", BrushText);
+                AddRun("", BrushText);
             }
             else
             {
@@ -68,6 +72,14 @@ namespace SakuraLauncher.View
                 AddRun(match.Groups["Level"].Value + ":" + match.Groups["Source"].Value + " ", levelColor);
                 AddRun(match.Groups["Content"].Value, BrushText);
             }
+            while(TextBlockLog.Inlines.Count > 600 - 1)
+            {
+                TextBlockLog.Inlines.Remove(TextBlockLog.Inlines.FirstInline);
+            }
+            if(bottom)
+            {
+                ScrollViewerLog.ScrollToBottom();
+            }
         }
 
         public void AddRun(string text, Brush color) => TextBlockLog.Inlines.Add(new Run(text)
@@ -76,5 +88,7 @@ namespace SakuraLauncher.View
         });
 
         public void AddLineBreak() => TextBlockLog.Inlines.Add(new LineBreak());
+
+        private void ButtonClear_Click(object sender, System.Windows.RoutedEventArgs e) => TextBlockLog.Inlines.Clear();
     }
 }
