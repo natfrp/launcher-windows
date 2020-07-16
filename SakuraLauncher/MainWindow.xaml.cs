@@ -3,12 +3,14 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.ComponentModel;
 using System.Windows.Interop;
 using System.Windows.Controls;
 using System.Collections.Generic;
-using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Collections.ObjectModel;
+using System.Windows.Media.Animation;
 
 using fastJSON;
 using MaterialDesignThemes.Wpf;
@@ -16,8 +18,6 @@ using MaterialDesignThemes.Wpf;
 using SakuraLauncher.View;
 using SakuraLauncher.Data;
 using SakuraLauncher.Helper;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace SakuraLauncher
 {

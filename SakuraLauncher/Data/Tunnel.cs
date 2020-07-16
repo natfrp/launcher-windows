@@ -73,6 +73,7 @@ namespace SakuraLauncher.Data
             try
             {
                 BaseProcess = Process.Start(start);
+                BaseProcess.EnableRaisingEvents = true;
                 BaseProcess.Exited += (s, e) =>
                 {
                     Enabled = false;

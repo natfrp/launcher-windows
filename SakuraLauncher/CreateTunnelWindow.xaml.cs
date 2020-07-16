@@ -128,8 +128,8 @@ namespace SakuraLauncher
                     if (MessageBox.Show("是否继续创建?", "创建成功", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
                     {
                         LocalPort.Value = 0;
+                        RemotePort.Value = 0;
                         TunnelName.Value = "";
-                        node.SelectedItem = null;
                         listening.SelectedItem = null;
                     }
                     else
