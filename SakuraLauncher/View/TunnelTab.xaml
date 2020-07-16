@@ -106,16 +106,12 @@
                                     <StackPanel DockPanel.Dock="Bottom" Margin="16">
                                         <DockPanel LastChildFill="False" Grid.Row="1">
                                             <TextBlock DockPanel.Dock="Left" Grid.Row="0" Foreground="White" FontSize="14" Margin="0,0,0,4">
-                                            #<Run Text="{Binding ServerID}"></Run>
-                                            <Run Text="{Binding ServerName}"></Run>
+                                            #<Run Text="{Binding NodeID}"></Run>
+                                            <Run Text="{Binding NodeName}"></Run>
                                             </TextBlock>
                                         </DockPanel>
                                         <DockPanel LastChildFill="False" Grid.Row="1">
-                                            <TextBlock DockPanel.Dock="Left" FontSize="13" Foreground="White" Opacity="0.8">
-                                            <Run Text="{Binding RemotePort}"></Run>
-                                            →
-                                            <Run Text="{Binding LocalAddress}"></Run>
-                                            </TextBlock>
+                                            <TextBlock DockPanel.Dock="Left" FontSize="13" Foreground="White" Opacity="0.8" Text="{Binding Description}" />
                                             <TextBlock DockPanel.Dock="Right" Foreground="White" FontSize="13" Text="{Binding Type}"/>
                                         </DockPanel>
                                     </StackPanel>

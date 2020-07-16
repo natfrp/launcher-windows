@@ -22,6 +22,9 @@ namespace SakuraLauncher
         public Prop<string> ProxyName { get; set; } = new Prop<string>("");
         public Prop<string> Protocol { get; set; } = new Prop<string>("");
 
+        public Prop<bool> Compression { get; set; } = new Prop<bool>(true);
+        public Prop<bool> Encryption { get; set; } = new Prop<bool>(false);
+
         public Prop<int> LocalPort { get; set; } = new Prop<int>();
         public Prop<string> LocalAddress { get; set; } = new Prop<string>("");
 
@@ -103,12 +106,13 @@ namespace SakuraLauncher
                 return;
             }
             Creating.Value = true;
-            App.ApiRequest("adduserproxy", new StringBuilder("proxytype=").Append(Protocol.Value)
-                .Append("&localaddr=").Append(LocalAddress.Value)
-                .Append("&localport=").Append(LocalPort.Value)
-                .Append("&proxyname=").Append(ProxyName.Value)
-                .Append("&nodeid=").Append(s.ID)
-                .Append("&remoteport=").Append(RemotePort.Value).ToString()).ContinueWith(t =>
+            App.ApiRequest("create_tunnel", new StringBuilder("type=").Append(Protocol.Value.ToLower())
+                .Append("&name=").Append(ProxyName.Value)
+                .Append("&local_ip=").Append(LocalAddress.Value)
+                .Append("&local_port=").Append(LocalPort.Value)
+                .Append("&encryption=").Append(Encryption.Value ? "true" : "false")
+                .Append("&compression=").Append(Compression.Value ? "true" : "false")
+                .Append("&remote_port=").Append(RemotePort.Value).ToString()).ContinueWith(t =>
             {
                 Creating.Value = false;
                 var json = t.Result;
@@ -116,16 +120,8 @@ namespace SakuraLauncher
                 {
                     return;
                 }
-                Dispatcher.Invoke(() => MainWindow.Instance.AddTunnel(new Tunnel()
-                {
-                    Name = json["tunnel"]["proxyname"] as string,
-                    Type = (json["tunnel"]["proxytype"] as string).ToUpper(),
-                    ServerID = json["tunnel"]["serverid"].ToString(),
-                    RemotePort = json["tunnel"]["remoteport"].ToString(),
-                    ServerName = json["tunnel"]["servername"] as string,
-                    LocalAddress = json["tunnel"]["localaddress"] as string
-                }, true));
-                if(MessageBox.Show(json["msg"] + "\n\n是否继续创建?", "创建成功", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
+                Dispatcher.Invoke(() => MainWindow.Instance.AddTunnel(json["data"], true));
+                if(MessageBox.Show("是否继续创建?", "创建成功", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
                 {
                     Dispatcher.Invoke(() =>
                     {

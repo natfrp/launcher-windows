@@ -144,7 +144,7 @@ namespace SakuraLauncher
         public void TryLogin()
         {
             LoggingIn.Value = true;
-            App.ApiRequest("getuserproxylist", "showall").ContinueWith(t =>
+            App.ApiRequest("get_tunnels").ContinueWith(t =>
             {
                 var tunnels = t.Result;
                 if(tunnels == null)
@@ -152,7 +152,7 @@ namespace SakuraLauncher
                     LoggingIn.Value = false;
                     return;
                 }
-                Dispatcher.Invoke(() => App.ApiRequest("showserverlist", "showall").ContinueWith(t2 =>
+                Dispatcher.Invoke(() => App.ApiRequest("get_nodes").ContinueWith(t2 =>
                 {
                     LoggingIn.Value = false;
                     var servers = t2.Result;
@@ -163,12 +163,13 @@ namespace SakuraLauncher
                     Dispatcher.Invoke(() =>
                     {
                         Servers.Clear();
-                        foreach(Dictionary<string, object> j in servers["nodes"])
+                        foreach(Dictionary<string, dynamic> j in servers["data"])
                         {
                             Servers.Add(new ServerData()
                             {
-                                ID = j["id"] as string,
-                                Name = j["name"] as string
+                                ID = j["id"],
+                                Name = j["name"],
+                                AcceptNew = j["accept_new"]
                             });
                         }
                         if(AutoStart == null)
@@ -187,18 +188,9 @@ namespace SakuraLauncher
                             }
                         }
                         Tunnels.Clear();
-                        foreach(Dictionary<string, object> j in tunnels["proxy"])
+                        foreach(Dictionary<string, dynamic> j in tunnels["proxy"])
                         {
-                            // 全 员 字 符 串
-                            AddTunnel(new Tunnel()
-                            {
-                                Name = j["proxyname"] as string,
-                                Type = (j["proxytype"] as string).ToUpper(),
-                                ServerID = j["serverid"] as string,
-                                RemotePort = j["remoteport"] as string,
-                                ServerName = j["servername"] as string,
-                                LocalAddress = j["localaddr"] as string + ":" + j["localport"] as string
-                            });
+                            AddTunnel(j);
                         }
                         if(AutoStart != null)
                         {
@@ -219,16 +211,36 @@ namespace SakuraLauncher
             });
         }
 
-        public void AddTunnel(Tunnel t,bool insert = false)
+        public void AddTunnel(dynamic json, bool insert = false)
         {
+            var name = "未知节点";
+            foreach (ServerData node in Servers)
+            {
+                if (node.ID == json["node"])
+                {
+                    name = node.Name;
+                    break;
+                }
+            }
+
+            var t = new Tunnel()
+            {
+                Id = json["id"],
+                Name = json["name"],
+                Type = json["type"].ToUpper(),
+                NodeID = json["node"],
+                NodeName = name,
+                Description = json["description"]
+            };
             t.PropertyChanged += (s, e) =>
             {
-                if(e.PropertyName == "Enabled")
+                if (e.PropertyName == "Enabled")
                 {
                     Save();
                 }
             };
-            if(insert)
+
+            if (insert)
             {
                 Tunnels.Insert(Tunnels.Count - 1, t);
             }

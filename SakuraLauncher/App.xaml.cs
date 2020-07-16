@@ -69,16 +69,16 @@ namespace SakuraLauncher
             return false;
         }
 
-        public static async Task<dynamic> ApiRequest(string action, string query)
+        public static async Task<dynamic> ApiRequest(string action, string query = null)
         {
             try
             {
-                var json = JSON.ToObject<Dictionary<string, dynamic>>(await HttpGetString("https://api.natfrp.com/?action=" + action + "&token=" + (Instance.MainWindow as MainWindow).UserToken.Value.Trim() + "&json&" + query));
-                if(json["status"] == 200)
+                var json = JSON.ToObject<Dictionary<string, dynamic>>(await HttpGetString("https://api.natfrp.com/client/" + action + "?token=" + (Instance.MainWindow as MainWindow).UserToken.Value.Trim() + (query == null ? "" : "&" + query)));
+                if (json["success"])
                 {
                     return json;
                 }
-                MessageBox.Show(json["msg"], "Oops", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(json["message"] ?? "出现未知错误", "Oops", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch(Exception e)
             {

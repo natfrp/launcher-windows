@@ -26,11 +26,11 @@ namespace SakuraLauncher.View
                     return;
                 }
                 IsEnabled = false;
-                App.ApiRequest("deltunnel", "name=" + tunnel.Real.Name + "&serverId=" + tunnel.Real.ServerID).ContinueWith(t => Dispatcher.Invoke(() =>
+                App.ApiRequest("delete_tunnel", "tunnel=" + tunnel.Real.Id).ContinueWith(t => Dispatcher.Invoke(() =>
                 {
                     IsEnabled = true;
                     var json = t.Result;
-                    if(json == null)
+                    if (json == null)
                     {
                         return;
                     }

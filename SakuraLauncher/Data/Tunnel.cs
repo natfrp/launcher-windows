@@ -37,13 +37,14 @@ namespace SakuraLauncher.Data
         }
         private bool _enabled;
 
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Type { get; set; }
-        public string ServerID { get; set; }
-        public string ServerName { get; set; }
-        public string RemotePort { get; set; }
-        public string LocalAddress { get; set; }
+        public string Description { get; set; }
 
+        public int NodeID { get; set; }
+        public string NodeName { get; set; }
+        
         public Process BaseProcess = null;
 
         public void LogOutput(object sender, DataReceivedEventArgs e)
@@ -59,8 +60,8 @@ namespace SakuraLauncher.Data
             Stop();
             var start = new ProcessStartInfo(ClientPath, new StringBuilder()
                 .Append("-t ").Append(MainWindow.Instance.UserToken.Value)
-                .Append(" -s ").Append(ServerID)
-                .Append(" -p ").Append(Name).ToString())
+                .Append(" -s ").Append(NodeID)
+                .Append(" -p ").Append(Id).ToString())
             {
                 CreateNoWindow = true,
                 UseShellExecute = false,
