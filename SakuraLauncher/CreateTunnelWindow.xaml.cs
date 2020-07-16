@@ -19,7 +19,7 @@ namespace SakuraLauncher
     {
         public Prop<bool> Creating { get; set; } = new Prop<bool>();
         public Prop<int> RemotePort { get; set; } = new Prop<int>();
-        public Prop<string> ProxyName { get; set; } = new Prop<string>("");
+        public Prop<string> TunnelName { get; set; } = new Prop<string>("");
         public Prop<string> Protocol { get; set; } = new Prop<string>("");
 
         public Prop<bool> Compression { get; set; } = new Prop<bool>(true);
@@ -30,7 +30,7 @@ namespace SakuraLauncher
 
         public Prop<bool> Loading { get; set; } = new Prop<bool>();
 
-        public ObservableCollection<ServerData> Servers => MainWindow.Instance.Servers;
+        public ObservableCollection<NodeData> Nodes => MainWindow.Instance.Nodes;
         public ObservableCollection<ListeningData> Listening { get; set; } = new ObservableCollection<ListeningData>();
 
         public CreateTunnelWindow()
@@ -100,14 +100,14 @@ namespace SakuraLauncher
             {
                 return;
             }
-            if(!(server.SelectedItem is ServerData s))
+            if(!(node.SelectedItem is NodeData s))
             {
                 MessageBox.Show("请选择穿透服务器", "Oops", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             Creating.Value = true;
             App.ApiRequest("create_tunnel", new StringBuilder("type=").Append(Protocol.Value.ToLower())
-                .Append("&name=").Append(ProxyName.Value)
+                .Append("&name=").Append(TunnelName.Value)
                 .Append("&local_ip=").Append(LocalAddress.Value)
                 .Append("&local_port=").Append(LocalPort.Value)
                 .Append("&encryption=").Append(Encryption.Value ? "true" : "false")
@@ -125,8 +125,8 @@ namespace SakuraLauncher
                 {
                     Dispatcher.Invoke(() =>
                     {
-                        ProxyName.Value = "";
-                        server.SelectedItem = null;
+                        TunnelName.Value = "";
+                        node.SelectedItem = null;
                         listening.SelectedItem = null;
                     });
                 }

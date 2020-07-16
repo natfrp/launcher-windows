@@ -63,7 +63,7 @@ namespace SakuraLauncher
 
         public List<string> AutoStart = null;
         public ObservableCollection<ITunnel> Tunnels { get; set; } = new ObservableCollection<ITunnel>();
-        public ObservableCollection<ServerData> Servers { get; set; } = new ObservableCollection<ServerData>();
+        public ObservableCollection<NodeData> Nodes { get; set; } = new ObservableCollection<NodeData>();
 
         public int LogoIndex = 0;
 
@@ -155,17 +155,17 @@ namespace SakuraLauncher
                 Dispatcher.Invoke(() => App.ApiRequest("get_nodes").ContinueWith(t2 =>
                 {
                     LoggingIn.Value = false;
-                    var servers = t2.Result;
-                    if(servers == null)
+                    var nodes = t2.Result;
+                    if(nodes == null)
                     {
                         return;
                     }
                     Dispatcher.Invoke(() =>
                     {
-                        Servers.Clear();
-                        foreach(Dictionary<string, dynamic> j in servers["data"])
+                        Nodes.Clear();
+                        foreach(Dictionary<string, dynamic> j in nodes["data"])
                         {
-                            Servers.Add(new ServerData()
+                            Nodes.Add(new NodeData()
                             {
                                 ID = j["id"],
                                 Name = j["name"],
@@ -188,7 +188,7 @@ namespace SakuraLauncher
                             }
                         }
                         Tunnels.Clear();
-                        foreach(Dictionary<string, dynamic> j in tunnels["proxy"])
+                        foreach(Dictionary<string, dynamic> j in tunnels["data"])
                         {
                             AddTunnel(j);
                         }
@@ -214,7 +214,7 @@ namespace SakuraLauncher
         public void AddTunnel(dynamic json, bool insert = false)
         {
             var name = "未知节点";
-            foreach (ServerData node in Servers)
+            foreach (NodeData node in Nodes)
             {
                 if (node.ID == json["node"])
                 {

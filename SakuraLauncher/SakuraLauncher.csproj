@@ -90,7 +90,7 @@
     <Compile Include="Data\FakeTunnel.cs" />
     <Compile Include="Data\ITunnel.cs" />
     <Compile Include="Data\ListeningData.cs" />
-    <Compile Include="Data\ServerData.cs" />
+    <Compile Include="Data\NodeData.cs" />
     <Compile Include="Data\Tunnel.cs" />
     <Compile Include="Helper\ModelBase.cs" />
     <Compile Include="Helper\SelectableTextBlock.cs" />
