@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.1000
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SakuraLauncher", "SakuraLauncher\SakuraLauncher.csproj", "{D47FAF57-F12E-4052-B69D-4FFD227D36FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegacyLauncher", "LegacyLauncher\LegacyLauncher.csproj", "{2341B65D-0B5E-45AE-BAA2-6DA63D119F41}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{D47FAF57-F12E-4052-B69D-4FFD227D36FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D47FAF57-F12E-4052-B69D-4FFD227D36FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D47FAF57-F12E-4052-B69D-4FFD227D36FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2341B65D-0B5E-45AE-BAA2-6DA63D119F41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2341B65D-0B5E-45AE-BAA2-6DA63D119F41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2341B65D-0B5E-45AE-BAA2-6DA63D119F41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2341B65D-0B5E-45AE-BAA2-6DA63D119F41}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
