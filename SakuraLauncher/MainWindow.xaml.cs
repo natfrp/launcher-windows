@@ -167,9 +167,9 @@ namespace SakuraLauncher
                         {
                             Nodes.Add(new NodeData()
                             {
-                                ID = j["id"],
-                                Name = j["name"],
-                                AcceptNew = j["accept_new"]
+                                ID = (int)j["id"],
+                                Name = (string)j["name"],
+                                AcceptNew = (bool)j["accept_new"]
                             });
                         }
                         if(AutoStart == null)
@@ -216,7 +216,7 @@ namespace SakuraLauncher
             var name = "未知节点";
             foreach (NodeData node in Nodes)
             {
-                if (node.ID == json["node"])
+                if (node.ID == (int)json["node"])
                 {
                     name = node.Name;
                     break;
@@ -225,12 +225,12 @@ namespace SakuraLauncher
 
             var t = new Tunnel()
             {
-                Id = json["id"],
-                Name = json["name"],
-                Type = json["type"].ToUpper(),
-                NodeID = json["node"],
+                Id = (int)json["id"],
+                Name = (string)json["name"],
+                Type = ((string)json["type"]).ToUpper(),
+                NodeID = (int)json["node"],
                 NodeName = name,
-                Description = json["description"]
+                Description = (string)json["description"]
             };
             t.PropertyChanged += (s, e) =>
             {

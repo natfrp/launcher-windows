@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Linq;
 using System.Windows;
 using System.Threading;
 using System.Diagnostics;
@@ -30,7 +31,7 @@ namespace SakuraLauncher
 
         public Prop<bool> Loading { get; set; } = new Prop<bool>();
 
-        public ObservableCollection<NodeData> Nodes => MainWindow.Instance.Nodes;
+        public ObservableCollection<NodeData> Nodes { get; } = new ObservableCollection<NodeData>(MainWindow.Instance.Nodes.Where(n => n.AcceptNew));
         public ObservableCollection<ListeningData> Listening { get; set; } = new ObservableCollection<ListeningData>();
 
         public CreateTunnelWindow()
@@ -54,14 +55,14 @@ namespace SakuraLauncher
             });
             process.OutputDataReceived += (s, e) =>
             {
-                if(e.Data != null)
+                if (e.Data != null)
                 {
                     var tokens = new List<string>(Regex.Split(e.Data.Trim(), "\\s+"));
-                    if(tokens[0] == "UDP" && tokens.Count > 3 && tokens[2] == "*:*")
+                    if (tokens[0] == "UDP" && tokens.Count > 3 && tokens[2] == "*:*")
                     {
                         tokens.Insert(3, "LISTENING");
                     }
-                    if((tokens[0] == "TCP" || tokens[0] == "UDP") && tokens.Count > 4 && tokens[3] == "LISTENING")
+                    if ((tokens[0] == "TCP" || tokens[0] == "UDP") && tokens.Count > 4 && tokens[3] == "LISTENING")
                     {
                         var pname = "[拒绝访问]";
                         try
@@ -96,11 +97,11 @@ namespace SakuraLauncher
 
         private void ButtonCreate_Click(object sender, RoutedEventArgs e)
         {
-            if(Creating.Value)
+            if (Creating.Value)
             {
                 return;
             }
-            if(!(node.SelectedItem is NodeData s))
+            if (!(node.SelectedItem is NodeData s))
             {
                 MessageBox.Show("请选择穿透服务器", "Oops", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -108,6 +109,7 @@ namespace SakuraLauncher
             Creating.Value = true;
             App.ApiRequest("create_tunnel", new StringBuilder("type=").Append(Protocol.Value.ToLower())
                 .Append("&name=").Append(TunnelName.Value)
+                .Append("&node=").Append(s.ID)
                 .Append("&local_ip=").Append(LocalAddress.Value)
                 .Append("&local_port=").Append(LocalPort.Value)
                 .Append("&encryption=").Append(Encryption.Value ? "true" : "false")
@@ -116,30 +118,31 @@ namespace SakuraLauncher
             {
                 Creating.Value = false;
                 var json = t.Result;
-                if(json == null)
+                if (json == null)
                 {
                     return;
                 }
-                Dispatcher.Invoke(() => MainWindow.Instance.AddTunnel(json["data"], true));
-                if(MessageBox.Show("是否继续创建?", "创建成功", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
+                Dispatcher.Invoke(() =>
                 {
-                    Dispatcher.Invoke(() =>
+                    MainWindow.Instance.AddTunnel((object)json["data"], true);
+                    if (MessageBox.Show("是否继续创建?", "创建成功", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
                     {
+                        LocalPort.Value = 0;
                         TunnelName.Value = "";
                         node.SelectedItem = null;
                         listening.SelectedItem = null;
-                    });
-                }
-                else
-                {
-                    Dispatcher.Invoke(Close);
-                }
+                    }
+                    else
+                    {
+                        Close();
+                    }
+                });
             });
         }
 
         private void ButtonReload_Click(object sender, RoutedEventArgs e)
         {
-            if(!Loading.Value)
+            if (!Loading.Value)
             {
                 LoadListeningList();
             }
@@ -147,7 +150,7 @@ namespace SakuraLauncher
 
         private void Listening_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(e.AddedItems.Count == 1 && e.AddedItems[0] is ListeningData l)
+            if (e.AddedItems.Count == 1 && e.AddedItems[0] is ListeningData l)
             {
                 Protocol.Value = l.Protocol;
                 LocalPort.Value = int.Parse(l.Port);
