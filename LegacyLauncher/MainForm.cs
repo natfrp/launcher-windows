@@ -88,8 +88,7 @@ namespace LegacyLauncher
         public void TryLogin()
         {
             LoggingIn = true;
-            textBox_token.Enabled = false;
-            button_login.Enabled = false;
+            textBox_token.Enabled = button_login.Enabled = false;
             ThreadPool.QueueUserWorkItem(s =>
             {
                 try
@@ -166,17 +165,13 @@ namespace LegacyLauncher
                 catch (Exception e)
                 {
                     MessageBox.Show(e.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    Invoke(new Action(() =>
-                    {
-                        textBox_token.Enabled = true;
-                    }));
                 }
                 finally
                 {
                     LoggingIn = false;
                     Invoke(new Action(() =>
                     {
-                        button_login.Enabled = true;
+                        textBox_token.Enabled = button_login.Enabled = true;
                     }));
                 }
             });

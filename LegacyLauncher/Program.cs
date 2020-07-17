@@ -63,7 +63,7 @@ namespace LegacyLauncher
         {
             try
             {
-                var json = JSON.ToObject<Dictionary<string, object>>(HttpGetString("https://api.natfrp.com/client/" + action + "?token=" + MainForm.Instance.UserToken.Trim() + (query == null ? "" : "&" + query)));
+                var json = JSON.ToObject<Dictionary<string, object>>(HttpGetString("https://api.natfrp.com/launcher/" + action + "?token=" + MainForm.Instance.UserToken.Trim() + (query == null ? "" : "&" + query)));
                 if ((bool)json["success"])
                 {
                     return json;

@@ -73,7 +73,7 @@ namespace SakuraLauncher
         {
             try
             {
-                var json = JSON.ToObject<Dictionary<string, dynamic>>(await HttpGetString("https://api.natfrp.com/client/" + action + "?token=" + (Instance.MainWindow as MainWindow).UserToken.Value.Trim() + (query == null ? "" : "&" + query)));
+                var json = JSON.ToObject<Dictionary<string, dynamic>>(await HttpGetString("https://api.natfrp.com/launcher/" + action + "?token=" + (Instance.MainWindow as MainWindow).UserToken.Value.Trim() + (query == null ? "" : "&" + query)));
                 if (json["success"])
                 {
                     return json;
