@@ -58,10 +58,7 @@ namespace SakuraLauncher.Data
         public void Start()
         {
             Stop();
-            var start = new ProcessStartInfo(ClientPath, new StringBuilder()
-                .Append("-t ").Append(MainWindow.Instance.UserToken.Value)
-                .Append(" -s ").Append(NodeID)
-                .Append(" -p ").Append(Id).ToString())
+            var start = new ProcessStartInfo(ClientPath, "-f " + MainWindow.Instance.UserToken.Value + ":" + Id)
             {
                 CreateNoWindow = true,
                 UseShellExecute = false,

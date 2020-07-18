@@ -62,10 +62,7 @@ namespace LegacyLauncher.Data
         public void Start()
         {
             Stop();
-            var start = new ProcessStartInfo(ClientPath, new StringBuilder()
-                .Append("-t ").Append(Main.UserToken)
-                .Append(" -s ").Append(Node)
-                .Append(" -p ").Append(Id).ToString())
+            var start = new ProcessStartInfo(ClientPath, "-f " + Main.UserToken + ":" + Id)
             {
                 CreateNoWindow = true,
                 UseShellExecute = false,
