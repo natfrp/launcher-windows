@@ -39,6 +39,7 @@ namespace SakuraLauncher
 
         public Prop<bool> AutoRun { get; set; } = new Prop<bool>();
         public Prop<bool> SuppressInfo { get; set; } = new Prop<bool>();
+        public Prop<bool> LogTextWrapping { get; set; } = new Prop<bool>(true);
         public Prop<bool> LoggedIn { get; set; } = new Prop<bool>();
         public Prop<bool> LoggingIn { get; set; } = new Prop<bool>();
         public Prop<string> UserToken { get; set; } = new Prop<string>();
@@ -103,6 +104,10 @@ namespace SakuraLauncher
                 {
                     SuppressInfo.Value = true;
                 }
+                if(!json.ContainsKey("log_text_wrapping") || json["log_text_wrapping"])
+                {
+                    LogTextWrapping.Value = true;
+                }
                 if(json.ContainsKey("enable_tunnels") && json["enable_tunnels"] is List<object> enable_tunnels)
                 {
                     AutoStart = enable_tunnels.Select(s => s.ToString()).ToList();
@@ -137,6 +142,7 @@ namespace SakuraLauncher
                 { "token", UserToken.Value.Trim() },
                 { "suppressinfo", SuppressInfo.Value },
                 { "loggedin", LoggedIn.Value },
+                { "log_text_wrapping", LogTextWrapping.Value },
                 { "enable_tunnels", Tunnels.Where(t => t.IsReal && t.Real.Enabled).Select(t => t.Real.Name) }
             }));
         }

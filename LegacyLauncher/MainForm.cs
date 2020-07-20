@@ -50,11 +50,14 @@ namespace LegacyLauncher
                     AutoStart = ((List<object>)json["enable_tunnels"]).Select(t => t.ToString()).ToList();
                 }
 
+                checkBox_textwrap.Checked = !json.ContainsKey("log_text_wrapping") || (bool)json["log_text_wrapping"];
+
                 if (json.ContainsKey("loggedin") && (bool)json["loggedin"])
                 {
                     TryLogin();
                 }
             }
+            checkBox_textwrap_CheckedChanged();
 
             ConfigPath = "config.json";
 
@@ -81,6 +84,7 @@ namespace LegacyLauncher
                 { "version", CONFIG_VERSION },
                 { "token", UserToken.Trim() },
                 { "loggedin", LoggedIn },
+                { "log_text_wrapping", checkBox_textwrap.Checked },
                 { "enable_tunnels", Tunnels.Where(t =>t.Enabled).Select(t => t.Name).ToList() }
             }));
         }
@@ -254,6 +258,13 @@ namespace LegacyLauncher
         }
 
         private void checkBox_autorun_CheckedChanged(object sender, EventArgs e) => Program.SetAutoRun(checkBox_autorun.Checked);
+
+        private void checkBox_textwrap_CheckedChanged(object sender = null, EventArgs e = null)
+        {
+            textBox_log.WordWrap = checkBox_textwrap.Checked;
+            textBox_log.ScrollBars = checkBox_textwrap.Checked ? ScrollBars.Vertical : ScrollBars.Both;
+            Save();
+        }
 
         private void listView_tunnels_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
