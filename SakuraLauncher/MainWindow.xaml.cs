@@ -296,10 +296,18 @@ namespace SakuraLauncher
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            if(MessageBox.Show("确定要退出程序吗?\n退出后隧道会被关闭.", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Asterisk) == MessageBoxResult.OK)
+            foreach(var t in Tunnels)
             {
-                Close();
+                if(t.IsReal && t.Real.Enabled)
+                {
+                    if (MessageBox.Show("确定要退出程序吗?\n退出后所有隧道都会被关闭.", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Asterisk) == MessageBoxResult.OK)
+                    {
+                        Close();
+                    }
+                    return;
+                }
             }
+            Close();
         }
 
         private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

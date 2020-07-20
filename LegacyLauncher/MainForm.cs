@@ -217,9 +217,16 @@ namespace LegacyLauncher
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (MessageBox.Show("确定要退出程序吗?\n退出后隧道会被关闭.", "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Asterisk) != DialogResult.OK)
+            foreach(var t in Tunnels)
             {
-                e.Cancel = true;
+                if(t.Enabled)
+                {
+                    if (MessageBox.Show("确定要退出程序吗?\n退出后所有隧道都会被关闭.", "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Asterisk) != DialogResult.OK)
+                    {
+                        e.Cancel = true;
+                    }
+                    return;
+                }
             }
         }
 
