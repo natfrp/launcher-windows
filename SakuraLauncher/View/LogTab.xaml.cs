@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Threading;
 using System.Windows.Media;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -54,7 +55,7 @@ namespace SakuraLauncher.View
                 {
                     if(Main.IsVisible && !Main.SuppressInfo.Value)
                     {
-                        MessageBox.Show(failedData, "日志", MessageBoxButton.OK, MessageBoxImage.Information);
+                        ThreadPool.QueueUserWorkItem(s => MessageBox.Show(failedData, "日志", MessageBoxButton.OK, MessageBoxImage.Information));
                     }
                     failedData = "";
                 }
