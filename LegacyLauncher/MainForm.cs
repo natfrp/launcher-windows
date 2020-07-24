@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 
 using fastJSON;
+using Microsoft.Win32;
 
 using LegacyLauncher.Data;
 
@@ -62,6 +63,11 @@ namespace LegacyLauncher
             ConfigPath = "config.json";
 
             #endregion
+
+            SystemEvents.SessionEnding += (s, e) =>
+            {
+                ConfigPath = null;
+            };
         }
 
         public void Log(string tunnel, string raw)
@@ -168,14 +174,18 @@ namespace LegacyLauncher
                 }
                 catch (Exception e)
                 {
-                    Invoke(new Action(() => MessageBox.Show(e.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)));
+                    Invoke(new Action(() =>
+                    {
+                        textBox_token.Enabled = true;
+                        MessageBox.Show(e.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }));
                 }
                 finally
                 {
                     LoggingIn = false;
                     Invoke(new Action(() =>
                     {
-                        textBox_token.Enabled = button_login.Enabled = true;
+                        button_login.Enabled = true;
                     }));
                 }
             });
@@ -217,6 +227,10 @@ namespace LegacyLauncher
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if(ConfigPath == null || e.CloseReason != CloseReason.UserClosing)
+            {
+                return;
+            }
             foreach(var t in Tunnels)
             {
                 if(t.Enabled)

@@ -30,6 +30,9 @@ namespace SakuraLauncher
         [DllImport("user32.dll")]
         public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern int SetProcessShutdownParameters(int dwLevel, int dwFlags);
+
         [DllImport("kernel32.dll")]
         public static extern bool QueryFullProcessImageName([In] IntPtr hProcess, [In] uint dwFlags, [Out] StringBuilder lpExeName, [In, Out] ref uint lpdwSize);
 
@@ -237,6 +240,11 @@ namespace SakuraLauncher
                         Environment.Exit(0);
                         break;
                     }
+                }
+
+                if (SetProcessShutdownParameters(0x300, 0) == 0)
+                {
+                    ShowMessage("无法设置关机优先级, 这可能导致隧道开机自启无法正常工作, 请检查杀毒软件是否拦截了此操作\n错误代码: " + Marshal.GetLastWin32Error(), "Oops", MessageBoxImage.Warning);
                 }
 
                 MainWindow = new MainWindow(File.Exists(AutoRunFile));

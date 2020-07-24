@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Media.Animation;
 
 using fastJSON;
+using Microsoft.Win32;
 using MaterialDesignThemes.Wpf;
 
 using SakuraLauncher.View;
@@ -125,6 +126,11 @@ namespace SakuraLauncher
             SuppressInfo.PropertyChanged += (s, e) => Save();
 
             SwitchTab(LoggedIn.Value || LoggingIn.Value ? 0 : 2);
+
+            SystemEvents.SessionEnding += (s, e) =>
+            {
+                ConfigPath = null;
+            };
         }
 
         public void Log(string tunnel, string raw) => (Tabs[1] as LogTab).Log(tunnel, raw);
