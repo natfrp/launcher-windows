@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Linq;
 using System.Windows;
 using System.Threading;
 using System.Reflection;
@@ -13,6 +14,7 @@ using System.Security.Cryptography;
 using System.Runtime.InteropServices;
 
 using fastJSON;
+
 using SakuraLauncher.Data;
 
 namespace SakuraLauncher
@@ -27,6 +29,9 @@ namespace SakuraLauncher
 
         [DllImport("user32.dll")]
         public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("kernel32.dll")]
+        public static extern bool QueryFullProcessImageName([In] IntPtr hProcess, [In] uint dwFlags, [Out] StringBuilder lpExeName, [In, Out] ref uint lpdwSize);
 
         public static readonly string ExecutablePath = Process.GetCurrentProcess().MainModule.FileName;
         public static readonly bool IsAdministrator = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
@@ -195,6 +200,45 @@ namespace SakuraLauncher
             AutoRunFile = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\SakuraLauncher_" + Md5(ExecutablePath) + ".lnk";
             if(created)
             {
+                var test = Path.GetFullPath(Tunnel.ClientPath);
+                var processes = Process.GetProcessesByName("frpc").Where(p =>
+                {
+                    try
+                    {
+                        uint bufferSize = 256;
+                        var sb = new StringBuilder((int)bufferSize - 1);
+                        if (QueryFullProcessImageName(p.Handle, 0, sb, ref bufferSize))
+                        {
+                            return Path.GetFullPath(sb.ToString()) == test;
+                        }
+                    }
+                    catch { }
+                    return false;
+                }).ToArray();
+
+                if (processes.Length != 0)
+                {
+                    switch (MessageBox.Show("发现 " + processes.Length + " 个的残留的 frpc 进程, 是否尝试将其关闭?\n这些进程可能是启动器不正常退出造成的残留.\n如果您不知道如何选择, 请点 \"是\".\n\n是 = 关闭所有进程\n否 = 忽略并继续\n取消 = 退出程序", "注意", MessageBoxButton.YesNoCancel, MessageBoxImage.Information))
+                    {
+                    case MessageBoxResult.Yes:
+                        foreach (var p in processes)
+                        {
+                            try
+                            {
+                                p.Kill();
+                                p.WaitForExit(200);
+                            }
+                            catch { }
+                        }
+                        break;
+                    case MessageBoxResult.No:
+                        break;
+                    default:
+                        Environment.Exit(0);
+                        break;
+                    }
+                }
+
                 MainWindow = new MainWindow(File.Exists(AutoRunFile));
                 if(!minimize)
                 {
