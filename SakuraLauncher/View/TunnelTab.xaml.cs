@@ -21,7 +21,7 @@ namespace SakuraLauncher.View
         {
             if((sender as Button).DataContext is Tunnel tunnel && tunnel.IsReal)
             {
-                if(MessageBox.Show("是否确定删除隧道 " + tunnel.Name + "?\n该操作不可撤销.", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Asterisk) != MessageBoxResult.OK)
+                if(App.ShowMessage("是否确定删除隧道 " + tunnel.Name + "?\n该操作不可撤销.", "Confirm", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) != MessageBoxResult.OK)
                 {
                     return;
                 }

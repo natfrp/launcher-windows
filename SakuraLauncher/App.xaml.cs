@@ -38,6 +38,11 @@ namespace SakuraLauncher
 
         #region Assistant Methods
 
+        public static MessageBoxResult ShowMessage(string text, string title, MessageBoxImage icon, MessageBoxButton buttons = MessageBoxButton.OK)
+        {
+            return Instance.Dispatcher.Invoke(() => MessageBox.Show(text, title, buttons, icon));
+        }
+
         public static bool SetAutoRun(bool start)
         {
             try
@@ -64,7 +69,7 @@ namespace SakuraLauncher
             }
             catch(Exception e)
             {
-                MessageBox.Show("无法设置开机启动, 请检查杀毒软件是否拦截了此操作.\n\n" + e.ToString(), "Oops", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowMessage("无法设置开机启动, 请检查杀毒软件是否拦截了此操作.\n\n" + e.ToString(), "Oops", MessageBoxImage.Error);
             }
             return false;
         }
@@ -78,11 +83,11 @@ namespace SakuraLauncher
                 {
                     return json;
                 }
-                MessageBox.Show(json["message"] ?? "出现未知错误", "Oops", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowMessage(json["message"] ?? "出现未知错误", "Oops", MessageBoxImage.Error);
             }
             catch(Exception e)
             {
-                MessageBox.Show("无法完成请求, 请检查网络连接并重试\n\n" + e.ToString(), "Oops", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowMessage("无法完成请求, 请检查网络连接并重试\n\n" + e.ToString(), "Oops", MessageBoxImage.Error);
             }
             return null;
         }
@@ -174,7 +179,7 @@ namespace SakuraLauncher
         {
             if(!File.Exists(Tunnel.ClientPath))
             {
-                MessageBox.Show("未找到 frpc.exe, 请尝试重新下载客户端.", "Oops", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowMessage("未找到 frpc.exe, 请尝试重新下载客户端.", "Oops", MessageBoxImage.Error);
                 Environment.Exit(0);
             }
             var minimize = false;
@@ -198,7 +203,8 @@ namespace SakuraLauncher
             }
             else
             {
-                MessageBox.Show("请不要重复开启 SakuraFrp 客户端. 如果想运行多个实例请将软件复制到其他目录.", "Oops", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowMessage("请不要重复开启 SakuraFrp 客户端. 如果想运行多个实例请将软件复制到其他目录.", "Oops", MessageBoxImage.Warning);
+                Environment.Exit(0);
             }
         }
 

@@ -23,8 +23,9 @@ namespace LegacyLauncher
 
         public static string AutoRunFile = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\LegacySakuraLauncher_" + Md5(ExecutablePath) + ".lnk";
         public static string DefaultUserAgent = "SakuraLauncher/" + Assembly.GetExecutingAssembly().GetName().Version;
-        
+
         public static Mutex AppMutex = null;
+        public static Form TopMostForm => new Form() { TopMost = true };
 
         #region Assistant Methods
 
@@ -54,7 +55,7 @@ namespace LegacyLauncher
             }
             catch (Exception e)
             {
-                MessageBox.Show("无法设置开机启动, 请检查杀毒软件是否拦截了此操作.\n\n" + e.ToString(), "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(TopMostForm, "无法设置开机启动, 请检查杀毒软件是否拦截了此操作.\n\n" + e.ToString(), "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             return false;
         }
@@ -68,11 +69,22 @@ namespace LegacyLauncher
                 {
                     return json;
                 }
-                MessageBox.Show(json["message"] as string ?? "出现未知错误", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(TopMostForm, json["message"] as string ?? "出现未知错误", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (NotSupportedException)
+            {
+                if (MessageBox.Show(TopMostForm, "您的系统不支持 TLS 1.2, 无法完成请求\n请先安装 .NET Framework 4.5 及以上版本\n\n是否自动打开下载页面?", "Oops", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                {
+                    try
+                    {
+                        Process.Start("https://dotnet.microsoft.com/download/dotnet-framework/net45");
+                    }
+                    catch { }
+                }
             }
             catch (Exception e)
             {
-                MessageBox.Show("无法完成请求, 请检查网络连接并重试\n\n" + e.ToString(), "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(TopMostForm, "无法完成请求, 请检查网络连接并重试\n\n" + e.ToString(), "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             return null;
         }
@@ -167,7 +179,7 @@ namespace LegacyLauncher
 
             if (!File.Exists(Tunnel.ClientPath))
             {
-                MessageBox.Show("未找到 frpc.exe, 请尝试重新下载客户端.", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(TopMostForm, "未找到 frpc.exe, 请尝试重新下载客户端.", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Environment.Exit(0);
             }
 
@@ -189,7 +201,8 @@ namespace LegacyLauncher
             }
             else
             {
-                MessageBox.Show("请不要重复开启 SakuraFrp 客户端. 如果想运行多个实例请将软件复制到其他目录.", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(TopMostForm, "请不要重复开启 SakuraFrp 客户端. 如果想运行多个实例请将软件复制到其他目录.", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Environment.Exit(0);
             }
 
             AppMutex.ReleaseMutex();

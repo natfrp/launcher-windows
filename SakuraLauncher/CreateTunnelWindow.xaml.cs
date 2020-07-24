@@ -103,7 +103,7 @@ namespace SakuraLauncher
             }
             if (!(node.SelectedItem is NodeData s))
             {
-                MessageBox.Show("请选择穿透服务器", "Oops", MessageBoxButton.OK, MessageBoxImage.Error);
+                App.ShowMessage("请选择穿透服务器", "Oops", MessageBoxImage.Error);
                 return;
             }
             Creating.Value = true;
@@ -125,7 +125,7 @@ namespace SakuraLauncher
                 Dispatcher.Invoke(() =>
                 {
                     MainWindow.Instance.AddTunnel((object)json["data"], true);
-                    if (MessageBox.Show("是否继续创建?", "创建成功", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
+                    if (App.ShowMessage("是否继续创建?", "创建成功", MessageBoxImage.Information, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
                         LocalPort.Value = 0;
                         RemotePort.Value = 0;

@@ -300,7 +300,7 @@ namespace SakuraLauncher
             {
                 if(t.IsReal && t.Real.Enabled)
                 {
-                    if (MessageBox.Show("确定要退出程序吗?\n退出后所有隧道都会被关闭.", "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Asterisk) == MessageBoxResult.OK)
+                    if (App.ShowMessage("确定要退出程序吗?\n退出后所有隧道都会被关闭.", "Confirm", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                     {
                         Close();
                     }

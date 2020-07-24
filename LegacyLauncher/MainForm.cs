@@ -168,7 +168,7 @@ namespace LegacyLauncher
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show(e.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Invoke(new Action(() => MessageBox.Show(e.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)));
                 }
                 finally
                 {
@@ -319,7 +319,7 @@ namespace LegacyLauncher
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            Invoke(new Action(() => MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)));
                         }
                         finally
                         {

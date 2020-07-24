@@ -55,7 +55,8 @@ namespace SakuraLauncher.View
                 {
                     if(Main.IsVisible && !Main.SuppressInfo.Value)
                     {
-                        ThreadPool.QueueUserWorkItem(s => MessageBox.Show(failedData, "日志", MessageBoxButton.OK, MessageBoxImage.Information));
+                        string failedData_ = failedData;
+                        ThreadPool.QueueUserWorkItem(s => App.ShowMessage(failedData_, "隧道日志 " + tunnel, MessageBoxImage.Information));
                     }
                     failedData = "";
                 }
@@ -90,6 +91,6 @@ namespace SakuraLauncher.View
 
         public void AddLineBreak() => TextBlockLog.Inlines.Add(new LineBreak());
 
-        private void ButtonClear_Click(object sender, System.Windows.RoutedEventArgs e) => TextBlockLog.Inlines.Clear();
+        private void ButtonClear_Click(object sender, RoutedEventArgs e) => TextBlockLog.Inlines.Clear();
     }
 }
