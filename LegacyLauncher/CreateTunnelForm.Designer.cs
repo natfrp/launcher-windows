@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreateTunnelForm));
             this.listView_listening = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -38,6 +39,8 @@
             this.textBox_local_port = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.checkBox_encrypt = new System.Windows.Forms.CheckBox();
+            this.checkBox_compress = new System.Windows.Forms.CheckBox();
             this.button_create = new System.Windows.Forms.Button();
             this.comboBox_node = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -48,8 +51,6 @@
             this.textBox_name = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.checkBox_compress = new System.Windows.Forms.CheckBox();
-            this.checkBox_encrypt = new System.Windows.Forms.CheckBox();
             this.button_reload = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -145,6 +146,28 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "隧道配置";
             // 
+            // checkBox_encrypt
+            // 
+            this.checkBox_encrypt.AutoSize = true;
+            this.checkBox_encrypt.Location = new System.Drawing.Point(84, 135);
+            this.checkBox_encrypt.Name = "checkBox_encrypt";
+            this.checkBox_encrypt.Size = new System.Drawing.Size(72, 16);
+            this.checkBox_encrypt.TabIndex = 13;
+            this.checkBox_encrypt.Text = "加密传输";
+            this.checkBox_encrypt.UseVisualStyleBackColor = true;
+            // 
+            // checkBox_compress
+            // 
+            this.checkBox_compress.AutoSize = true;
+            this.checkBox_compress.Checked = true;
+            this.checkBox_compress.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox_compress.Location = new System.Drawing.Point(6, 135);
+            this.checkBox_compress.Name = "checkBox_compress";
+            this.checkBox_compress.Size = new System.Drawing.Size(72, 16);
+            this.checkBox_compress.TabIndex = 13;
+            this.checkBox_compress.Text = "压缩数据";
+            this.checkBox_compress.UseVisualStyleBackColor = true;
+            // 
             // button_create
             // 
             this.button_create.Location = new System.Drawing.Point(215, 131);
@@ -237,28 +260,6 @@
             this.label2.TabIndex = 4;
             this.label2.Text = ":";
             // 
-            // checkBox_compress
-            // 
-            this.checkBox_compress.AutoSize = true;
-            this.checkBox_compress.Checked = true;
-            this.checkBox_compress.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_compress.Location = new System.Drawing.Point(6, 135);
-            this.checkBox_compress.Name = "checkBox_compress";
-            this.checkBox_compress.Size = new System.Drawing.Size(72, 16);
-            this.checkBox_compress.TabIndex = 13;
-            this.checkBox_compress.Text = "压缩数据";
-            this.checkBox_compress.UseVisualStyleBackColor = true;
-            // 
-            // checkBox_encrypt
-            // 
-            this.checkBox_encrypt.AutoSize = true;
-            this.checkBox_encrypt.Location = new System.Drawing.Point(84, 135);
-            this.checkBox_encrypt.Name = "checkBox_encrypt";
-            this.checkBox_encrypt.Size = new System.Drawing.Size(72, 16);
-            this.checkBox_encrypt.TabIndex = 13;
-            this.checkBox_encrypt.Text = "加密传输";
-            this.checkBox_encrypt.UseVisualStyleBackColor = true;
-            // 
             // button_reload
             // 
             this.button_reload.Location = new System.Drawing.Point(382, 288);
@@ -278,6 +279,7 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.listView_listening);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "CreateTunnelForm";
