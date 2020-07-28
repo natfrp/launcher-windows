@@ -26,6 +26,31 @@ namespace LegacyLauncher
         [DllImport("kernel32.dll")]
         public static extern bool QueryFullProcessImageName([In] IntPtr hProcess, [In] uint dwFlags, [Out] StringBuilder lpExeName, [In, Out] ref uint lpdwSize);
 
+        /* This approach sometimes kills launcher, unstable.
+        public enum ConsoleCtrlEvent
+        {
+            CTRL_C = 0,
+            CTRL_BREAK = 1,
+            CTRL_CLOSE = 2,
+            CTRL_LOGOFF = 5,
+            CTRL_SHUTDOWN = 6
+        }
+
+        [DllImport("kernel32.dll")]
+        public static extern bool GenerateConsoleCtrlEvent(ConsoleCtrlEvent sigevent, int dwProcessGroupId);
+        
+        [DllImport("kernel32.dll")]
+        public static extern bool AttachConsole(uint dwProcessId);
+
+        [DllImport("kernel32.dll")]
+        public static extern bool FreeConsole();
+        
+        public delegate bool ConsoleCtrlDelegate(uint CtrlType);
+
+        [DllImport("kernel32.dll")]
+        public static extern bool SetConsoleCtrlHandler(ConsoleCtrlDelegate HandlerRoutine, bool Add);
+        */
+
         public static readonly string ExecutablePath = Process.GetCurrentProcess().MainModule.FileName;
         public static readonly bool IsAdministrator = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 

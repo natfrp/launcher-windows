@@ -62,6 +62,7 @@ namespace SakuraLauncher.Data
             {
                 CreateNoWindow = true,
                 UseShellExecute = false,
+                RedirectStandardInput = true,
                 RedirectStandardError = true,
                 StandardErrorEncoding = Encoding.UTF8,
                 RedirectStandardOutput = true,
@@ -91,10 +92,16 @@ namespace SakuraLauncher.Data
             }
             try
             {
-                if(!BaseProcess.HasExited && !BaseProcess.CloseMainWindow())
+                if(!BaseProcess.HasExited)
                 {
-                    BaseProcess.Kill();
+                    BaseProcess.StandardInput.Write("stop\n");
+                    if (!BaseProcess.WaitForExit(200))
+                    {
+                        MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.Log(Name, "frpc 未响应, 正在强制结束进程"));
+                        BaseProcess.Kill();
+                    }
                 }
+                MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.Log(Name, "frpc 已结束"));
                 BaseProcess.Dispose();
             }
             catch { }

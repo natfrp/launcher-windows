@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Diagnostics;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace LegacyLauncher.Data
 {
@@ -66,6 +67,7 @@ namespace LegacyLauncher.Data
             {
                 CreateNoWindow = true,
                 UseShellExecute = false,
+                RedirectStandardInput = true,
                 RedirectStandardError = true,
                 StandardErrorEncoding = Encoding.UTF8,
                 RedirectStandardOutput = true,
@@ -95,10 +97,32 @@ namespace LegacyLauncher.Data
             }
             try
             {
-                if (!BaseProcess.HasExited && !BaseProcess.CloseMainWindow())
+                if (!BaseProcess.HasExited)
                 {
-                    BaseProcess.Kill();
+                    /* Unstable, see Program.cs
+                    Program.FreeConsole();
+                    if (Program.AttachConsole((uint)BaseProcess.Id) && Program.SetConsoleCtrlHandler(null, true))
+                    {
+                        Program.GenerateConsoleCtrlEvent(Program.ConsoleCtrlEvent.CTRL_C, 0);
+                        Thread.Sleep(200);
+                        Program.FreeConsole();
+                        Program.SetConsoleCtrlHandler(null, false);
+                    }
+                    */
+                    BaseProcess.StandardInput.Write("stop\n");
+                    if (!BaseProcess.WaitForExit(200))
+                    {
+                        Main.Invoke((MethodInvoker)delegate
+                        {
+                            Main.Log(Name, "frpc 未响应, 正在强制结束进程");
+                        });
+                        BaseProcess.Kill();
+                    }
                 }
+                Main.Invoke((MethodInvoker)delegate
+                {
+                    Main.Log(Name, "frpc 已结束");
+                });
                 BaseProcess.Dispose();
             }
             catch { }

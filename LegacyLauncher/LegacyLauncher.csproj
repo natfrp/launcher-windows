@@ -108,6 +108,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y $(ProjectDir)\..\SakuraLauncher\Resources\frpc.exe $(ProjectDir)$(OutDir)</PostBuildEvent>
+    <PostBuildEvent>copy /Y $(SolutionDir)SakuraLauncher\Resources\frpc.exe $(ProjectDir)$(OutDir)</PostBuildEvent>
   </PropertyGroup>
 </Project>
