@@ -52,6 +52,7 @@ namespace LegacyLauncher
                 }
 
                 checkBox_textwrap.Checked = !json.ContainsKey("log_text_wrapping") || (bool)json["log_text_wrapping"];
+                Program.BypassProxy = !json.ContainsKey("bypass_proxy") || (bool)json["bypass_proxy"];
 
                 if (json.ContainsKey("loggedin") && (bool)json["loggedin"])
                 {
@@ -90,6 +91,7 @@ namespace LegacyLauncher
                 { "version", CONFIG_VERSION },
                 { "token", UserToken.Trim() },
                 { "loggedin", LoggedIn },
+                { "bypass_proxy", Program.BypassProxy },
                 { "log_text_wrapping", checkBox_textwrap.Checked },
                 { "enable_tunnels", Tunnels.Where(t =>t.Enabled).Select(t => t.Name).ToList() }
             }));
@@ -111,7 +113,6 @@ namespace LegacyLauncher
                     }
 
                     var nodes = Program.ApiRequest("get_nodes");
-
                     if (nodes == null)
                     {
                         return;
@@ -174,11 +175,7 @@ namespace LegacyLauncher
                 }
                 catch (Exception e)
                 {
-                    Invoke(new Action(() =>
-                    {
-                        textBox_token.Enabled = true;
-                        MessageBox.Show(e.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }));
+                    Invoke(new Action(() => MessageBox.Show(e.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)));
                 }
                 finally
                 {
@@ -186,6 +183,7 @@ namespace LegacyLauncher
                     Invoke(new Action(() =>
                     {
                         button_login.Enabled = true;
+                        textBox_token.Enabled = !LoggedIn;
                     }));
                 }
             });

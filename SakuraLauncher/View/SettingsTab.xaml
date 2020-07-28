@@ -18,6 +18,10 @@
             <ToggleButton IsChecked="{Binding LogTextWrapping.Value}"/>
             <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">日志自动换行</TextBlock>
         </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="24,0,24,16">
+            <ToggleButton IsChecked="{Binding BypassProxy.Value}"/>
+            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">启动器绕过系统代理</TextBlock>
+        </StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16" Margin="16,0,8,0">访问密钥:</TextBlock>
             <TextBox Text="{Binding UserToken.Value}" MinWidth="256" FontSize="16" IsEnabled="{Binding CanEditToken}" />

@@ -100,16 +100,16 @@ namespace SakuraLauncher
             return null;
         }
 
-        public static async Task<string> HttpGetString(string url, Encoding encoding = null, int timeoutMs = 5000, bool redirect = false, IWebProxy proxy = null)
+        public static async Task<string> HttpGetString(string url, Encoding encoding = null, int timeoutMs = 5000, bool redirect = false)
         {
             if(encoding == null)
             {
                 encoding = Encoding.UTF8;
             }
-            return encoding.GetString(await HttpGetBytes(url, timeoutMs, redirect, proxy));
+            return encoding.GetString(await HttpGetBytes(url, timeoutMs, redirect));
         }
 
-        public static async Task<byte[]> HttpGetBytes(string url, int timeoutMs = -1, bool redirect = false, IWebProxy proxy = null)
+        public static async Task<byte[]> HttpGetBytes(string url, int timeoutMs = -1, bool redirect = false)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             if(url.StartsWith("//"))
@@ -121,11 +121,12 @@ namespace SakuraLauncher
             request.UserAgent = DefaultUserAgent;
             request.Credentials = CredentialCache.DefaultCredentials;
             request.AllowAutoRedirect = redirect;
-            if(proxy != null)
+
+            if ((Instance.MainWindow as MainWindow).BypassProxy.Value)
             {
-                request.Proxy = proxy;
+                request.Proxy = null;
             }
-            if(timeoutMs > 0)
+            if (timeoutMs > 0)
             {
                 request.Timeout = timeoutMs;
             }

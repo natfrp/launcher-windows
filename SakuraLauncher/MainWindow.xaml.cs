@@ -41,9 +41,11 @@ namespace SakuraLauncher
         public Prop<bool> AutoRun { get; set; } = new Prop<bool>();
         public Prop<bool> SuppressInfo { get; set; } = new Prop<bool>();
         public Prop<bool> LogTextWrapping { get; set; } = new Prop<bool>(true);
+        public Prop<bool> BypassProxy { get; set; } = new Prop<bool>(true);
+        public Prop<string> UserToken { get; set; } = new Prop<string>();
+
         public Prop<bool> LoggedIn { get; set; } = new Prop<bool>();
         public Prop<bool> LoggingIn { get; set; } = new Prop<bool>();
-        public Prop<string> UserToken { get; set; } = new Prop<string>();
 
         public UserControl[] Tabs = null;
         public TabIndexTester CurrentTabTester { get; set; }
@@ -109,7 +111,11 @@ namespace SakuraLauncher
                 {
                     LogTextWrapping.Value = true;
                 }
-                if(json.ContainsKey("enable_tunnels") && json["enable_tunnels"] is List<object> enable_tunnels)
+                if (!json.ContainsKey("bypass_proxy") || json["bypass_proxy"])
+                {
+                    BypassProxy.Value = true;
+                }
+                if (json.ContainsKey("enable_tunnels") && json["enable_tunnels"] is List<object> enable_tunnels)
                 {
                     AutoStart = enable_tunnels.Select(s => s.ToString()).ToList();
                 }
@@ -147,8 +153,9 @@ namespace SakuraLauncher
                 { "logo", LogoIndex },
                 { "token", UserToken.Value.Trim() },
                 { "suppressinfo", SuppressInfo.Value },
-                { "loggedin", LoggedIn.Value },
                 { "log_text_wrapping", LogTextWrapping.Value },
+                { "bypass_proxy", BypassProxy.Value },
+                { "loggedin", LoggedIn.Value },
                 { "enable_tunnels", Tunnels.Where(t => t.IsReal && t.Real.Enabled).Select(t => t.Real.Name) }
             }));
         }

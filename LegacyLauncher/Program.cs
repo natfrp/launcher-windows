@@ -34,6 +34,9 @@ namespace LegacyLauncher
 
         public static Mutex AppMutex = null;
         public static Form TopMostForm => new Form() { TopMost = true };
+        
+        // We don't provide UI for this option
+        public static bool BypassProxy = true;
 
         #region Assistant Methods
 
@@ -97,16 +100,16 @@ namespace LegacyLauncher
             return null;
         }
 
-        public static string HttpGetString(string url, Encoding encoding = null, int timeoutMs = 5000, IWebProxy proxy = null)
+        public static string HttpGetString(string url, Encoding encoding = null, int timeoutMs = 5000)
         {
             if (encoding == null)
             {
                 encoding = Encoding.UTF8;
             }
-            return encoding.GetString(HttpGetBytes(url, timeoutMs, proxy));
+            return encoding.GetString(HttpGetBytes(url, timeoutMs));
         }
 
-        public static byte[] HttpGetBytes(string url, int timeoutMs = -1, IWebProxy proxy = null)
+        public static byte[] HttpGetBytes(string url, int timeoutMs = -1)
         {
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)(3072 | 768); // Tls12 & Tls11
             if (url.StartsWith("//"))
@@ -117,9 +120,9 @@ namespace LegacyLauncher
             request.Method = "GET";
             request.UserAgent = DefaultUserAgent;
             request.Credentials = CredentialCache.DefaultCredentials;
-            if (proxy != null)
+            if (BypassProxy)
             {
-                request.Proxy = proxy;
+                request.Proxy = null;
             }
             if (timeoutMs > 0)
             {
