@@ -1,8 +1,10 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Threading;
 using System.Windows.Media;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace SakuraLauncher.View
@@ -21,48 +23,47 @@ namespace SakuraLauncher.View
              BrushText = new SolidColorBrush(Colors.Silver),
              BrushTunnel = new SolidColorBrush(Colors.Wheat);
 
+        public static LogTab Instance = null;
+
         private readonly MainWindow Main = null;
 
-        public string failedData = "";
+        public Dictionary<string,string> failedData = new Dictionary<string, string>();
 
         public LogTab(MainWindow main)
         {
+            Instance = this;
             InitializeComponent();
             DataContext = Main = main;
         }
 
-        public void Log(string tunnel, string raw)
+        private void LogFrpc(string tunnel, string raw)
         {
-            bool bottom = ScrollViewerLog.ScrollableHeight - ScrollViewerLog.VerticalOffset < 1;
-            if(TextBlockLog.Inlines.Count != 0)
-            {
-                AddLineBreak();
-            }
-            AddRun(tunnel + " ", BrushTunnel);
             var match = LogPattern.Match(raw);
-            if(!match.Success)
+            if (!match.Success)
             {
-                failedData += raw + "\n";
+                if (!failedData.ContainsKey(tunnel))
+                {
+                    failedData[tunnel] = "";
+                }
+                failedData[tunnel] += raw + "\n";
                 AddRun(raw, BrushText);
                 AddRun("", BrushText); // Dirty Patch
-                AddRun("", BrushText);
                 AddRun("", BrushText);
             }
             else
             {
-                AddRun(match.Groups["Time"].Value + " ", BrushTime);
-                if(failedData != "")
+                if (failedData.ContainsKey(tunnel))
                 {
-                    if(Main.IsVisible && !Main.SuppressInfo.Value)
+                    if (Main.IsVisible && !Main.SuppressInfo.Value)
                     {
-                        string failedData_ = failedData;
-                        ThreadPool.QueueUserWorkItem(s => App.ShowMessage(failedData_, "隧道日志 " + tunnel, MessageBoxImage.Information));
+                        string failedData_ = failedData[tunnel];
+                        ThreadPool.QueueUserWorkItem(s => App.ShowMessage(failedData_, "隧道日志", MessageBoxImage.Information));
                     }
-                    failedData = "";
+                    failedData.Remove(tunnel);
                 }
                 AddRun(match.Groups["Time"].Value + " ", BrushTime);
                 var levelColor = BrushInfo;
-                switch(match.Groups["Level"].Value)
+                switch (match.Groups["Level"].Value)
                 {
                 case "W":
                     levelColor = BrushWarning;
@@ -74,7 +75,46 @@ namespace SakuraLauncher.View
                 AddRun(match.Groups["Level"].Value + ":" + match.Groups["Source"].Value + " ", levelColor);
                 AddRun(match.Groups["Content"].Value, BrushText);
             }
-            while(TextBlockLog.Inlines.Count > 600 - 1)
+        }
+        
+        public void Log(string tunnel, string raw, int type)
+        {
+            if(!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(() => Log(tunnel, raw, type));
+                return;
+            }
+            bool bottom = ScrollViewerLog.ScrollableHeight - ScrollViewerLog.VerticalOffset < 1;
+            if(TextBlockLog.Inlines.Count != 0)
+            {
+                AddLineBreak();
+            }
+            AddRun(tunnel + " ", BrushTunnel);
+
+            if(type == -1)
+            {
+                LogFrpc(tunnel, raw);
+            }
+            else
+            {
+                AddRun(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), BrushTime);
+                switch (type)
+                {
+                case 0:
+                default:
+                    AddRun(" INFO ", BrushInfo);
+                    break;
+                case 1:
+                    AddRun(" WARNING ", BrushWarning);
+                    break;
+                case 2:
+                    AddRun(" ERROR ", BrushError);
+                    break;
+                }
+                AddRun(raw, BrushText);
+            }
+            
+            while (TextBlockLog.Inlines.Count > 4 * 300 - 1)
             {
                 TextBlockLog.Inlines.Remove(TextBlockLog.Inlines.FirstInline);
             }

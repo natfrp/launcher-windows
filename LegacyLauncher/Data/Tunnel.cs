@@ -54,12 +54,10 @@ namespace LegacyLauncher.Data
         {
             if (e.Data != null)
             {
-                Main.Invoke((MethodInvoker)delegate {
-                    Main.Log(Name, e.Data.Replace("\r", "").Replace("\n", ""));
-                });
+                Main.Log(Name, e.Data.Replace("\r", "").Replace("\n", ""));
             }
         }
-
+        
         public void Start()
         {
             Stop();
@@ -99,34 +97,21 @@ namespace LegacyLauncher.Data
             {
                 if (!BaseProcess.HasExited)
                 {
-                    /* Unstable, see Program.cs
-                    Program.FreeConsole();
-                    if (Program.AttachConsole((uint)BaseProcess.Id) && Program.SetConsoleCtrlHandler(null, true))
-                    {
-                        Program.GenerateConsoleCtrlEvent(Program.ConsoleCtrlEvent.CTRL_C, 0);
-                        Thread.Sleep(200);
-                        Program.FreeConsole();
-                        Program.SetConsoleCtrlHandler(null, false);
-                    }
-                    */
                     BaseProcess.StandardInput.Write("stop\n");
-                    if (!BaseProcess.WaitForExit(200))
+                    if (!BaseProcess.WaitForExit(3500))
                     {
-                        Main.Invoke((MethodInvoker)delegate
-                        {
-                            Main.Log(Name, "frpc 未响应, 正在强制结束进程");
-                        });
+                        Main.Log("Launcher", "frpc 未响应, 正在强制结束进程");
                         BaseProcess.Kill();
                     }
                 }
-                Main.Invoke((MethodInvoker)delegate
-                {
-                    Main.Log(Name, "frpc 已结束");
-                });
+                Main.Log("Launcher", "frpc 已结束");
                 BaseProcess.Dispose();
             }
             catch { }
-            BaseProcess = null;
+            finally
+            {
+                BaseProcess = null;
+            }
         }
     }
 }

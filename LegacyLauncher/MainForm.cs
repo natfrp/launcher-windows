@@ -73,8 +73,13 @@ namespace LegacyLauncher
 
         public void Log(string tunnel, string raw)
         {
+            if(InvokeRequired)
+            {
+                Invoke(new Action(() => Log(tunnel, raw)));
+                return;
+            }
             var lines = new string[Math.Min(textBox_log.Lines.Length + 1, 400)];
-            lines[0] = raw;
+            lines[0] = tunnel + " " + raw;
             Array.Copy(textBox_log.Lines, 0, lines, 1, lines.Length - 1);
             textBox_log.Lines = lines;
         }

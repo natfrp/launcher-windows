@@ -1,6 +1,8 @@
 ﻿using System.Text;
+using System.Threading;
 using System.Diagnostics;
 
+using SakuraLauncher.View;
 using SakuraLauncher.Helper;
 
 namespace SakuraLauncher.Data
@@ -19,7 +21,7 @@ namespace SakuraLauncher.Data
             get => _enabled;
             set
             {
-                if(_enabled == value)
+                if(_enabled == value || Exiting)
                 {
                     return;
                 }
@@ -51,9 +53,11 @@ namespace SakuraLauncher.Data
         {
             if(e.Data != null)
             {
-                MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.Log(Name, e.Data.Replace("\r", "").Replace("\n", "")));
+                LogTab.Instance.Log(Name, e.Data.Replace("\r", "").Replace("\n", ""), -1);
             }
         }
+
+        public bool Exiting = false;
 
         public void Start()
         {
@@ -90,22 +94,30 @@ namespace SakuraLauncher.Data
             {
                 return;
             }
-            try
+            Exiting = true;
+            ThreadPool.QueueUserWorkItem(s =>
             {
-                if(!BaseProcess.HasExited)
+                try
                 {
-                    BaseProcess.StandardInput.Write("stop\n");
-                    if (!BaseProcess.WaitForExit(200))
+                    if (!BaseProcess.HasExited)
                     {
-                        MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.Log(Name, "frpc 未响应, 正在强制结束进程"));
-                        BaseProcess.Kill();
+                        BaseProcess.StandardInput.Write("stop\n");
+                        if (!BaseProcess.WaitForExit(3500))
+                        {
+                            LogTab.Instance.Log("Launcher", "frpc 未响应, 正在强制结束进程", 1);
+                            BaseProcess.Kill();
+                        }
                     }
+                    LogTab.Instance.Log("Launcher", "frpc 已结束", 0);
+                    BaseProcess.Dispose();
                 }
-                MainWindow.Instance.Dispatcher.Invoke(() => MainWindow.Instance.Log(Name, "frpc 已结束"));
-                BaseProcess.Dispose();
-            }
-            catch { }
-            BaseProcess = null;
+                catch { }
+                finally
+                {
+                    Exiting = false;
+                    BaseProcess = null;
+                }
+            });
         }
     }
 }

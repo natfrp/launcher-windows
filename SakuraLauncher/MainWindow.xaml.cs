@@ -138,9 +138,7 @@ namespace SakuraLauncher
                 ConfigPath = null;
             };
         }
-
-        public void Log(string tunnel, string raw) => (Tabs[1] as LogTab).Log(tunnel, raw);
-
+        
         public void Save()
         {
             if(ConfigPath == null)
