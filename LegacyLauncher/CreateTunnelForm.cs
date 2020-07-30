@@ -121,18 +121,17 @@ namespace LegacyLauncher
                     .Append("&encryption=").Append(checkBox_encrypt.Checked ? "true" : "false")
                     .Append("&compression=").Append(checkBox_compress.Checked ? "true" : "false")
                     .Append("&remote_port=").Append(remote).ToString();
-            ThreadPool.QueueUserWorkItem(s =>
+            Program.ApiRequest("create_tunnel", query).ContinueWith(t =>
             {
                 try
                 {
-                    var json = Program.ApiRequest("create_tunnel", query);
-                    if (json == null)
+                    if(t.Result == null)
                     {
                         return;
                     }
                     Invoke(new Action(() =>
                     {
-                        MainForm.Instance.AddTunnel(json["data"]);
+                        MainForm.Instance.AddTunnel(t.Result["data"]);
                         if (MessageBox.Show("是否继续创建?", "创建成功", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                         {
                             textBox_local_port.Text = "";

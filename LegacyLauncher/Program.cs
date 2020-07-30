@@ -15,6 +15,7 @@ using System.Runtime.InteropServices;
 using fastJSON;
 
 using LegacyLauncher.Data;
+using System.Threading.Tasks;
 
 namespace LegacyLauncher
 {
@@ -55,11 +56,14 @@ namespace LegacyLauncher
         public static readonly bool IsAdministrator = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
         public static string AutoRunFile = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\LegacySakuraLauncher_" + Md5(ExecutablePath) + ".lnk";
-        public static string DefaultUserAgent = "SakuraLauncher/" + Assembly.GetExecutingAssembly().GetName().Version;
+        public static string DefaultUserAgent = "LegacyLauncher/" + Assembly.GetExecutingAssembly().GetName().Version;
+
+        public static Version FrpcVersion = null;
+        public static float FrpcVersionSakura = 0;
 
         public static Mutex AppMutex = null;
         public static Form TopMostForm => new Form() { TopMost = true };
-        
+
         // We don't provide UI for this option
         public static bool BypassProxy = true;
 
@@ -96,27 +100,16 @@ namespace LegacyLauncher
             return false;
         }
 
-        public static Dictionary<string, dynamic> ApiRequest(string action, string query = null)
+        public static async Task<dynamic> ApiRequest(string action, string query = null)
         {
             try
             {
-                var json = JSON.ToObject<Dictionary<string, object>>(HttpGetString("https://api.natfrp.com/launcher/" + action + "?token=" + MainForm.Instance.UserToken.Trim() + (query == null ? "" : "&" + query)));
-                if ((bool)json["success"])
+                var json = JSON.ToObject<Dictionary<string, dynamic>>(await HttpGetString("https://api.natfrp.com/launcher/" + action + "?token=" + MainForm.Instance.UserToken.Trim() + (query == null ? "" : "&" + query)));
+                if (json["success"])
                 {
                     return json;
                 }
-                MessageBox.Show(TopMostForm, json["message"] as string ?? "出现未知错误", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (NotSupportedException)
-            {
-                if (MessageBox.Show(TopMostForm, "您的系统不支持 TLS 1.2, 无法完成请求\n请先安装 .NET Framework 4.5 及以上版本\n\n是否自动打开下载页面?", "Oops", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
-                {
-                    try
-                    {
-                        Process.Start("https://dotnet.microsoft.com/download/dotnet-framework/net45");
-                    }
-                    catch { }
-                }
+                MessageBox.Show(TopMostForm, json["message"] ?? "出现未知错误", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception e)
             {
@@ -125,26 +118,28 @@ namespace LegacyLauncher
             return null;
         }
 
-        public static string HttpGetString(string url, Encoding encoding = null, int timeoutMs = 5000)
+        public static async Task<string> HttpGetString(string url, Encoding encoding = null, int timeoutMs = 5000, bool redirect = false)
         {
             if (encoding == null)
             {
                 encoding = Encoding.UTF8;
             }
-            return encoding.GetString(HttpGetBytes(url, timeoutMs));
+            return encoding.GetString(await HttpGetBytes(url, timeoutMs, redirect));
         }
 
-        public static byte[] HttpGetBytes(string url, int timeoutMs = -1)
+        public static async Task<byte[]> HttpGetBytes(string url, int timeoutMs = -1, bool redirect = false)
         {
-            ServicePointManager.SecurityProtocol = (SecurityProtocolType)(3072 | 768); // Tls12 & Tls11
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             if (url.StartsWith("//"))
             {
                 url = "https:" + url;
             }
-            var request = (HttpWebRequest)WebRequest.Create(url);
+            var request = WebRequest.CreateHttp(url);
             request.Method = "GET";
             request.UserAgent = DefaultUserAgent;
             request.Credentials = CredentialCache.DefaultCredentials;
+            request.AllowAutoRedirect = redirect;
+
             if (BypassProxy)
             {
                 request.Proxy = null;
@@ -153,7 +148,7 @@ namespace LegacyLauncher
             {
                 request.Timeout = timeoutMs;
             }
-            using (var response = request.GetResponse() as HttpWebResponse)
+            using (var response = await request.GetResponseAsync() as HttpWebResponse)
             {
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
@@ -161,13 +156,7 @@ namespace LegacyLauncher
                 }
                 using (var ms = new MemoryStream())
                 {
-                    int count;
-                    byte[] buffer = new byte[4096];
-                    var stream = response.GetResponseStream();
-                    while ((count = stream.Read(buffer, 0, buffer.Length)) != 0)
-                    {
-                        ms.Write(buffer, 0, count);
-                    }
+                    response.GetResponseStream().CopyTo(ms);
                     return ms.ToArray();
                 }
             }
@@ -215,7 +204,41 @@ namespace LegacyLauncher
 
             if (!File.Exists(Tunnel.ClientPath))
             {
-                MessageBox.Show(TopMostForm, "未找到 frpc.exe, 请尝试重新下载客户端.", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(TopMostForm, "未找到 frpc.exe, 请尝试重新下载客户端", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Environment.Exit(0);
+            }
+
+            string[] temp = null;
+            try
+            {
+                var start = new ProcessStartInfo(Tunnel.ClientPath, "-v")
+                {
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    StandardOutputEncoding = Encoding.UTF8
+                };
+                using (var p = Process.Start(start))
+                {
+                    p.Start();
+                    p.WaitForExit(100);
+                    temp = p.StandardOutput.ReadLine().Trim().Split(new string[] { "-sakura-" }, StringSplitOptions.RemoveEmptyEntries);
+                }
+            }
+            catch { }
+
+            if (temp[0].Length > 0 && temp[0][0] == 'v')
+            {
+                temp[0] = temp[0].Substring(1);
+            }
+            if (!Version.TryParse(temp[0], out FrpcVersion))
+            {
+                MessageBox.Show(TopMostForm, "无法获取 frpc.exe 的版本[1], 请尝试重新下载客户端", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Environment.Exit(0);
+            }
+            if (temp.Length == 2 && !float.TryParse(temp[1], out FrpcVersionSakura))
+            {
+                MessageBox.Show(TopMostForm, "无法获取 frpc.exe 的版本[2], 请尝试重新下载客户端", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Environment.Exit(0);
             }
 

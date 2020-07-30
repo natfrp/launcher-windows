@@ -49,6 +49,7 @@
             this.contextMenuStrip_tunnel = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem_delete = new System.Windows.Forms.ToolStripMenuItem();
             this.checkBox_textwrap = new System.Windows.Forms.CheckBox();
+            this.checkBox_update = new System.Windows.Forms.CheckBox();
             this.contextMenuStrip_tray.SuspendLayout();
             this.contextMenuStrip_tunnel.SuspendLayout();
             this.SuspendLayout();
@@ -98,10 +99,10 @@
             // 
             // textBox_token
             // 
-            this.textBox_token.Location = new System.Drawing.Point(257, 11);
+            this.textBox_token.Location = new System.Drawing.Point(311, 11);
             this.textBox_token.Name = "textBox_token";
             this.textBox_token.PasswordChar = '*';
-            this.textBox_token.Size = new System.Drawing.Size(153, 21);
+            this.textBox_token.Size = new System.Drawing.Size(129, 21);
             this.textBox_token.TabIndex = 1;
             // 
             // checkBox_autorun
@@ -118,7 +119,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(192, 15);
+            this.label1.Location = new System.Drawing.Point(246, 15);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(59, 12);
             this.label1.TabIndex = 6;
@@ -126,9 +127,9 @@
             // 
             // button_login
             // 
-            this.button_login.Location = new System.Drawing.Point(416, 10);
+            this.button_login.Location = new System.Drawing.Point(446, 10);
             this.button_login.Name = "button_login";
-            this.button_login.Size = new System.Drawing.Size(75, 23);
+            this.button_login.Size = new System.Drawing.Size(65, 23);
             this.button_login.TabIndex = 7;
             this.button_login.Text = "登录";
             this.button_login.UseVisualStyleBackColor = true;
@@ -137,9 +138,9 @@
             // button_create
             // 
             this.button_create.Enabled = false;
-            this.button_create.Location = new System.Drawing.Point(578, 10);
+            this.button_create.Location = new System.Drawing.Point(588, 10);
             this.button_create.Name = "button_create";
-            this.button_create.Size = new System.Drawing.Size(75, 23);
+            this.button_create.Size = new System.Drawing.Size(65, 23);
             this.button_create.TabIndex = 8;
             this.button_create.Text = "新建隧道";
             this.button_create.UseVisualStyleBackColor = true;
@@ -189,9 +190,9 @@
             // 
             // button_clear
             // 
-            this.button_clear.Location = new System.Drawing.Point(497, 10);
+            this.button_clear.Location = new System.Drawing.Point(517, 10);
             this.button_clear.Name = "button_clear";
-            this.button_clear.Size = new System.Drawing.Size(75, 23);
+            this.button_clear.Size = new System.Drawing.Size(65, 23);
             this.button_clear.TabIndex = 10;
             this.button_clear.Text = "清空日志";
             this.button_clear.UseVisualStyleBackColor = true;
@@ -218,17 +219,31 @@
             this.checkBox_textwrap.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_textwrap.Location = new System.Drawing.Point(90, 14);
             this.checkBox_textwrap.Name = "checkBox_textwrap";
-            this.checkBox_textwrap.Size = new System.Drawing.Size(96, 16);
+            this.checkBox_textwrap.Size = new System.Drawing.Size(72, 16);
             this.checkBox_textwrap.TabIndex = 11;
-            this.checkBox_textwrap.Text = "日志自动换行";
+            this.checkBox_textwrap.Text = "日志换行";
             this.checkBox_textwrap.UseVisualStyleBackColor = true;
             this.checkBox_textwrap.CheckedChanged += new System.EventHandler(this.checkBox_textwrap_CheckedChanged);
+            // 
+            // checkBox_update
+            // 
+            this.checkBox_update.AutoSize = true;
+            this.checkBox_update.Checked = true;
+            this.checkBox_update.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox_update.Location = new System.Drawing.Point(168, 14);
+            this.checkBox_update.Name = "checkBox_update";
+            this.checkBox_update.Size = new System.Drawing.Size(72, 16);
+            this.checkBox_update.TabIndex = 12;
+            this.checkBox_update.Text = "检查更新";
+            this.checkBox_update.UseVisualStyleBackColor = true;
+            this.checkBox_update.CheckedChanged += new System.EventHandler(this.checkBox_update_CheckedChanged);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(665, 523);
+            this.Controls.Add(this.checkBox_update);
             this.Controls.Add(this.checkBox_textwrap);
             this.Controls.Add(this.button_clear);
             this.Controls.Add(this.textBox_log);
@@ -274,6 +289,7 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip_tunnel;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_delete;
         private System.Windows.Forms.CheckBox checkBox_textwrap;
+        private System.Windows.Forms.CheckBox checkBox_update;
     }
 }
 

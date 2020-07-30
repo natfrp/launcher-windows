@@ -1,7 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
+using System.Reflection;
+using System.Diagnostics;
 using System.Windows.Forms;
 using System.Collections.Generic;
 
@@ -20,7 +23,7 @@ namespace LegacyLauncher
 
         public string ConfigPath = null;
 
-        public bool LoggedIn = false, LoggingIn = false;
+        public bool LoggedIn = false, LoggingIn = false, CheckUpdate = true;
         public string UserToken = "";
 
         public List<string> AutoStart = null;
@@ -53,6 +56,7 @@ namespace LegacyLauncher
 
                 checkBox_textwrap.Checked = !json.ContainsKey("log_text_wrapping") || (bool)json["log_text_wrapping"];
                 Program.BypassProxy = !json.ContainsKey("bypass_proxy") || (bool)json["bypass_proxy"];
+                CheckUpdate = !json.ContainsKey("check_update") || (bool)json["check_update"];
 
                 if (json.ContainsKey("loggedin") && (bool)json["loggedin"])
                 {
@@ -97,6 +101,7 @@ namespace LegacyLauncher
                 { "token", UserToken.Trim() },
                 { "loggedin", LoggedIn },
                 { "bypass_proxy", Program.BypassProxy },
+                { "check_update", CheckUpdate },
                 { "log_text_wrapping", checkBox_textwrap.Checked },
                 { "enable_tunnels", Tunnels.Where(t =>t.Enabled).Select(t => t.Name).ToList() }
             }));
@@ -106,90 +111,149 @@ namespace LegacyLauncher
         {
             LoggingIn = true;
             textBox_token.Enabled = button_login.Enabled = false;
-            ThreadPool.QueueUserWorkItem(s =>
+            Program.ApiRequest("get_tunnels").ContinueWith(t =>
             {
-                try
+                var tunnels = t.Result;
+                if (tunnels == null)
                 {
-                    var tunnels = Program.ApiRequest("get_tunnels");
-                    if (tunnels == null)
-                    {
-                        LoggingIn = false;
-                        return;
-                    }
-
-                    var nodes = Program.ApiRequest("get_nodes");
+                    LoggingIn = false;
+                    return;
+                }
+                Program.ApiRequest("get_nodes").ContinueWith(t2 =>
+                {
+                    var nodes = t2.Result;
                     if (nodes == null)
                     {
                         return;
                     }
-
-                    Nodes.Clear();
-                    foreach (dynamic j in nodes["data"])
+                    try
                     {
-                        Nodes.Add(new NodeData()
+                        Nodes.Clear();
+                        foreach (dynamic j in nodes["data"])
                         {
-                            ID = (int)j["id"],
-                            Name = (string)j["name"],
-                            AcceptNew = (bool)j["accept_new"]
-                        });
-                    }
-
-                    if (AutoStart == null)
-                    {
-                        AutoStart = new List<string>();
-                        foreach (var tunnel in Tunnels)
-                        {
-                            if (tunnel.Enabled)
+                            Nodes.Add(new NodeData()
                             {
-                                AutoStart.Add(tunnel.Name);
-                            }
-                            tunnel.Stop();
+                                ID = (int)j["id"],
+                                Name = (string)j["name"],
+                                AcceptNew = (bool)j["accept_new"]
+                            });
                         }
-                    }
 
-                    Tunnels.Clear();
-                    Invoke(new Action(() =>
-                    {
-                        listView_tunnels.Items.Clear();
-                        foreach (dynamic j in tunnels["data"])
+                        if (AutoStart == null)
                         {
-                            AddTunnel(j);
-                        }
-                    }));
-
-                    if (AutoStart != null)
-                    {
-                        foreach (var tunnel in Tunnels)
-                        {
-                            if (AutoStart.Contains(tunnel.Name))
+                            AutoStart = new List<string>();
+                            foreach (var tunnel in Tunnels)
                             {
-                                tunnel.Enabled = true;
+                                if (tunnel.Enabled)
+                                {
+                                    AutoStart.Add(tunnel.Name);
+                                }
+                                tunnel.Stop();
                             }
                         }
-                        AutoStart = null;
+
+                        Tunnels.Clear();
+                        Invoke(new Action(() =>
+                        {
+                            listView_tunnels.Items.Clear();
+                            foreach (dynamic j in tunnels["data"])
+                            {
+                                AddTunnel(j);
+                            }
+                        }));
+
+                        if (AutoStart != null)
+                        {
+                            foreach (var tunnel in Tunnels)
+                            {
+                                if (AutoStart.Contains(tunnel.Name))
+                                {
+                                    tunnel.Enabled = true;
+                                }
+                            }
+                            AutoStart = null;
+                        }
+
+                        LoggedIn = true;
+                        Invoke(new Action(() =>
+                        {
+                            button_login.Text = "注销";
+                            textBox_token.Enabled = false;
+                            listView_tunnels.Enabled = button_create.Enabled = true;
+                        }));
+                        Save();
+                    }
+                    catch (Exception e)
+                    {
+                        Invoke(new Action(() => MessageBox.Show(e.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)));
+                    }
+                    finally
+                    {
+                        LoggingIn = false;
+                        Invoke(new Action(() =>
+                        {
+                            button_login.Enabled = true;
+                            textBox_token.Enabled = !LoggedIn;
+                        }));
+                    }
+                });
+            });
+        }
+
+        public void TryCheckUpdate(bool silent = false)
+        {
+            if (!File.Exists("SakuraUpdater.exe"))
+            {
+                if (!silent)
+                {
+                    MessageBox.Show(Program.TopMostForm, "自动更新程序不存在, 无法进行更新检查", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                return;
+            }
+            Program.ApiRequest("get_version", "legacy=true").ContinueWith(t =>
+            {
+                var version = t.Result;
+                if (version == null)
+                {
+                    return;
+                }
+                try
+                {
+                    var sb = new StringBuilder();
+                    bool launcher_update = false, frpc_update = false;
+                    if (Assembly.GetExecutingAssembly().GetName().Version.CompareTo(Version.Parse(version["launcher"]["version"] as string)) < 0)
+                    {
+                        launcher_update = true;
+                        sb.Append("启动器最新版: ")
+                            .AppendLine(version["launcher"]["version"] as string)
+                            .AppendLine("更新日志:")
+                            .AppendLine(version["launcher"]["note"] as string)
+                            .AppendLine();
                     }
 
-                    LoggedIn = true;
-                    Invoke(new Action(() =>
+                    var temp = (version["frpc"]["version"] as string).Split(new string[] { "-sakura-" }, StringSplitOptions.None);
+                    if (Program.FrpcVersion.CompareTo(Version.Parse(temp[0])) < 0 || Program.FrpcVersionSakura < float.Parse(temp[1]))
                     {
-                        button_login.Text = "注销";
-                        textBox_token.Enabled = false;
-                        listView_tunnels.Enabled = button_create.Enabled = true;
-                    }));
-                    Save();
+                        frpc_update = true;
+                        sb.Append("frpc 最新版: ")
+                            .AppendLine(version["frpc"]["version"] as string)
+                            .AppendLine("更新日志:")
+                            .AppendLine(version["frpc"]["note"] as string);
+                    }
+
+                    if (!launcher_update && !frpc_update)
+                    {
+                        MessageBox.Show(Program.TopMostForm, "您当前使用的启动器和 frpc 均为最新版本", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else if (MessageBox.Show(Program.TopMostForm, sb.ToString(), "发现新版本, 是否更新", MessageBoxButtons.OK, MessageBoxIcon.Asterisk) == DialogResult.OK)
+                    {
+                        Process.Start("SakuraUpdater.exe", (launcher_update ? "-legacy" : "") + (frpc_update ? " -frpc" : ""));
+                        Invoke(new Action(() => Close()));
+                    }
                 }
                 catch (Exception e)
                 {
-                    Invoke(new Action(() => MessageBox.Show(e.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)));
-                }
-                finally
-                {
-                    LoggingIn = false;
-                    Invoke(new Action(() =>
-                    {
-                        button_login.Enabled = true;
-                        textBox_token.Enabled = !LoggedIn;
-                    }));
+                    MessageBox.Show(Program.TopMostForm, "检查更新出错:\n" + e.ToString(), "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             });
         }
@@ -279,6 +343,12 @@ namespace LegacyLauncher
             {
                 Visible = !Visible;
             }
+        }
+
+        private void checkBox_update_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckUpdate = checkBox_update.Checked;
+            Save();
         }
 
         private void checkBox_autorun_CheckedChanged(object sender, EventArgs e) => Program.SetAutoRun(checkBox_autorun.Checked);
