@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Reflection;
+using System.Diagnostics;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.ComponentModel;
@@ -245,6 +246,14 @@ namespace SakuraLauncher
 
         public void TryCheckUpdate(bool silent = false)
         {
+            if (!File.Exists("SakuraUpdater.exe"))
+            {
+                if (!silent)
+                {
+                    App.ShowMessage("自动更新程序不存在, 无法进行更新检查", "Oops", MessageBoxImage.Error);
+                }
+                return;
+            }
             CheckingUpdate.Value = true;
             App.ApiRequest("get_version", "legacy=false").ContinueWith(t =>
             {
@@ -283,7 +292,8 @@ namespace SakuraLauncher
                     }
                     else if (App.ShowMessage(sb.ToString(), "发现新版本, 是否更新", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                     {
-
+                        Process.Start("SakuraUpdater.exe", (launcher_update ? "-launcher" : "") + (frpc_update ? " -frpc" : ""));
+                        Dispatcher.Invoke(() => Close());
                     }
                 }
                 catch (Exception e)

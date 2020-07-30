@@ -21,12 +21,12 @@ namespace SakuraLauncher.Data
             get => _enabled;
             set
             {
-                if(_enabled == value || Exiting)
+                if (_enabled == value || Exiting)
                 {
                     return;
                 }
                 _enabled = value;
-                if(value)
+                if (value)
                 {
                     Start();
                 }
@@ -46,12 +46,12 @@ namespace SakuraLauncher.Data
 
         public int NodeID { get; set; }
         public string NodeName { get; set; }
-        
+
         public Process BaseProcess = null;
 
         public void LogOutput(object sender, DataReceivedEventArgs e)
         {
-            if(e.Data != null)
+            if (e.Data != null)
             {
                 LogTab.Instance.Log(Name, e.Data.Replace("\r", "").Replace("\n", ""), -1);
             }
@@ -90,12 +90,12 @@ namespace SakuraLauncher.Data
 
         public void Stop()
         {
-            if(BaseProcess == null)
+            if (BaseProcess == null)
             {
                 return;
             }
             Exiting = true;
-            ThreadPool.QueueUserWorkItem(s =>
+            new Thread(s =>
             {
                 try
                 {
@@ -117,7 +117,11 @@ namespace SakuraLauncher.Data
                     Exiting = false;
                     BaseProcess = null;
                 }
-            });
+            })
+            {
+                // Make sure our thread don't get killed while exiting program
+                IsBackground = false
+            }.Start();
         }
     }
 }
