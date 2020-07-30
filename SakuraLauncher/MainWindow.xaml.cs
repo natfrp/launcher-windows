@@ -257,13 +257,13 @@ namespace SakuraLauncher
             CheckingUpdate.Value = true;
             App.ApiRequest("get_version", "legacy=false").ContinueWith(t =>
             {
-                var version = t.Result;
-                if (version == null)
-                {
-                    return;
-                }
                 try
                 {
+                    var version = t.Result;
+                    if (version == null)
+                    {
+                        return;
+                    }
                     var sb = new StringBuilder();
                     bool launcher_update = false, frpc_update = false;
                     if (Assembly.GetExecutingAssembly().GetName().Version.CompareTo(Version.Parse(version["launcher"]["version"] as string)) < 0)
@@ -288,7 +288,7 @@ namespace SakuraLauncher
 
                     if (!launcher_update && !frpc_update)
                     {
-                        App.ShowMessage("您当前使用的启动器和 frpc 均为最新版本", "提示", MessageBoxImage.Asterisk);
+                        App.ShowMessage("您当前使用的启动器和 frpc 均为最新版本", "提示", MessageBoxImage.Information);
                     }
                     else if (App.ShowMessage(sb.ToString(), "发现新版本, 是否更新", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                     {
@@ -299,6 +299,10 @@ namespace SakuraLauncher
                 catch (Exception e)
                 {
                     App.ShowMessage("检查更新出错:\n" + e.ToString(), "Oops", MessageBoxImage.Error);
+                }
+                finally
+                {
+                    Dispatcher.Invoke(() => CheckingUpdate.Value = false);
                 }
             });
         }

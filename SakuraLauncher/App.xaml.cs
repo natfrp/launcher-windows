@@ -191,7 +191,7 @@ namespace SakuraLauncher
         {
             if(!File.Exists(Tunnel.ClientPath))
             {
-                ShowMessage("未找到 frpc.exe, 请尝试重新下载客户端.", "Oops", MessageBoxImage.Error);
+                ShowMessage("未找到 frpc.exe, 请尝试重新下载客户端", "Oops", MessageBoxImage.Error);
                 Environment.Exit(0);
             }
 
@@ -220,12 +220,12 @@ namespace SakuraLauncher
             }
             if (!Version.TryParse(temp[0], out FrpcVersion))
             {
-                ShowMessage("无法获取 frpc.exe 的版本[1], 请尝试重新下载客户端.", "Oops", MessageBoxImage.Error);
+                ShowMessage("无法获取 frpc.exe 的版本[1], 请尝试重新下载客户端", "Oops", MessageBoxImage.Error);
                 Environment.Exit(0);
             }
             if (temp.Length == 2 && !float.TryParse(temp[1], out FrpcVersionSakura))
             {
-                ShowMessage("无法获取 frpc.exe 的版本[2], 请尝试重新下载客户端.", "Oops", MessageBoxImage.Error);
+                ShowMessage("无法获取 frpc.exe 的版本[2], 请尝试重新下载客户端", "Oops", MessageBoxImage.Error);
                 Environment.Exit(0);
             }
 
