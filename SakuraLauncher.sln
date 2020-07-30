@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SakuraLauncher", "SakuraLau
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegacyLauncher", "LegacyLauncher\LegacyLauncher.csproj", "{2341B65D-0B5E-45AE-BAA2-6DA63D119F41}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SakuraUpdater", "SakuraUpdater\SakuraUpdater.csproj", "{5FF971A9-1F53-4A85-9440-E61A8F659D75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{2341B65D-0B5E-45AE-BAA2-6DA63D119F41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2341B65D-0B5E-45AE-BAA2-6DA63D119F41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2341B65D-0B5E-45AE-BAA2-6DA63D119F41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FF971A9-1F53-4A85-9440-E61A8F659D75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FF971A9-1F53-4A85-9440-E61A8F659D75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FF971A9-1F53-4A85-9440-E61A8F659D75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FF971A9-1F53-4A85-9440-E61A8F659D75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
