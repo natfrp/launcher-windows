@@ -211,9 +211,6 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\frpc.exe" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\debian.png" />
   </ItemGroup>
   <ItemGroup>
@@ -225,6 +222,7 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy /Y $(ProjectDir)Resources\frpc.exe $(ProjectDir)$(OutDir)</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
