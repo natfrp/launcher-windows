@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
+using System.Reflection;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.ComponentModel;
@@ -43,6 +45,9 @@ namespace SakuraLauncher
         public Prop<bool> LogTextWrapping { get; set; } = new Prop<bool>(true);
         public Prop<bool> BypassProxy { get; set; } = new Prop<bool>(true);
         public Prop<string> UserToken { get; set; } = new Prop<string>();
+
+        public Prop<bool> CheckUpdate { get; set; } = new Prop<bool>(true);
+        public Prop<bool> CheckingUpdate { get; set; } = new Prop<bool>();
 
         public Prop<bool> LoggedIn { get; set; } = new Prop<bool>();
         public Prop<bool> LoggingIn { get; set; } = new Prop<bool>();
@@ -115,6 +120,10 @@ namespace SakuraLauncher
                 {
                     BypassProxy.Value = true;
                 }
+                if (!json.ContainsKey("check_update") || json["check_update"])
+                {
+                    CheckUpdate.Value = true;
+                }
                 if (json.ContainsKey("enable_tunnels") && json["enable_tunnels"] is List<object> enable_tunnels)
                 {
                     AutoStart = enable_tunnels.Select(s => s.ToString()).ToList();
@@ -137,6 +146,11 @@ namespace SakuraLauncher
             {
                 ConfigPath = null;
             };
+
+            if (CheckUpdate)
+            {
+                TryCheckUpdate(true);
+            }
         }
         
         public void Save()
@@ -153,6 +167,7 @@ namespace SakuraLauncher
                 { "suppressinfo", SuppressInfo.Value },
                 { "log_text_wrapping", LogTextWrapping.Value },
                 { "bypass_proxy", BypassProxy.Value },
+                { "check_update", CheckUpdate.Value },
                 { "loggedin", LoggedIn.Value },
                 { "enable_tunnels", Tunnels.Where(t => t.IsReal && t.Real.Enabled).Select(t => t.Real.Name) }
             }));
@@ -225,6 +240,56 @@ namespace SakuraLauncher
                     LoggedIn.Value = true;
                     Save();
                 }));
+            });
+        }
+
+        public void TryCheckUpdate(bool silent = false)
+        {
+            CheckingUpdate.Value = true;
+            App.ApiRequest("get_version", "legacy=false").ContinueWith(t =>
+            {
+                var version = t.Result;
+                if (version == null)
+                {
+                    return;
+                }
+                try
+                {
+                    var sb = new StringBuilder();
+                    bool launcher_update = false, frpc_update = false;
+                    if (Assembly.GetExecutingAssembly().GetName().Version.CompareTo(Version.Parse(version["launcher"]["version"] as string)) < 0)
+                    {
+                        launcher_update = true;
+                        sb.Append("启动器最新版: ")
+                            .AppendLine(version["launcher"]["version"] as string)
+                            .AppendLine("更新日志:")
+                            .AppendLine(version["launcher"]["note"] as string)
+                            .AppendLine();
+                    }
+
+                    var temp = (version["frpc"]["version"] as string).Split(new string[] { "-sakura-" }, StringSplitOptions.None);
+                    if (App.FrpcVersion.CompareTo(Version.Parse(temp[0])) < 0 || App.FrpcVersionSakura < float.Parse(temp[1]))
+                    {
+                        frpc_update = true;
+                        sb.Append("frpc 最新版: ")
+                            .AppendLine(version["frpc"]["version"] as string)
+                            .AppendLine("更新日志:")
+                            .AppendLine(version["frpc"]["note"] as string);
+                    }
+
+                    if (!launcher_update && !frpc_update)
+                    {
+                        App.ShowMessage("您当前使用的启动器和 frpc 均为最新版本", "提示", MessageBoxImage.Asterisk);
+                    }
+                    else if (App.ShowMessage(sb.ToString(), "发现新版本, 是否更新", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                    {
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    App.ShowMessage("检查更新出错:\n" + e.ToString(), "Oops", MessageBoxImage.Error);
+                }
             });
         }
 

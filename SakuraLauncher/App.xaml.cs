@@ -39,6 +39,9 @@ namespace SakuraLauncher
         public static readonly string ExecutablePath = Process.GetCurrentProcess().MainModule.FileName;
         public static readonly bool IsAdministrator = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
+        public static Version FrpcVersion = null;
+        public static float FrpcVersionSakura = 0;
+
         public static string AutoRunFile { get; private set; }
         public static string DefaultUserAgent = "SakuraLauncher/" + Assembly.GetExecutingAssembly().GetName().Version;
 
@@ -191,6 +194,41 @@ namespace SakuraLauncher
                 ShowMessage("未找到 frpc.exe, 请尝试重新下载客户端.", "Oops", MessageBoxImage.Error);
                 Environment.Exit(0);
             }
+
+            string[] temp = null;
+            try
+            {
+                var start = new ProcessStartInfo(Tunnel.ClientPath, "-v")
+                {
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    StandardOutputEncoding = Encoding.UTF8
+                };
+                using (var p = Process.Start(start))
+                {
+                    p.Start();
+                    p.WaitForExit(100);
+                    temp = p.StandardOutput.ReadLine().Trim().Split(new string[] { "-sakura-" }, StringSplitOptions.RemoveEmptyEntries);
+                }
+            }
+            catch { }
+
+            if (temp[0].Length > 0 && temp[0][0] == 'v')
+            {
+                temp[0] = temp[0].Substring(1);
+            }
+            if (!Version.TryParse(temp[0], out FrpcVersion))
+            {
+                ShowMessage("无法获取 frpc.exe 的版本[1], 请尝试重新下载客户端.", "Oops", MessageBoxImage.Error);
+                Environment.Exit(0);
+            }
+            if (temp.Length == 2 && !float.TryParse(temp[1], out FrpcVersionSakura))
+            {
+                ShowMessage("无法获取 frpc.exe 的版本[2], 请尝试重新下载客户端.", "Oops", MessageBoxImage.Error);
+                Environment.Exit(0);
+            }
+
             var minimize = false;
             foreach(var a in e.Args)
             {

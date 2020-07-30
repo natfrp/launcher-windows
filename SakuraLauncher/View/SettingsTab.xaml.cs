@@ -19,7 +19,16 @@ namespace SakuraLauncher.View
 
         private void ToggleButtonAutoRun_Unchecked(object sender, System.Windows.RoutedEventArgs e) => App.SetAutoRun(false);
 
-        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void ButtonUpdate_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (Main.CheckingUpdate)
+            {
+                return;
+            }
+            Main.TryCheckUpdate();
+        }
+
+        private void ButtonLogin_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             if(Main.LoggingIn)
             {

@@ -62,7 +62,7 @@ namespace SakuraLauncher.Data
         public void Start()
         {
             Stop();
-            var start = new ProcessStartInfo(ClientPath, "-f " + MainWindow.Instance.UserToken.Value + ":" + Id)
+            var start = new ProcessStartInfo(ClientPath, "-n -f " + MainWindow.Instance.UserToken.Value + ":" + Id)
             {
                 CreateNoWindow = true,
                 UseShellExecute = false,
