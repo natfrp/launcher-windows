@@ -122,6 +122,12 @@ namespace SakuraUpdater
 
         private void button_start_Click(object sender, EventArgs e)
         {
+            if (button_start.Text != "开始更新")
+            {
+                Process.Start(Program.UpdateLauncher == 2 ? "LegacyLauncher.exe" : "SakuraLauncher.exe");
+                Close();
+                return;
+            }
             Working = true;
             button_start.Visible = false;
             ThreadPool.QueueUserWorkItem(s =>
@@ -202,6 +208,11 @@ namespace SakuraUpdater
 
                         sw.Stop();
                         Log("更新成功! 耗时 " + sw.ElapsedMilliseconds / 1000.0 + "s");
+                        Invoke(new Action(() =>
+                        {
+                            button_start.Text = "打开启动器";
+                            button_start.Visible = true;
+                        }));
                     }
                     catch (Exception ex)
                     {
