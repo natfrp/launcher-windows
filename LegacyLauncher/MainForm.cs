@@ -73,6 +73,10 @@ namespace LegacyLauncher
             {
                 ConfigPath = null;
             };
+            if(CheckUpdate)
+            {
+                TryCheckUpdate(true);
+            }
         }
 
         public void Log(string tunnel, string raw)
@@ -243,7 +247,10 @@ namespace LegacyLauncher
 
                     if (!launcher_update && !frpc_update)
                     {
-                        MessageBox.Show(Program.TopMostForm, "您当前使用的启动器和 frpc 均为最新版本", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        if (!silent)
+                        {
+                            MessageBox.Show(Program.TopMostForm, "您当前使用的启动器和 frpc 均为最新版本", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
                     }
                     else if (MessageBox.Show(Program.TopMostForm, sb.ToString(), "发现新版本, 是否更新", MessageBoxButtons.OK, MessageBoxIcon.Asterisk) == DialogResult.OK)
                     {
@@ -253,7 +260,10 @@ namespace LegacyLauncher
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show(Program.TopMostForm, "检查更新出错:\n" + e.ToString(), "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    if (!silent)
+                    {
+                        MessageBox.Show(Program.TopMostForm, "检查更新出错:\n" + e.ToString(), "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             });
         }
