@@ -109,7 +109,15 @@ namespace SakuraLauncher
                 {
                     SetLogo((int)json["logo"]);
                 }
-                if(json.ContainsKey("suppressinfo") && json["suppressinfo"])
+                if (json.ContainsKey("width"))
+                {
+                    Width = json["width"];
+                }
+                if (json.ContainsKey("height"))
+                {
+                    Height = json["height"];
+                }
+                if (json.ContainsKey("suppressinfo") && json["suppressinfo"])
                 {
                     SuppressInfo.Value = true;
                 }
@@ -164,6 +172,8 @@ namespace SakuraLauncher
             {
                 { "version", CONFIG_VERSION },
                 { "logo", LogoIndex },
+                { "width", Dispatcher.Invoke(() => (int)Width) },
+                { "height", Dispatcher.Invoke(() => (int)Height) },
                 { "token", UserToken.Value.Trim() },
                 { "suppressinfo", SuppressInfo.Value },
                 { "log_text_wrapping", LogTextWrapping.Value },
@@ -369,6 +379,8 @@ namespace SakuraLauncher
             LogoIndex = index;
             Save();
         }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e) => Save();
 
         private void Window_Closed(object sender, EventArgs e)
         {

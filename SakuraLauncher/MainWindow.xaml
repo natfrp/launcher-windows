@@ -10,7 +10,8 @@
         TextOptions.TextRenderingMode="Auto"
         TextOptions.TextFormattingMode="Ideal" 
         FontFamily="{DynamicResource MaterialDesignFont}"
-        Title="SakuraLauncher" Height="500" Width="782" ResizeMode="CanResize"
+        Title="SakuraLauncher" Height="500" Width="782"
+        MinHeight="380" MinWidth="725" ResizeMode="CanResize" SizeChanged="Window_SizeChanged"
         AllowsTransparency="True" Background="Transparent" WindowStyle="None"
         MouseDown="Window_MouseDown" Closed="Window_Closed" WindowStartupLocation="CenterScreen">
     <WindowChrome.WindowChrome>
