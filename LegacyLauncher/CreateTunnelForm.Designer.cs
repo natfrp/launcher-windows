@@ -159,8 +159,6 @@
             // checkBox_compress
             // 
             this.checkBox_compress.AutoSize = true;
-            this.checkBox_compress.Checked = true;
-            this.checkBox_compress.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_compress.Location = new System.Drawing.Point(6, 135);
             this.checkBox_compress.Name = "checkBox_compress";
             this.checkBox_compress.Size = new System.Drawing.Size(72, 16);

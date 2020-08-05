@@ -23,7 +23,7 @@ namespace SakuraLauncher
         public Prop<string> TunnelName { get; set; } = new Prop<string>("");
         public Prop<string> Protocol { get; set; } = new Prop<string>("");
 
-        public Prop<bool> Compression { get; set; } = new Prop<bool>(true);
+        public Prop<bool> Compression { get; set; } = new Prop<bool>(false);
         public Prop<bool> Encryption { get; set; } = new Prop<bool>(false);
 
         public Prop<int> LocalPort { get; set; } = new Prop<int>();
