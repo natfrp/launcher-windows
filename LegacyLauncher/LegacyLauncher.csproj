@@ -61,6 +61,7 @@
     </Compile>
     <Compile Include="Data\NodeData.cs" />
     <Compile Include="Data\Tunnel.cs" />
+    <Compile Include="Data\WinTrust.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

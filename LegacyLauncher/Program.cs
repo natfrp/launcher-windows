@@ -7,6 +7,7 @@ using System.Threading;
 using System.Reflection;
 using System.Diagnostics;
 using System.Windows.Forms;
+using System.Threading.Tasks;
 using System.Security.Principal;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -15,7 +16,6 @@ using System.Runtime.InteropServices;
 using fastJSON;
 
 using LegacyLauncher.Data;
-using System.Threading.Tasks;
 
 namespace LegacyLauncher
 {
@@ -202,6 +202,13 @@ namespace LegacyLauncher
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            if (!File.Exists("SKIP_LAUNCHER_SIGN_VERIFY") && !WinTrust.VerifyEmbeddedSignature(Assembly.GetExecutingAssembly().Location))
+            {
+                MessageBox.Show(TopMostForm, "@@@@@@@@@@@@@@@@@@\n       !!!  警告: 启动器签名验证失败  !!!\n@@@@@@@@@@@@@@@@@@\n\n" +
+                    "您使用的启动器文件未能通过签名验证, 该文件可能已损坏或被纂改\n您的电脑可能已经被病毒感染, 请立即进行杀毒然后重新下载完整的启动器压缩包\n\n" +
+                    "如果您从源代码编译了启动器, 请在工作目录下创建 SKIP_LAUNCHER_SIGN_VERIFY 文件来禁用签名验证", "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
             if (!File.Exists(Tunnel.ClientPath))
             {
                 // Try to correct the working dir
@@ -211,6 +218,13 @@ namespace LegacyLauncher
                     MessageBox.Show(TopMostForm, "未找到 frpc.exe, 请尝试重新下载客户端", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Environment.Exit(0);
                 }
+            }
+
+            if (!File.Exists("SKIP_FRPC_SIGN_VERIFY") && !WinTrust.VerifyEmbeddedSignature(Tunnel.ClientPath))
+            {
+                MessageBox.Show(TopMostForm, "@@@@@@@@@@@@@@@@@@\n       !!!  警告: FRPC 签名验证失败  !!!\n@@@@@@@@@@@@@@@@@@\n\n" +
+                    "您使用的 frpc.exe 未能通过签名验证, 该文件可能已损坏或被纂改\n您的电脑可能已经被病毒感染, 请立即进行杀毒然后重新下载完整的启动器压缩包\n\n" +
+                    "如果您准备使用非 Sakura Frp 提供的 frpc.exe, 请在工作目录下创建 SKIP_FRPC_SIGN_VERIFY 文件来禁用签名验证", "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             string[] temp = null;
