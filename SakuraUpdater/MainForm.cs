@@ -2,13 +2,13 @@
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Diagnostics;
 using System.Windows.Forms;
 using System.IO.Compression;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 using fastJSON;
-using System.Security.Cryptography;
-using System.Diagnostics;
 
 namespace SakuraUpdater
 {
@@ -208,11 +208,6 @@ namespace SakuraUpdater
 
                         sw.Stop();
                         Log("更新成功! 耗时 " + sw.ElapsedMilliseconds / 1000.0 + "s");
-                        Invoke(new Action(() =>
-                        {
-                            button_start.Text = "打开启动器";
-                            button_start.Visible = true;
-                        }));
                     }
                     catch (Exception ex)
                     {
@@ -220,8 +215,15 @@ namespace SakuraUpdater
                         Log(ex);
                         continue;
                     }
-                    Working = false;
                 }
+
+                Working = false;
+                Log("全部更新操作完成, 请点击下面的按钮打开启动器");
+                Invoke(new Action(() =>
+                {
+                    button_start.Text = "打开启动器";
+                    button_start.Visible = true;
+                }));
             });
         }
     }
