@@ -254,8 +254,13 @@ namespace LegacyLauncher
                     }
                     else if (MessageBox.Show(Program.TopMostForm, sb.ToString(), "发现新版本, 是否更新", MessageBoxButtons.OK, MessageBoxIcon.Asterisk) == DialogResult.OK)
                     {
+                        ConfigPath = null;
+                        foreach (var l in Tunnels)
+                        {
+                            l.Stop();
+                        }
                         Process.Start("SakuraUpdater.exe", (launcher_update ? "-legacy" : "") + (frpc_update ? " -frpc" : ""));
-                        Invoke(new Action(() => Close()));
+                        Environment.Exit(0);
                     }
                 }
                 catch (Exception e)

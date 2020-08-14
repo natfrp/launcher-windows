@@ -89,12 +89,7 @@ namespace SakuraLauncher
         {
             try
             {
-                var token = "";
-                if((Instance.MainWindow as MainWindow).UserToken.Value != null)
-                {
-                    token = "token=" + (Instance.MainWindow as MainWindow).UserToken.Value.Trim() + "&";
-                }
-                var json = JSON.ToObject<Dictionary<string, dynamic>>(await HttpGetString("https://api.natfrp.com/launcher/" + action + "?" + token + (query ?? "")));
+                var json = JSON.ToObject<Dictionary<string, dynamic>>(await HttpGetString("https://api.natfrp.com/launcher/" + action + "?token=" + (Instance.MainWindow as MainWindow).UserToken.Value.Trim() + "&" + (query ?? "")));
                 if (json["success"])
                 {
                     return json;
@@ -196,8 +191,13 @@ namespace SakuraLauncher
         {
             if(!File.Exists(Tunnel.ClientPath))
             {
-                ShowMessage("未找到 frpc.exe, 请尝试重新下载客户端", "Oops", MessageBoxImage.Error);
-                Environment.Exit(0);
+                // Try to correct the working dir
+                Environment.CurrentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                if (!File.Exists(Tunnel.ClientPath))
+                {
+                    ShowMessage("未找到 frpc.exe, 请尝试重新下载客户端", "Oops", MessageBoxImage.Error);
+                    Environment.Exit(0);
+                }
             }
 
             string[] temp = null;

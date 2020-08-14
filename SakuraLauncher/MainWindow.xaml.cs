@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Threading;
 using System.Reflection;
 using System.Diagnostics;
 using System.Windows.Input;
@@ -45,7 +46,7 @@ namespace SakuraLauncher
         public Prop<bool> SuppressInfo { get; set; } = new Prop<bool>();
         public Prop<bool> LogTextWrapping { get; set; } = new Prop<bool>(true);
         public Prop<bool> BypassProxy { get; set; } = new Prop<bool>(true);
-        public Prop<string> UserToken { get; set; } = new Prop<string>();
+        public Prop<string> UserToken { get; set; } = new Prop<string>("");
 
         public Prop<bool> CheckUpdate { get; set; } = new Prop<bool>(true);
         public Prop<bool> CheckingUpdate { get; set; } = new Prop<bool>();
@@ -305,8 +306,16 @@ namespace SakuraLauncher
                     }
                     else if (App.ShowMessage(sb.ToString(), "发现新版本, 是否更新", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                     {
+                        ConfigPath = null;
+                        foreach (var l in Tunnels)
+                        {
+                            if (l.IsReal)
+                            {
+                                l.Real.Stop();
+                            }
+                        }
                         Process.Start("SakuraUpdater.exe", (launcher_update ? "-launcher" : "") + (frpc_update ? " -frpc" : ""));
-                        Dispatcher.Invoke(() => Close());
+                        Environment.Exit(0);
                     }
                 }
                 catch (Exception e)

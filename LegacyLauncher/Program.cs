@@ -204,8 +204,13 @@ namespace LegacyLauncher
 
             if (!File.Exists(Tunnel.ClientPath))
             {
-                MessageBox.Show(TopMostForm, "未找到 frpc.exe, 请尝试重新下载客户端", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Environment.Exit(0);
+                // Try to correct the working dir
+                Environment.CurrentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                if (!File.Exists(Tunnel.ClientPath))
+                {
+                    MessageBox.Show(TopMostForm, "未找到 frpc.exe, 请尝试重新下载客户端", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Environment.Exit(0);
+                }
             }
 
             string[] temp = null;
