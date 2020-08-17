@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="fastJSON, Version=2.3.0.0, Culture=neutral, PublicKeyToken=6b75a806b86095cd, processorArchitecture=MSIL">
+      <HintPath>..\packages\fastJSON.2.3.2\lib\net40\fastJSON.dll</HintPath>
+    </Reference>
     <Reference Include="Google.Protobuf, Version=3.13.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Protobuf.3.13.0\lib\net45\Google.Protobuf.dll</HintPath>
     </Reference>
@@ -61,6 +64,7 @@
     <Compile Include="MainService.Designer.cs">
       <DependentUpon>MainService.cs</DependentUpon>
     </Compile>
+    <Compile Include="Natfrp.cs" />
     <Compile Include="Pipe\PipeConnection.cs" />
     <Compile Include="Pipe\PipeServer.cs" />
     <Compile Include="Program.cs" />
