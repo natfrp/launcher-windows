@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegacyLauncher", "LegacyLau
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SakuraUpdater", "SakuraUpdater\SakuraUpdater.csproj", "{5FF971A9-1F53-4A85-9440-E61A8F659D75}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SakuraFrpService", "SakuraFrpService\SakuraFrpService.csproj", "{1D8A7DBA-C82F-4EEA-B443-2AF24062DC6F}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SakuraLibrary", "SakuraLibrary\SakuraLibrary.csproj", "{EC113DEE-C0B2-4E52-A318-FD44DAD67EA3}"
 EndProject
 Global
@@ -29,6 +31,10 @@ Global
 		{5FF971A9-1F53-4A85-9440-E61A8F659D75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FF971A9-1F53-4A85-9440-E61A8F659D75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FF971A9-1F53-4A85-9440-E61A8F659D75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D8A7DBA-C82F-4EEA-B443-2AF24062DC6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D8A7DBA-C82F-4EEA-B443-2AF24062DC6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D8A7DBA-C82F-4EEA-B443-2AF24062DC6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D8A7DBA-C82F-4EEA-B443-2AF24062DC6F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EC113DEE-C0B2-4E52-A318-FD44DAD67EA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EC113DEE-C0B2-4E52-A318-FD44DAD67EA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC113DEE-C0B2-4E52-A318-FD44DAD67EA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
