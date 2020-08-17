@@ -1,0 +1,20 @@
+﻿syntax = "proto3";
+option csharp_namespace = "SakuraLibrary.Proto";
+
+message User {
+  int32 id = 1;
+  string name = 2;
+
+  enum Status {
+    NO_LOGIN = 0;
+    LOGGING_IN = 1;
+    LOGGED_IN = 2;
+  }
+  Status status = 3;
+}
+
+message UserLogin { string token = 1; }
+
+message UserLogout {}
+
+message UserInfoRequest {}

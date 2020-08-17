@@ -1,0 +1,33 @@
+syntax = "proto3";
+option csharp_namespace = "SakuraLibrary.Proto";
+
+import "user.proto";
+import "tunnel.proto";
+
+enum MessageID {
+  USER_LOGIN = 0;
+  USER_LOGOUT = 1;
+  USER_INFO = 2;
+  TUNNEL_LIST = 3;
+  TUNNEL_RELOAD = 4;
+  TUNNEL_UPDATE = 5;
+}
+
+message BasicResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message BasicRequest {
+  int32 version = 1;
+  MessageID type = 2;
+
+  oneof data {
+    UserLogin USER_LOGIN = 3;
+    UserLogout USER_LOGOUT = 4;
+    UserInfoRequest USER_INFO = 5;
+    GetTunnelList TUNNEL_LIST = 6;
+    ReloadTunnelList TUNNEL_RELOAD = 7;
+    UpdateTunnelStatus TUNNEL_UPDATE = 8;
+  }
+}
