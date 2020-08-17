@@ -27,3 +27,13 @@ message UpdateTunnelStatus {
   int32 id = 1;
   int32 status = 2;
 }
+
+message GetTunnelLog { int32 id = 1; }
+
+message GetTunnelLogResponse {
+  bool success = 1;
+  string message = 2;
+  repeated Tunnel tunnels = 3;
+}
+
+message ClearTunnelLog { int32 id = 1; }

@@ -70,7 +70,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Tunnel.cs" />
+    <Compile Include="Tunnel\Tunnel.cs" />
+    <Compile Include="Tunnel\TunnelLogger.cs" />
+    <Compile Include="Tunnel\TunnelManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -11,6 +11,8 @@ enum MessageID {
   TUNNEL_LIST = 3;
   TUNNEL_RELOAD = 4;
   TUNNEL_UPDATE = 5;
+  TUNNEL_LOG_GET = 6;
+  TUNNEL_LOG_CLEAR = 7;
 }
 
 message BasicResponse {
@@ -29,5 +31,7 @@ message BasicRequest {
     GetTunnelList TUNNEL_LIST = 6;
     ReloadTunnelList TUNNEL_RELOAD = 7;
     UpdateTunnelStatus TUNNEL_UPDATE = 8;
+    GetTunnelLog TUNNEL_LOG_GET = 9;
+    ClearTunnelLog TUNNEL_LOG_CLEAR = 10;
   }
 }
