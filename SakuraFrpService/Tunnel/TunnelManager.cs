@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace SakuraFrpService.Tunnel
@@ -15,6 +16,8 @@ namespace SakuraFrpService.Tunnel
         public readonly string FrpcPath;
         public readonly Thread MainThread;
 
+        protected bool FirstFetch = true;
+        protected int FetchTicks = 20 * 3600;
         protected string UserToken = null;
         protected ManualResetEvent stopEvent = new ManualResetEvent(false);
 
@@ -27,21 +30,6 @@ namespace SakuraFrpService.Tunnel
 
         public string GetArguments(int tunnel) => "-n -f " + Main.UserToken + ":" + tunnel;
 
-        public void AddJson(Dictionary<string, dynamic> json)
-        {
-            lock (this)
-            {
-                this[json["id"]] = new Tunnel(this)
-                {
-                    Id = json["id"],
-                    Node = json["node"],
-                    Name = json["name"],
-                    Type = json["type"],
-                    Description = json["description"]
-                };
-            }
-        }
-
         public void StopAll()
         {
             lock (this)
@@ -49,6 +37,39 @@ namespace SakuraFrpService.Tunnel
                 foreach (var t in Values)
                 {
                     t.Stop();
+                }
+            }
+        }
+
+        public async Task UpdateTunnels()
+        {
+            var tunnels = await Natfrp.Request("get_tunnels");
+            lock (this)
+            {
+                var tmp = new List<int>();
+                foreach (Dictionary<string, dynamic> j in tunnels["data"])
+                {
+                    tmp.Add(j["id"]);
+                    if (!ContainsKey(j["id"]))
+                    {
+                        this[j["id"]] = new Tunnel(this)
+                        {
+                            Id = j["id"],
+                            Node = j["node"],
+                            Name = j["name"],
+                            Type = j["type"],
+                            Description = j["description"]
+                        };
+                    }
+                }
+                foreach (var k in Keys.Where(k => !tmp.Contains(k)))
+                {
+                    Remove(k);
+                }
+                if (FirstFetch)
+                {
+                    FirstFetch = false;
+                    SetEnabledTunnels(Properties.Settings.Default.EnabledTunnels);
                 }
             }
         }
@@ -81,23 +102,54 @@ namespace SakuraFrpService.Tunnel
         {
             if (MainThread.IsAlive)
             {
-                return;
+                MainThread.Abort(); // Shouldn't happen, just in case
             }
             UserToken = token;
             stopEvent.Reset();
             MainThread.Start();
         }
 
-        public void Stop() => stopEvent.Set();
-
-        protected void Run()
+        public void Stop(bool wait = false)
         {
-            while (!stopEvent.WaitOne(0))
+            stopEvent.Set();
+            if (wait)
             {
                 try
                 {
-                    // TODO: Fetch tunnels periodically
-                    // TODO: Control tunnel start / stop / retry status
+                    MainThread.Join();
+                }
+                catch { }
+            }
+        }
+
+        protected void Run()
+        {
+            FirstFetch = true;
+            while (!stopEvent.WaitOne(0))
+            {
+                Thread.Sleep(50);
+                try
+                {
+                    if (FetchTicks-- <= 0)
+                    {
+                        var t = UpdateTunnels();
+                        t.Wait();
+                        FetchTicks = t.Status == TaskStatus.RanToCompletion ? 20 * 3600 : 20 * 5;
+                    }
+                    foreach (var t in Values)
+                    {
+                        if (t.Enabled)
+                        {
+                            if (!t.Running)
+                            {
+                                t.Start();
+                            }
+                        }
+                        else if (t.Running)
+                        {
+                            t.Stop();
+                        }
+                    }
                 }
                 catch { }
             }
@@ -123,6 +175,28 @@ namespace SakuraFrpService.Tunnel
                 {
                     base[key] = value;
                 }
+            }
+        }
+
+        public new void Clear()
+        {
+            lock (this)
+            {
+                StopAll();
+                base.Clear();
+            }
+        }
+
+        protected new void Remove(int k)
+        {
+            lock (this)
+            {
+                if (!ContainsKey(k))
+                {
+                    return;
+                }
+                this[k].Stop();
+                base.Remove(k);
             }
         }
 

@@ -45,8 +45,8 @@ namespace SakuraFrpService.Tunnel
                     UseShellExecute = false,
                     RedirectStandardInput = true,
                     RedirectStandardError = true,
-                    StandardErrorEncoding = Encoding.UTF8,
                     RedirectStandardOutput = true,
+                    StandardErrorEncoding = Encoding.UTF8,
                     StandardOutputEncoding = Encoding.UTF8
                 });
 
@@ -74,14 +74,12 @@ namespace SakuraFrpService.Tunnel
             try
             {
                 BaseProcess.StandardInput.Write("stop\n");
-                /* TODO: Exit & kill check
                 if (!BaseProcess.WaitForExit(3500))
                 {
-                    Main.Log("Launcher", "frpc 未响应, 正在强制结束进程");
+                    // Main.Log("Launcher", "frpc 未响应, 正在强制结束进程");
                     BaseProcess.Kill();
                 }
-                Main.Log("Launcher", "frpc 已结束");
-                */
+                // Main.Log("Launcher", "frpc 已结束");
             }
             finally
             {

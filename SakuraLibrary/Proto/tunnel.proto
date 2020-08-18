@@ -13,15 +13,11 @@ message Tunnel {
   Status status = 3;
 }
 
-message GetTunnelList {}
-
 message GetTunnelListResponse {
   bool success = 1;
   string message = 2;
   repeated Tunnel tunnels = 3;
 }
-
-message ReloadTunnelList {}
 
 message UpdateTunnelStatus {
   int32 id = 1;

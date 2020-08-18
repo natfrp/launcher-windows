@@ -14,7 +14,3 @@ message User {
 }
 
 message UserLogin { string token = 1; }
-
-message UserLogout {}
-
-message UserInfoRequest {}
