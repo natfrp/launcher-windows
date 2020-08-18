@@ -37,24 +37,12 @@ namespace SakuraFrpService.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public string[] AutoStartTunnels {
+        public global::System.Collections.Generic.List<System.Int32> EnabledTunnels {
             get {
-                return ((string[])(this["AutoStartTunnels"]));
+                return ((global::System.Collections.Generic.List<System.Int32>)(this["EnabledTunnels"]));
             }
             set {
-                this["AutoStartTunnels"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string FrpcPath {
-            get {
-                return ((string)(this["FrpcPath"]));
-            }
-            set {
-                this["FrpcPath"] = value;
+                this["EnabledTunnels"] = value;
             }
         }
     }

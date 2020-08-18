@@ -11,8 +11,8 @@ namespace SakuraFrpService.Tunnel
         public readonly TunnelLogger Logger = null;
         public readonly TunnelManager Manager = null;
 
-        public int Id;
-        public string Name;
+        public int Id, Node;
+        public string Name, Type, Description;
 
         public bool Enabled = false;
         public bool Running => BaseProcess != null && !BaseProcess.HasExited;

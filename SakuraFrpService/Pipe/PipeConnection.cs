@@ -1,4 +1,7 @@
-﻿using System.IO.Pipes;
+﻿using System.IO;
+using System.IO.Pipes;
+
+using Google.Protobuf;
 
 namespace SakuraFrpService.Pipe
 {
@@ -9,5 +12,16 @@ namespace SakuraFrpService.Pipe
 
         public byte[] Buffer = null;
         public PipeStream Pipe = null;
+
+        public void Send(byte[] data) => Pipe.Write(data, 0, data.Length);
+
+        public void SendProto(IMessage message)
+        {
+            using (var ms = new MemoryStream())
+            {
+                message.WriteTo(ms);
+                Send(ms.ToArray());
+            }
+        }
     }
 }

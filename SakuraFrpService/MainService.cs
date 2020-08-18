@@ -1,7 +1,11 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.ServiceProcess;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using SakuraLibrary.Proto;
+using UserStatus = SakuraLibrary.Proto.User.Types.Status;
 
 using SakuraFrpService.Pipe;
 using SakuraFrpService.Tunnel;
@@ -10,24 +14,44 @@ namespace SakuraFrpService
 {
     public partial class MainService : ServiceBase
     {
-        public bool Daemonize = false;
+        public string UserToken = "";
+        public UserStatus LoginStatus = UserStatus.NoLogin; // TODO: Thread safety?
 
-        public readonly PipeServer Pipe = null;
-        public readonly TunnelManager TunnelManager = new TunnelManager();
+        public readonly bool Daemonize;
+        public readonly Thread TickThread = null;
 
-        public MainService()
+        public readonly PipeServer Pipe;
+        public readonly TunnelManager TunnelManager;
+
+        public MainService(bool daemon)
         {
+            Daemonize = daemon;
+            if (!daemon)
+            {
+                TickThread = new Thread(new ThreadStart(Tick));
+            }
+
             InitializeComponent();
+
             Pipe = new PipeServer("SakuraFrpLauncher_Service");
+            TunnelManager = new TunnelManager(this);
+        }
+
+        public void Tick()
+        {
+            Thread.Sleep(50);
         }
 
         public void DaemonRun(string[] args)
         {
-            Daemonize = true;
+            if (!Daemonize)
+            {
+                throw new InvalidOperationException();
+            }
             OnStart(args);
             while (true)
             {
-                Thread.Sleep(10);
+                Tick();
             }
         }
 
@@ -39,6 +63,47 @@ namespace SakuraFrpService
                 return;
             }
             base.Stop();
+        }
+
+        protected async Task<string> Login(string token)
+        {
+            if (LoginStatus != UserStatus.NoLogin)
+            {
+                return "用户已登录";
+            }
+            LoginStatus = UserStatus.Pending;
+            try
+            {
+                var nodes = await Natfrp.Request("get_nodes");
+                /*
+                Nodes.Clear();
+                foreach (Dictionary<string, dynamic> j in nodes["data"])
+                {
+                    Nodes.Add(new NodeData()
+                    {
+                        ID = (int)j["id"],
+                        Name = (string)j["name"],
+                        AcceptNew = (bool)j["accept_new"]
+                    });
+                }
+                */
+
+                var tunnels = await Natfrp.Request("get_tunnels");
+                foreach (Dictionary<string, dynamic> j in tunnels["data"])
+                {
+                    TunnelManager.AddJson(j);
+                }
+
+                LoginStatus = UserStatus.LoggedIn;
+
+                TunnelManager.SetEnabledTunnels(Properties.Settings.Default.EnabledTunnels);
+                TunnelManager.Start();
+            }
+            catch (NatfrpException e)
+            {
+                return e.Message + (e.InnerException == null ? "" : e.InnerException.ToString());
+            }
+            return null;
         }
 
         protected override void OnStart(string[] args)
@@ -54,11 +119,6 @@ namespace SakuraFrpService
                 ExitCode = 1;
                 Stop();
                 return;
-            }
-
-            if (Properties.Settings.Default.FrpcPath == "")
-            {
-
             }
         }
 
@@ -80,6 +140,13 @@ namespace SakuraFrpService
                 switch (req.Type)
                 {
                 case MessageID.UserLogin:
+                    var t = Login(req.USERLOGIN.Token);
+                    t.Wait();
+                    connection.SendProto(new BasicResponse()
+                    {
+                        Success = t.Result == null,
+                        Message = t.Result ?? "登录成功"
+                    });
                     break;
                 case MessageID.UserLogout:
                     break;

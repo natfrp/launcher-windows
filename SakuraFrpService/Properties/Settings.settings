@@ -5,10 +5,7 @@
     <Setting Name="Token" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="AutoStartTunnels" Type="System.String[]" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="FrpcPath" Type="System.String" Scope="User">
+    <Setting Name="EnabledTunnels" Type="System.Collections.Generic.List&lt;System.Int32&gt;" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

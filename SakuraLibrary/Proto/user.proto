@@ -7,7 +7,7 @@ message User {
 
   enum Status {
     NO_LOGIN = 0;
-    LOGGING_IN = 1;
+    PENDING = 1;
     LOGGED_IN = 2;
   }
   Status status = 3;
