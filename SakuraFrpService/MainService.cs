@@ -18,7 +18,6 @@ namespace SakuraFrpService
 {
     public partial class MainService : ServiceBase
     {
-        public string UserToken = "";
         public User UserInfo = new User()
         {
             Status = UserStatus.NoLogin
@@ -81,19 +80,24 @@ namespace SakuraFrpService
             {
                 return "用户已登录";
             }
+            if (token.Length != 16)
+            {
+                return "Token  无效";
+            }
             UserInfo.Status = UserStatus.Pending;
             try
             {
+                Natfrp.Token = token;
+
                 var user = await Natfrp.Request("get_user");
                 if (!user["login"])
                 {
                     return user["message"];
                 }
-                UserInfo.Id = user["data"]["id"];
+                UserInfo.Id = (int)user["data"]["uid"];
                 UserInfo.Name = user["data"]["name"];
                 // string traffic, advanced_traffic
 
-                UserToken = token;
                 UserInfo.Status = UserStatus.LoggedIn;
 
                 /*
@@ -163,10 +167,15 @@ namespace SakuraFrpService
                 Stop();
                 return;
             }
+
+            var settings = Properties.Settings.Default;
+            Natfrp.Token = settings.Token;
+            // TODO: auto login, may do this in tick system
         }
 
         protected override void OnStop()
         {
+            // TODO: save
             Pipe.Stop();
         }
 
@@ -197,6 +206,10 @@ namespace SakuraFrpService
                         {
                             resp.Success = false;
                             resp.Message = t.Result;
+                        }
+                        else
+                        {
+                            resp.DataUser = UserInfo;
                         }
                     }
                     break;

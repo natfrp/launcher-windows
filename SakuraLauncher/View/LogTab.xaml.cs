@@ -24,15 +24,15 @@ namespace SakuraLauncher.View
              BrushTime = new SolidColorBrush(Color.FromRgb(80, 141, 220)),
              BrushText = new SolidColorBrush(Colors.Silver),
              BrushTunnel = new SolidColorBrush(Colors.Wheat);
-        
-        private LauncherModel Model => (LauncherModel)DataContext;
 
-        public Dictionary<string,string> failedData = new Dictionary<string, string>();
+        private readonly LauncherModel Model;
+
+        public Dictionary<string, string> failedData = new Dictionary<string, string>();
 
         public LogTab(LauncherModel main)
         {
             InitializeComponent();
-            DataContext = main;
+            DataContext = Model = main;
         }
 
         private void LogFrpc(string tunnel, string raw)
@@ -75,22 +75,22 @@ namespace SakuraLauncher.View
                 AddRun(match.Groups["Content"].Value, BrushText);
             }
         }
-        
+
         public void Log(string tunnel, string raw, int type)
         {
-            if(!Dispatcher.CheckAccess())
+            if (!Dispatcher.CheckAccess())
             {
                 Dispatcher.Invoke(() => Log(tunnel, raw, type));
                 return;
             }
             bool bottom = ScrollViewerLog.ScrollableHeight - ScrollViewerLog.VerticalOffset < 1;
-            if(TextBlockLog.Inlines.Count != 0)
+            if (TextBlockLog.Inlines.Count != 0)
             {
                 AddLineBreak();
             }
             AddRun(tunnel + " ", BrushTunnel);
 
-            if(type == -1)
+            if (type == -1)
             {
                 LogFrpc(tunnel, raw);
             }
@@ -112,12 +112,12 @@ namespace SakuraLauncher.View
                 }
                 AddRun(raw, BrushText);
             }
-            
+
             while (TextBlockLog.Inlines.Count > 4 * 300 - 1)
             {
                 TextBlockLog.Inlines.Remove(TextBlockLog.Inlines.FirstInline);
             }
-            if(bottom)
+            if (bottom)
             {
                 ScrollViewerLog.ScrollToBottom();
             }

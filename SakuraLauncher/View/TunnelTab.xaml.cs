@@ -7,12 +7,12 @@ namespace SakuraLauncher.View
 {
     public partial class TunnelTab : UserControl
     {
-        private LauncherModel Model => (LauncherModel)DataContext;
+        private readonly LauncherModel Model;
 
         public TunnelTab(LauncherModel main)
         {
             InitializeComponent();
-            DataContext = main;
+            DataContext = Model = main;
         }
 
         private void ButtonCreate_Click(object sender, RoutedEventArgs e) => new CreateTunnelWindow().ShowDialog();

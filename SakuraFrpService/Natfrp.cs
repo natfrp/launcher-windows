@@ -14,6 +14,7 @@ namespace SakuraFrpService
     {
         public static bool BypassProxy = false;
 
+        public static string Token = "";
         public static string Endpoint = "https://api.natfrp.com/launcher/";
         public static string UserAgent = "SakuraFrpService/" + Assembly.GetExecutingAssembly().GetName().Version;
 
@@ -23,7 +24,7 @@ namespace SakuraFrpService
             {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-                var request = WebRequest.CreateHttp(string.Format("{0}{1}?token={2}{3}{4}", Endpoint, action, "/* TODO: Token */", query == null ? null : "&", query));
+                var request = WebRequest.CreateHttp(string.Format("{0}{1}?token={2}{3}{4}", Endpoint, action, Token, query == null ? null : "&", query));
                 request.Method = "GET";
                 request.Timeout = 10 * 1000;
                 request.UserAgent = UserAgent;

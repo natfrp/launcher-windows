@@ -1,5 +1,4 @@
-﻿using System.IO.Pipes;
-using System.Threading;
+﻿using System.Threading;
 using System.Collections.ObjectModel;
 
 using SakuraLibrary;
@@ -13,9 +12,9 @@ namespace SakuraLauncher.Model
     public class LauncherModel : ModelBase
     {
         public readonly MainWindow View;
+        public readonly PipeClient Pipe = new PipeClient(Consts.PipeName);
 
         protected Thread PipeThread;
-        protected PipeClient Pipe = new PipeClient(Consts.PipeName);
 
         // get rid of this!!! ↓
         public ObservableCollection<NodeData> Nodes { get; set; } = new ObservableCollection<NodeData>();
@@ -99,12 +98,14 @@ namespace SakuraLauncher.Model
                         Pipe.Connect();
                         continue;
                     }
-                    var test = Pipe.Request(new RequestBase()
+                    var resp = Pipe.Request(new RequestBase()
                     {
                         Type = MessageID.UserInfo
                     });
-
-
+                    if (resp.DataUser != null)
+                    {
+                        UserInfo = resp.DataUser;
+                    }
                 }
                 Thread.Sleep(500);
             }
@@ -191,13 +192,13 @@ namespace SakuraLauncher.Model
 
         #region Main Window
 
-        public bool Connected { get => _connected; set => Set(ref _connected, value); }
+        public bool Connected { get => _connected; set => Set(out _connected, value); }
         private bool _connected;
 
-        public User UserInfo { get => _userInfo; set => Set(ref _userInfo, value); }
-        private User _userInfo;
+        public User UserInfo { get => _userInfo; set => SafeSet(out _userInfo, value, View.Dispatcher); }
+        private User _userInfo = new User();
 
-        public int CurrentTab { get => _currentTab; set => Set(ref _currentTab, value); }
+        public int CurrentTab { get => _currentTab; set => Set(out _currentTab, value); }
         private int _currentTab;
 
         [SourceBinding(nameof(CurrentTab))]
@@ -224,10 +225,19 @@ namespace SakuraLauncher.Model
 
         public string UserToken { get; set; }
 
-        public bool SuppressInfo { get => _suppressInfo; set => Set(ref _suppressInfo, value); }
+        [SourceBinding(nameof(UserInfo))]
+        public bool LoggedIn => UserInfo.Status == User.Types.Status.LoggedIn;
+
+        [SourceBinding(nameof(LoggingIn), nameof(LoggedIn))]
+        public bool TokenEditable => !LoggingIn && !LoggedIn;
+
+        public bool LoggingIn { get => _loggingIn; set => SafeSet(out _loggingIn, value, View.Dispatcher); }
+        private bool _loggingIn;
+
+        public bool SuppressInfo { get => _suppressInfo; set => Set(out _suppressInfo, value); }
         private bool _suppressInfo;
 
-        public bool LogTextWrapping { get => _logTextWrapping; set => Set(ref _logTextWrapping, value); }
+        public bool LogTextWrapping { get => _logTextWrapping; set => Set(out _logTextWrapping, value); }
         private bool _logTextWrapping;
 
         // public Prop<bool> AutoRun { get; set; } = new Prop<bool>();

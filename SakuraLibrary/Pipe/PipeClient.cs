@@ -60,20 +60,23 @@ namespace SakuraLibrary.Pipe
 
         public ResponseBase Request(IMessage message)
         {
-            try
+            lock (this)
             {
-                var data = message.ToByteArray();
-                Pipe.Pipe.Write(data, 0, data.Length);
-                return ResponseBase.Parser.ParseFrom(Pipe.Buffer, 0, Pipe.EnsureMessageComplete(Pipe.Pipe.Read(Pipe.Buffer, 0, Pipe.Buffer.Length)));
-            }
-            catch
-            {
-                if (!Pipe.Pipe.IsConnected)
+                try
                 {
-                    Dispose();
+                    var data = message.ToByteArray();
+                    Pipe.Pipe.Write(data, 0, data.Length);
+                    return ResponseBase.Parser.ParseFrom(Pipe.Buffer, 0, Pipe.EnsureMessageComplete(Pipe.Pipe.Read(Pipe.Buffer, 0, Pipe.Buffer.Length)));
                 }
+                catch
+                {
+                    if (!Pipe.Pipe.IsConnected)
+                    {
+                        Dispose();
+                    }
+                }
+                return null;
             }
-            return null;
         }
 
         protected void OnPushPipeData(IAsyncResult ar)

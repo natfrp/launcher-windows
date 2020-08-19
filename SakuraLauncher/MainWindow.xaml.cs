@@ -19,7 +19,7 @@ namespace SakuraLauncher
     /// </summary>
     public partial class MainWindow : Window
     {
-        private LauncherModel Model => (LauncherModel)DataContext;
+        private readonly LauncherModel Model;
 
         public UserControl[] Tabs = null;
 
@@ -28,7 +28,7 @@ namespace SakuraLauncher
             InitializeComponent();
             SetLogo(Properties.Settings.Default.LogoIndex);
 
-            DataContext = new LauncherModel(this);
+            DataContext = Model = new LauncherModel(this);
 
             Tabs = new UserControl[] {
                 new TunnelTab(Model),

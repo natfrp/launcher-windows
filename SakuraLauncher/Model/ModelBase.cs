@@ -3,6 +3,7 @@ using System.Reflection;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Windows.Threading;
 
 namespace SakuraLauncher.Model
 {
@@ -32,7 +33,23 @@ namespace SakuraLauncher.Model
             }
         }
 
-        protected void Set<T>(ref T target, T value, [CallerMemberName] string propertyName = "")
+        protected void SafeSet<T>(out T target, T value, Dispatcher dispatcher, [CallerMemberName] string propertyName = "")
+        {
+            target = value;
+            if (dispatcher != null && !dispatcher.CheckAccess())
+            {
+                dispatcher.Invoke(() =>
+                {
+                    RaisePropertyChanged(propertyName);
+                });
+            }
+            else
+            {
+                RaisePropertyChanged(propertyName);
+            }
+        }
+
+        protected void Set<T>(out T target, T value, [CallerMemberName] string propertyName = "")
         {
             target = value;
             RaisePropertyChanged(propertyName);

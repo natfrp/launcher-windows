@@ -30,7 +30,7 @@ namespace SakuraFrpService.Tunnel
             MainThread = new Thread(new ThreadStart(Run));
         }
 
-        public string GetArguments(int tunnel) => "-n -f " + Main.UserToken + ":" + tunnel;
+        public string GetArguments(int tunnel) => "-n -f " + Natfrp.Token + ":" + tunnel;
 
         public void StopAll()
         {
