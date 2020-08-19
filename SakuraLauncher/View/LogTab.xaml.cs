@@ -53,7 +53,7 @@ namespace SakuraLauncher.View
             {
                 if (failedData.ContainsKey(tunnel))
                 {
-                    if (Model.View.IsVisible && !Model.SuppressInfo.Value)
+                    if (Model.View.IsVisible && !Model.SuppressInfo)
                     {
                         string failedData_ = failedData[tunnel];
                         ThreadPool.QueueUserWorkItem(s => App.ShowMessage(failedData_, "隧道日志", MessageBoxImage.Information));

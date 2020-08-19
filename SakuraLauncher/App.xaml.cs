@@ -1,21 +1,7 @@
 ﻿using System;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Linq;
 using System.Windows;
 using System.Threading;
-using System.Reflection;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Security.Principal;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Runtime.InteropServices;
 
-using fastJSON;
-
-using SakuraLauncher.Model;
 using SakuraLibrary;
 
 namespace SakuraLauncher
@@ -25,29 +11,9 @@ namespace SakuraLauncher
     /// </summary>
     public partial class App : Application
     {
-        [DllImport("user32.dll")]
-        public static extern bool ReleaseCapture();
-
-        [DllImport("user32.dll")]
-        public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern int SetProcessShutdownParameters(int dwLevel, int dwFlags);
-
-        [DllImport("kernel32.dll")]
-        public static extern bool QueryFullProcessImageName([In] IntPtr hProcess, [In] uint dwFlags, [Out] StringBuilder lpExeName, [In, Out] ref uint lpdwSize);
-        
-        public static Version FrpcVersion = null;
-        public static float FrpcVersionSakura = 0;
-
-        public static string AutoRunFile { get; private set; }
-
         public static App Instance = null;
 
-        public static MessageBoxResult ShowMessage(string text, string title, MessageBoxImage icon, MessageBoxButton buttons = MessageBoxButton.OK)
-        {
-            return Instance.Dispatcher.Invoke(() => MessageBox.Show(text, title, buttons, icon));
-        }
+        public static MessageBoxResult ShowMessage(string text, string title, MessageBoxImage icon, MessageBoxButton buttons = MessageBoxButton.OK) => Instance.Dispatcher.Invoke(() => MessageBox.Show(text, title, buttons, icon));
 
         public Mutex AppMutex = null;
 
@@ -61,6 +27,9 @@ namespace SakuraLauncher
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             /*
+        public static Version FrpcVersion = null;
+        public static float FrpcVersionSakura = 0;
+
             if (!File.Exists("SKIP_LAUNCHER_SIGN_VERIFY") && !WinTrust.VerifyEmbeddedSignature(Assembly.GetExecutingAssembly().Location))
             {
                 ShowMessage("@@@@@@@@@@@@@@@@@@\n       !!!  警告: 启动器签名验证失败  !!!\n@@@@@@@@@@@@@@@@@@\n\n" +
@@ -129,69 +98,29 @@ namespace SakuraLauncher
                     minimize = true;
                 }
             }
+
+            // AutoRunFile = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\SakuraLauncher_" + Utils.Md5(Utils.ExecutablePath) + ".lnk";
+
             AppMutex = new Mutex(true, "SakuraLauncher_" + Utils.ExecutablePath.GetHashCode(), out bool created);
-            AutoRunFile = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\SakuraLauncher_" + Utils.Md5(Utils.ExecutablePath) + ".lnk";
-            if (created)
-            {
-                var test = Path.GetFullPath("");// TODO: TunnelModel.ClientPath);
-                var processes = Process.GetProcessesByName("frpc").Where(p =>
-                {
-                    try
-                    {
-                        uint bufferSize = 256;
-                        var sb = new StringBuilder((int)bufferSize - 1);
-                        if (QueryFullProcessImageName(p.Handle, 0, sb, ref bufferSize))
-                        {
-                            return Path.GetFullPath(sb.ToString()) == test;
-                        }
-                    }
-                    catch { }
-                    return false;
-                }).ToArray();
-
-                if (processes.Length != 0)
-                {
-                    switch (MessageBox.Show("发现 " + processes.Length + " 个的残留的 frpc 进程, 是否尝试将其关闭?\n这些进程可能是启动器不正常退出造成的残留.\n如果您不知道如何选择, 请点 \"是\".\n\n是 = 关闭所有进程\n否 = 忽略并继续\n取消 = 退出程序", "注意", MessageBoxButton.YesNoCancel, MessageBoxImage.Information))
-                    {
-                    case MessageBoxResult.Yes:
-                        foreach (var p in processes)
-                        {
-                            try
-                            {
-                                p.Kill();
-                                p.WaitForExit(200);
-                            }
-                            catch { }
-                        }
-                        break;
-                    case MessageBoxResult.No:
-                        break;
-                    default:
-                        Environment.Exit(0);
-                        break;
-                    }
-                }
-
-                if (SetProcessShutdownParameters(0x300, 0) == 0)
-                {
-                    ShowMessage("无法设置关机优先级, 这可能导致隧道开机自启无法正常工作, 请检查杀毒软件是否拦截了此操作\n错误代码: " + Marshal.GetLastWin32Error(), "Oops", MessageBoxImage.Warning);
-                }
-
-                MainWindow = new MainWindow(File.Exists(AutoRunFile));
-                if (!minimize)
-                {
-                    MainWindow.Show();
-                }
-            }
-            else
+            if (!created)
             {
                 ShowMessage("请不要重复开启 SakuraFrp 客户端. 如果想运行多个实例请将软件复制到其他目录.", "Oops", MessageBoxImage.Warning);
                 Environment.Exit(0);
+            }
+
+            MainWindow = new MainWindow();
+            if (!minimize)
+            {
+                MainWindow.Show();
             }
         }
 
         private void TrayMenu_Show(object sender, RoutedEventArgs e) => MainWindow.Show();
 
-        private void TrayMenu_Exit(object sender, RoutedEventArgs e) => MainWindow.Close();
+        private void TrayMenu_Exit(object sender, RoutedEventArgs e)
+        {
+            // TODO: Exit & shut down daemon
+            // IDK if we should stop the service or not
+        }
     }
 }

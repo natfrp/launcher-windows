@@ -21,7 +21,7 @@
                             <Setter Property="HorizontalScrollBarVisibility" Value="Auto"></Setter>
                         </Style.Setters>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding LogTextWrapping.Value}" Value="True">
+                            <DataTrigger Binding="{Binding LogTextWrapping}" Value="True">
                                 <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"></Setter>
                             </DataTrigger>
                         </Style.Triggers>
@@ -34,7 +34,7 @@
                                 <Setter Property="TextWrapping" Value="NoWrap"></Setter>
                             </Style.Setters>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding LogTextWrapping.Value}" Value="True">
+                                <DataTrigger Binding="{Binding LogTextWrapping}" Value="True">
                                     <Setter Property="TextWrapping" Value="WrapWithOverflow"></Setter>
                                 </DataTrigger>
                             </Style.Triggers>

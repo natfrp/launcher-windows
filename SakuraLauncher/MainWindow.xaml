@@ -102,7 +102,7 @@
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource TabButtonBase}">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding CurrentTab.Value}" Value="0">
+                                <DataTrigger Binding="{Binding CurrentTab}" Value="0">
                                     <Setter Property="Opacity" Value="1"></Setter>
                                     <Setter Property="Background" Value="{StaticResource TabGradientSelected}"></Setter>
                                     <DataTrigger.ExitActions>
@@ -140,7 +140,7 @@
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource TabButtonBase}">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding CurrentTab.Value}" Value="1">
+                                <DataTrigger Binding="{Binding CurrentTab}" Value="1">
                                     <Setter Property="Opacity" Value="1"></Setter>
                                     <Setter Property="Background" Value="{StaticResource TabGradientSelected}"></Setter>
                                     <DataTrigger.ExitActions>
@@ -174,7 +174,7 @@
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource TabButtonBase}">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding CurrentTab.Value}" Value="2">
+                                <DataTrigger Binding="{Binding CurrentTab}" Value="2">
                                     <Setter Property="Opacity" Value="1"></Setter>
                                     <Setter Property="Background" Value="{StaticResource TabGradientSelected}"></Setter>
                                     <DataTrigger.ExitActions>
@@ -208,7 +208,7 @@
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource TabButtonBase}">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding CurrentTab.Value}" Value="3">
+                                <DataTrigger Binding="{Binding CurrentTab}" Value="3">
                                     <Setter Property="Opacity" Value="1"></Setter>
                                     <Setter Property="Background" Value="{StaticResource TabGradientSelected}"></Setter>
                                     <DataTrigger.ExitActions>

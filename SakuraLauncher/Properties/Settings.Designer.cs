@@ -58,5 +58,17 @@ namespace SakuraLauncher.Properties {
                 this["LogoIndex"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool LogTextWrapping {
+            get {
+                return ((bool)(this["LogTextWrapping"]));
+            }
+            set {
+                this["LogTextWrapping"] = value;
+            }
+        }
     }
 }

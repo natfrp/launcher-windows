@@ -7,6 +7,8 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Animation;
 
+using SakuraLibrary;
+
 using SakuraLauncher.View;
 using SakuraLauncher.Model;
 
@@ -21,7 +23,7 @@ namespace SakuraLauncher
 
         public UserControl[] Tabs = null;
 
-        public MainWindow(bool autorun)
+        public MainWindow()
         {
             InitializeComponent();
             SetLogo(Properties.Settings.Default.LogoIndex);
@@ -65,8 +67,8 @@ namespace SakuraLauncher
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            App.ReleaseCapture();
-            App.SendMessage(new WindowInteropHelper(this).Handle, 0xA1, (IntPtr)0x2, IntPtr.Zero);
+            NTAPI.ReleaseCapture();
+            NTAPI.SendMessage(new WindowInteropHelper(this).Handle, 0xA1, new IntPtr(0x2), IntPtr.Zero);
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e) => Model.Save();

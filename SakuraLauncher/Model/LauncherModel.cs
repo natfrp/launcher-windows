@@ -1,10 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Collections.Generic;
+﻿using System.IO.Pipes;
+using System.Threading;
 using System.Collections.ObjectModel;
 
-using fastJSON;
+using SakuraLibrary;
 using SakuraLibrary.Proto;
 
 using SakuraLauncher.Helper;
@@ -15,49 +13,10 @@ namespace SakuraLauncher.Model
     {
         public readonly MainWindow View;
 
-        #region Main Window
+        protected Thread PipeThread;
+        protected NamedPipeClientStream Pipe = new NamedPipeClientStream(".", Consts.PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
 
-        public bool Connected { get => _connected; set => Set(ref _connected, value); }
-        private bool _connected;
-
-        public User UserInfo { get => _userInfo; set => Set(ref _userInfo, value); }
-        private User _userInfo;
-
-        public int CurrentTab { get => _currentTab; set => Set(ref _currentTab, value); }
-        private int _currentTab;
-
-        [SourceBinding(nameof(CurrentTab))]
-        public TabIndexTester CurrentTabTester { get; set; }
-
-        public void SwitchTab(int id)
-        {
-            if (CurrentTab != id)
-            {
-                CurrentTab = id;
-                View.BeginTabStoryboard("TabHideAnimation");
-            }
-        }
-
-        #endregion
-
-        #region Tunnel Tab Binding
-
-        public ObservableCollection<ITunnelModel> Tunnels { get; set; } = new ObservableCollection<ITunnelModel>();
-
-        #endregion
-
-        #region Settings Tab Binding
-
-        public string UserToken { get; set; }
-
-        public Prop<bool> AutoRun { get; set; } = new Prop<bool>();
-        public Prop<bool> SuppressInfo { get; set; } = new Prop<bool>();
-        public Prop<bool> LogTextWrapping { get; set; } = new Prop<bool>(true);
-        public Prop<bool> BypassProxy { get; set; } = new Prop<bool>(true);
-
-        #endregion
-
-        // WTF ↓
+        // get rid of this!!! ↓
         public ObservableCollection<NodeData> Nodes { get; set; } = new ObservableCollection<NodeData>();
 
         public LauncherModel(MainWindow view)
@@ -65,7 +24,88 @@ namespace SakuraLauncher.Model
             View = view;
             CurrentTabTester = new TabIndexTester(this);
 
+            PipeThread = new Thread(new ThreadStart(PipeWork));
+
             PropertyChanged += (s, e) => Save();
+        }
+
+        public void Load()
+        {
+            var settings = Properties.Settings.Default;
+
+            View.Width = settings.Width;
+            View.Height = settings.Height;
+
+            LogTextWrapping = settings.LogTextWrapping;
+            /*
+            if (File.Exists("config.json"))
+            {
+                var json = JSON.ToObject<Dictionary<string, dynamic>>(File.ReadAllText("config.json"));
+                if (json.ContainsKey("suppressinfo") && json["suppressinfo"])
+                {
+                    SuppressInfo.Value = true;
+                }
+                if (!json.ContainsKey("log_text_wrapping") || json["log_text_wrapping"])
+                {
+                    LogTextWrapping.Value = true;
+                }
+                if (!json.ContainsKey("bypass_proxy") || json["bypass_proxy"])
+                {
+                    BypassProxy.Value = true;
+                }
+                if (!json.ContainsKey("check_update") || json["check_update"])
+                {
+                    // CheckUpdate.Value = true;
+                }
+            }
+            */
+        }
+
+        public void Save()
+        {
+            if (!View.CheckAccess())
+            {
+                View.Dispatcher.Invoke(() => Save());
+                return;
+            }
+
+            var settings = Properties.Settings.Default;
+
+            settings.Width = (int)View.Width;
+            settings.Height = (int)View.Height;
+            settings.LogTextWrapping = LogTextWrapping;
+
+            settings.Save();
+
+            // TODO: Replace with app settings
+            /*
+            { "suppressinfo", SuppressInfo.Value },
+            { "log_text_wrapping", LogTextWrapping.Value },
+            { "bypass_proxy", BypassProxy.Value },
+            { "check_update", CheckUpdate.Value }
+            */
+        }
+
+        protected void PipeWork()
+        {
+            while(true)
+            {
+                var connected = false;
+                lock(Pipe)
+                {
+                    connected = Pipe.IsConnected;
+                }
+                if(connected)
+                {
+                    Thread.Sleep(500);
+                    continue;
+                }
+                lock(Pipe)
+                {
+                    Pipe.Connect();
+                    Pipe.ReadMode = PipeTransmissionMode.Message;
+                }
+            }
         }
 
         /* TODO: lul
@@ -147,70 +187,50 @@ namespace SakuraLauncher.Model
         }
         */
 
-        public void Load()
+        #region Main Window
+
+        public bool Connected { get => _connected; set => Set(ref _connected, value); }
+        private bool _connected;
+
+        public User UserInfo { get => _userInfo; set => Set(ref _userInfo, value); }
+        private User _userInfo;
+
+        public int CurrentTab { get => _currentTab; set => Set(ref _currentTab, value); }
+        private int _currentTab;
+
+        [SourceBinding(nameof(CurrentTab))]
+        public TabIndexTester CurrentTabTester { get; set; }
+
+        public void SwitchTab(int id)
         {
-            var settings = Properties.Settings.Default;
-
-            View.Width = settings.Width;
-            View.Height = settings.Height;
-            View.SetLogo(settings.LogoIndex);
-
-            if (File.Exists("config.json"))
+            if (CurrentTab != id)
             {
-                var json = JSON.ToObject<Dictionary<string, dynamic>>(File.ReadAllText("config.json"));
-                if (json.ContainsKey("logo"))
-                {
-                    View.SetLogo((int)json["logo"]);
-                }
-                if (json.ContainsKey("width"))
-                {
-                    View.Width = json["width"];
-                }
-                if (json.ContainsKey("height"))
-                {
-                    View.Height = json["height"];
-                }
-                if (json.ContainsKey("suppressinfo") && json["suppressinfo"])
-                {
-                    SuppressInfo.Value = true;
-                }
-                if (!json.ContainsKey("log_text_wrapping") || json["log_text_wrapping"])
-                {
-                    LogTextWrapping.Value = true;
-                }
-                if (!json.ContainsKey("bypass_proxy") || json["bypass_proxy"])
-                {
-                    BypassProxy.Value = true;
-                }
-                if (!json.ContainsKey("check_update") || json["check_update"])
-                {
-                    // CheckUpdate.Value = true;
-                }
+                CurrentTab = id;
+                View.BeginTabStoryboard("TabHideAnimation");
             }
         }
 
-        public void Save()
-        {
-            if (!View.CheckAccess())
-            {
-                View.Dispatcher.Invoke(() => Save());
-                return;
-            }
+        #endregion
 
-            var settings = Properties.Settings.Default;
+        #region Tunnel Tab Binding
 
-            settings.Width = (int)View.Width;
-            settings.Height = (int)View.Height;
+        public ObservableCollection<ITunnelModel> Tunnels { get; set; } = new ObservableCollection<ITunnelModel>();
 
-            settings.Save();
+        #endregion
 
-            // TODO: Replace with app settings
-            /*
-            { "suppressinfo", SuppressInfo.Value },
-            { "log_text_wrapping", LogTextWrapping.Value },
-            { "bypass_proxy", BypassProxy.Value },
-            { "check_update", CheckUpdate.Value }
-            */
-        }
+        #region Settings Tab Binding
+
+        public string UserToken { get; set; }
+
+        public bool SuppressInfo { get => _suppressInfo; set => Set(ref _suppressInfo, value); }
+        private bool _suppressInfo;
+
+        public bool LogTextWrapping { get => _logTextWrapping; set => Set(ref _logTextWrapping, value); }
+        private bool _logTextWrapping;
+
+        // public Prop<bool> AutoRun { get; set; } = new Prop<bool>();
+        // public Prop<bool> BypassProxy { get; set; } = new Prop<bool>(true);
+
+        #endregion
     }
 }

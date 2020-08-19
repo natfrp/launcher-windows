@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
+using System.Linq;
 using System.Diagnostics;
 using System.Security.Principal;
 using System.Security.Cryptography;
@@ -68,6 +70,24 @@ namespace SakuraLibrary
             }
             */
             return false;
+        }
+
+        public static Process[] SearchProcess(string name, string testPath = null)
+        {
+            return Process.GetProcessesByName(name).Where(p =>
+            {
+                try
+                {
+                    uint size = 256;
+                    var sb = new StringBuilder((int)size - 1);
+                    if (NTAPI.QueryFullProcessImageName(p.Handle, 0, sb, ref size))
+                    {
+                        return testPath == null || Path.GetFullPath(sb.ToString()) == testPath;
+                    }
+                }
+                catch { }
+                return false;
+            }).ToArray();
         }
     }
 }

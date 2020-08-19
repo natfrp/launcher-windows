@@ -91,7 +91,6 @@
     <Compile Include="Model\LocalProcessModel.cs" />
     <Compile Include="Model\NodeData.cs" />
     <Compile Include="Model\TunnelModel.cs" />
-    <Compile Include="Model\WinTrust.cs" />
     <Compile Include="Model\ModelBase.cs" />
     <Compile Include="Helper\SelectableTextBlock.cs" />
     <Compile Include="Helper\TabIndexTester.cs" />
