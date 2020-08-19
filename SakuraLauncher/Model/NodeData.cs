@@ -1,4 +1,4 @@
-﻿namespace SakuraLauncher.Data
+﻿namespace SakuraLauncher.Model
 {
     public class NodeData
     {

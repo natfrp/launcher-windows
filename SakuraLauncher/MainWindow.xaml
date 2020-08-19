@@ -13,7 +13,7 @@
         Title="SakuraLauncher" Height="500" Width="782"
         MinHeight="380" MinWidth="725" ResizeMode="CanResize" SizeChanged="Window_SizeChanged"
         AllowsTransparency="True" Background="Transparent" WindowStyle="None"
-        MouseDown="Window_MouseDown" Closed="Window_Closed" WindowStartupLocation="CenterScreen">
+        MouseDown="Window_MouseDown" WindowStartupLocation="CenterScreen">
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="0" ResizeBorderThickness="3" />
     </WindowChrome.WindowChrome>
@@ -90,7 +90,7 @@
         </Grid.ColumnDefinitions>
         <Border CornerRadius="3,0,0,3" Background="{StaticResource Background_SidePanel}">
             <StackPanel>
-                <Border x:Name="logo" Margin="0,24,0,24" Width="120" Height="120" CornerRadius="180" MouseLeftButtonDown="Border_MouseLeftButtonDown">
+                <Border x:Name="logo" Margin="0,24,0,24" Width="120" Height="120" CornerRadius="180" MouseLeftButtonDown="Logo_MouseLeftButtonDown">
                     <Border.Background>
                         <ImageBrush Stretch="Fill" ImageSource="Resources/logo.png"/>
                     </Border.Background>
@@ -247,13 +247,13 @@
                         <TranslateTransform Y="0"/>
                     </Border.RenderTransform>
                 </Border>
-                <Button HorizontalAlignment="Right" VerticalAlignment="Top" Width="32" Height="32" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Margin="0,5,5,0" Click="ButtonClose_Click">
+                <Button HorizontalAlignment="Right" VerticalAlignment="Top" Width="32" Height="32" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Margin="0,5,5,0" Click="ButtonHide_Click">
                     <Grid>
                         <Line X2="16" Y2="16" Stroke="White" StrokeThickness="1.5" />
                         <Line X1="16" Y2="16"  Stroke="White" StrokeThickness="1.5" />
                     </Grid>
                 </Button>
-                <Button HorizontalAlignment="Right" VerticalAlignment="Top" Width="32" Height="32" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Margin="0,5,43,0" Click="ButtonHide_Click">
+                <Button HorizontalAlignment="Right" VerticalAlignment="Top" Width="32" Height="32" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Margin="0,5,43,0" Click="ButtonMinimize_Click">
                     <Line X2="16" Stroke="White" StrokeThickness="1.5" Margin="0,8,0,0" />
                 </Button>
             </Grid>
@@ -261,7 +261,7 @@
         <tb:TaskbarIcon x:Name="trayIcon" TrayLeftMouseUp="TrayIcon_TrayLeftMouseUp" IconSource="Resources/icon.ico" ContextMenu="{StaticResource TrayMenu}">
             <tb:TaskbarIcon.TrayToolTip>
                 <ToolTip Placement="Mouse">
-                    <TextBlock>SakuraLauncher 运行中, 点击显示主窗口</TextBlock>
+                    <TextBlock>SakuraFrp Launcher 运行中, 点击显示主窗口</TextBlock>
                 </ToolTip>
             </tb:TaskbarIcon.TrayToolTip>
         </tb:TaskbarIcon>

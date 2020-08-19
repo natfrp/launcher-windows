@@ -7,6 +7,8 @@ using System.Windows.Documents;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
+using SakuraLauncher.Model;
+
 namespace SakuraLauncher.View
 {
     /// <summary>
@@ -22,16 +24,13 @@ namespace SakuraLauncher.View
              BrushTime = new SolidColorBrush(Color.FromRgb(80, 141, 220)),
              BrushText = new SolidColorBrush(Colors.Silver),
              BrushTunnel = new SolidColorBrush(Colors.Wheat);
-
-        public static LogTab Instance = null;
-
-        private MainWindow Main => (MainWindow)DataContext;
+        
+        private LauncherModel Model => (LauncherModel)DataContext;
 
         public Dictionary<string,string> failedData = new Dictionary<string, string>();
 
-        public LogTab(MainWindow main)
+        public LogTab(LauncherModel main)
         {
-            Instance = this;
             InitializeComponent();
             DataContext = main;
         }
@@ -54,7 +53,7 @@ namespace SakuraLauncher.View
             {
                 if (failedData.ContainsKey(tunnel))
                 {
-                    if (Main.IsVisible && !Main.SuppressInfo.Value)
+                    if (Model.View.IsVisible && !Model.SuppressInfo.Value)
                     {
                         string failedData_ = failedData[tunnel];
                         ThreadPool.QueueUserWorkItem(s => App.ShowMessage(failedData_, "隧道日志", MessageBoxImage.Information));

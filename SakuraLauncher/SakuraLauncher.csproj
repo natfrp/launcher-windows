@@ -87,12 +87,12 @@
     <Compile Include="CreateTunnelWindow.xaml.cs">
       <DependentUpon>CreateTunnelWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Data\LocalProcessModel.cs" />
-    <Compile Include="Data\NodeData.cs" />
-    <Compile Include="Data\TunnelModel.cs" />
-    <Compile Include="Data\WinTrust.cs" />
-    <Compile Include="Helper\ModelBase.cs" />
-    <Compile Include="Helper\NotEqualConverter.cs" />
+    <Compile Include="Model\LauncherModel.cs" />
+    <Compile Include="Model\LocalProcessModel.cs" />
+    <Compile Include="Model\NodeData.cs" />
+    <Compile Include="Model\TunnelModel.cs" />
+    <Compile Include="Model\WinTrust.cs" />
+    <Compile Include="Model\ModelBase.cs" />
     <Compile Include="Helper\SelectableTextBlock.cs" />
     <Compile Include="Helper\TabIndexTester.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -198,17 +198,6 @@
     <PackageReference Include="MaterialDesignThemes">
       <Version>3.0.1</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <COMReference Include="IWshRuntimeLibrary">
-      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\debian.png" />

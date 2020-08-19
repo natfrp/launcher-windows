@@ -1,6 +1,4 @@
-﻿using SakuraLauncher.Helper;
-
-namespace SakuraLauncher.Data
+﻿namespace SakuraLauncher.Model
 {
     public class LocalProcessModel : ModelBase
     {

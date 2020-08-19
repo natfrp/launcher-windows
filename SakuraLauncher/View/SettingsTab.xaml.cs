@@ -1,4 +1,7 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
+
+using SakuraLauncher.Model;
 
 namespace SakuraLauncher.View
 {
@@ -7,48 +10,26 @@ namespace SakuraLauncher.View
     /// </summary>
     public partial class SettingsTab : UserControl
     {
-        private readonly MainWindow Main = null;
+        private LauncherModel Model => (LauncherModel)DataContext;
 
-        public SettingsTab(MainWindow main)
+        public SettingsTab(LauncherModel main)
         {
             InitializeComponent();
-            DataContext = Main = main;
+            DataContext = main;
         }
 
-        private void ToggleButtonAutoRun_Checked(object sender, System.Windows.RoutedEventArgs e) => App.SetAutoRun(true);
+        private void ToggleButtonAutoRun_Checked(object sender, System.Windows.RoutedEventArgs e) => throw new NotImplementedException(); // App.SetAutoRun(true);
 
-        private void ToggleButtonAutoRun_Unchecked(object sender, System.Windows.RoutedEventArgs e) => App.SetAutoRun(false);
+        private void ToggleButtonAutoRun_Unchecked(object sender, System.Windows.RoutedEventArgs e) => throw new NotImplementedException(); // App.SetAutoRun(false);
 
         private void ButtonUpdate_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (Main.CheckingUpdate)
-            {
-                return;
-            }
-            Main.TryCheckUpdate();
+            // TODO: IPC
         }
 
         private void ButtonLogin_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            if(Main.LoggingIn)
-            {
-                return;
-            }
-            if(Main.LoggedIn)
-            {
-                foreach(var t in Main.Tunnels)
-                {
-                    if(t.IsReal)
-                    {
-                        t.Real.Stop();
-                    }
-                }
-                Main.Tunnels.Clear();
-                Main.LoggedIn.Value = false;
-                Main.UserToken.Value = "";
-                Main.Save();
-            }
-
+            // TODO: IPC
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using SakuraLibrary.Proto;
 using TunnelStatus = SakuraLibrary.Proto.Tunnel.Types.Status;
 
-namespace SakuraLauncher.Data
+namespace SakuraLauncher.Model
 {
     public interface ITunnelModel
     {

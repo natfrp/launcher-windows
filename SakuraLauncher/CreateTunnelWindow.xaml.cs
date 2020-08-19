@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 using SakuraLibrary.Proto;
 
-using SakuraLauncher.Data;
+using SakuraLauncher.Model;
 using SakuraLauncher.Helper;
 
 namespace SakuraLauncher
@@ -32,7 +32,7 @@ namespace SakuraLauncher
         public Prop<bool> Loading { get; set; } = new Prop<bool>();
         public Prop<bool> Creating { get; set; } = new Prop<bool>();
 
-        public ObservableCollection<NodeData> Nodes { get; } = new ObservableCollection<NodeData>(MainWindow.Instance.Nodes.Where(n => n.AcceptNew));
+        public ObservableCollection<NodeData> Nodes { get; } = null; // TODO: Get nodes
         public ObservableCollection<LocalProcessModel> Listening { get; set; } = new ObservableCollection<LocalProcessModel>();
 
         public CreateTunnelWindow()

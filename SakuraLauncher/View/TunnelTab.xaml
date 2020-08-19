@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:Data="clr-namespace:SakuraLauncher.Data"
+             xmlns:Data="clr-namespace:SakuraLauncher.Model"
              d:DesignWidth="690" d:DesignHeight="600">
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" IsEnabled="{Binding LoggedIn.Value}">
         <ScrollViewer.Template>

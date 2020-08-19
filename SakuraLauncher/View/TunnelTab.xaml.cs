@@ -1,15 +1,15 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-using SakuraLauncher.Data;
+using SakuraLauncher.Model;
 
 namespace SakuraLauncher.View
 {
     public partial class TunnelTab : UserControl
     {
-        private MainWindow Main => (MainWindow)DataContext;
+        private LauncherModel Model => (LauncherModel)DataContext;
 
-        public TunnelTab(MainWindow main)
+        public TunnelTab(LauncherModel main)
         {
             InitializeComponent();
             DataContext = main;
@@ -25,6 +25,7 @@ namespace SakuraLauncher.View
                 {
                     IsEnabled = false;
                     // TODO: IPC
+                    IsEnabled = true;
                 }
             }
         }

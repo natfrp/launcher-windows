@@ -1,5 +1,11 @@
-﻿namespace SakuraLauncher.Helper
+﻿using SakuraLauncher.Model;
+
+namespace SakuraLauncher.Helper
 {
+    /// <summary>
+    /// Deprecated, don't use.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class Prop<T> : ModelBase
     {
         public T Value

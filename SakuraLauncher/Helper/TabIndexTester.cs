@@ -1,14 +1,16 @@
-﻿namespace SakuraLauncher.Helper
+﻿using SakuraLauncher.Model;
+
+namespace SakuraLauncher.Helper
 {
     public class TabIndexTester
     {
-        public MainWindow Main;
+        public LauncherModel Model;
 
-        public bool this[int offset] => Main.CurrentTab == offset;
+        public bool this[int offset] => Model.CurrentTab == offset;
 
-        public TabIndexTester(MainWindow main)
+        public TabIndexTester(LauncherModel main)
         {
-            Main = main;
+            Model = main;
         }
     }
 }
