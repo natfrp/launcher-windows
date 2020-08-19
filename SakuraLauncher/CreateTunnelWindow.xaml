@@ -11,7 +11,7 @@
         TextOptions.TextFormattingMode="Ideal" 
         FontFamily="{DynamicResource MaterialDesignFont}"
         Background="{StaticResource MaterialDesignPaper}"
-        Title="新建穿透隧道" Height="450" Width="800" 
+        Title="新建穿透隧道" Height="500" Width="800" 
         WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -51,7 +51,7 @@
                         <ListView ItemsSource="{Binding Listening}" SelectionMode="Single" Name="listening" SelectionChanged="Listening_SelectionChanged">
                             <ListView.View>
                                 <GridView>
-                                    <GridViewColumn Header="类型" DisplayMemberBinding="{Binding Protocol}" />
+                                    <GridViewColumn Header="协议" DisplayMemberBinding="{Binding Protocol}" />
                                     <GridViewColumn Header="监听地址" DisplayMemberBinding="{Binding Address}" />
                                     <GridViewColumn Header="监听端口" DisplayMemberBinding="{Binding Port}" />
                                     <GridViewColumn Header="PID" DisplayMemberBinding="{Binding PID}" />
@@ -75,12 +75,13 @@
                         <TextBox Grid.Column="1" materialDesign:HintAssist.Hint="端口" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding LocalPort.Value}"/>
                     </Grid>
                     <TextBox materialDesign:HintAssist.Hint="隧道名称(留空随机)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding TunnelName.Value}"/>
+                    <TextBox materialDesign:HintAssist.Hint="备注(可空)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding Note.Value}" TextWrapping="Wrap" AcceptsReturn="True"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="100"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <ComboBox Margin="8" materialDesign:HintAssist.Hint="隧道类型" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Text="{Binding Protocol.Value}" IsEditable="True">
+                        <ComboBox Margin="8" materialDesign:HintAssist.Hint="隧道类型" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Text="{Binding Type.Value}" IsEditable="True">
                             <ComboBoxItem>TCP</ComboBoxItem>
                             <ComboBoxItem>UDP</ComboBoxItem>
                         </ComboBox>

@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
 using System.Threading;
 using System.Diagnostics;
@@ -7,6 +6,8 @@ using System.Windows.Controls;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+
+using SakuraLibrary.Proto;
 
 using SakuraLauncher.Data;
 using SakuraLauncher.Helper;
@@ -18,21 +19,21 @@ namespace SakuraLauncher
     /// </summary>
     public partial class CreateTunnelWindow : Window
     {
-        public Prop<bool> Creating { get; set; } = new Prop<bool>();
+        public Prop<int> LocalPort { get; set; } = new Prop<int>();
         public Prop<int> RemotePort { get; set; } = new Prop<int>();
+        public Prop<string> Note { get; set; } = new Prop<string>("");
+        public Prop<string> Type { get; set; } = new Prop<string>("");
         public Prop<string> TunnelName { get; set; } = new Prop<string>("");
-        public Prop<string> Protocol { get; set; } = new Prop<string>("");
+        public Prop<string> LocalAddress { get; set; } = new Prop<string>("");
 
         public Prop<bool> Compression { get; set; } = new Prop<bool>(false);
         public Prop<bool> Encryption { get; set; } = new Prop<bool>(false);
 
-        public Prop<int> LocalPort { get; set; } = new Prop<int>();
-        public Prop<string> LocalAddress { get; set; } = new Prop<string>("");
-
         public Prop<bool> Loading { get; set; } = new Prop<bool>();
+        public Prop<bool> Creating { get; set; } = new Prop<bool>();
 
         public ObservableCollection<NodeData> Nodes { get; } = new ObservableCollection<NodeData>(MainWindow.Instance.Nodes.Where(n => n.AcceptNew));
-        public ObservableCollection<ListeningData> Listening { get; set; } = new ObservableCollection<ListeningData>();
+        public ObservableCollection<LocalProcessModel> Listening { get; set; } = new ObservableCollection<LocalProcessModel>();
 
         public CreateTunnelWindow()
         {
@@ -71,7 +72,7 @@ namespace SakuraLauncher
                         }
                         catch { }
                         var spliter = tokens[1].LastIndexOf(':');
-                        Dispatcher.Invoke(() => Listening.Add(new ListeningData()
+                        Dispatcher.Invoke(() => Listening.Add(new LocalProcessModel()
                         {
                             Protocol = tokens[0],
                             Address = tokens[1].Substring(0, spliter),
@@ -101,43 +102,22 @@ namespace SakuraLauncher
             {
                 return;
             }
-            if (!(node.SelectedItem is NodeData s))
+            if (!(this.node.SelectedItem is NodeData node))
             {
                 App.ShowMessage("请选择穿透服务器", "Oops", MessageBoxImage.Error);
                 return;
             }
-            Creating.Value = true;
-            App.ApiRequest("create_tunnel", new StringBuilder("type=").Append(Protocol.Value.ToLower())
-                .Append("&name=").Append(TunnelName.Value)
-                .Append("&node=").Append(s.ID)
-                .Append("&local_ip=").Append(LocalAddress.Value)
-                .Append("&local_port=").Append(LocalPort.Value)
-                .Append("&encryption=").Append(Encryption.Value ? "true" : "false")
-                .Append("&compression=").Append(Compression.Value ? "true" : "false")
-                .Append("&remote_port=").Append(RemotePort.Value).ToString()).ContinueWith(t =>
+            /* TODO: IPC */
+            new CreateTunnel()
             {
-                Creating.Value = false;
-                var json = t.Result;
-                if (json == null)
-                {
-                    return;
-                }
-                Dispatcher.Invoke(() =>
-                {
-                    MainWindow.Instance.AddTunnel((object)json["data"], true);
-                    if (App.ShowMessage("是否继续创建?", "创建成功", MessageBoxImage.Information, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                    {
-                        LocalPort.Value = 0;
-                        RemotePort.Value = 0;
-                        TunnelName.Value = "";
-                        listening.SelectedItem = null;
-                    }
-                    else
-                    {
-                        Close();
-                    }
-                });
-            });
+                Name = TunnelName.Value,
+                Note = Note.Value,
+                Node = node.ID,
+                Type = Type.Value.ToLower(),
+                RemotePort = RemotePort.Value,
+                LocalPort = LocalPort.Value,
+                LocalAddress = LocalAddress.Value
+            };
         }
 
         private void ButtonReload_Click(object sender, RoutedEventArgs e)
@@ -150,9 +130,9 @@ namespace SakuraLauncher
 
         private void Listening_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.AddedItems.Count == 1 && e.AddedItems[0] is ListeningData l)
+            if (e.AddedItems.Count == 1 && e.AddedItems[0] is LocalProcessModel l)
             {
-                Protocol.Value = l.Protocol;
+                Type.Value = l.Protocol;
                 LocalPort.Value = int.Parse(l.Port);
                 LocalAddress.Value = l.Address == "0.0.0.0" ? "127.0.0.1" : l.Address;
             }
