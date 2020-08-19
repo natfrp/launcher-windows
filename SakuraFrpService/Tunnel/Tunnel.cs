@@ -8,7 +8,6 @@ namespace SakuraFrpService.Tunnel
 {
     public class Tunnel
     {
-        public readonly TunnelLogger Logger = null;
         public readonly TunnelManager Manager = null;
 
         public int Id, Node;
@@ -18,16 +17,18 @@ namespace SakuraFrpService.Tunnel
         public bool Running => BaseProcess != null && !BaseProcess.HasExited;
         public Process BaseProcess = null;
 
-        public Tunnel(TunnelManager manager, int logRotateSize = 1024)
+        public Tunnel(TunnelManager manager)
         {
             Manager = manager;
-            Logger = new TunnelLogger(logRotateSize);
         }
 
         public TunnelProto CreateProto() => new TunnelProto()
         {
             Id = Id,
+            Node = Node,
             Name = Name,
+            Type = Type,
+            Description = Description,
             Status = Enabled ? (Running ? TunnelStatus.Running : TunnelStatus.Pending) : TunnelStatus.Disabled
         };
 
@@ -50,8 +51,8 @@ namespace SakuraFrpService.Tunnel
                     StandardOutputEncoding = Encoding.UTF8
                 });
 
-                BaseProcess.ErrorDataReceived += Logger.DataReceived;
-                BaseProcess.OutputDataReceived += Logger.DataReceived;
+                BaseProcess.ErrorDataReceived += OnProcessData;
+                BaseProcess.OutputDataReceived += OnProcessData;
 
                 BaseProcess.BeginErrorReadLine();
                 BaseProcess.BeginOutputReadLine();
@@ -76,14 +77,22 @@ namespace SakuraFrpService.Tunnel
                 BaseProcess.StandardInput.Write("stop\n");
                 if (!BaseProcess.WaitForExit(3500))
                 {
-                    // Main.Log("Launcher", "frpc 未响应, 正在强制结束进程");
+                    Manager.Main.LogManager.Log(Name, "frpc 未响应, 正在强制结束进程");
                     BaseProcess.Kill();
                 }
-                // Main.Log("Launcher", "frpc 已结束");
+                Manager.Main.LogManager.Log(Name, "frpc 已结束");
             }
             finally
             {
                 Cleanup();
+            }
+        }
+
+        protected void OnProcessData(object sender, DataReceivedEventArgs e)
+        {
+            if (e.Data != null)
+            {
+                Manager.Main.LogManager.Log(Name, e.Data);
             }
         }
 

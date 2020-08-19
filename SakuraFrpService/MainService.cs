@@ -23,6 +23,7 @@ namespace SakuraFrpService
         public readonly Thread TickThread = null;
 
         public readonly PipeServer Pipe;
+        public readonly LogManager LogManager;
         public readonly TunnelManager TunnelManager;
 
         public MainService(bool daemon)
@@ -36,6 +37,8 @@ namespace SakuraFrpService
             InitializeComponent();
 
             Pipe = new PipeServer(Consts.PipeName);
+
+            LogManager = new LogManager(8192);
             TunnelManager = new TunnelManager(this);
         }
 

@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LogManager.cs" />
     <Compile Include="MainService.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -74,7 +75,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Tunnel\Tunnel.cs" />
-    <Compile Include="Tunnel\TunnelLogger.cs" />
     <Compile Include="Tunnel\TunnelManager.cs" />
   </ItemGroup>
   <ItemGroup>

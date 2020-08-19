@@ -5,6 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
+using SakuraLibrary;
+
 namespace SakuraFrpService.Tunnel
 {
     public class TunnelManager : Dictionary<int, Tunnel>
@@ -104,7 +106,19 @@ namespace SakuraFrpService.Tunnel
             {
                 MainThread.Abort(); // Shouldn't happen, just in case
             }
+
+            foreach (var p in Utils.SearchProcess("frpc", FrpcPath)) // Get rid of leftover processes
+            {
+                try
+                {
+                    p.Kill();
+                }
+                catch { }
+            }
+
             UserToken = token;
+            FirstFetch = true;
+
             stopEvent.Reset();
             MainThread.Start();
         }
@@ -124,7 +138,6 @@ namespace SakuraFrpService.Tunnel
 
         protected void Run()
         {
-            FirstFetch = true;
             while (!stopEvent.WaitOne(0))
             {
                 Thread.Sleep(50);
