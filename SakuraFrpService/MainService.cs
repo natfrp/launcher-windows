@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using SakuraLibrary.Proto;
 using UserStatus = SakuraLibrary.Proto.User.Types.Status;
 
-using SakuraFrpService.Pipe;
+using SakuraLibrary;
+using SakuraLibrary.Pipe;
+
 using SakuraFrpService.Tunnel;
 
 namespace SakuraFrpService
@@ -33,7 +35,7 @@ namespace SakuraFrpService
 
             InitializeComponent();
 
-            Pipe = new PipeServer("SakuraFrpLauncher_Service");
+            Pipe = new PipeServer(Consts.PipeName);
             TunnelManager = new TunnelManager(this);
         }
 
