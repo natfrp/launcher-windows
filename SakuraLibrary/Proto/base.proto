@@ -4,6 +4,11 @@ option csharp_namespace = "SakuraLibrary.Proto";
 import "user.proto";
 import "tunnel.proto";
 
+message Log {
+  string source = 1;
+  string data = 2;
+}
+
 enum MessageID {
   USER_LOGIN = 0;
   USER_LOGOUT = 1;
@@ -11,9 +16,13 @@ enum MessageID {
   TUNNEL_LIST = 3;
   TUNNEL_RELOAD = 4;
   TUNNEL_UPDATE = 5;
+  TUNNEL_DELETE = 8;
+  TUNNEL_CREATE = 9;
   TUNNEL_LOG_GET = 6;
   TUNNEL_LOG_CLEAR = 7;
 }
+
+message BasicIdRequest { int32 id = 1; }
 
 message BasicResponse {
   bool success = 1;
@@ -25,9 +34,10 @@ message BasicRequest {
   MessageID type = 2;
 
   oneof data {
-    UserLogin USER_LOGIN = 3;
+    BasicIdRequest REQUEST_ID = 3;
+
+    UserLogin USER_LOGIN = 4;
     UpdateTunnelStatus TUNNEL_UPDATE = 5;
-    GetTunnelLog TUNNEL_LOG_GET = 6;
-    ClearTunnelLog TUNNEL_LOG_CLEAR = 7;
+    CreateTunnel TUNNEL_CREATE = 6;
   }
 }

@@ -14,6 +14,11 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,13 +31,8 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -87,13 +87,12 @@
     <Compile Include="CreateTunnelWindow.xaml.cs">
       <DependentUpon>CreateTunnelWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Data\FakeTunnel.cs" />
-    <Compile Include="Data\ITunnel.cs" />
-    <Compile Include="Data\ListeningData.cs" />
+    <Compile Include="Data\LocalProcessModel.cs" />
     <Compile Include="Data\NodeData.cs" />
-    <Compile Include="Data\Tunnel.cs" />
+    <Compile Include="Data\TunnelModel.cs" />
     <Compile Include="Data\WinTrust.cs" />
     <Compile Include="Helper\ModelBase.cs" />
+    <Compile Include="Helper\NotEqualConverter.cs" />
     <Compile Include="Helper\SelectableTextBlock.cs" />
     <Compile Include="Helper\TabIndexTester.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -216,6 +215,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\fishcake.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SakuraLibrary\SakuraLibrary.csproj">
+      <Project>{ec113dee-c0b2-4e52-a318-fd44dad67ea3}</Project>
+      <Name>SakuraLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

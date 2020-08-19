@@ -8,7 +8,7 @@
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
             <TextBlock Padding="24,0,24,0">
-                <Run FontSize="26">SakuraLauncher</Run>
+                <Run FontSize="26">SakuraFrp Launcher</Run>
                 <LineBreak/>
                 <LineBreak/>
                 <Run FontSize="16">版本</Run>

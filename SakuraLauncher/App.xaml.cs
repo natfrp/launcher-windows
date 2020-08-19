@@ -189,6 +189,7 @@ namespace SakuraLauncher
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            /*
             if (!File.Exists("SKIP_LAUNCHER_SIGN_VERIFY") && !WinTrust.VerifyEmbeddedSignature(Assembly.GetExecutingAssembly().Location))
             {
                 ShowMessage("@@@@@@@@@@@@@@@@@@\n       !!!  警告: 启动器签名验证失败  !!!\n@@@@@@@@@@@@@@@@@@\n\n" +
@@ -196,28 +197,28 @@ namespace SakuraLauncher
                     "如果您从源代码编译了启动器, 请在工作目录下创建 SKIP_LAUNCHER_SIGN_VERIFY 文件来禁用签名验证", "警告", MessageBoxImage.Warning);
             }
 
-            if (!File.Exists(Tunnel.ClientPath))
+            if (!File.Exists(TunnelModel.ClientPath))
             {
                 // Try to correct the working dir
                 Environment.CurrentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                if (!File.Exists(Tunnel.ClientPath))
+                if (!File.Exists(TunnelModel.ClientPath))
                 {
                     ShowMessage("未找到 frpc.exe, 请尝试重新下载客户端", "Oops", MessageBoxImage.Error);
                     Environment.Exit(0);
                 }
             }
 
-            if (!File.Exists("SKIP_FRPC_SIGN_VERIFY") && !WinTrust.VerifyEmbeddedSignature(Tunnel.ClientPath))
+            if (!File.Exists("SKIP_FRPC_SIGN_VERIFY") && !WinTrust.VerifyEmbeddedSignature(TunnelModel.ClientPath))
             {
                 ShowMessage("@@@@@@@@@@@@@@@@@@\n       !!!  警告: FRPC 签名验证失败  !!!\n@@@@@@@@@@@@@@@@@@\n\n" +
                     "您使用的 frpc.exe 未能通过签名验证, 该文件可能已损坏或被纂改\n您的电脑可能已经被病毒感染, 请立即进行杀毒然后重新下载完整的启动器压缩包\n\n" +
                     "如果您准备使用非 Sakura Frp 提供的 frpc.exe, 请在工作目录下创建 SKIP_FRPC_SIGN_VERIFY 文件来禁用签名验证", "警告", MessageBoxImage.Warning);
             }
-
+            
             string[] temp = null;
             try
             {
-                var start = new ProcessStartInfo(Tunnel.ClientPath, "-v")
+                var start = new ProcessStartInfo(TunnelModel.ClientPath, "-v")
                 {
                     CreateNoWindow = true,
                     UseShellExecute = false,
@@ -232,7 +233,7 @@ namespace SakuraLauncher
                 }
             }
             catch { }
-
+            
             if (temp[0].Length > 0 && temp[0][0] == 'v')
             {
                 temp[0] = temp[0].Substring(1);
@@ -247,7 +248,7 @@ namespace SakuraLauncher
                 ShowMessage("无法获取 frpc.exe 的版本[2], 请尝试重新下载客户端", "Oops", MessageBoxImage.Error);
                 Environment.Exit(0);
             }
-
+            */
             var minimize = false;
             foreach(var a in e.Args)
             {
@@ -261,7 +262,7 @@ namespace SakuraLauncher
             AutoRunFile = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\SakuraLauncher_" + Md5(ExecutablePath) + ".lnk";
             if(created)
             {
-                var test = Path.GetFullPath(Tunnel.ClientPath);
+                var test = Path.GetFullPath("");// TODO: TunnelModel.ClientPath);
                 var processes = Process.GetProcessesByName("frpc").Where(p =>
                 {
                     try

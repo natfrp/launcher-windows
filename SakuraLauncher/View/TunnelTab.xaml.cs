@@ -7,36 +7,25 @@ namespace SakuraLauncher.View
 {
     public partial class TunnelTab : UserControl
     {
-        private readonly MainWindow Main = null;
+        private MainWindow Main => (MainWindow)DataContext;
 
         public TunnelTab(MainWindow main)
         {
             InitializeComponent();
-            DataContext = Main = main;
+            DataContext = main;
         }
 
-        private void ButtonAddListener_Click(object sender, RoutedEventArgs e) => new CreateTunnelWindow().ShowDialog();
+        private void ButtonCreate_Click(object sender, RoutedEventArgs e) => new CreateTunnelWindow().ShowDialog();
 
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
         {
-            if((sender as Button).DataContext is Tunnel tunnel && tunnel.IsReal)
+            if ((sender as Button).DataContext is TunnelModel tunnel)
             {
-                if(App.ShowMessage("是否确定删除隧道 " + tunnel.Name + "?\n该操作不可撤销.", "Confirm", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) != MessageBoxResult.OK)
+                if (App.ShowMessage(string.Format("确定要删除隧道 #{0} {1} 吗?", tunnel.Id, tunnel.Name), "操作确认", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                 {
-                    return;
+                    IsEnabled = false;
+                    // TODO: IPC
                 }
-                IsEnabled = false;
-                App.ApiRequest("delete_tunnel", "tunnel=" + tunnel.Real.Id).ContinueWith(t => Dispatcher.Invoke(() =>
-                {
-                    IsEnabled = true;
-                    var json = t.Result;
-                    if (json == null)
-                    {
-                        return;
-                    }
-                    tunnel.Stop();
-                    Main.Tunnels.Remove(tunnel);
-                }));
             }
         }
     }

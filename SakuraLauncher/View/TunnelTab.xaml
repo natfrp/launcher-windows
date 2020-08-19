@@ -52,9 +52,9 @@
             </TextBlock>
             <ListView ItemsSource="{Binding Tunnels}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="{x:Null}" BorderBrush="{x:Null}" Margin="8,0,0,0">
                 <ListView.Resources>
-                    <DataTemplate DataType="{x:Type Data:FakeTunnel}">
+                    <DataTemplate DataType="{x:Type Data:FakeTunnelModel}">
                         <Border CornerRadius="2" Width="256" Height="128" BorderThickness="4" Opacity="0.5" BorderBrush="White">
-                            <Button Width="192" Height="88" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Center" VerticalAlignment="Center" Click="ButtonAddListener_Click">
+                            <Button Width="192" Height="88" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Center" VerticalAlignment="Center" Click="ButtonCreate_Click">
                                 <materialDesign:PackIcon Kind="AddCircleOutline" RenderTransformOrigin="0.5,0.5" Foreground="White">
                                     <materialDesign:PackIcon.RenderTransform>
                                         <ScaleTransform ScaleX="3" ScaleY="3"/>
@@ -63,7 +63,7 @@
                             </Button>
                         </Border>
                     </DataTemplate>
-                    <DataTemplate DataType="{x:Type Data:Tunnel}">
+                    <DataTemplate DataType="{x:Type Data:TunnelModel}">
                         <Border CornerRadius="2" Width="256" Height="128" Background="{StaticResource Background_Tunnel}">
                             <Border.Effect>
                                 <DropShadowEffect BlurRadius="16" RenderingBias="Quality" ShadowDepth="4" Opacity="0.3"/>

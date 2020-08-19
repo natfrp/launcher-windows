@@ -25,7 +25,7 @@ namespace SakuraLauncher.View
 
         public static LogTab Instance = null;
 
-        private readonly MainWindow Main = null;
+        private MainWindow Main => (MainWindow)DataContext;
 
         public Dictionary<string,string> failedData = new Dictionary<string, string>();
 
@@ -33,7 +33,7 @@ namespace SakuraLauncher.View
         {
             Instance = this;
             InitializeComponent();
-            DataContext = Main = main;
+            DataContext = main;
         }
 
         private void LogFrpc(string tunnel, string raw)

@@ -48,10 +48,7 @@ namespace SakuraLauncher.View
                 Main.UserToken.Value = "";
                 Main.Save();
             }
-            else
-            {
-                Main.TryLogin();
-            }
+
         }
     }
 }
