@@ -118,7 +118,7 @@
                                         <Setter Property="Background" Value="{StaticResource TabGradientHover}" />
                                     </MultiDataTrigger.Setters>
                                 </MultiDataTrigger>
-                                <DataTrigger Binding="{Binding LoggedIn.Value}" Value="False">
+                                <DataTrigger Binding="{Binding LoggedIn}" Value="False">
                                     <Setter Property="Opacity" Value="0.2"></Setter>
                                     <Setter Property="IsEnabled" Value="False"></Setter>
                                 </DataTrigger>

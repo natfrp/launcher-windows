@@ -20,6 +20,14 @@ namespace SakuraFrpService
             RotateSize = bufferSize;
         }
 
+        public void Clear()
+        {
+            while (Count > 0)
+            {
+                TryDequeue(out Log _);
+            }
+        }
+
         public void Log(string source, string data)
         {
             if (data == null)

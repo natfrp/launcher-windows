@@ -223,7 +223,8 @@ namespace SakuraLauncher.Model
 
         #region Settings Tab Binding
 
-        public string UserToken { get; set; }
+        public string UserToken { get => _userToken; set => SafeSet(out _userToken, value, View.Dispatcher); }
+        private string _userToken;
 
         [SourceBinding(nameof(UserInfo))]
         public bool LoggedIn => UserInfo.Status == User.Types.Status.LoggedIn;

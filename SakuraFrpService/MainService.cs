@@ -206,13 +206,10 @@ namespace SakuraFrpService
                         {
                             resp.Success = false;
                             resp.Message = t.Result;
-                        }
-                        else
-                        {
-                            resp.DataUser = UserInfo;
+                            break;
                         }
                     }
-                    break;
+                    goto USERINFO;
                 case MessageID.UserLogout:
                     {
                         var result = Logout();
@@ -220,10 +217,12 @@ namespace SakuraFrpService
                         {
                             resp.Success = false;
                             resp.Message = result;
+                            break;
                         }
                     }
-                    break;
+                    goto USERINFO;
                 case MessageID.UserInfo:
+                USERINFO:
                     resp.DataUser = UserInfo;
                     break;
                 case MessageID.TunnelList:
@@ -275,6 +274,7 @@ namespace SakuraFrpService
                     // ?
                     break;
                 case MessageID.LogClear:
+                    LogManager.Clear();
                     break;
                 }
                 connection.SendProto(resp);

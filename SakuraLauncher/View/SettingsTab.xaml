@@ -5,8 +5,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              d:DesignHeight="315" d:DesignWidth="580">
     <StackPanel>
-        <TextBlock Foreground="#DDFFFFFF" FontSize="26" Margin="24,0,0,0">设置</TextBlock>
-        <!--StackPanel Orientation="Horizontal" Margin="24,24,24,16">
+        <TextBlock Foreground="#DDFFFFFF" FontSize="26" Margin="24,0,0,24">设置</TextBlock>
+        <!--StackPanel Orientation="Horizontal" Margin="24,0,24,16">
             <ToggleButton IsChecked="{Binding AutoRun.Value}" Checked="ToggleButtonAutoRun_Checked" Unchecked="ToggleButtonAutoRun_Unchecked"/>
             <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">开机启动</TextBlock>
         </StackPanel-->

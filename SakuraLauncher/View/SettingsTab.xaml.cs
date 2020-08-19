@@ -38,20 +38,39 @@ namespace SakuraLauncher.View
             {
                 try
                 {
-                    var resp = Model.Pipe.Request(new RequestBase()
+                    if (Model.LoggedIn)
                     {
-                        Type = MessageID.UserLogin,
-                        DataUserLogin = new UserLogin()
+                        var resp = Model.Pipe.Request(new RequestBase()
                         {
-                            Token = Model.UserToken
+                            Type = MessageID.UserLogout
+                        });
+                        if (!resp.Success)
+                        {
+                            App.ShowMessage(resp.Message, "操作失败", MessageBoxImage.Error, MessageBoxButton.OK);
+                            return;
                         }
-                    });
-                    if (!resp.Success)
-                    {
-                        App.ShowMessage(resp.Message, "登录失败", MessageBoxImage.Error, MessageBoxButton.OK);
+                        Model.UserInfo = resp.DataUser;
+                        Model.UserToken = "";
                         return;
                     }
-                    Model.UserInfo = resp.DataUser;
+                    else
+                    {
+                        var resp = Model.Pipe.Request(new RequestBase()
+                        {
+                            Type = MessageID.UserLogin,
+                            DataUserLogin = new UserLogin()
+                            {
+                                Token = Model.UserToken
+                            }
+                        });
+                        if (!resp.Success)
+                        {
+                            App.ShowMessage(resp.Message, "登录失败", MessageBoxImage.Error, MessageBoxButton.OK);
+                            return;
+                        }
+                        Model.UserInfo = resp.DataUser;
+                        Model.UserToken = "****************";
+                    }
                 }
                 finally
                 {
