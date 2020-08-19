@@ -16,18 +16,12 @@ message Tunnel {
   Status status = 6;
 }
 
-message GetTunnelListResponse {
-  bool success = 1;
-  string message = 2;
-  repeated Tunnel tunnels = 3;
-}
+message TunnelList { repeated Tunnel tunnels = 3; }
 
 message UpdateTunnelStatus {
   int32 id = 1;
   int32 status = 2;
 }
-
-message DeleteTunnel { int32 id = 1; }
 
 message CreateTunnel {
   int32 node = 2;
@@ -38,13 +32,3 @@ message CreateTunnel {
   int32 local_port = 7;
   string local_address = 8;
 }
-
-message GetTunnelLog { int32 id = 1; }
-
-message GetTunnelLogResponse {
-  bool success = 1;
-  string message = 2;
-  repeated Tunnel tunnels = 3;
-}
-
-message ClearTunnelLog { int32 id = 1; }

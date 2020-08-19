@@ -1,6 +1,10 @@
 ﻿using System;
 using System.IO.Pipes;
 
+using Google.Protobuf;
+
+using SakuraLibrary.Proto;
+
 namespace SakuraLibrary.Pipe
 {
     public class PipeClient : IDisposable
@@ -8,6 +12,8 @@ namespace SakuraLibrary.Pipe
         public event PipeConnection.PipeDataEventHandler ServerPush;
 
         public PipeConnection Pipe = null, PushPipe = null;
+
+        public bool Connected => Pipe != null && PushPipe != null && Pipe.Pipe.IsConnected && PushPipe.Pipe.IsConnected;
 
         public readonly int BufferSize;
         public readonly string Name, Host;
@@ -25,10 +31,12 @@ namespace SakuraLibrary.Pipe
             {
                 var pipe = new NamedPipeClientStream(Host, Name, PipeDirection.InOut, PipeOptions.Asynchronous);
                 pipe.Connect();
+                pipe.ReadMode = PipeTransmissionMode.Message;
                 Pipe = new PipeConnection(new byte[BufferSize], pipe);
 
-                pipe = new NamedPipeClientStream(Host, Name + PipeConnection.PUSH_SUFFIX, PipeDirection.In, PipeOptions.Asynchronous);
+                pipe = new NamedPipeClientStream(Host, Name + PipeConnection.PUSH_SUFFIX, PipeDirection.InOut, PipeOptions.Asynchronous);
                 pipe.Connect();
+                pipe.ReadMode = PipeTransmissionMode.Message;
                 PushPipe = new PipeConnection(new byte[BufferSize], pipe);
 
                 BeginPushPipeRead();
@@ -48,6 +56,24 @@ namespace SakuraLibrary.Pipe
 
             PushPipe?.Dispose();
             PushPipe = null;
+        }
+
+        public ResponseBase Request(IMessage message)
+        {
+            try
+            {
+                var data = message.ToByteArray();
+                Pipe.Pipe.Write(data, 0, data.Length);
+                return ResponseBase.Parser.ParseFrom(Pipe.Buffer, 0, Pipe.EnsureMessageComplete(Pipe.Pipe.Read(Pipe.Buffer, 0, Pipe.Buffer.Length)));
+            }
+            catch
+            {
+                if (!Pipe.Pipe.IsConnected)
+                {
+                    Dispose();
+                }
+            }
+            return null;
         }
 
         protected void OnPushPipeData(IAsyncResult ar)

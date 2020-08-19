@@ -3,6 +3,7 @@ using System.Threading;
 using System.Collections.ObjectModel;
 
 using SakuraLibrary;
+using SakuraLibrary.Pipe;
 using SakuraLibrary.Proto;
 
 using SakuraLauncher.Helper;
@@ -14,7 +15,7 @@ namespace SakuraLauncher.Model
         public readonly MainWindow View;
 
         protected Thread PipeThread;
-        protected NamedPipeClientStream Pipe = new NamedPipeClientStream(".", Consts.PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
+        protected PipeClient Pipe = new PipeClient(Consts.PipeName);
 
         // get rid of this!!! ↓
         public ObservableCollection<NodeData> Nodes { get; set; } = new ObservableCollection<NodeData>();
@@ -25,6 +26,7 @@ namespace SakuraLauncher.Model
             CurrentTabTester = new TabIndexTester(this);
 
             PipeThread = new Thread(new ThreadStart(PipeWork));
+            PipeThread.Start();
 
             PropertyChanged += (s, e) => Save();
         }
@@ -88,23 +90,23 @@ namespace SakuraLauncher.Model
 
         protected void PipeWork()
         {
-            while(true)
+            while (true)
             {
-                var connected = false;
-                lock(Pipe)
+                lock (Pipe)
                 {
-                    connected = Pipe.IsConnected;
+                    if (!Pipe.Connected)
+                    {
+                        Pipe.Connect();
+                        continue;
+                    }
+                    var test = Pipe.Request(new RequestBase()
+                    {
+                        Type = MessageID.UserInfo
+                    });
+
+
                 }
-                if(connected)
-                {
-                    Thread.Sleep(500);
-                    continue;
-                }
-                lock(Pipe)
-                {
-                    Pipe.Connect();
-                    Pipe.ReadMode = PipeTransmissionMode.Message;
-                }
+                Thread.Sleep(500);
             }
         }
 

@@ -99,7 +99,7 @@ namespace SakuraLibrary.Pipe
 
                 lock (Pipes)
                 {
-                    Pipes.Add(ListeningPipe, conn);
+                    Pipes.Add(conn.Pipe, conn);
                 }
 
                 BeginPipeRead(conn);
@@ -213,7 +213,8 @@ namespace SakuraLibrary.Pipe
                 {
                     ListeningPushPipe.Dispose(); // Shouldn't happen too
                 }
-                ListeningPushPipe = new NamedPipeServerStream(Name + PipeConnection.PUSH_SUFFIX, PipeDirection.Out, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Message, PipeOptions.Asynchronous, 0, BufferSize, CreateSecurity());
+                // Note: PipeDirection.InOut ensures the client can set ReadMode, IDK why but it works this way
+                ListeningPushPipe = new NamedPipeServerStream(Name + PipeConnection.PUSH_SUFFIX, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Message, PipeOptions.Asynchronous, 0, BufferSize, CreateSecurity());
                 ListeningPushPipe.BeginWaitForConnection(OnPushPipeConnect, null);
             }
         }

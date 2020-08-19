@@ -1,14 +1,16 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.ServiceProcess;
 using System.Threading.Tasks;
 
-using SakuraLibrary.Proto;
-using UserStatus = SakuraLibrary.Proto.User.Types.Status;
+using Google.Protobuf;
 
 using SakuraLibrary;
 using SakuraLibrary.Pipe;
+using SakuraLibrary.Proto;
+using UserStatus = SakuraLibrary.Proto.User.Types.Status;
 
 using SakuraFrpService.Tunnel;
 
@@ -17,7 +19,10 @@ namespace SakuraFrpService
     public partial class MainService : ServiceBase
     {
         public string UserToken = "";
-        public User UserInfo = new User();
+        public User UserInfo = new User()
+        {
+            Status = UserStatus.NoLogin
+        };
 
         public readonly bool Daemonize;
         public readonly Thread TickThread = null;
@@ -165,10 +170,10 @@ namespace SakuraFrpService
             Pipe.Stop();
         }
 
-        protected BasicResponse BasicResponse(bool success, string message = null) => new BasicResponse()
+        protected ResponseBase ResponseBase(bool success, string message = null) => new ResponseBase()
         {
             Success = success,
-            Message = message
+            Message = message ?? ""
         };
 
         private void Pipe_Connected(PipeConnection connection)
@@ -176,84 +181,95 @@ namespace SakuraFrpService
             // TODO: May authorize the client by signature, don't forget those compile from source users
         }
 
-        private void Pipe_DataReceived(PipeConnection connection, int length)
+        private void Pipe_DataReceived(PipeConnection connection, int count)
         {
             try
             {
-                var req = BasicRequest.Parser.ParseFrom(connection.Buffer, 0, length);
+                var req = RequestBase.Parser.ParseFrom(connection.Buffer, 0, count);
+                var resp = ResponseBase(true);
                 switch (req.Type)
                 {
                 case MessageID.UserLogin:
                     {
-                        var t = Login(req.USERLOGIN.Token);
+                        var t = Login(req.DataUserLogin.Token);
                         t.Wait();
-                        connection.SendProto(BasicResponse(t.Result == null, t.Result ?? "登录成功"));
+                        if (t.Result != null)
+                        {
+                            resp.Success = false;
+                            resp.Message = t.Result;
+                        }
                     }
                     break;
                 case MessageID.UserLogout:
                     {
                         var result = Logout();
-                        connection.SendProto(BasicResponse(result == null, result ?? "注销成功"));
+                        if (result != null)
+                        {
+                            resp.Success = false;
+                            resp.Message = result;
+                        }
                     }
                     break;
                 case MessageID.UserInfo:
-                    connection.SendProto(UserInfo);
+                    resp.DataUser = UserInfo;
                     break;
                 case MessageID.TunnelList:
+                    if (UserInfo.Status != UserStatus.LoggedIn)
                     {
-                        if (UserInfo.Status != UserStatus.LoggedIn)
-                        {
-                            connection.SendProto(BasicResponse(false, "用户未登录"));
-                            break;
-                        }
-                        var resp = new GetTunnelListResponse()
-                        {
-                            Success = true,
-                            Message = null
-                        };
-                        resp.Tunnels.Add(TunnelManager.Values.Select(t => t.CreateProto()));
-                        connection.SendProto(resp);
+                        resp.Success = false;
+                        resp.Message = "用户未登录";
+                        break;
                     }
+                    resp.DataTunnelList = new TunnelList();
+                    resp.DataTunnelList.Tunnels.Add(TunnelManager.Values.Select(t => t.CreateProto()));
                     break;
                 case MessageID.TunnelReload:
                     {
                         if (UserInfo.Status != UserStatus.LoggedIn)
                         {
-                            connection.SendProto(BasicResponse(false, "用户未登录"));
+                            resp.Success = false;
+                            resp.Message = "用户未登录";
                             break;
                         }
                         var t = TunnelManager.UpdateTunnels();
                         t.Wait();
-                        connection.SendProto(BasicResponse(t.Status == TaskStatus.RanToCompletion, t.Exception?.ToString()));
+                        if (t.Status != TaskStatus.RanToCompletion)
+                        {
+                            resp.Success = false;
+                            resp.Message = t.Exception?.ToString() ?? "未知错误";
+                        }
                     }
                     break;
                 case MessageID.TunnelUpdate:
+                    if (UserInfo.Status != UserStatus.LoggedIn)
                     {
-                        if (UserInfo.Status != UserStatus.LoggedIn)
+                        resp.Success = false;
+                        resp.Message = "用户未登录";
+                        break;
+                    }
+                    lock (TunnelManager)
+                    {
+                        if (!TunnelManager.ContainsKey(req.DataUpdateTunnel.Id))
                         {
-                            connection.SendProto(BasicResponse(false, "用户未登录"));
+                            resp.Success = false;
+                            resp.Message = "隧道不存在";
                             break;
                         }
-                        lock (TunnelManager)
-                        {
-                            if (!TunnelManager.ContainsKey(req.TUNNELUPDATE.Id))
-                            {
-                                connection.SendProto(BasicResponse(false, "隧道不存在"));
-                                break;
-                            }
-                            TunnelManager[req.TUNNELUPDATE.Id].Enabled = req.TUNNELUPDATE.Status == 1;
-                        }
-                        connection.SendProto(BasicResponse(true));
+                        TunnelManager[req.DataUpdateTunnel.Id].Enabled = req.DataUpdateTunnel.Status == 1;
                     }
                     break;
-                case MessageID.TunnelLogGet:
-                    // return GetTunnelLogResponse
+                case MessageID.LogGet:
+                    // ?
                     break;
-                case MessageID.TunnelLogClear:
+                case MessageID.LogClear:
                     break;
                 }
+                connection.SendProto(resp);
             }
-            catch { }
+            catch (Exception e)
+            {
+                connection.SendProto(ResponseBase(false, e.ToString()));
+            }
         }
     }
 }

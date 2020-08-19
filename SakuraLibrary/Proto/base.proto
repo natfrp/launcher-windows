@@ -18,26 +18,37 @@ enum MessageID {
   TUNNEL_UPDATE = 5;
   TUNNEL_DELETE = 8;
   TUNNEL_CREATE = 9;
-  TUNNEL_LOG_GET = 6;
-  TUNNEL_LOG_CLEAR = 7;
+  LOG_GET = 6;
+  LOG_CLEAR = 7;
 }
 
-message BasicIdRequest { int32 id = 1; }
-
-message BasicResponse {
+message ResponseBase {
   bool success = 1;
   string message = 2;
-}
-
-message BasicRequest {
-  int32 version = 1;
-  MessageID type = 2;
 
   oneof data {
-    BasicIdRequest REQUEST_ID = 3;
-
-    UserLogin USER_LOGIN = 4;
-    UpdateTunnelStatus TUNNEL_UPDATE = 5;
-    CreateTunnel TUNNEL_CREATE = 6;
+    User data_user = 3;
+    Tunnel data_tunnel = 4;
+    TunnelList data_tunnel_list = 5;
   }
+}
+
+message RequestBase {
+  MessageID type = 1;
+
+  oneof data {
+    int32 data_id = 2;
+
+    UserLogin data_user_login = 3;
+    UpdateTunnelStatus data_update_tunnel = 4;
+    CreateTunnel data_create_tunnel = 5;
+  }
+}
+
+enum PushMessageID { PLACEHOLDER = 0; }
+
+message PushMessageBase {
+  PushMessageID type = 1;
+
+  oneof data { int32 placeholder = 2; }
 }
