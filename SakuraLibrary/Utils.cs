@@ -39,6 +39,21 @@ namespace SakuraLibrary
 
         public static string Md5(string Data) => Md5(Encoding.UTF8.GetBytes(Data));
 
+        public static int CastInt(dynamic item)
+        {
+            switch (item)
+            {
+            case int i:
+                return i;
+            case long l:
+                return (int)l;
+            case string s:
+                return int.Parse(s);
+            default:
+                return (int)item;
+            }
+        }
+
         public static bool SetAutoRun(bool start)
         {
             /* TODO

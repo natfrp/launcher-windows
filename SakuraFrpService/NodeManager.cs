@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
+using SakuraLibrary;
 using SakuraLibrary.Proto;
 
 namespace SakuraFrpService
@@ -29,13 +30,14 @@ namespace SakuraFrpService
                 Clear();
                 foreach (Dictionary<string, dynamic> j in nodes["data"])
                 {
-                    this[(int)j["id"]] = new Node()
+                    var n = new Node()
                     {
-                        Id = (int)j["id"],
-                        Name = j["name"] as string,
+                        Id = Utils.CastInt(j["id"]),
+                        Name = (string)j["name"],
                         AcceptNew = j["accept_new"],
-                        AcceptHttp = (int)j["accept_http"]
+                        AcceptHttp = Utils.CastInt(j["accept_http"])
                     };
+                    this[n.Id] = n;
                 }
             }
         }

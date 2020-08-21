@@ -53,16 +53,17 @@ namespace SakuraFrpService.Tunnel
                 var tmp = new List<int>();
                 foreach (Dictionary<string, dynamic> j in tunnels["data"])
                 {
-                    tmp.Add(j["id"]);
-                    if (!ContainsKey(j["id"]))
+                    var id = Utils.CastInt(j["id"]);
+                    tmp.Add(id);
+                    if (!ContainsKey(id))
                     {
-                        this[j["id"]] = new Tunnel(this)
+                        this[id] = new Tunnel(this)
                         {
-                            Id = j["id"],
-                            Node = j["node"],
-                            Name = j["name"],
-                            Type = j["type"],
-                            Description = j["description"]
+                            Id = id,
+                            Node = Utils.CastInt(j["node"]),
+                            Name = (string)j["name"],
+                            Type = (string)j["type"],
+                            Description = (string)j["description"]
                         };
                     }
                 }
