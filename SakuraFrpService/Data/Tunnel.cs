@@ -66,7 +66,7 @@ namespace SakuraFrpService.Data
             }
             catch (Exception e)
             {
-                Manager.Main.LogManager.Log(Name, "隧道启动失败: " + e.Message);
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Name, "隧道启动失败: " + e.Message);
                 Stop();
             }
             return false;
@@ -88,10 +88,10 @@ namespace SakuraFrpService.Data
                 BaseProcess.StandardInput.Write("stop\n");
                 if (!BaseProcess.WaitForExit(3500))
                 {
-                    Manager.Main.LogManager.Log(Name, "frpc 未响应, 正在强制结束进程");
+                    Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Name, "frpc 未响应, 正在强制结束进程");
                     BaseProcess.Kill();
                 }
-                Manager.Main.LogManager.Log(Name, "frpc 已结束");
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Name, "frpc 已结束");
             }
             finally
             {
@@ -103,7 +103,7 @@ namespace SakuraFrpService.Data
         {
             if (e.Data != null)
             {
-                Manager.Main.LogManager.Log(Name, e.Data);
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_FRPC, Name, e.Data);
             }
         }
 

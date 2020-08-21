@@ -8,6 +8,8 @@ namespace SakuraFrpService.Manager
 {
     public class LogManager : ConcurrentQueue<Log>
     {
+        public const int CATEGORY_FRPC = 0, CATEGORY_SERVICE_INFO = 1, CATEGORY_SERVICE_WARNING = 2, CATEGORY_SERVICE_ERROR = 3;
+
         public readonly MainService Main;
         public readonly Thread MainThread;
 
@@ -32,7 +34,7 @@ namespace SakuraFrpService.Manager
             }
         }
 
-        public void Log(string source, string data)
+        public void Log(int category, string source, string data)
         {
             if (data == null)
             {
@@ -42,6 +44,7 @@ namespace SakuraFrpService.Manager
             {
                 newLog.Add(new Log()
                 {
+                    Category = category,
                     Source = source,
                     Data = data
                 });

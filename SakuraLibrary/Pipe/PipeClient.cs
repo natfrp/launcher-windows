@@ -58,7 +58,7 @@ namespace SakuraLibrary.Pipe
             PushPipe = null;
         }
 
-        public ResponseBase Request(IMessage message)
+        public ResponseBase Request(RequestBase message)
         {
             lock (this)
             {

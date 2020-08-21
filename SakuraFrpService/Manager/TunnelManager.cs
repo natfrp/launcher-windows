@@ -203,7 +203,7 @@ namespace SakuraFrpService.Manager
                                 if (++t.FailCount >= 3)
                                 {
                                     t.Enabled = false;
-                                    Main.LogManager.Log(t.Name, "隧道持续启动失败, 已禁用该隧道");
+                                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, t.Name, "隧道持续启动失败, 已禁用该隧道");
                                 }
                                 else
                                 {

@@ -7,6 +7,7 @@ using SakuraLibrary;
 using SakuraLibrary.Pipe;
 using SakuraLibrary.Proto;
 
+using SakuraLauncher.View;
 using SakuraLauncher.Helper;
 
 namespace SakuraLauncher.Model
@@ -16,6 +17,8 @@ namespace SakuraLauncher.Model
         public readonly MainWindow View;
         public readonly PipeClient Pipe = new PipeClient(Consts.PipeName);
 
+        public LogTab LogView;
+
         protected Thread PipeThread;
 
         public LauncherModel(MainWindow view)
@@ -23,7 +26,10 @@ namespace SakuraLauncher.Model
             View = view;
             CurrentTabTester = new TabIndexTester(this);
 
-            PipeThread = new Thread(new ThreadStart(PipeWork));
+            PipeThread = new Thread(new ThreadStart(PipeWork))
+            {
+                IsBackground = true
+            };
             PipeThread.Start();
 
             Pipe.ServerPush += Pipe_ServerPush;
@@ -59,8 +65,16 @@ namespace SakuraLauncher.Model
 
         public void Refresh()
         {
+            var logs = Pipe.Request(new RequestBase()
+            {
+                Type = MessageID.LogGet
+            });
             View.Dispatcher.Invoke(() =>
             {
+                foreach (var l in logs.DataLog.Data)
+                {
+                    LogView.Log(l, true);
+                }
                 Nodes.Clear();
                 Tunnels.Clear();
             });
@@ -68,11 +82,11 @@ namespace SakuraLauncher.Model
             {
                 Type = MessageID.NodeList
             });
-            var resp = Pipe.Request(new RequestBase()
+            var tunnels = Pipe.Request(new RequestBase()
             {
                 Type = MessageID.TunnelList
             });
-            if (!nodes.Success || !resp.Success)
+            if (!nodes.Success || !tunnels.Success)
             {
                 return;
             }
@@ -84,7 +98,7 @@ namespace SakuraLauncher.Model
                     Nodes.Add(new NodeModel(n));
                     map.Add(n.Id, n.Name);
                 }
-                foreach (var t in resp.DataTunnels.Tunnels)
+                foreach (var t in tunnels.DataTunnels.Tunnels)
                 {
                     Tunnels.Add(new TunnelModel(t, this, map));
                 }
@@ -139,7 +153,7 @@ namespace SakuraLauncher.Model
                             if (t.IsReal && t.Real.Id == msg.DataTunnel.Id)
                             {
                                 t.Real.Proto = msg.DataTunnel;
-                                t.Real.SetNodeName(Nodes.ToDictionary(k => k.Id, v => v.ToString()));
+                                t.Real.SetNodeName(Nodes.ToDictionary(k => k.Id, v => v.Name));
                                 break;
                             }
                         }
@@ -181,7 +195,7 @@ namespace SakuraLauncher.Model
                     {
                         foreach (var l in msg.DataLog.Data)
                         {
-                            SakuraLauncher.View.LogTab.YAAAY.Log(l.Source, l.Data, -1);
+                            LogView.Log(l);
                         }
                     });
                     break;

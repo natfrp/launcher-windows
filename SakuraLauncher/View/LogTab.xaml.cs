@@ -7,8 +7,11 @@ using System.Windows.Documents;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
+using SakuraLibrary.Proto;
+
 using SakuraLauncher.Model;
 
+// 这一坨先不重构了, 太麻烦
 namespace SakuraLauncher.View
 {
     /// <summary>
@@ -16,9 +19,7 @@ namespace SakuraLauncher.View
     /// </summary>
     public partial class LogTab : UserControl
     {
-        public static LogTab YAAAY;
-        public static Regex LogPattern = new Regex(@"(?<Time>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) (?<Level>\[[DIWE]\]) \[(?<Source>[a-zA-Z0-9\-_\.]+:\d+)\] (?<Content>.+)", RegexOptions.Compiled | RegexOptions.Singleline);
-
+        public static readonly Regex LogPattern = new Regex(@"(?<Time>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) (?<Level>\[[DIWE]\]) \[(?<Source>[a-zA-Z0-9\-_\.]+:\d+)\] (?<Content>.+)", RegexOptions.Compiled | RegexOptions.Singleline);
         public static readonly SolidColorBrush BrushInfo = new SolidColorBrush(Colors.White),
              BrushWarning = new SolidColorBrush(Colors.Orange),
              BrushError = new SolidColorBrush(Color.FromRgb(220, 80, 54)),
@@ -32,88 +33,84 @@ namespace SakuraLauncher.View
 
         public LogTab(LauncherModel main)
         {
-            YAAAY = this;
-
             InitializeComponent();
             DataContext = Model = main;
         }
 
-        private void LogFrpc(string tunnel, string raw)
-        {
-            var match = LogPattern.Match(raw);
-            if (!match.Success)
-            {
-                if (!failedData.ContainsKey(tunnel))
-                {
-                    failedData[tunnel] = "";
-                }
-                failedData[tunnel] += raw + "\n";
-                AddRun(raw, BrushText);
-                AddRun("", BrushText); // Dirty Patch
-                AddRun("", BrushText);
-            }
-            else
-            {
-                if (failedData.ContainsKey(tunnel))
-                {
-                    if (Model.View.IsVisible && !Model.SuppressInfo)
-                    {
-                        string failedData_ = failedData[tunnel];
-                        ThreadPool.QueueUserWorkItem(s => App.ShowMessage(failedData_, "隧道日志", MessageBoxImage.Information));
-                    }
-                    failedData.Remove(tunnel);
-                }
-                AddRun(match.Groups["Time"].Value + " ", BrushTime);
-                var levelColor = BrushInfo;
-                switch (match.Groups["Level"].Value)
-                {
-                case "W":
-                    levelColor = BrushWarning;
-                    break;
-                case "E":
-                    levelColor = BrushError;
-                    break;
-                }
-                AddRun(match.Groups["Level"].Value + ":" + match.Groups["Source"].Value + " ", levelColor);
-                AddRun(match.Groups["Content"].Value, BrushText);
-            }
-        }
-
-        public void Log(string tunnel, string raw, int type)
+        public void Log(Log l, bool init = false)
         {
             if (!Dispatcher.CheckAccess())
             {
-                Dispatcher.Invoke(() => Log(tunnel, raw, type));
+                Dispatcher.Invoke(() => Log(l));
                 return;
             }
             bool bottom = ScrollViewerLog.ScrollableHeight - ScrollViewerLog.VerticalOffset < 1;
             if (TextBlockLog.Inlines.Count != 0)
             {
-                AddLineBreak();
+                TextBlockLog.Inlines.Add(new LineBreak());
             }
-            AddRun(tunnel + " ", BrushTunnel);
+            AddRun(l.Source + " ", BrushTunnel);
 
-            if (type == -1)
+            if (l.Category == 0) // CATEGORY_FRPC
             {
-                LogFrpc(tunnel, raw);
+                var match = LogPattern.Match(l.Data);
+                if (!match.Success)
+                {
+                    if (!init)
+                    {
+                        if (!failedData.ContainsKey(l.Source))
+                        {
+                            failedData[l.Source] = "";
+                        }
+                        failedData[l.Source] += l.Data + "\n";
+                    }
+                    AddRun(l.Data, BrushText);
+                    AddRun("", BrushText); // Dirty Patch
+                    AddRun("", BrushText);
+                }
+                else
+                {
+                    if (failedData.ContainsKey(l.Source))
+                    {
+                        if (Model.View.IsVisible && !Model.SuppressInfo)
+                        {
+                            string failedData_ = failedData[l.Source];
+                            ThreadPool.QueueUserWorkItem(s => App.ShowMessage(failedData_, "隧道日志", MessageBoxImage.Information));
+                        }
+                        failedData.Remove(l.Source);
+                    }
+                    AddRun(match.Groups["Time"].Value + " ", BrushTime);
+                    var levelColor = BrushInfo;
+                    switch (match.Groups["Level"].Value)
+                    {
+                    case "W":
+                        levelColor = BrushWarning;
+                        break;
+                    case "E":
+                        levelColor = BrushError;
+                        break;
+                    }
+                    AddRun(match.Groups["Level"].Value + ":" + match.Groups["Source"].Value + " ", levelColor);
+                    AddRun(match.Groups["Content"].Value, BrushText);
+                }
             }
             else
             {
                 AddRun(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), BrushTime);
-                switch (type)
+                switch (l.Category)
                 {
-                case 0:
+                case 1:
                 default:
                     AddRun(" INFO ", BrushInfo);
                     break;
-                case 1:
+                case 2:
                     AddRun(" WARNING ", BrushWarning);
                     break;
-                case 2:
+                case 3:
                     AddRun(" ERROR ", BrushError);
                     break;
                 }
-                AddRun(raw, BrushText);
+                AddRun(l.Data, BrushText);
             }
 
             while (TextBlockLog.Inlines.Count > 4 * 300 - 1)
@@ -131,8 +128,13 @@ namespace SakuraLauncher.View
             Foreground = color
         });
 
-        public void AddLineBreak() => TextBlockLog.Inlines.Add(new LineBreak());
-
-        private void ButtonClear_Click(object sender, RoutedEventArgs e) => TextBlockLog.Inlines.Clear();
+        private void ButtonClear_Click(object sender, RoutedEventArgs e)
+        {
+            Model.Pipe.Request(new RequestBase()
+            {
+                Type = MessageID.LogClear
+            });
+            TextBlockLog.Inlines.Clear();
+        }
     }
 }
