@@ -4,6 +4,10 @@ using System.Security.Principal;
 using System.Collections.Generic;
 using System.Security.AccessControl;
 
+using Google.Protobuf;
+
+using SakuraLibrary.Proto;
+
 namespace SakuraLibrary.Pipe
 {
     public class PipeServer : IDisposable
@@ -160,16 +164,17 @@ namespace SakuraLibrary.Pipe
 
         #region Message Push Pipe
 
-        public void PushMessage(byte[] message)
+        public void PushMessage(PushMessageBase msg)
         {
+            var buffer = msg.ToByteArray();
+            var remove = new List<PipeStream>();
             lock (PushPipes)
             {
-                var remove = new List<PipeStream>();
                 foreach (var p in PushPipes)
                 {
                     try
                     {
-                        p.Write(message, 0, message.Length);
+                        p.Write(buffer, 0, buffer.Length);
                     }
                     catch
                     {

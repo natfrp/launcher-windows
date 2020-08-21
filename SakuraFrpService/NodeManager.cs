@@ -24,6 +24,11 @@ namespace SakuraFrpService
 
         public async Task UpdateNodes()
         {
+            PushMessageBase msg = new PushMessageBase()
+            {
+                Type = PushMessageID.UpdateNodes,
+                DataNodeList = new NodeList()
+            };
             var nodes = await Natfrp.Request("get_nodes");
             lock (this)
             {
@@ -39,7 +44,9 @@ namespace SakuraFrpService
                     };
                     this[n.Id] = n;
                 }
+                msg.DataNodeList.Nodes.Add(Values);
             }
+            Main.Pipe.PushMessage(msg);
         }
 
         #region Async Work

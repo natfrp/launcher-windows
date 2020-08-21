@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using SakuraLibrary;
+using SakuraLibrary.Proto;
 
 namespace SakuraFrpService.Tunnel
 {
@@ -45,11 +46,14 @@ namespace SakuraFrpService.Tunnel
 
         public async Task UpdateTunnels()
         {
+            PushMessageBase msg = new PushMessageBase()
+            {
+                Type = PushMessageID.UpdateTunnels,
+                DataTunnelList = new TunnelList()
+            };
             var tunnels = await Natfrp.Request("get_tunnels");
             lock (this)
             {
-                // TODO: May push changes
-
                 var tmp = new List<int>();
                 foreach (Dictionary<string, dynamic> j in tunnels["data"])
                 {
@@ -76,7 +80,10 @@ namespace SakuraFrpService.Tunnel
                     FirstFetch = false;
                     SetEnabledTunnels(Properties.Settings.Default.EnabledTunnels);
                 }
+                // TODO: We might need to update EnabledTunnels each time we fetch
+                msg.DataTunnelList.Tunnels.Add(Values.Select(t => t.CreateProto()));
             }
+            Main.Pipe.PushMessage(msg);
         }
 
         public void SetEnabledTunnels(List<int> ids)

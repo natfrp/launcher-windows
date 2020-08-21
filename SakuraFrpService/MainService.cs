@@ -54,6 +54,8 @@ namespace SakuraFrpService
                 settings.Token = Natfrp.Token;
                 settings.LoggedIn = UserInfo.Status == UserStatus.LoggedIn;
             }
+            settings.EnabledTunnels = TunnelManager.GetEnabledTunnels();
+            // TODO: This setting should be saved when ToggleTunnel action performed ↑
 
             settings.Save();
         }
@@ -84,6 +86,18 @@ namespace SakuraFrpService
             while (true)
             {
                 Tick();
+            }
+        }
+
+        protected void PushUserInfo()
+        {
+            lock (UserInfo)
+            {
+                Pipe.PushMessage(new PushMessageBase()
+                {
+                    Type = PushMessageID.UpdateUser,
+                    DataUser = UserInfo
+                });
             }
         }
 
@@ -127,6 +141,7 @@ namespace SakuraFrpService
                 TunnelManager.Start(token);
 
                 Save();
+                PushUserInfo();
             }
             catch (NatfrpException e)
             {
@@ -168,6 +183,7 @@ namespace SakuraFrpService
                     UserInfo.Status = UserStatus.NoLogin;
                 }
                 Save();
+                PushUserInfo();
             }
             return null;
         }
@@ -249,7 +265,7 @@ namespace SakuraFrpService
                             return;
                         }
                     }
-                    goto USERINFO;
+                    break;
                 case MessageID.UserLogout:
                     {
                         var result = Logout();
@@ -259,9 +275,8 @@ namespace SakuraFrpService
                             return;
                         }
                     }
-                    goto USERINFO;
+                    break;
                 case MessageID.UserInfo:
-                USERINFO:
                     lock (UserInfo)
                     {
                         resp.DataUser = UserInfo;
@@ -285,6 +300,12 @@ namespace SakuraFrpService
                     }
                     switch (req.Type)
                     {
+                    case MessageID.TunnelCreate:
+                        // TODO: Return the created tunnel proto
+                        resp.Success = false;
+                        resp.Message = "foobar";
+                        resp.DataTunnel = null;
+                        break;
                     case MessageID.TunnelList:
                         resp.DataTunnelList = new TunnelList();
                         resp.DataTunnelList.Tunnels.Add(TunnelManager.Values.Select(t => t.CreateProto()));
