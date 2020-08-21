@@ -1,8 +1,7 @@
 ﻿using System.Windows;
-using System.Threading;
 using System.Windows.Controls;
 
-using SakuraLibrary.Proto;
+using SakuraLibrary.Model;
 
 using SakuraLauncher.Model;
 
@@ -10,9 +9,9 @@ namespace SakuraLauncher.View
 {
     public partial class TunnelTab : UserControl
     {
-        private readonly LauncherModel Model;
+        private readonly LauncherViewModel Model;
 
-        public TunnelTab(LauncherModel main)
+        public TunnelTab(LauncherViewModel main)
         {
             InitializeComponent();
             DataContext = Model = main;
@@ -27,26 +26,7 @@ namespace SakuraLauncher.View
                 if (App.ShowMessage(string.Format("确定要删除隧道 #{0} {1} 吗?", tunnel.Id, tunnel.Name), "操作确认", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                 {
                     IsEnabled = false;
-                    ThreadPool.QueueUserWorkItem(s =>
-                    {
-                        try
-                        {
-                            var resp = Model.Pipe.Request(new RequestBase()
-                            {
-                                Type = MessageID.TunnelDelete,
-                                DataId = tunnel.Id
-                            });
-                            if (!resp.Success)
-                            {
-                                App.ShowMessage(resp.Message, "操作失败", MessageBoxImage.Error, MessageBoxButton.OK);
-                                return;
-                            }
-                        }
-                        finally
-                        {
-                            Dispatcher.Invoke(() => IsEnabled = true);
-                        }
-                    });
+                    Model.RequestDeleteTunnel(tunnel.Id, Model.SimpleFailureHandler);
                 }
             }
         }

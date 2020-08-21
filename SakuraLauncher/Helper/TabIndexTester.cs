@@ -4,11 +4,11 @@ namespace SakuraLauncher.Helper
 {
     public class TabIndexTester
     {
-        public LauncherModel Model;
+        public LauncherViewModel Model;
 
         public bool this[int offset] => Model.CurrentTab == offset;
 
-        public TabIndexTester(LauncherModel main)
+        public TabIndexTester(LauncherViewModel main)
         {
             Model = main;
         }

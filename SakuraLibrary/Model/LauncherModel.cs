@@ -1,31 +1,25 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
+using System.ComponentModel;
+using System.Windows.Threading;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-using SakuraLibrary;
 using SakuraLibrary.Pipe;
 using SakuraLibrary.Proto;
 
-using SakuraLauncher.View;
-using SakuraLauncher.Helper;
-
-namespace SakuraLauncher.Model
+namespace SakuraLibrary.Model
 {
-    public class LauncherModel : ModelBase
+    public abstract class LauncherModel : ModelBase
     {
-        public readonly MainWindow View;
         public readonly PipeClient Pipe = new PipeClient(Consts.PipeName);
-
-        public LogTab LogView;
 
         protected Thread PipeThread;
 
-        public LauncherModel(MainWindow view)
+        // TODO: Remove view
+        public LauncherModel(Dispatcher dispatcher) : base(dispatcher)
         {
-            View = view;
-            CurrentTabTester = new TabIndexTester(this);
-
             PipeThread = new Thread(new ThreadStart(PipeWork))
             {
                 IsBackground = true
@@ -36,44 +30,22 @@ namespace SakuraLauncher.Model
             PropertyChanged += (s, e) => Save();
         }
 
-        public void Load()
-        {
-            var settings = Properties.Settings.Default;
+        public abstract void Log(Log l, bool init = false);
 
-            View.Width = settings.Width;
-            View.Height = settings.Height;
+        public abstract void Save();
+        public abstract void Load();
 
-            LogTextWrapping = settings.LogTextWrapping;
-        }
-
-        public void Save()
-        {
-            if (!View.CheckAccess())
-            {
-                View.Dispatcher.Invoke(() => Save());
-                return;
-            }
-
-            var settings = Properties.Settings.Default;
-
-            settings.Width = (int)View.Width;
-            settings.Height = (int)View.Height;
-            settings.LogTextWrapping = LogTextWrapping;
-
-            settings.Save();
-        }
-
-        public void Refresh()
+        public virtual bool Refresh()
         {
             var logs = Pipe.Request(new RequestBase()
             {
                 Type = MessageID.LogGet
             });
-            View.Dispatcher.Invoke(() =>
+            Dispatcher.Invoke(() =>
             {
                 foreach (var l in logs.DataLog.Data)
                 {
-                    LogView.Log(l, true);
+                    Log(l, true);
                 }
                 Nodes.Clear();
                 Tunnels.Clear();
@@ -88,9 +60,9 @@ namespace SakuraLauncher.Model
             });
             if (!nodes.Success || !tunnels.Success)
             {
-                return;
+                return false;
             }
-            View.Dispatcher.Invoke(() =>
+            Dispatcher.Invoke(() =>
             {
                 var map = new Dictionary<int, string>();
                 foreach (var n in nodes.DataNodes.Nodes)
@@ -102,9 +74,8 @@ namespace SakuraLauncher.Model
                 {
                     Tunnels.Add(new TunnelModel(t, this, map));
                 }
-                Tunnels.Add(new FakeTunnelModel());
             });
-            SwitchTab(LoggedIn ? 0 : 2);
+            return true;
         }
 
         #region IPC Handling
@@ -146,21 +117,21 @@ namespace SakuraLauncher.Model
                     UserInfo = msg.DataUser;
                     break;
                 case PushMessageID.UpdateTunnel:
-                    View.Dispatcher.Invoke(() =>
+                    Dispatcher.Invoke(() =>
                     {
                         foreach (var t in Tunnels)
                         {
-                            if (t.IsReal && t.Real.Id == msg.DataTunnel.Id)
+                            if (t.Id == msg.DataTunnel.Id)
                             {
-                                t.Real.Proto = msg.DataTunnel;
-                                t.Real.SetNodeName(Nodes.ToDictionary(k => k.Id, v => v.Name));
+                                t.Proto = msg.DataTunnel;
+                                t.SetNodeName(Nodes.ToDictionary(k => k.Id, v => v.Name));
                                 break;
                             }
                         }
                     });
                     break;
                 case PushMessageID.UpdateTunnels:
-                    View.Dispatcher.Invoke(() =>
+                    Dispatcher.Invoke(() =>
                     {
                         Tunnels.Clear();
                         var map = Nodes.ToDictionary(k => k.Id, v => v.ToString());
@@ -168,11 +139,10 @@ namespace SakuraLauncher.Model
                         {
                             Tunnels.Add(new TunnelModel(t, this, map));
                         }
-                        Tunnels.Add(new FakeTunnelModel());
                     });
                     break;
                 case PushMessageID.UpdateNodes:
-                    View.Dispatcher.Invoke(() =>
+                    Dispatcher.Invoke(() =>
                     {
                         Nodes.Clear();
                         var map = new Dictionary<int, string>();
@@ -183,19 +153,16 @@ namespace SakuraLauncher.Model
                         }
                         foreach (var t in Tunnels)
                         {
-                            if (t.IsReal)
-                            {
-                                t.Real.SetNodeName(map);
-                            }
+                            t.SetNodeName(map);
                         }
                     });
                     break;
                 case PushMessageID.AppendLog:
-                    View.Dispatcher.Invoke(() =>
+                    Dispatcher.Invoke(() =>
                     {
                         foreach (var l in msg.DataLog.Data)
                         {
-                            LogView.Log(l);
+                            Log(l);
                         }
                     });
                     break;
@@ -290,7 +257,7 @@ namespace SakuraLauncher.Model
         public bool Connected { get => _connected; set => Set(out _connected, value); }
         private bool _connected = false;
 
-        public User UserInfo { get => _userInfo; set => SafeSet(out _userInfo, value, View.Dispatcher); }
+        public User UserInfo { get => _userInfo; set => SafeSet(out _userInfo, value); }
         private User _userInfo = new User();
 
         public int CurrentTab { get => _currentTab; set => Set(out _currentTab, value); }
@@ -298,35 +265,18 @@ namespace SakuraLauncher.Model
 
         public ObservableCollection<NodeModel> Nodes { get; set; } = new ObservableCollection<NodeModel>();
 
-        [SourceBinding(nameof(CurrentTab))]
-        public TabIndexTester CurrentTabTester { get; set; }
+        #endregion
 
-        public void SwitchTab(int id)
-        {
-            if (!View.CheckAccess())
-            {
-                View.Dispatcher.Invoke(() => SwitchTab(id));
-                return;
-            }
-            if (CurrentTab != id)
-            {
-                CurrentTab = id;
-                View.BeginTabStoryboard("TabHideAnimation");
-            }
-        }
+        #region Tunnel
+
+        public ObservableCollection<TunnelModel> Tunnels { get; set; } = new ObservableCollection<TunnelModel>();
 
         #endregion
 
-        #region Tunnel Tab Binding
-
-        public ObservableCollection<ITunnelModel> Tunnels { get; set; } = new ObservableCollection<ITunnelModel>();
-
-        #endregion
-
-        #region Settings Tab Binding
+        #region Settings
 
         [SourceBinding(nameof(UserInfo))]
-        public string UserToken { get => UserInfo.Status == User.Types.Status.LoggedIn ? "****************" : _userToken; set => SafeSet(out _userToken, value, View.Dispatcher); }
+        public string UserToken { get => UserInfo.Status == User.Types.Status.LoggedIn ? "****************" : _userToken; set => SafeSet(out _userToken, value); }
         private string _userToken = "";
 
         [SourceBinding(nameof(UserInfo))]
@@ -335,7 +285,7 @@ namespace SakuraLauncher.Model
         [SourceBinding(nameof(LoggingIn))]
         public bool TokenEditable => !LoggingIn;
 
-        public bool LoggingIn { get => _loggingIn; set => SafeSet(out _loggingIn, value, View.Dispatcher); }
+        public bool LoggingIn { get => _loggingIn; set => SafeSet(out _loggingIn, value); }
         private bool _loggingIn;
 
         public bool SuppressInfo { get => _suppressInfo; set => Set(out _suppressInfo, value); }
@@ -344,8 +294,57 @@ namespace SakuraLauncher.Model
         public bool LogTextWrapping { get => _logTextWrapping; set => Set(out _logTextWrapping, value); }
         private bool _logTextWrapping;
 
-        // public Prop<bool> AutoRun { get; set; } = new Prop<bool>();
-        // public Prop<bool> BypassProxy { get; set; } = new Prop<bool>(true);
+        public void RequestDeleteTunnel(int id, Action<bool, string> callback)
+        {
+            ThreadPool.QueueUserWorkItem(s =>
+            {
+                try
+                {
+                    var resp = Pipe.Request(new RequestBase()
+                    {
+                        Type = MessageID.TunnelDelete,
+                        DataId = id
+                    });
+                    callback(resp.Success, resp.Message);
+                }
+                catch (Exception e)
+                {
+                    callback(false, e.ToString());
+                }
+            });
+        }
+
+        public void RequestLogin(Action<bool, string> callback)
+        {
+            LoggingIn = true;
+            ThreadPool.QueueUserWorkItem(s =>
+            {
+                try
+                {
+                    var resp = Pipe.Request(LoggedIn ? new RequestBase()
+                    {
+                        Type = MessageID.UserLogout
+                    } : new RequestBase()
+                    {
+                        Type = MessageID.UserLogin,
+                        DataUserLogin = new UserLogin()
+                        {
+                            Token = UserToken
+                        }
+                    });
+                    callback(resp.Success, resp.Message);
+                    Refresh();
+                }
+                catch (Exception e)
+                {
+                    callback(false, e.ToString());
+                }
+                finally
+                {
+                    LoggingIn = false;
+                }
+            });
+        }
 
         #endregion
     }

@@ -1,10 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-using SakuraLibrary.Proto;
-
-using SakuraLauncher.Model;
-using System.Threading;
+using SakuraLibrary.Model;
 
 namespace SakuraLauncher
 {
@@ -18,7 +15,7 @@ namespace SakuraLauncher
         public CreateTunnelWindow(LauncherModel launcher)
         {
             InitializeComponent();
-            DataContext = Model = new CreateTunnelModel(this, launcher);
+            DataContext = Model = new CreateTunnelModel(launcher);
 
             Model.ReloadListening();
         }
@@ -34,47 +31,17 @@ namespace SakuraLauncher
                 App.ShowMessage("请选择穿透服务器", "Oops", MessageBoxImage.Error);
                 return;
             }
-            Model.Creating = true;
-            ThreadPool.QueueUserWorkItem(s =>
+            Model.RequestCreate(node.Id, (success, message) =>
             {
-                try
+                if (!success)
                 {
-                    var resp = Model.Launcher.Pipe.Request(new RequestBase()
-                    {
-                        Type = MessageID.TunnelCreate,
-                        DataCreateTunnel = new CreateTunnel()
-                        {
-                            Name = Model.TunnelName,
-                            Note = Model.Note,
-                            Node = node.Id,
-                            Type = Model.Type.ToLower(),
-                            RemotePort = Model.RemotePort,
-                            LocalPort = Model.LocalPort,
-                            LocalAddress = Model.LocalAddress
-                        }
-                    });
-                    if (!resp.Success)
-                    {
-                        App.ShowMessage(resp.Message, "操作失败", MessageBoxImage.Error, MessageBoxButton.OK);
-                        return;
-                    }
-                    Dispatcher.Invoke(() =>
-                    {
-                        Model.LocalPort = 0;
-                        Model.LocalAddress = "";
-                        Model.RemotePort = 0;
-                        Model.TunnelName = "";
-                        listening.SelectedItem = null;
-                    });
-                    if (App.ShowMessage("成功创建隧道 " + resp.Message + "\n是否继续创建?", "创建成功", MessageBoxImage.Question, MessageBoxButton.YesNo) != MessageBoxResult.Yes)
-                    {
-                        Dispatcher.Invoke(() => Close());
-                        return;
-                    }
+                    App.ShowMessage(message, "操作失败", MessageBoxImage.Error);
+                    return;
                 }
-                finally
+                if (App.ShowMessage(message + "\n是否继续创建?", "创建成功", MessageBoxImage.Question, MessageBoxButton.YesNo) != MessageBoxResult.Yes)
                 {
-                    Model.Creating = false;
+                    Dispatcher.Invoke(() => Close());
+                    return;
                 }
             });
         }

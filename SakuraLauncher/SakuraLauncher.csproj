@@ -87,14 +87,9 @@
     <Compile Include="CreateTunnelWindow.xaml.cs">
       <DependentUpon>CreateTunnelWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\CreateTunnelModel.cs" />
-    <Compile Include="Model\LauncherModel.cs" />
-    <Compile Include="Model\LocalProcessModel.cs" />
-    <Compile Include="Model\NodeModel.cs" />
-    <Compile Include="Model\TunnelModel.cs" />
-    <Compile Include="Model\ModelBase.cs" />
     <Compile Include="Helper\SelectableTextBlock.cs" />
     <Compile Include="Helper\TabIndexTester.cs" />
+    <Compile Include="Model\LauncherViewModel.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -103,7 +98,6 @@
     <Compile Include="View\LogTab.xaml.cs">
       <DependentUpon>LogTab.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Helper\Prop.cs" />
     <Compile Include="View\AboutTab.xaml.cs">
       <DependentUpon>AboutTab.xaml</DependentUpon>
     </Compile>

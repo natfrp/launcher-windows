@@ -3,19 +3,10 @@
 using SakuraLibrary.Proto;
 using TunnelStatus = SakuraLibrary.Proto.Tunnel.Types.Status;
 
-namespace SakuraLauncher.Model
+namespace SakuraLibrary.Model
 {
-    public interface ITunnelModel
+    public class TunnelModel : ModelBase
     {
-        bool IsReal { get; }
-        TunnelModel Real { get; }
-    }
-
-    public class TunnelModel : ModelBase, ITunnelModel
-    {
-        public bool IsReal => true;
-        public TunnelModel Real => this;
-
         public readonly LauncherModel Launcher;
 
         public Tunnel Proto { get => _proto; set => Set(out _proto, value); }
@@ -65,11 +56,5 @@ namespace SakuraLauncher.Model
         }
 
         public void SetNodeName(Dictionary<int, string> nodes) => NodeName = nodes != null && nodes.ContainsKey(Node) ? nodes[Node] : "未知节点";
-    }
-
-    public class FakeTunnelModel : ITunnelModel
-    {
-        public bool IsReal => false;
-        public TunnelModel Real => null;
     }
 }

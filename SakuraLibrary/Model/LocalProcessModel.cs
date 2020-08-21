@@ -1,4 +1,4 @@
-﻿namespace SakuraLauncher.Model
+﻿namespace SakuraLibrary.Model
 {
     public class LocalProcessModel : ModelBase
     {

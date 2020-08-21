@@ -6,11 +6,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
-namespace SakuraLauncher.Model
+using SakuraLibrary.Proto;
+
+namespace SakuraLibrary.Model
 {
     public class CreateTunnelModel : ModelBase
     {
-        public readonly CreateTunnelWindow View;
         public readonly LauncherModel Launcher;
 
         public string Type { get => _type; set => Set(out _type, value); }
@@ -35,7 +36,7 @@ namespace SakuraLauncher.Model
         public bool Loading { get => _loading; set => Set(out _loading, value); }
         private bool _loading = false;
 
-        public bool Creating { get => _creating; set => SafeSet(out _creating, value, View.Dispatcher); }
+        public bool Creating { get => _creating; set => SafeSet(out _creating, value); }
         private bool _creating = false;
 
         public IEnumerable<NodeModel> Nodes { get => _nodes; set => Set(out _nodes, value); }
@@ -43,9 +44,8 @@ namespace SakuraLauncher.Model
 
         public ObservableCollection<LocalProcessModel> Listening { get; set; } = new ObservableCollection<LocalProcessModel>();
 
-        public CreateTunnelModel(CreateTunnelWindow view, LauncherModel launcher)
+        public CreateTunnelModel(LauncherModel launcher) : base(launcher.Dispatcher)
         {
-            View = view;
             Launcher = launcher;
             launcher.Nodes.CollectionChanged += LauncherNodes_CollectionChanged;
             LauncherNodes_CollectionChanged();
@@ -56,7 +56,47 @@ namespace SakuraLauncher.Model
             Launcher.Nodes.CollectionChanged -= LauncherNodes_CollectionChanged;
         }
 
-        private void LauncherNodes_CollectionChanged(object sender = null, NotifyCollectionChangedEventArgs e = null) => Nodes = Launcher.Nodes.Where(t => t.AcceptNew);
+        public void RequestCreate(int node, Action<bool, string> callback)
+        {
+            Creating = true;
+            ThreadPool.QueueUserWorkItem(s =>
+            {
+                try
+                {
+                    var resp = Launcher.Pipe.Request(new RequestBase()
+                    {
+                        Type = MessageID.TunnelCreate,
+                        DataCreateTunnel = new CreateTunnel()
+                        {
+                            Name = TunnelName,
+                            Note = Note,
+                            Node = node,
+                            Type = Type.ToLower(),
+                            RemotePort = RemotePort,
+                            LocalPort = LocalPort,
+                            LocalAddress = LocalAddress
+                        }
+                    });
+                    if (!resp.Success)
+                    {
+                        callback(false, resp.Message);
+                        return;
+                    }
+                    Dispatcher.Invoke(() =>
+                    {
+                        LocalPort = 0;
+                        LocalAddress = "";
+                        RemotePort = 0;
+                        TunnelName = "";
+                    });
+                    callback(true, "成功创建隧道 " + resp.Message);
+                }
+                finally
+                {
+                    Creating = false;
+                }
+            });
+        }
 
         public void ReloadListening()
         {
@@ -112,7 +152,7 @@ namespace SakuraLauncher.Model
                     }
 
                     var spliter = tokens[1].Split(':');
-                    View.Dispatcher.InvokeAsync(() => Listening.Add(new LocalProcessModel()
+                    Launcher.Dispatcher.InvokeAsync(() => Listening.Add(new LocalProcessModel()
                     {
                         Protocol = tokens[0],
                         Address = spliter[0],
@@ -131,8 +171,10 @@ namespace SakuraLauncher.Model
                     process.Kill();
                 }
                 catch { }
-                View.Dispatcher.InvokeAsync(() => Loading = false);
+                Launcher.Dispatcher.InvokeAsync(() => Loading = false);
             });
         }
+
+        private void LauncherNodes_CollectionChanged(object sender = null, NotifyCollectionChangedEventArgs e = null) => Nodes = Launcher.Nodes.Where(t => t.AcceptNew);
     }
 }

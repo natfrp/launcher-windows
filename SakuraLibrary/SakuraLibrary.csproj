@@ -51,10 +51,17 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Consts.cs" />
     <Compile Include="Helper\TaskExtension.cs" />
+    <Compile Include="Model\CreateTunnelModel.cs" />
+    <Compile Include="Model\LauncherModel.cs" />
+    <Compile Include="Model\LocalProcessModel.cs" />
+    <Compile Include="Model\ModelBase.cs" />
+    <Compile Include="Model\NodeModel.cs" />
+    <Compile Include="Model\TunnelModel.cs" />
     <Compile Include="NTAPI.cs" />
     <Compile Include="Pipe\PipeClient.cs" />
     <Compile Include="Pipe\PipeConnection.cs" />

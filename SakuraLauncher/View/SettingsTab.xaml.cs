@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Windows;
-using System.Threading;
 using System.Windows.Controls;
-
-using SakuraLibrary.Proto;
 
 using SakuraLauncher.Model;
 
@@ -14,9 +11,9 @@ namespace SakuraLauncher.View
     /// </summary>
     public partial class SettingsTab : UserControl
     {
-        private readonly LauncherModel Model;
+        private readonly LauncherViewModel Model;
 
-        public SettingsTab(LauncherModel main)
+        public SettingsTab(LauncherViewModel main)
         {
             InitializeComponent();
             DataContext = Model = main;
@@ -37,34 +34,7 @@ namespace SakuraLauncher.View
             {
                 return;
             }
-            Model.LoggingIn = true;
-            ThreadPool.QueueUserWorkItem(s =>
-            {
-                try
-                {
-                    var resp = Model.Pipe.Request(Model.LoggedIn ? new RequestBase()
-                    {
-                        Type = MessageID.UserLogout
-                    } : new RequestBase()
-                    {
-                        Type = MessageID.UserLogin,
-                        DataUserLogin = new UserLogin()
-                        {
-                            Token = Model.UserToken
-                        }
-                    });
-                    if (!resp.Success)
-                    {
-                        App.ShowMessage(resp.Message, "操作失败", MessageBoxImage.Error, MessageBoxButton.OK);
-                        return;
-                    }
-                    Model.Refresh();
-                }
-                finally
-                {
-                    Model.LoggingIn = false;
-                }
-            });
+            Model.RequestLogin(Model.SimpleFailureHandler);
         }
     }
 }

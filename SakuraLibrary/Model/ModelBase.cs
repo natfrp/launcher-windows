@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Reflection;
 using System.ComponentModel;
+using System.Windows.Threading;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Windows.Threading;
 
-namespace SakuraLauncher.Model
+namespace SakuraLibrary.Model
 {
     public class ModelBase : INotifyPropertyChanged
     {
+        public Dispatcher Dispatcher = null;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected Dictionary<string, HashSet<string>> SourceBinding = new Dictionary<string, HashSet<string>>();
 
-        public ModelBase()
+        public ModelBase(Dispatcher dispatcher = null)
         {
-            foreach (var prop in GetType().GetTypeInfo().DeclaredProperties)
+            Dispatcher = dispatcher;
+            foreach (var prop in GetType().GetTypeInfo().GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
                 var attr = prop.GetCustomAttribute<SourceBindingAttribute>();
                 if (attr == null)
@@ -33,15 +36,16 @@ namespace SakuraLauncher.Model
             }
         }
 
-        protected void SafeSet<T>(out T target, T value, Dispatcher dispatcher, [CallerMemberName] string propertyName = "")
+        protected void SafeSet<T>(out T target, T value, [CallerMemberName] string propertyName = "")
         {
-            target = value;
-            if (dispatcher != null && !dispatcher.CheckAccess())
+            if (Dispatcher == null)
             {
-                dispatcher.Invoke(() =>
-                {
-                    RaisePropertyChanged(propertyName);
-                });
+                throw new InvalidOperationException("Dispatcher must be set before calling SafeSet");
+            }
+            target = value;
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(() => RaisePropertyChanged(propertyName));
             }
             else
             {

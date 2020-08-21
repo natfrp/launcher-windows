@@ -27,11 +27,11 @@ namespace SakuraLauncher.View
              BrushText = new SolidColorBrush(Colors.Silver),
              BrushTunnel = new SolidColorBrush(Colors.Wheat);
 
-        private readonly LauncherModel Model;
+        private readonly LauncherViewModel Model;
 
         public Dictionary<string, string> failedData = new Dictionary<string, string>();
 
-        public LogTab(LauncherModel main)
+        public LogTab(LauncherViewModel main)
         {
             InitializeComponent();
             DataContext = Model = main;

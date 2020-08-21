@@ -19,7 +19,7 @@ namespace SakuraLauncher
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly LauncherModel Model;
+        private readonly LauncherViewModel Model;
 
         public UserControl[] Tabs = null;
 
@@ -28,16 +28,14 @@ namespace SakuraLauncher
             InitializeComponent();
             SetLogo(Properties.Settings.Default.LogoIndex);
 
-            DataContext = Model = new LauncherModel(this);
+            DataContext = Model = new LauncherViewModel(this);
 
             Tabs = new UserControl[] {
                 new TunnelTab(Model),
-                new LogTab(Model),
+                Model.LogView,
                 new SettingsTab(Model),
                 new AboutTab()
             };
-
-            Model.LogView = (LogTab)Tabs[1];
             Model.SwitchTab(0);
 
             // TODO: Check daemon status

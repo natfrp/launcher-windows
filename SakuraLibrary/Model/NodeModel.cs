@@ -1,6 +1,6 @@
 ﻿using SakuraLibrary.Proto;
 
-namespace SakuraLauncher.Model
+namespace SakuraLibrary.Model
 {
     public class NodeModel
     {
