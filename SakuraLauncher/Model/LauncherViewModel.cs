@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Threading;
 
 using SakuraLibrary.Model;
 using SakuraLibrary.Proto;
+using SakuraLibrary.Helper;
 
 using SakuraLauncher.View;
 using SakuraLauncher.Helper;
@@ -23,9 +23,11 @@ namespace SakuraLauncher.Model
         public readonly LogTab LogView;
         public readonly MainWindow View;
 
-        public LauncherViewModel(MainWindow view) : base(view.Dispatcher)
+        public LauncherViewModel(MainWindow view)
         {
             View = view;
+            Dispatcher = new DispatcherWrapper(a => View.Dispatcher.Invoke(a), a => View.Dispatcher.BeginInvoke(a), () => View.Dispatcher.CheckAccess());
+
             LogView = new LogTab(this);
         }
 

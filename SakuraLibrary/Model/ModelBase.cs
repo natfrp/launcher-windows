@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Reflection;
 using System.ComponentModel;
-using System.Windows.Threading;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+
+using SakuraLibrary.Helper;
 
 namespace SakuraLibrary.Model
 {
     public class ModelBase : INotifyPropertyChanged
     {
-        public Dispatcher Dispatcher = null;
+        public DispatcherWrapper Dispatcher = null;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected Dictionary<string, HashSet<string>> SourceBinding = new Dictionary<string, HashSet<string>>();
 
-        public ModelBase(Dispatcher dispatcher = null)
+        public ModelBase(DispatcherWrapper dispatcher = null)
         {
             Dispatcher = dispatcher;
             foreach (var prop in GetType().GetTypeInfo().GetProperties(BindingFlags.Instance | BindingFlags.Public))

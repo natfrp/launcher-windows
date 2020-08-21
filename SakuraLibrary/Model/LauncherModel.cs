@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Threading;
 using System.ComponentModel;
-using System.Windows.Threading;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 using SakuraLibrary.Pipe;
 using SakuraLibrary.Proto;
+using SakuraLibrary.Helper;
 
 namespace SakuraLibrary.Model
 {
@@ -18,7 +18,7 @@ namespace SakuraLibrary.Model
         protected Thread PipeThread;
 
         // TODO: Remove view
-        public LauncherModel(Dispatcher dispatcher) : base(dispatcher)
+        public LauncherModel()
         {
             PipeThread = new Thread(new ThreadStart(PipeWork))
             {

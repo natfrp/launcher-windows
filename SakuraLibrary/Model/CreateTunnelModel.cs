@@ -152,7 +152,7 @@ namespace SakuraLibrary.Model
                     }
 
                     var spliter = tokens[1].Split(':');
-                    Launcher.Dispatcher.InvokeAsync(() => Listening.Add(new LocalProcessModel()
+                    Launcher.Dispatcher.BeginInvoke(() => Listening.Add(new LocalProcessModel()
                     {
                         Protocol = tokens[0],
                         Address = spliter[0],
@@ -171,7 +171,7 @@ namespace SakuraLibrary.Model
                     process.Kill();
                 }
                 catch { }
-                Launcher.Dispatcher.InvokeAsync(() => Loading = false);
+                Launcher.Dispatcher.BeginInvoke(() => Loading = false);
             });
         }
 
