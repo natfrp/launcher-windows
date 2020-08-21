@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using SakuraLibrary;
 using SakuraLibrary.Proto;
 
-namespace SakuraFrpService
+namespace SakuraFrpService.Manager
 {
     public class NodeManager : Dictionary<int, Node>
     {
@@ -27,7 +27,7 @@ namespace SakuraFrpService
             PushMessageBase msg = new PushMessageBase()
             {
                 Type = PushMessageID.UpdateNodes,
-                DataNodeList = new NodeList()
+                DataNodes = new NodeList()
             };
             var nodes = await Natfrp.Request("get_nodes");
             lock (this)
@@ -43,7 +43,7 @@ namespace SakuraFrpService
                     };
                     this[n.Id] = n;
                 }
-                msg.DataNodeList.Nodes.Add(Values);
+                msg.DataNodes.Nodes.Add(Values);
             }
             Main.Pipe.PushMessage(msg);
         }

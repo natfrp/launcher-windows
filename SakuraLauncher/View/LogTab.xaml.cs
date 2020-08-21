@@ -16,6 +16,7 @@ namespace SakuraLauncher.View
     /// </summary>
     public partial class LogTab : UserControl
     {
+        public static LogTab YAAAY;
         public static Regex LogPattern = new Regex(@"(?<Time>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) (?<Level>\[[DIWE]\]) \[(?<Source>[a-zA-Z0-9\-_\.]+:\d+)\] (?<Content>.+)", RegexOptions.Compiled | RegexOptions.Singleline);
 
         public static readonly SolidColorBrush BrushInfo = new SolidColorBrush(Colors.White),
@@ -31,6 +32,8 @@ namespace SakuraLauncher.View
 
         public LogTab(LauncherModel main)
         {
+            YAAAY = this;
+
             InitializeComponent();
             DataContext = Model = main;
         }

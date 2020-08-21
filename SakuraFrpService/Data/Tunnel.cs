@@ -5,7 +5,9 @@ using System.Diagnostics;
 using TunnelProto = SakuraLibrary.Proto.Tunnel;
 using TunnelStatus = SakuraLibrary.Proto.Tunnel.Types.Status;
 
-namespace SakuraFrpService.Tunnel
+using SakuraFrpService.Manager;
+
+namespace SakuraFrpService.Data
 {
     public class Tunnel
     {

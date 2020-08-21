@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 
 using SakuraLibrary.Proto;
 
-namespace SakuraFrpService
+namespace SakuraFrpService.Manager
 {
     public class LogManager : ConcurrentQueue<Log>
     {

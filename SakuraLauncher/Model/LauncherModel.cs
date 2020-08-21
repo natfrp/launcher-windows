@@ -79,12 +79,12 @@ namespace SakuraLauncher.Model
             View.Dispatcher.Invoke(() =>
             {
                 var map = new Dictionary<int, string>();
-                foreach (var n in nodes.DataNodeList.Nodes)
+                foreach (var n in nodes.DataNodes.Nodes)
                 {
                     Nodes.Add(new NodeModel(n));
                     map.Add(n.Id, n.Name);
                 }
-                foreach (var t in resp.DataTunnelList.Tunnels)
+                foreach (var t in resp.DataTunnels.Tunnels)
                 {
                     Tunnels.Add(new TunnelModel(t, this, map));
                 }
@@ -150,7 +150,7 @@ namespace SakuraLauncher.Model
                     {
                         Tunnels.Clear();
                         var map = Nodes.ToDictionary(k => k.Id, v => v.ToString());
-                        foreach (var t in msg.DataTunnelList.Tunnels)
+                        foreach (var t in msg.DataTunnels.Tunnels)
                         {
                             Tunnels.Add(new TunnelModel(t, this, map));
                         }
@@ -162,7 +162,7 @@ namespace SakuraLauncher.Model
                     {
                         Nodes.Clear();
                         var map = new Dictionary<int, string>();
-                        foreach (var n in msg.DataNodeList.Nodes)
+                        foreach (var n in msg.DataNodes.Nodes)
                         {
                             Nodes.Add(new NodeModel(n));
                             map.Add(n.Id, n.Name);

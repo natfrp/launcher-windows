@@ -7,7 +7,9 @@ using System.Collections.Generic;
 using SakuraLibrary;
 using SakuraLibrary.Proto;
 
-namespace SakuraFrpService.Tunnel
+using Tunnel = SakuraFrpService.Data.Tunnel;
+
+namespace SakuraFrpService.Manager
 {
     public class TunnelManager : Dictionary<int, Tunnel>
     {
@@ -48,11 +50,11 @@ namespace SakuraFrpService.Tunnel
             PushMessageBase msg = new PushMessageBase()
             {
                 Type = PushMessageID.UpdateTunnels,
-                DataTunnelList = new TunnelList()
+                DataTunnels = new TunnelList()
             };
             lock (this)
             {
-                msg.DataTunnelList.Tunnels.Add(Values.Select(t => t.CreateProto()));
+                msg.DataTunnels.Tunnels.Add(Values.Select(t => t.CreateProto()));
             }
             Main.Pipe.PushMessage(msg);
         }

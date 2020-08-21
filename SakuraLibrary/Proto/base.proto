@@ -10,6 +10,8 @@ message Log {
   string data = 2;
 }
 
+message LogList { repeated Log data = 3; }
+
 enum MessageID {
   USER_LOGIN = 0;
   USER_LOGOUT = 1;
@@ -32,9 +34,9 @@ message ResponseBase {
   oneof data {
     User data_user = 3;
     Tunnel data_tunnel = 4;
-    TunnelList data_tunnel_list = 5;
-    NodeList data_node_list = 6;
+    TunnelList data_tunnels = 5;
     LogList data_log = 7;
+    NodeList data_nodes = 6;
   }
 }
 
@@ -64,8 +66,8 @@ message PushMessageBase {
   oneof data {
     User data_user = 3;
     Tunnel data_tunnel = 4;
-    TunnelList data_tunnel_list = 5;
-    NodeList data_node_list = 6;
+    TunnelList data_tunnels = 5;
+    NodeList data_nodes = 6;
     LogList data_log = 7;
   }
 }

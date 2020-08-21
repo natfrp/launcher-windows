@@ -59,7 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LogManager.cs" />
+    <Compile Include="Manager\LogManager.cs" />
     <Compile Include="MainService.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -74,9 +74,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="NodeManager.cs" />
-    <Compile Include="Tunnel\Tunnel.cs" />
-    <Compile Include="Tunnel\TunnelManager.cs" />
+    <Compile Include="Manager\NodeManager.cs" />
+    <Compile Include="Data\Tunnel.cs" />
+    <Compile Include="Manager\TunnelManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -98,5 +98,6 @@
       <Name>SakuraLibrary</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

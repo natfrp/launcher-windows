@@ -10,7 +10,8 @@ using SakuraLibrary.Pipe;
 using SakuraLibrary.Proto;
 using UserStatus = SakuraLibrary.Proto.User.Types.Status;
 
-using SakuraFrpService.Tunnel;
+using SakuraFrpService.Manager;
+using Tunnel = SakuraFrpService.Data.Tunnel;
 
 namespace SakuraFrpService
 {
@@ -310,7 +311,7 @@ namespace SakuraFrpService
                     case MessageID.TunnelUpdate:
                         lock (TunnelManager)
                         {
-                            if (!TunnelManager.TryGetValue(req.DataUpdateTunnel.Id, out Tunnel.Tunnel t))
+                            if (!TunnelManager.TryGetValue(req.DataUpdateTunnel.Id, out Tunnel t))
                             {
                                 connection.RespondFailure("隧道不存在");
                                 return;
@@ -341,7 +342,7 @@ namespace SakuraFrpService
                                 .Append("&remote_port=").Append(req.DataCreateTunnel.RemotePort)
                                 .Append("&encryption=").Append(req.DataCreateTunnel.Encryption ? "true" : "false")
                                 .Append("&compression=").Append(req.DataCreateTunnel.Compression ? "true" : "false").ToString()).WaitResult();
-                            Tunnel.Tunnel t = TunnelManager.ParseJson(result["data"]);
+                            Tunnel t = TunnelManager.ParseJson(result["data"]);
                             lock (TunnelManager)
                             {
                                 TunnelManager[t.Id] = t;
