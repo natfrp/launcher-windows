@@ -39,8 +39,7 @@ namespace SakuraFrpService
                     {
                         Id = Utils.CastInt(j["id"]),
                         Name = (string)j["name"],
-                        AcceptNew = j["accept_new"],
-                        AcceptHttp = Utils.CastInt(j["accept_http"])
+                        AcceptNew = j["accept_new"]
                     };
                     this[n.Id] = n;
                 }

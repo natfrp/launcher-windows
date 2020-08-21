@@ -6,6 +6,7 @@ message Tunnel {
   int32 node = 2;
   string name = 3;
   string type = 4;
+  string note = 7;
   string description = 5;
 
   enum Status {
@@ -31,4 +32,6 @@ message CreateTunnel {
   int32 remote_port = 6;
   int32 local_port = 7;
   string local_address = 8;
+  bool compression = 9;
+  bool encryption = 10;
 }

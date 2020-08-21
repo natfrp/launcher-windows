@@ -11,7 +11,7 @@ namespace SakuraFrpService.Tunnel
         public readonly TunnelManager Manager = null;
 
         public int Id, Node;
-        public string Name, Type, Description;
+        public string Name, Type, Note, Description;
 
         public bool Enabled = false;
         public bool Running => BaseProcess != null && !BaseProcess.HasExited;
@@ -28,6 +28,7 @@ namespace SakuraFrpService.Tunnel
             Node = Node,
             Name = Name,
             Type = Type,
+            Note = Note,
             Description = Description,
             Status = Enabled ? (Running ? TunnelStatus.Running : TunnelStatus.Pending) : TunnelStatus.Disabled
         };

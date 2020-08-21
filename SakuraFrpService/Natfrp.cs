@@ -68,5 +68,7 @@ namespace SakuraFrpService
         public NatfrpException(string message) : base(message) { }
 
         public NatfrpException(string message, Exception inner) : base(message, inner) { }
+
+        public override string ToString() => Message + (InnerException == null ? "" : "\n" + InnerException.ToString());
     }
 }

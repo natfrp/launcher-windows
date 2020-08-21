@@ -60,15 +60,15 @@ namespace SakuraLauncher
                     }
                     Dispatcher.Invoke(() =>
                     {
-                        Model.Launcher.Tunnels.Add(new TunnelModel(resp.DataTunnel));
                         Model.LocalPort = 0;
+                        Model.LocalAddress = "";
                         Model.RemotePort = 0;
                         Model.TunnelName = "";
                         listening.SelectedItem = null;
                     });
-                    if (App.ShowMessage(string.Format("成功创建隧道 #{0} {1}\n是否继续创建?", resp.DataTunnel.Id, resp.DataTunnel.Name), "创建成功", MessageBoxImage.Question, MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                    if (App.ShowMessage("成功创建隧道 " + resp.Message + "\n是否继续创建?", "创建成功", MessageBoxImage.Question, MessageBoxButton.YesNo) != MessageBoxResult.Yes)
                     {
-                        Close();
+                        Dispatcher.Invoke(() => Close());
                         return;
                     }
                 }

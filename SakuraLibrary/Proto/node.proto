@@ -5,7 +5,6 @@ message Node {
   int32 id = 1;
   string name = 2;
   bool accept_new = 3;
-  int32 accept_http = 4;
 }
 
 message NodeList { repeated Node nodes = 3; }

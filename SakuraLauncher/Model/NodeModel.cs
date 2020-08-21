@@ -9,7 +9,6 @@ namespace SakuraLauncher.Model
         public int Id => Proto.Id;
         public string Name => Proto.Name;
         public bool AcceptNew => Proto.AcceptNew;
-        public int AcceptHttp => Proto.AcceptHttp;
 
         public NodeModel(Node n)
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Linq;
 using System.Threading;
 using System.ServiceProcess;
@@ -8,6 +9,7 @@ using SakuraLibrary;
 using SakuraLibrary.Pipe;
 using SakuraLibrary.Proto;
 using UserStatus = SakuraLibrary.Proto.User.Types.Status;
+using TunnelProto = SakuraLibrary.Proto.Tunnel;
 
 using SakuraFrpService.Tunnel;
 
@@ -143,15 +145,10 @@ namespace SakuraFrpService
                 Save();
                 PushUserInfo();
             }
-            catch (NatfrpException e)
-            {
-                Logout(true);
-                return e.Message + (e.InnerException == null ? "" : "\n" + e.InnerException.ToString());
-            }
             catch (Exception e)
             {
                 Logout(true);
-                return "未知错误:\n" + e.ToString();
+                return e.ToString();
             }
             return null;
         }
@@ -301,10 +298,22 @@ namespace SakuraFrpService
                     switch (req.Type)
                     {
                     case MessageID.TunnelCreate:
-                        // TODO: Return the created tunnel proto
-                        resp.Success = false;
-                        resp.Message = "foobar";
-                        resp.DataTunnel = null;
+                        {
+                            var result = Natfrp.Request("create_tunnel", new StringBuilder()
+                                .Append("type=").Append(req.DataCreateTunnel.Type)
+                                .Append("&name=").Append(req.DataCreateTunnel.Name)
+                                .Append("&note=").Append(req.DataCreateTunnel.Note)
+                                .Append("&node=").Append(req.DataCreateTunnel.Node)
+                                .Append("&local_ip=").Append(req.DataCreateTunnel.LocalAddress)
+                                .Append("&local_port=").Append(req.DataCreateTunnel.LocalPort)
+                                .Append("&remote_port=").Append(req.DataCreateTunnel.RemotePort)
+                                .Append("&encryption=").Append(req.DataCreateTunnel.Encryption ? "true" : "false")
+                                .Append("&compression=").Append(req.DataCreateTunnel.Compression ? "true" : "false").ToString()).WaitResult();
+                            Tunnel.Tunnel t = TunnelManager.ParseJson(result["data"]);
+                            TunnelManager[t.Id] = t;
+                            TunnelManager.Push();
+                            resp.Message = "#" + t.Id + " " + t.Name;
+                        }
                         break;
                     case MessageID.TunnelList:
                         resp.DataTunnelList = new TunnelList();
@@ -336,6 +345,10 @@ namespace SakuraFrpService
                     break;
                 }
                 connection.SendProto(resp);
+            }
+            catch (AggregateException e) when (e.InnerExceptions.Count == 1)
+            {
+                connection.SendProto(ResponseBase(false, e.InnerExceptions[0].ToString()));
             }
             catch (Exception e)
             {

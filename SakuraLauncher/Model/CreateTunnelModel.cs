@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace SakuraLauncher.Model
 {
@@ -10,15 +12,6 @@ namespace SakuraLauncher.Model
     {
         public readonly CreateTunnelWindow View;
         public readonly LauncherModel Launcher;
-
-        public ObservableCollection<NodeModel> Nodes => Launcher.Nodes;
-        public ObservableCollection<LocalProcessModel> Listening { get; set; } = new ObservableCollection<LocalProcessModel>();
-
-        public CreateTunnelModel(CreateTunnelWindow view, LauncherModel launcher)
-        {
-            View = view;
-            Launcher = launcher;
-        }
 
         public string Type { get => _type; set => Set(out _type, value); }
         private string _type = "";
@@ -44,6 +37,26 @@ namespace SakuraLauncher.Model
 
         public bool Creating { get => _creating; set => SafeSet(out _creating, value, View.Dispatcher); }
         private bool _creating = false;
+
+        public IEnumerable<NodeModel> Nodes { get => _nodes; set => Set(out _nodes, value); }
+        private IEnumerable<NodeModel> _nodes;
+
+        public ObservableCollection<LocalProcessModel> Listening { get; set; } = new ObservableCollection<LocalProcessModel>();
+
+        public CreateTunnelModel(CreateTunnelWindow view, LauncherModel launcher)
+        {
+            View = view;
+            Launcher = launcher;
+            launcher.Nodes.CollectionChanged += LauncherNodes_CollectionChanged;
+            LauncherNodes_CollectionChanged();
+        }
+
+        ~CreateTunnelModel()
+        {
+            Launcher.Nodes.CollectionChanged -= LauncherNodes_CollectionChanged;
+        }
+
+        private void LauncherNodes_CollectionChanged(object sender = null, NotifyCollectionChangedEventArgs e = null) => Nodes = Launcher.Nodes.Where(t => t.AcceptNew);
 
         public void ReloadListening()
         {

@@ -44,13 +44,32 @@ namespace SakuraFrpService.Tunnel
             }
         }
 
-        public async Task UpdateTunnels()
+        public void Push()
         {
             PushMessageBase msg = new PushMessageBase()
             {
                 Type = PushMessageID.UpdateTunnels,
                 DataTunnelList = new TunnelList()
             };
+            lock (this)
+            {
+                msg.DataTunnelList.Tunnels.Add(Values.Select(t => t.CreateProto()));
+            }
+            Main.Pipe.PushMessage(msg);
+        }
+
+        public Tunnel ParseJson(dynamic j) => new Tunnel(this)
+        {
+            Id = Utils.CastInt(j["id"]),
+            Node = Utils.CastInt(j["node"]),
+            Name = (string)j["name"],
+            Type = (string)j["type"],
+            Note = (string)j["note"],
+            Description = (string)j["description"]
+        };
+
+        public async Task UpdateTunnels()
+        {
             var tunnels = await Natfrp.Request("get_tunnels");
             lock (this)
             {
@@ -61,14 +80,7 @@ namespace SakuraFrpService.Tunnel
                     tmp.Add(id);
                     if (!ContainsKey(id))
                     {
-                        this[id] = new Tunnel(this)
-                        {
-                            Id = id,
-                            Node = Utils.CastInt(j["node"]),
-                            Name = (string)j["name"],
-                            Type = (string)j["type"],
-                            Description = (string)j["description"]
-                        };
+                        this[id] = ParseJson(j);
                     }
                 }
                 foreach (var k in Keys.Where(k => !tmp.Contains(k)))
@@ -81,9 +93,8 @@ namespace SakuraFrpService.Tunnel
                     SetEnabledTunnels(Properties.Settings.Default.EnabledTunnels);
                 }
                 // TODO: We might need to update EnabledTunnels each time we fetch
-                msg.DataTunnelList.Tunnels.Add(Values.Select(t => t.CreateProto()));
             }
-            Main.Pipe.PushMessage(msg);
+            Push();
         }
 
         public void SetEnabledTunnels(List<int> ids)
@@ -216,7 +227,7 @@ namespace SakuraFrpService.Tunnel
             }
         }
 
-        protected new void Remove(int k)
+        public new void Remove(int k)
         {
             lock (this)
             {
@@ -228,8 +239,6 @@ namespace SakuraFrpService.Tunnel
                 base.Remove(k);
             }
         }
-
-        protected new void Add(int k, Tunnel v) => throw new NotImplementedException();
 
         #endregion
     }
