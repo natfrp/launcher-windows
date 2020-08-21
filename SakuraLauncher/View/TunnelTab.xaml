@@ -6,7 +6,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:Data="clr-namespace:SakuraLauncher.Model"
              d:DesignWidth="690" d:DesignHeight="600">
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" IsEnabled="{Binding LoggedIn.Value}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" IsEnabled="{Binding LoggedIn}">
         <ScrollViewer.Template>
             <ControlTemplate TargetType="{x:Type ScrollViewer}">
                 <Grid x:Name="Grid" Background="{TemplateBinding Background}">
@@ -30,7 +30,7 @@
                     <Style TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignCircularProgressBar}">
                         <Setter Property="Visibility" Value="Collapsed"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding LoggingIn.Value}" Value="True">
+                            <DataTrigger Binding="{Binding LoggingIn}" Value="True">
                                 <Setter Property="Visibility" Value="Visible"/>
                             </DataTrigger>
                         </Style.Triggers>
@@ -42,7 +42,7 @@
                         <Style TargetType="Run">
                             <Setter Property="Text" Value="隧道"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding LoggingIn.Value}" Value="True">
+                                <DataTrigger Binding="{Binding LoggingIn}" Value="True">
                                     <Setter Property="Text" Value="加载中..."/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -101,7 +101,7 @@
                                 <DockPanel LastChildFill="False">
                                     <DockPanel DockPanel.Dock="Top" Margin="16" LastChildFill="False">
                                         <TextBlock Foreground="White" FontSize="22" Text="{Binding Name}" TextWrapping="Wrap" MaxWidth="180"/>
-                                        <ToggleButton DockPanel.Dock="Right" IsChecked="{Binding Enabled}"/>
+                                        <ToggleButton DockPanel.Dock="Right" IsChecked="{Binding Enabled}" IsEnabled="{Binding NotPending}"/>
                                     </DockPanel>
                                     <StackPanel DockPanel.Dock="Bottom" Margin="16">
                                         <DockPanel LastChildFill="False" Grid.Row="1">

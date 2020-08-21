@@ -33,6 +33,10 @@ namespace SakuraLauncher.View
 
         private void ButtonLogin_Click(object sender, RoutedEventArgs e)
         {
+            if (Model.LoggingIn)
+            {
+                return;
+            }
             Model.LoggingIn = true;
             ThreadPool.QueueUserWorkItem(s =>
             {
@@ -54,7 +58,6 @@ namespace SakuraLauncher.View
                         App.ShowMessage(resp.Message, "操作失败", MessageBoxImage.Error, MessageBoxButton.OK);
                         return;
                     }
-                    Model.UserInfo = resp.DataUser;
                     Model.Refresh();
                 }
                 finally

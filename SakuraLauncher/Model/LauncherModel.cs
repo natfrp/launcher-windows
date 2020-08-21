@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -25,6 +26,7 @@ namespace SakuraLauncher.Model
             PipeThread = new Thread(new ThreadStart(PipeWork));
             PipeThread.Start();
 
+            Pipe.ServerPush += Pipe_ServerPush;
             PropertyChanged += (s, e) => Save();
         }
 
@@ -36,28 +38,6 @@ namespace SakuraLauncher.Model
             View.Height = settings.Height;
 
             LogTextWrapping = settings.LogTextWrapping;
-            /*
-            if (File.Exists("config.json"))
-            {
-                var json = JSON.ToObject<Dictionary<string, dynamic>>(File.ReadAllText("config.json"));
-                if (json.ContainsKey("suppressinfo") && json["suppressinfo"])
-                {
-                    SuppressInfo.Value = true;
-                }
-                if (!json.ContainsKey("log_text_wrapping") || json["log_text_wrapping"])
-                {
-                    LogTextWrapping.Value = true;
-                }
-                if (!json.ContainsKey("bypass_proxy") || json["bypass_proxy"])
-                {
-                    BypassProxy.Value = true;
-                }
-                if (!json.ContainsKey("check_update") || json["check_update"])
-                {
-                    // CheckUpdate.Value = true;
-                }
-            }
-            */
         }
 
         public void Save()
@@ -75,63 +55,45 @@ namespace SakuraLauncher.Model
             settings.LogTextWrapping = LogTextWrapping;
 
             settings.Save();
-
-            // TODO: Replace with app settings
-            /*
-            { "suppressinfo", SuppressInfo.Value },
-            { "log_text_wrapping", LogTextWrapping.Value },
-            { "bypass_proxy", BypassProxy.Value },
-            { "check_update", CheckUpdate.Value }
-            */
         }
 
-        public void Refresh(bool user = false)
+        public void Refresh()
         {
-            ResponseBase resp;
-            if (user)
-            {
-                resp = Pipe.Request(new RequestBase()
-                {
-                    Type = MessageID.UserInfo
-                });
-                UserInfo = resp.DataUser;
-            }
-
             View.Dispatcher.Invoke(() =>
             {
                 Nodes.Clear();
                 Tunnels.Clear();
             });
-            if (LoggedIn)
+            var nodes = Pipe.Request(new RequestBase()
             {
-                var nodes = Pipe.Request(new RequestBase()
-                {
-                    Type = MessageID.NodeList
-                });
-                resp = Pipe.Request(new RequestBase()
-                {
-                    Type = MessageID.TunnelList
-                });
-                View.Dispatcher.Invoke(() =>
-                {
-                    var map = new Dictionary<int, string>();
-                    foreach (var n in nodes.DataNodeList.Nodes)
-                    {
-                        Nodes.Add(new NodeModel(n));
-                        map.Add(n.Id, n.Name);
-                    }
-                    foreach (var t in resp.DataTunnelList.Tunnels)
-                    {
-                        Tunnels.Add(new TunnelModel(t)
-                        {
-                            NodeName = map.ContainsKey(t.Node) ? map[t.Node].ToString() : string.Format("#{0} 未知节点", t.Node)
-                        });
-                    }
-                    Tunnels.Add(new FakeTunnelModel());
-                });
+                Type = MessageID.NodeList
+            });
+            var resp = Pipe.Request(new RequestBase()
+            {
+                Type = MessageID.TunnelList
+            });
+            if (!nodes.Success || !resp.Success)
+            {
+                return;
             }
+            View.Dispatcher.Invoke(() =>
+            {
+                var map = new Dictionary<int, string>();
+                foreach (var n in nodes.DataNodeList.Nodes)
+                {
+                    Nodes.Add(new NodeModel(n));
+                    map.Add(n.Id, n.Name);
+                }
+                foreach (var t in resp.DataTunnelList.Tunnels)
+                {
+                    Tunnels.Add(new TunnelModel(t, map));
+                }
+                Tunnels.Add(new FakeTunnelModel());
+            });
             SwitchTab(LoggedIn ? 0 : 2);
         }
+
+        #region IPC Handling
 
         protected void PipeWork()
         {
@@ -144,16 +106,82 @@ namespace SakuraLauncher.Model
                         Connected = false;
                         if (Pipe.Connect())
                         {
-                            Refresh(true);
+                            Connected = true;
+                            var resp = Pipe.Request(new RequestBase()
+                            {
+                                Type = MessageID.UserInfo
+                            });
+                            UserInfo = resp.DataUser;
+                            Refresh();
                         }
                         continue;
                     }
-                    Connected = true;
-
                 }
                 Thread.Sleep(500);
             }
         }
+
+        protected void Pipe_ServerPush(PipeConnection connection, int length)
+        {
+            try
+            {
+                var msg = PushMessageBase.Parser.ParseFrom(connection.Buffer, 0, length);
+                switch (msg.Type)
+                {
+                case PushMessageID.UpdateUser:
+                    UserInfo = msg.DataUser;
+                    break;
+                case PushMessageID.UpdateTunnel:
+                    View.Dispatcher.Invoke(() =>
+                    {
+                        foreach (var t in Tunnels)
+                        {
+                            if (t.IsReal && t.Real.Id == msg.DataTunnel.Id)
+                            {
+                                t.Real.Proto = msg.DataTunnel;
+                                t.Real.SetNodeName(Nodes.ToDictionary(k => k.Id, v => v.ToString()));
+                                break;
+                            }
+                        }
+                    });
+                    break;
+                case PushMessageID.UpdateTunnels:
+                    View.Dispatcher.Invoke(() =>
+                    {
+                        Tunnels.Clear();
+                        var map = Nodes.ToDictionary(k => k.Id, v => v.ToString());
+                        foreach (var t in msg.DataTunnelList.Tunnels)
+                        {
+                            Tunnels.Add(new TunnelModel(t, map));
+                        }
+                        Tunnels.Add(new FakeTunnelModel());
+                    });
+                    break;
+                case PushMessageID.UpdateNodes:
+                    View.Dispatcher.Invoke(() =>
+                    {
+                        Nodes.Clear();
+                        var map = new Dictionary<int, string>();
+                        foreach (var n in msg.DataNodeList.Nodes)
+                        {
+                            Nodes.Add(new NodeModel(n));
+                            map.Add(n.Id, n.Name);
+                        }
+                        foreach (var t in Tunnels)
+                        {
+                            if (t.IsReal)
+                            {
+                                t.Real.SetNodeName(map);
+                            }
+                        }
+                    });
+                    break;
+                }
+            }
+            catch { }
+        }
+
+        #endregion
 
         /* TODO: lul
         public void TryCheckUpdate(bool silent = false)
@@ -243,7 +271,7 @@ namespace SakuraLauncher.Model
         private User _userInfo = new User();
 
         public int CurrentTab { get => _currentTab; set => Set(out _currentTab, value); }
-        private int _currentTab;
+        private int _currentTab = -1;
 
         public ObservableCollection<NodeModel> Nodes { get; set; } = new ObservableCollection<NodeModel>();
 
@@ -276,7 +304,7 @@ namespace SakuraLauncher.Model
 
         [SourceBinding(nameof(UserInfo))]
         public string UserToken { get => UserInfo.Status == User.Types.Status.LoggedIn ? "****************" : _userToken; set => SafeSet(out _userToken, value, View.Dispatcher); }
-        private string _userToken;
+        private string _userToken = "";
 
         [SourceBinding(nameof(UserInfo))]
         public bool LoggedIn => UserInfo.Status == User.Types.Status.LoggedIn;
