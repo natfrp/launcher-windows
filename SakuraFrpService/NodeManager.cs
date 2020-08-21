@@ -60,17 +60,19 @@ namespace SakuraFrpService
             MainThread.Start();
         }
 
-        public void Stop(bool wait = false)
+        public void Stop(bool kill = false)
         {
             stopEvent.Set();
-            if (wait)
+            try
             {
-                try
+                if (kill)
                 {
-                    MainThread.Join();
+                    MainThread.Abort();
+                    return;
                 }
-                catch { }
+                MainThread.Join();
             }
+            catch { }
         }
 
         protected void Run()

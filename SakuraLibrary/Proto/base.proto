@@ -34,6 +34,7 @@ message ResponseBase {
     Tunnel data_tunnel = 4;
     TunnelList data_tunnel_list = 5;
     NodeList data_node_list = 6;
+    LogList data_log = 7;
   }
 }
 
@@ -54,6 +55,7 @@ enum PushMessageID {
   UPDATE_TUNNEL = 1;
   UPDATE_TUNNELS = 2;
   UPDATE_NODES = 3;
+  APPEND_LOG = 4;
 }
 
 message PushMessageBase {
@@ -64,5 +66,6 @@ message PushMessageBase {
     Tunnel data_tunnel = 4;
     TunnelList data_tunnel_list = 5;
     NodeList data_node_list = 6;
+    LogList data_log = 7;
   }
 }

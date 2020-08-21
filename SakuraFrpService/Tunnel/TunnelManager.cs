@@ -149,17 +149,19 @@ namespace SakuraFrpService.Tunnel
             MainThread.Start();
         }
 
-        public void Stop(bool wait = false)
+        public void Stop(bool kill = false)
         {
             stopEvent.Set();
-            if (wait)
+            try
             {
-                try
+                if (kill)
                 {
-                    MainThread.Join();
+                    MainThread.Abort();
+                    return;
                 }
-                catch { }
+                MainThread.Join();
             }
+            catch { }
         }
 
         protected void Run()
@@ -196,7 +198,7 @@ namespace SakuraFrpService.Tunnel
                             }
                             if (!t.Start())
                             {
-                                if (++t.FailCount > 3)
+                                if (++t.FailCount >= 3)
                                 {
                                     t.Enabled = false;
                                     Main.LogManager.Log(t.Name, "隧道持续启动失败, 已禁用该隧道");

@@ -176,6 +176,15 @@ namespace SakuraLauncher.Model
                         }
                     });
                     break;
+                case PushMessageID.AppendLog:
+                    View.Dispatcher.Invoke(() =>
+                    {
+                        foreach (var l in msg.DataLog.Data)
+                        {
+                            SakuraLauncher.View.LogTab.YAAAY.Log(l.Source, l.Data, -1);
+                        }
+                    });
+                    break;
                 }
             }
             catch { }

@@ -9,7 +9,6 @@ using SakuraLibrary;
 using SakuraLibrary.Pipe;
 using SakuraLibrary.Proto;
 using UserStatus = SakuraLibrary.Proto.User.Types.Status;
-using TunnelProto = SakuraLibrary.Proto.Tunnel;
 
 using SakuraFrpService.Tunnel;
 
@@ -41,8 +40,10 @@ namespace SakuraFrpService
             InitializeComponent();
 
             Pipe = new PipeServer(Consts.PipeName);
+            Pipe.Connected += Pipe_Connected;
+            Pipe.DataReceived += Pipe_DataReceived;
 
-            LogManager = new LogManager(8192);
+            LogManager = new LogManager(this, 8192);
             NodeManager = new NodeManager(this);
             TunnelManager = new TunnelManager(this);
         }
@@ -167,7 +168,8 @@ namespace SakuraFrpService
             {
                 Properties.Settings.Default.Token = "";
                 Properties.Settings.Default.LoggedIn = false;
-                TunnelManager.Stop(true);
+                TunnelManager.Stop();
+                NodeManager.Stop();
             }
             catch (Exception e)
             {
@@ -201,8 +203,7 @@ namespace SakuraFrpService
         {
             try
             {
-                Pipe.Connected += Pipe_Connected;
-                Pipe.DataReceived += Pipe_DataReceived;
+                LogManager.Start();
                 Pipe.Start();
                 if (!Daemonize)
                 {
@@ -222,11 +223,12 @@ namespace SakuraFrpService
             try
             {
                 Pipe.Stop();
-                NodeManager.Stop();
-                TunnelManager.Stop();
+                TunnelManager.Stop(true);
+                NodeManager.Stop(true);
                 TickThread.Abort(); // Hmm, should we use ResetEvent?
             }
             catch { }
+            LogManager.Stop();
         }
 
         #endregion
@@ -280,7 +282,8 @@ namespace SakuraFrpService
                     }
                     break;
                 case MessageID.LogGet:
-                    // TODO
+                    resp.DataLog = new LogList();
+                    resp.DataLog.Data.Add(LogManager);
                     break;
                 case MessageID.LogClear:
                     LogManager.Clear();
@@ -298,8 +301,8 @@ namespace SakuraFrpService
                     switch (req.Type)
                     {
                     case MessageID.TunnelList:
-                        resp.DataTunnelList = new TunnelList();
-                        resp.DataTunnelList.Tunnels.Add(TunnelManager.Values.Select(t => t.CreateProto()));
+                        resp.DataTunnels = new TunnelList();
+                        resp.DataTunnels.Tunnels.Add(TunnelManager.Values.Select(t => t.CreateProto()));
                         break;
                     case MessageID.TunnelReload:
                         TunnelManager.UpdateTunnels().Wait();
@@ -348,8 +351,8 @@ namespace SakuraFrpService
                         }
                         break;
                     case MessageID.NodeList:
-                        resp.DataNodeList = new NodeList();
-                        resp.DataNodeList.Nodes.Add(NodeManager.Values);
+                        resp.DataNodes = new NodeList();
+                        resp.DataNodes.Nodes.Add(NodeManager.Values);
                         break;
                     case MessageID.NodeReload:
                         NodeManager.UpdateNodes().Wait();
