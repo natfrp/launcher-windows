@@ -1,11 +1,8 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.ServiceProcess;
 using System.Threading.Tasks;
-
-using Google.Protobuf;
 
 using SakuraLibrary;
 using SakuraLibrary.Pipe;
@@ -46,8 +43,32 @@ namespace SakuraFrpService
             TunnelManager = new TunnelManager(this);
         }
 
+        public void Save()
+        {
+            var settings = Properties.Settings.Default;
+
+            lock (UserInfo)
+            {
+                settings.Token = Natfrp.Token;
+                settings.LoggedIn = UserInfo.Status == UserStatus.LoggedIn;
+            }
+
+            settings.Save();
+        }
+
         public void Tick()
         {
+            try
+            {
+                lock (UserInfo)
+                {
+                    if (UserInfo.Status == UserStatus.NoLogin && Properties.Settings.Default.LoggedIn)
+                    {
+                        var _ = Login(Properties.Settings.Default.Token);
+                    }
+                }
+            }
+            catch { }
             Thread.Sleep(50);
         }
 
@@ -76,15 +97,18 @@ namespace SakuraFrpService
 
         protected async Task<string> Login(string token)
         {
-            if (UserInfo.Status != UserStatus.NoLogin)
+            lock (UserInfo)
             {
-                return "用户已登录";
+                if (UserInfo.Status != UserStatus.NoLogin)
+                {
+                    return "用户已登录";
+                }
+                if (token.Length != 16)
+                {
+                    return "Token  无效";
+                }
+                UserInfo.Status = UserStatus.Pending;
             }
-            if (token.Length != 16)
-            {
-                return "Token  无效";
-            }
-            UserInfo.Status = UserStatus.Pending;
             try
             {
                 Natfrp.Token = token;
@@ -94,11 +118,15 @@ namespace SakuraFrpService
                 {
                     return user["message"];
                 }
-                UserInfo.Id = (int)user["data"]["uid"];
-                UserInfo.Name = user["data"]["name"];
-                // string traffic, advanced_traffic
 
-                UserInfo.Status = UserStatus.LoggedIn;
+                lock (UserInfo)
+                {
+                    UserInfo.Id = (int)user["data"]["uid"];
+                    UserInfo.Name = user["data"]["name"];
+                    // string traffic, advanced_traffic
+
+                    UserInfo.Status = UserStatus.LoggedIn;
+                }
 
                 /*
                 var nodes = await Natfrp.Request("get_nodes");
@@ -116,6 +144,8 @@ namespace SakuraFrpService
 
                 TunnelManager.Clear();
                 TunnelManager.Start(token);
+
+                Save();
             }
             catch (NatfrpException e)
             {
@@ -132,14 +162,18 @@ namespace SakuraFrpService
 
         protected string Logout(bool force = false)
         {
-            if (!force && UserInfo.Status != UserStatus.LoggedIn)
+            lock (UserInfo)
             {
-                return UserInfo.Status == UserStatus.Pending ? "登录进行中, 请稍候" : null;
+                if (!force && UserInfo.Status != UserStatus.LoggedIn)
+                {
+                    return UserInfo.Status == UserStatus.Pending ? "登录进行中, 请稍候" : null;
+                }
+                UserInfo.Status = UserStatus.Pending;
             }
-            UserInfo.Status = UserStatus.Pending;
-
             try
             {
+                Properties.Settings.Default.Token = "";
+                Properties.Settings.Default.LoggedIn = false;
                 TunnelManager.Stop(true);
             }
             catch (Exception e)
@@ -148,10 +182,16 @@ namespace SakuraFrpService
             }
             finally
             {
-                UserInfo.Status = UserStatus.NoLogin;
+                lock (UserInfo)
+                {
+                    UserInfo.Status = UserStatus.NoLogin;
+                }
+                Save();
             }
             return null;
         }
+
+        #region Service Implemention
 
         protected override void OnStart(string[] args)
         {
@@ -160,6 +200,10 @@ namespace SakuraFrpService
                 Pipe.Connected += Pipe_Connected;
                 Pipe.DataReceived += Pipe_DataReceived;
                 Pipe.Start();
+                if (!Daemonize)
+                {
+                    TickThread.Start();
+                }
             }
             catch
             {
@@ -167,17 +211,21 @@ namespace SakuraFrpService
                 Stop();
                 return;
             }
-
-            var settings = Properties.Settings.Default;
-            Natfrp.Token = settings.Token;
-            // TODO: auto login, may do this in tick system
         }
 
         protected override void OnStop()
         {
-            // TODO: save
-            Pipe.Stop();
+            try
+            {
+                Pipe.Stop();
+                TickThread.Abort(); // Hmm, should we use ResetEvent?
+            }
+            catch { }
         }
+
+        #endregion
+
+        #region IPC Handling
 
         protected ResponseBase ResponseBase(bool success, string message = null) => new ResponseBase()
         {
@@ -284,5 +332,7 @@ namespace SakuraFrpService
                 connection.SendProto(ResponseBase(false, e.ToString()));
             }
         }
+
+        #endregion
     }
 }

@@ -38,39 +38,23 @@ namespace SakuraLauncher.View
             {
                 try
                 {
-                    if (Model.LoggedIn)
+                    var resp = Model.Pipe.Request(Model.LoggedIn ? new RequestBase()
                     {
-                        var resp = Model.Pipe.Request(new RequestBase()
+                        Type = MessageID.UserLogout
+                    } : new RequestBase()
+                    {
+                        Type = MessageID.UserLogin,
+                        DataUserLogin = new UserLogin()
                         {
-                            Type = MessageID.UserLogout
-                        });
-                        if (!resp.Success)
-                        {
-                            App.ShowMessage(resp.Message, "操作失败", MessageBoxImage.Error, MessageBoxButton.OK);
-                            return;
+                            Token = Model.UserToken
                         }
-                        Model.UserInfo = resp.DataUser;
-                        Model.UserToken = "";
+                    });
+                    if (!resp.Success)
+                    {
+                        App.ShowMessage(resp.Message, "操作失败", MessageBoxImage.Error, MessageBoxButton.OK);
                         return;
                     }
-                    else
-                    {
-                        var resp = Model.Pipe.Request(new RequestBase()
-                        {
-                            Type = MessageID.UserLogin,
-                            DataUserLogin = new UserLogin()
-                            {
-                                Token = Model.UserToken
-                            }
-                        });
-                        if (!resp.Success)
-                        {
-                            App.ShowMessage(resp.Message, "登录失败", MessageBoxImage.Error, MessageBoxButton.OK);
-                            return;
-                        }
-                        Model.UserInfo = resp.DataUser;
-                        Model.UserToken = "****************";
-                    }
+                    Model.UserInfo = resp.DataUser;
                 }
                 finally
                 {

@@ -93,12 +93,13 @@ namespace SakuraLibrary.Pipe
         {
             try
             {
-                ListeningPipe.EndWaitForConnection(ar);
-                var conn = new PipeConnection(new byte[BufferSize], ListeningPipe);
-                ListeningPipe = null;
-
+                PipeConnection conn;
                 lock (Pipes)
                 {
+                    ListeningPipe.EndWaitForConnection(ar);
+                    conn = new PipeConnection(new byte[BufferSize], ListeningPipe);
+                    ListeningPipe = null;
+
                     Pipes.Add(conn.Pipe, conn);
                 }
 
@@ -189,12 +190,12 @@ namespace SakuraLibrary.Pipe
         {
             try
             {
-                ListeningPushPipe.EndWaitForConnection(ar);
                 lock (PushPipes)
                 {
+                    ListeningPushPipe.EndWaitForConnection(ar);
                     PushPipes.Add(ListeningPushPipe);
+                    ListeningPushPipe = null;
                 }
-                ListeningPushPipe = null;
             }
             catch { }
 
