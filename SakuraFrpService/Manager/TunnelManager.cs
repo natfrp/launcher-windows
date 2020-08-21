@@ -11,25 +11,24 @@ using Tunnel = SakuraFrpService.Data.Tunnel;
 
 namespace SakuraFrpService.Manager
 {
-    public class TunnelManager : Dictionary<int, Tunnel>
+    public class TunnelManager : Dictionary<int, Tunnel>, IAsyncManager
     {
         public const string FrpcExecutable = "frpc.exe";
 
         public readonly MainService Main;
+        public readonly AsyncManager AsyncManager;
 
         public readonly string FrpcPath;
-        public readonly Thread MainThread;
 
         protected bool FirstFetch = true;
         protected int FetchTicks = 0;
-        protected string UserToken = null;
-        protected ManualResetEvent stopEvent = new ManualResetEvent(false);
 
         public TunnelManager(MainService main)
         {
             Main = main;
             FrpcPath = Path.GetFullPath(FrpcExecutable);
-            MainThread = new Thread(new ThreadStart(Run));
+
+            AsyncManager = new AsyncManager(Run);
         }
 
         public string GetArguments(int tunnel) => "-n -f " + Natfrp.Token + ":" + tunnel;
@@ -126,49 +125,10 @@ namespace SakuraFrpService.Manager
             }
         }
 
-        #region Async Work
-
-        public void Start(string token)
-        {
-            if (MainThread.IsAlive)
-            {
-                MainThread.Abort(); // Shouldn't happen, just in case
-            }
-
-            foreach (var p in Utils.SearchProcess("frpc", FrpcPath)) // Get rid of leftover processes
-            {
-                try
-                {
-                    p.Kill();
-                }
-                catch { }
-            }
-
-            UserToken = token;
-            FirstFetch = true;
-
-            stopEvent.Reset();
-            MainThread.Start();
-        }
-
-        public void Stop(bool kill = false)
-        {
-            stopEvent.Set();
-            try
-            {
-                if (kill)
-                {
-                    MainThread.Abort();
-                    return;
-                }
-                MainThread.Join();
-            }
-            catch { }
-        }
-
         protected void Run()
         {
-            while (!stopEvent.WaitOne(0))
+            FirstFetch = true;
+            while (!AsyncManager.StopEvent.WaitOne(0))
             {
                 Thread.Sleep(50);
                 try
@@ -228,8 +188,6 @@ namespace SakuraFrpService.Manager
             StopAll();
         }
 
-        #endregion
-
         #region Dictionary Overload
 
         public new Tunnel this[int key]
@@ -271,6 +229,14 @@ namespace SakuraFrpService.Manager
                 base.Remove(k);
             }
         }
+
+        #endregion
+
+        #region IAsyncManager
+
+        public void Start() => AsyncManager.Start();
+
+        public void Stop(bool kill = false) => AsyncManager.Stop(kill);
 
         #endregion
     }

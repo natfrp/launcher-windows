@@ -142,7 +142,7 @@ namespace SakuraFrpService
                 NodeManager.Start();
 
                 TunnelManager.Clear();
-                TunnelManager.Start(token);
+                TunnelManager.Start();
 
                 Save();
                 PushUserInfo();

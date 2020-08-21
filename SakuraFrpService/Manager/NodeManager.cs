@@ -7,19 +7,18 @@ using SakuraLibrary.Proto;
 
 namespace SakuraFrpService.Manager
 {
-    public class NodeManager : Dictionary<int, Node>
+    public class NodeManager : Dictionary<int, Node>, IAsyncManager
     {
         public readonly MainService Main;
-
-        public readonly Thread MainThread;
+        public readonly AsyncManager AsyncManager;
 
         protected int FetchTicks = 0;
-        protected ManualResetEvent stopEvent = new ManualResetEvent(false);
 
         public NodeManager(MainService main)
         {
             Main = main;
-            MainThread = new Thread(new ThreadStart(Run));
+
+            AsyncManager = new AsyncManager(Run);
         }
 
         public async Task UpdateNodes()
@@ -48,36 +47,9 @@ namespace SakuraFrpService.Manager
             Main.Pipe.PushMessage(msg);
         }
 
-        #region Async Work
-
-        public void Start()
-        {
-            if (MainThread.IsAlive)
-            {
-                MainThread.Abort(); // Shouldn't happen, just in case
-            }
-            stopEvent.Reset();
-            MainThread.Start();
-        }
-
-        public void Stop(bool kill = false)
-        {
-            stopEvent.Set();
-            try
-            {
-                if (kill)
-                {
-                    MainThread.Abort();
-                    return;
-                }
-                MainThread.Join();
-            }
-            catch { }
-        }
-
         protected void Run()
         {
-            while (!stopEvent.WaitOne(0))
+            while (!AsyncManager.StopEvent.WaitOne(0))
             {
                 Thread.Sleep(50);
                 if (FetchTicks-- <= 0)
@@ -94,6 +66,12 @@ namespace SakuraFrpService.Manager
                 }
             }
         }
+
+        #region IAsyncManager
+
+        public void Start() => AsyncManager.Start();
+
+        public void Stop(bool kill = false) => AsyncManager.Stop(kill);
 
         #endregion
     }

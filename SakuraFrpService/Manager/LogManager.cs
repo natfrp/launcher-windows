@@ -6,24 +6,23 @@ using SakuraLibrary.Proto;
 
 namespace SakuraFrpService.Manager
 {
-    public class LogManager : ConcurrentQueue<Log>
+    public class LogManager : ConcurrentQueue<Log>, IAsyncManager
     {
         public const int CATEGORY_FRPC = 0, CATEGORY_SERVICE_INFO = 1, CATEGORY_SERVICE_WARNING = 2, CATEGORY_SERVICE_ERROR = 3;
 
         public readonly MainService Main;
-        public readonly Thread MainThread;
+        public readonly AsyncManager AsyncManager;
 
         public int RotateSize;
 
         protected List<Log> newLog = new List<Log>();
-        protected ManualResetEvent stopEvent = new ManualResetEvent(false);
 
         public LogManager(MainService main, int bufferSize)
         {
             Main = main;
             RotateSize = bufferSize;
 
-            MainThread = new Thread(new ThreadStart(Run));
+            AsyncManager = new AsyncManager(Run);
         }
 
         public void Clear()
@@ -51,33 +50,6 @@ namespace SakuraFrpService.Manager
             }
         }
 
-        #region Async Work
-
-        public void Start()
-        {
-            if (MainThread.IsAlive)
-            {
-                MainThread.Abort(); // Shouldn't happen, just in case
-            }
-            stopEvent.Reset();
-            MainThread.Start();
-        }
-
-        public void Stop(bool kill = false)
-        {
-            stopEvent.Set();
-            try
-            {
-                if (kill)
-                {
-                    MainThread.Abort();
-                    return;
-                }
-                MainThread.Join();
-            }
-            catch { }
-        }
-
         protected void Run()
         {
             var msg = new PushMessageBase()
@@ -85,7 +57,7 @@ namespace SakuraFrpService.Manager
                 Type = PushMessageID.AppendLog,
                 DataLog = new LogList()
             };
-            while (!stopEvent.WaitOne(0))
+            while (!AsyncManager.StopEvent.WaitOne(0))
             {
                 Thread.Sleep(50);
                 try
@@ -113,6 +85,12 @@ namespace SakuraFrpService.Manager
                 catch { }
             }
         }
+
+        #region IAsyncManager
+
+        public void Start() => AsyncManager.Start();
+
+        public void Stop(bool kill = false) => AsyncManager.Stop(kill);
 
         #endregion
     }
