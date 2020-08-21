@@ -55,6 +55,7 @@ namespace SakuraLauncher.View
                         return;
                     }
                     Model.UserInfo = resp.DataUser;
+                    Model.Refresh();
                 }
                 finally
                 {

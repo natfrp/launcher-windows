@@ -87,6 +87,37 @@ namespace SakuraLauncher.Model
             */
         }
 
+        public void Refresh(bool user = false)
+        {
+            ResponseBase resp;
+            if (user)
+            {
+                resp = Pipe.Request(new RequestBase()
+                {
+                    Type = MessageID.UserInfo
+                });
+                UserInfo = resp.DataUser;
+            }
+
+            View.Dispatcher.Invoke(() => Tunnels.Clear());
+            if (LoggedIn)
+            {
+                resp = Pipe.Request(new RequestBase()
+                {
+                    Type = MessageID.TunnelList
+                });
+                View.Dispatcher.Invoke(() =>
+                {
+                    Tunnels.Clear();
+                    foreach (var t in resp.DataTunnelList.Tunnels)
+                    {
+                        Tunnels.Add(new TunnelModel(t));
+                    }
+                });
+            }
+            SwitchTab(LoggedIn ? 0 : 2);
+        }
+
         protected void PipeWork()
         {
             while (true)
@@ -95,17 +126,15 @@ namespace SakuraLauncher.Model
                 {
                     if (!Pipe.Connected)
                     {
-                        Pipe.Connect();
+                        Connected = false;
+                        if (Pipe.Connect())
+                        {
+                            Refresh(true);
+                        }
                         continue;
                     }
-                    var resp = Pipe.Request(new RequestBase()
-                    {
-                        Type = MessageID.UserInfo
-                    });
-                    if (resp.DataUser != null)
-                    {
-                        UserInfo = resp.DataUser;
-                    }
+                    Connected = true;
+
                 }
                 Thread.Sleep(500);
             }
@@ -193,7 +222,7 @@ namespace SakuraLauncher.Model
         #region Main Window
 
         public bool Connected { get => _connected; set => Set(out _connected, value); }
-        private bool _connected;
+        private bool _connected = false;
 
         public User UserInfo { get => _userInfo; set => SafeSet(out _userInfo, value, View.Dispatcher); }
         private User _userInfo = new User();
@@ -206,6 +235,11 @@ namespace SakuraLauncher.Model
 
         public void SwitchTab(int id)
         {
+            if (!View.CheckAccess())
+            {
+                View.Dispatcher.Invoke(() => SwitchTab(id));
+                return;
+            }
             if (CurrentTab != id)
             {
                 CurrentTab = id;
@@ -230,8 +264,8 @@ namespace SakuraLauncher.Model
         [SourceBinding(nameof(UserInfo))]
         public bool LoggedIn => UserInfo.Status == User.Types.Status.LoggedIn;
 
-        [SourceBinding(nameof(LoggingIn), nameof(LoggedIn))]
-        public bool TokenEditable => !LoggingIn && !LoggedIn;
+        [SourceBinding(nameof(LoggingIn))]
+        public bool TokenEditable => !LoggingIn;
 
         public bool LoggingIn { get => _loggingIn; set => SafeSet(out _loggingIn, value, View.Dispatcher); }
         private bool _loggingIn;
