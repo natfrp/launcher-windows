@@ -100,19 +100,19 @@
                                 </Button>
                                 <DockPanel LastChildFill="False">
                                     <DockPanel DockPanel.Dock="Top" Margin="16" LastChildFill="False">
-                                        <TextBlock Foreground="White" FontSize="22" Text="{Binding Name}" TextWrapping="Wrap" MaxWidth="180"/>
-                                        <ToggleButton DockPanel.Dock="Right" IsChecked="{Binding Enabled}" IsEnabled="{Binding NotPending}"/>
+                                        <TextBlock Foreground="White" FontSize="22" Text="{Binding Name, Mode=OneWay}" TextWrapping="Wrap" MaxWidth="180"/>
+                                        <ToggleButton DockPanel.Dock="Right" IsChecked="{Binding Enabled}" IsEnabled="{Binding NotPending, Mode=OneWay}"/>
                                     </DockPanel>
                                     <StackPanel DockPanel.Dock="Bottom" Margin="16">
                                         <DockPanel LastChildFill="False" Grid.Row="1">
                                             <TextBlock DockPanel.Dock="Left" Grid.Row="0" Foreground="White" FontSize="14" Margin="0,0,0,4">
-                                            #<Run Text="{Binding NodeID}"></Run>
-                                            <Run Text="{Binding NodeName}"></Run>
+                                                #<Run Text="{Binding Node, Mode=OneWay}"></Run>
+                                                <Run Text="{Binding NodeName, Mode=OneWay}"></Run>
                                             </TextBlock>
                                         </DockPanel>
                                         <DockPanel LastChildFill="False" Grid.Row="1">
-                                            <TextBlock DockPanel.Dock="Left" FontSize="13" Foreground="White" Opacity="0.8" Text="{Binding Description}" />
-                                            <TextBlock DockPanel.Dock="Right" Foreground="White" FontSize="13" Text="{Binding Type}"/>
+                                            <TextBlock DockPanel.Dock="Left" FontSize="13" Foreground="White" Opacity="0.8" Text="{Binding Description, Mode=OneWay}" />
+                                            <TextBlock DockPanel.Dock="Right" Foreground="White" FontSize="13" Text="{Binding Type, Mode=OneWay}"/>
                                         </DockPanel>
                                     </StackPanel>
                                 </DockPanel>

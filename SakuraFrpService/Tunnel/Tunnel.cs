@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Diagnostics;
 
 using TunnelProto = SakuraLibrary.Proto.Tunnel;
@@ -13,8 +14,10 @@ namespace SakuraFrpService.Tunnel
         public int Id, Node;
         public string Name, Type, Note, Description;
 
+        public int WaitTick = 0, FailCount = 0;
         public bool Enabled = false;
         public bool Running => BaseProcess != null && !BaseProcess.HasExited;
+
         public Process BaseProcess = null;
 
         public Tunnel(TunnelManager manager)
@@ -59,8 +62,9 @@ namespace SakuraFrpService.Tunnel
                 BaseProcess.BeginOutputReadLine();
                 return true;
             }
-            catch
+            catch (Exception e)
             {
+                Manager.Main.LogManager.Log(Name, "隧道启动失败: " + e.Message);
                 Stop();
             }
             return false;
@@ -75,6 +79,10 @@ namespace SakuraFrpService.Tunnel
             }
             try
             {
+                if (BaseProcess.HasExited)
+                {
+                    return;
+                }
                 BaseProcess.StandardInput.Write("stop\n");
                 if (!BaseProcess.WaitForExit(3500))
                 {

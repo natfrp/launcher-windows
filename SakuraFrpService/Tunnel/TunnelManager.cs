@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -57,6 +56,12 @@ namespace SakuraFrpService.Tunnel
             }
             Main.Pipe.PushMessage(msg);
         }
+
+        public void PushOne(Tunnel t) => Main.Pipe.PushMessage(new PushMessageBase()
+        {
+            Type = PushMessageID.UpdateTunnel,
+            DataTunnel = t.CreateProto()
+        });
 
         public Tunnel ParseJson(dynamic j) => new Tunnel(this)
         {
@@ -180,14 +185,37 @@ namespace SakuraFrpService.Tunnel
                     {
                         if (t.Enabled)
                         {
-                            if (!t.Running)
+                            if (t.Running)
                             {
-                                t.Start();
+                                continue;
                             }
+                            if (t.WaitTick > 0)
+                            {
+                                t.WaitTick--;
+                                continue;
+                            }
+                            if (!t.Start())
+                            {
+                                if (++t.FailCount > 3)
+                                {
+                                    t.Enabled = false;
+                                    Main.LogManager.Log(t.Name, "隧道持续启动失败, 已禁用该隧道");
+                                }
+                                else
+                                {
+                                    t.WaitTick = 20 * 5 * t.FailCount;
+                                }
+                            }
+                            else
+                            {
+                                t.FailCount = 0;
+                            }
+                            PushOne(t);
                         }
                         else if (t.Running)
                         {
                             t.Stop();
+                            PushOne(t);
                         }
                     }
                 }

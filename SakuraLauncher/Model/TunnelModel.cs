@@ -16,6 +16,8 @@ namespace SakuraLauncher.Model
         public bool IsReal => true;
         public TunnelModel Real => this;
 
+        public readonly LauncherModel Launcher;
+
         public Tunnel Proto { get => _proto; set => Set(out _proto, value); }
         private Tunnel _proto;
 
@@ -41,22 +43,28 @@ namespace SakuraLauncher.Model
         public bool Enabled
         {
             get => Proto.Status != TunnelStatus.Disabled;
-            set
+            set => Launcher.Pipe.Request(new RequestBase()
             {
-                // TODO: Update status
-            }
+                Type = MessageID.TunnelUpdate,
+                DataUpdateTunnel = new UpdateTunnelStatus()
+                {
+                    Id = Id,
+                    Status = value ? 1 : 0
+                }
+            });
         }
 
         public string NodeName { get => _nodeName; set => Set(out _nodeName, value); }
         private string _nodeName;
 
-        public TunnelModel(Tunnel proto, Dictionary<int, string> nodes = null)
+        public TunnelModel(Tunnel proto, LauncherModel launcher, Dictionary<int, string> nodes = null)
         {
             Proto = proto;
+            Launcher = launcher;
             SetNodeName(nodes);
         }
 
-        public void SetNodeName(Dictionary<int, string> nodes) => NodeName = nodes != null && nodes.ContainsKey(Node) ? nodes[Node] : string.Format("#{0} 未知节点", Node);
+        public void SetNodeName(Dictionary<int, string> nodes) => NodeName = nodes != null && nodes.ContainsKey(Node) ? nodes[Node] : "未知节点";
     }
 
     public class FakeTunnelModel : ITunnelModel

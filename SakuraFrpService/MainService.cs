@@ -109,7 +109,7 @@ namespace SakuraFrpService
             {
                 if (UserInfo.Status != UserStatus.NoLogin)
                 {
-                    return "用户已登录";
+                    return UserInfo.Status == UserStatus.Pending ? "操作进行中, 请稍候" : "用户已登录";
                 }
                 if (token.Length != 16)
                 {
@@ -159,7 +159,7 @@ namespace SakuraFrpService
             {
                 if (!force && UserInfo.Status != UserStatus.LoggedIn)
                 {
-                    return UserInfo.Status == UserStatus.Pending ? "登录进行中, 请稍候" : null;
+                    return UserInfo.Status == UserStatus.Pending ? "操作进行中, 请稍候" : null;
                 }
                 UserInfo.Status = UserStatus.Pending;
             }
@@ -307,13 +307,13 @@ namespace SakuraFrpService
                     case MessageID.TunnelUpdate:
                         lock (TunnelManager)
                         {
-                            if (!TunnelManager.ContainsKey(req.DataUpdateTunnel.Id))
+                            if (!TunnelManager.TryGetValue(req.DataUpdateTunnel.Id, out Tunnel.Tunnel t))
                             {
-                                resp.Success = false;
-                                resp.Message = "隧道不存在";
-                                break;
+                                connection.RespondFailure("隧道不存在");
+                                return;
                             }
-                            TunnelManager[req.DataUpdateTunnel.Id].Enabled = req.DataUpdateTunnel.Status == 1;
+                            t.Enabled = req.DataUpdateTunnel.Status == 1;
+                            TunnelManager.PushOne(t);
                         }
                         break;
                     case MessageID.TunnelDelete:

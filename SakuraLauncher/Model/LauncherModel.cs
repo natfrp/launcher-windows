@@ -86,7 +86,7 @@ namespace SakuraLauncher.Model
                 }
                 foreach (var t in resp.DataTunnelList.Tunnels)
                 {
-                    Tunnels.Add(new TunnelModel(t, map));
+                    Tunnels.Add(new TunnelModel(t, this, map));
                 }
                 Tunnels.Add(new FakeTunnelModel());
             });
@@ -152,7 +152,7 @@ namespace SakuraLauncher.Model
                         var map = Nodes.ToDictionary(k => k.Id, v => v.ToString());
                         foreach (var t in msg.DataTunnelList.Tunnels)
                         {
-                            Tunnels.Add(new TunnelModel(t, map));
+                            Tunnels.Add(new TunnelModel(t, this, map));
                         }
                         Tunnels.Add(new FakeTunnelModel());
                     });
