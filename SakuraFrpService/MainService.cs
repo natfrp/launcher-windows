@@ -25,6 +25,7 @@ namespace SakuraFrpService
 
         public readonly PipeServer Pipe;
         public readonly LogManager LogManager;
+        public readonly NodeManager NodeManager;
         public readonly TunnelManager TunnelManager;
 
         public MainService(bool daemon)
@@ -40,6 +41,7 @@ namespace SakuraFrpService
             Pipe = new PipeServer(Consts.PipeName);
 
             LogManager = new LogManager(8192);
+            NodeManager = new NodeManager(this);
             TunnelManager = new TunnelManager(this);
         }
 
@@ -85,16 +87,6 @@ namespace SakuraFrpService
             }
         }
 
-        public new void Stop()
-        {
-            if (Daemonize)
-            {
-                OnStop();
-                return;
-            }
-            base.Stop();
-        }
-
         protected async Task<string> Login(string token)
         {
             lock (UserInfo)
@@ -123,24 +115,13 @@ namespace SakuraFrpService
                 {
                     UserInfo.Id = (int)user["data"]["uid"];
                     UserInfo.Name = user["data"]["name"];
-                    // string traffic, advanced_traffic
+                    UserInfo.Meta = user["data"]["meta"];
 
                     UserInfo.Status = UserStatus.LoggedIn;
                 }
 
-                /*
-                var nodes = await Natfrp.Request("get_nodes");
-                Nodes.Clear();
-                foreach (Dictionary<string, dynamic> j in nodes["data"])
-                {
-                    Nodes.Add(new NodeData()
-                    {
-                        ID = (int)j["id"],
-                        Name = (string)j["name"],
-                        AcceptNew = (bool)j["accept_new"]
-                    });
-                }
-                */
+                NodeManager.Clear();
+                NodeManager.Start();
 
                 TunnelManager.Clear();
                 TunnelManager.Start(token);
@@ -191,7 +172,17 @@ namespace SakuraFrpService
             return null;
         }
 
-        #region Service Implemention
+        #region ServiceBase Override
+
+        public new void Stop()
+        {
+            if (Daemonize)
+            {
+                OnStop();
+                return;
+            }
+            base.Stop();
+        }
 
         protected override void OnStart(string[] args)
         {
@@ -218,6 +209,8 @@ namespace SakuraFrpService
             try
             {
                 Pipe.Stop();
+                NodeManager.Stop();
+                TunnelManager.Stop();
                 TickThread.Abort(); // Hmm, should we use ResetEvent?
             }
             catch { }
@@ -244,17 +237,16 @@ namespace SakuraFrpService
             {
                 var req = RequestBase.Parser.ParseFrom(connection.Buffer, 0, count);
                 var resp = ResponseBase(true);
+
                 switch (req.Type)
                 {
                 case MessageID.UserLogin:
                     {
-                        var t = Login(req.DataUserLogin.Token);
-                        t.Wait();
-                        if (t.Result != null)
+                        var result = Login(req.DataUserLogin.Token).WaitResult();
+                        if (result != null)
                         {
-                            resp.Success = false;
-                            resp.Message = t.Result;
-                            break;
+                            connection.RespondFailure(result);
+                            return;
                         }
                     }
                     goto USERINFO;
@@ -263,66 +255,63 @@ namespace SakuraFrpService
                         var result = Logout();
                         if (result != null)
                         {
-                            resp.Success = false;
-                            resp.Message = result;
-                            break;
+                            connection.RespondFailure(result);
+                            return;
                         }
                     }
                     goto USERINFO;
                 case MessageID.UserInfo:
                 USERINFO:
-                    resp.DataUser = UserInfo;
-                    break;
-                case MessageID.TunnelList:
-                    if (UserInfo.Status != UserStatus.LoggedIn)
+                    lock (UserInfo)
                     {
-                        resp.Success = false;
-                        resp.Message = "用户未登录";
-                        break;
-                    }
-                    resp.DataTunnelList = new TunnelList();
-                    resp.DataTunnelList.Tunnels.Add(TunnelManager.Values.Select(t => t.CreateProto()));
-                    break;
-                case MessageID.TunnelReload:
-                    {
-                        if (UserInfo.Status != UserStatus.LoggedIn)
-                        {
-                            resp.Success = false;
-                            resp.Message = "用户未登录";
-                            break;
-                        }
-                        var t = TunnelManager.UpdateTunnels();
-                        t.Wait();
-                        if (t.Status != TaskStatus.RanToCompletion)
-                        {
-                            resp.Success = false;
-                            resp.Message = t.Exception?.ToString() ?? "未知错误";
-                        }
-                    }
-                    break;
-                case MessageID.TunnelUpdate:
-                    if (UserInfo.Status != UserStatus.LoggedIn)
-                    {
-                        resp.Success = false;
-                        resp.Message = "用户未登录";
-                        break;
-                    }
-                    lock (TunnelManager)
-                    {
-                        if (!TunnelManager.ContainsKey(req.DataUpdateTunnel.Id))
-                        {
-                            resp.Success = false;
-                            resp.Message = "隧道不存在";
-                            break;
-                        }
-                        TunnelManager[req.DataUpdateTunnel.Id].Enabled = req.DataUpdateTunnel.Status == 1;
+                        resp.DataUser = UserInfo;
                     }
                     break;
                 case MessageID.LogGet:
-                    // ?
+                    // TODO
                     break;
                 case MessageID.LogClear:
                     LogManager.Clear();
+                    break;
+                default:
+                    // Login required ↓
+                    lock (UserInfo)
+                    {
+                        if (UserInfo.Status != UserStatus.LoggedIn)
+                        {
+                            connection.RespondFailure("用户未登录");
+                            return;
+                        }
+                    }
+                    switch (req.Type)
+                    {
+                    case MessageID.TunnelList:
+                        resp.DataTunnelList = new TunnelList();
+                        resp.DataTunnelList.Tunnels.Add(TunnelManager.Values.Select(t => t.CreateProto()));
+                        break;
+                    case MessageID.TunnelReload:
+                        TunnelManager.UpdateTunnels().Wait();
+                        break;
+                    case MessageID.TunnelUpdate:
+                        lock (TunnelManager)
+                        {
+                            if (!TunnelManager.ContainsKey(req.DataUpdateTunnel.Id))
+                            {
+                                resp.Success = false;
+                                resp.Message = "隧道不存在";
+                                break;
+                            }
+                            TunnelManager[req.DataUpdateTunnel.Id].Enabled = req.DataUpdateTunnel.Status == 1;
+                        }
+                        break;
+                    case MessageID.NodeList:
+                        resp.DataNodeList = new NodeList();
+                        resp.DataNodeList.Nodes.Add(NodeManager.Values);
+                        break;
+                    case MessageID.NodeReload:
+                        NodeManager.UpdateNodes().Wait();
+                        break;
+                    }
                     break;
                 }
                 connection.SendProto(resp);

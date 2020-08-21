@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Consts.cs" />
+    <Compile Include="Helper\TaskExtension.cs" />
     <Compile Include="NTAPI.cs" />
     <Compile Include="Pipe\PipeClient.cs" />
     <Compile Include="Pipe\PipeConnection.cs" />

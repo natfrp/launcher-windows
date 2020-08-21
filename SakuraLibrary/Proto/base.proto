@@ -2,6 +2,7 @@ syntax = "proto3";
 option csharp_namespace = "SakuraLibrary.Proto";
 
 import "user.proto";
+import "node.proto";
 import "tunnel.proto";
 
 message Log {
@@ -20,6 +21,8 @@ enum MessageID {
   TUNNEL_CREATE = 9;
   LOG_GET = 6;
   LOG_CLEAR = 7;
+  NODE_LIST = 10;
+  NODE_RELOAD = 11;
 }
 
 message ResponseBase {
@@ -30,6 +33,7 @@ message ResponseBase {
     User data_user = 3;
     Tunnel data_tunnel = 4;
     TunnelList data_tunnel_list = 5;
+    NodeList data_node_list = 6;
   }
 }
 

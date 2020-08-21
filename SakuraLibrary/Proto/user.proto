@@ -11,6 +11,8 @@ message User {
     LOGGED_IN = 2;
   }
   Status status = 3;
+
+  string meta = 4;
 }
 
 message UserLogin { string token = 1; }

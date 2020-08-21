@@ -4,6 +4,8 @@ using System.IO.Pipes;
 
 using Google.Protobuf;
 
+using SakuraLibrary.Proto;
+
 namespace SakuraLibrary.Pipe
 {
     public class PipeConnection : IDisposable
@@ -34,6 +36,12 @@ namespace SakuraLibrary.Pipe
                 Send(ms.ToArray());
             }
         }
+
+        public void RespondFailure(string message = "") => SendProto(new ResponseBase()
+        {
+            Success = false,
+            Message = message ?? ""
+        });
 
         public int EnsureMessageComplete(int read)
         {

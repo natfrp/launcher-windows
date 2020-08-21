@@ -74,6 +74,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="NodeManager.cs" />
     <Compile Include="Tunnel\Tunnel.cs" />
     <Compile Include="Tunnel\TunnelManager.cs" />
   </ItemGroup>
