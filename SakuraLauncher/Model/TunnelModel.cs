@@ -9,7 +9,7 @@ namespace SakuraLauncher.Model
         TunnelModel Real { get; }
     }
 
-    public class TunnelModel : ITunnelModel
+    public class TunnelModel : ModelBase, ITunnelModel
     {
         public bool IsReal => true;
         public TunnelModel Real => this;
@@ -25,7 +25,8 @@ namespace SakuraLauncher.Model
         public bool Pending => Proto.Status == TunnelStatus.Pending;
         public bool Enabled => Proto.Status != TunnelStatus.Disabled;
 
-        public string NodeName { get; set; }
+        public string NodeName { get => _nodeName; set => Set(out _nodeName, value); }
+        private string _nodeName;
 
         public TunnelModel(Tunnel proto)
         {

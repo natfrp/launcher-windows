@@ -89,7 +89,7 @@
     </Compile>
     <Compile Include="Model\LauncherModel.cs" />
     <Compile Include="Model\LocalProcessModel.cs" />
-    <Compile Include="Model\NodeData.cs" />
+    <Compile Include="Model\NodeModel.cs" />
     <Compile Include="Model\TunnelModel.cs" />
     <Compile Include="Model\ModelBase.cs" />
     <Compile Include="Helper\SelectableTextBlock.cs" />

@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 using SakuraLibrary;
@@ -15,9 +16,6 @@ namespace SakuraLauncher.Model
         public readonly PipeClient Pipe = new PipeClient(Consts.PipeName);
 
         protected Thread PipeThread;
-
-        // get rid of this!!! ↓
-        public ObservableCollection<NodeData> Nodes { get; set; } = new ObservableCollection<NodeData>();
 
         public LauncherModel(MainWindow view)
         {
@@ -99,20 +97,37 @@ namespace SakuraLauncher.Model
                 UserInfo = resp.DataUser;
             }
 
-            View.Dispatcher.Invoke(() => Tunnels.Clear());
+            View.Dispatcher.Invoke(() =>
+            {
+                Nodes.Clear();
+                Tunnels.Clear();
+            });
             if (LoggedIn)
             {
+                var nodes = Pipe.Request(new RequestBase()
+                {
+                    Type = MessageID.NodeList
+                });
                 resp = Pipe.Request(new RequestBase()
                 {
                     Type = MessageID.TunnelList
                 });
                 View.Dispatcher.Invoke(() =>
                 {
-                    Tunnels.Clear();
+                    var map = new Dictionary<int, string>();
+                    foreach (var n in nodes.DataNodeList.Nodes)
+                    {
+                        Nodes.Add(new NodeModel(n));
+                        map.Add(n.Id, n.Name);
+                    }
                     foreach (var t in resp.DataTunnelList.Tunnels)
                     {
-                        Tunnels.Add(new TunnelModel(t));
+                        Tunnels.Add(new TunnelModel(t)
+                        {
+                            NodeName = map.ContainsKey(t.Node) ? map[t.Node].ToString() : string.Format("#{0} 未知节点", t.Node)
+                        });
                     }
+                    Tunnels.Add(new FakeTunnelModel());
                 });
             }
             SwitchTab(LoggedIn ? 0 : 2);
@@ -229,6 +244,8 @@ namespace SakuraLauncher.Model
 
         public int CurrentTab { get => _currentTab; set => Set(out _currentTab, value); }
         private int _currentTab;
+
+        public ObservableCollection<NodeModel> Nodes { get; set; } = new ObservableCollection<NodeModel>();
 
         [SourceBinding(nameof(CurrentTab))]
         public TabIndexTester CurrentTabTester { get; set; }

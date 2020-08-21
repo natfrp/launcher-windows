@@ -12,7 +12,7 @@ namespace SakuraFrpService
 
         public readonly Thread MainThread;
 
-        protected int FetchTicks = 20 * 3600;
+        protected int FetchTicks = 0;
         protected ManualResetEvent stopEvent = new ManualResetEvent(false);
 
         public NodeManager(MainService main)
@@ -29,10 +29,10 @@ namespace SakuraFrpService
                 Clear();
                 foreach (Dictionary<string, dynamic> j in nodes["data"])
                 {
-                    this[j["id"]] = new Node()
+                    this[(int)j["id"]] = new Node()
                     {
                         Id = (int)j["id"],
-                        Name = j["name"],
+                        Name = j["name"] as string,
                         AcceptNew = j["accept_new"],
                         AcceptHttp = (int)j["accept_http"]
                     };
@@ -70,16 +70,18 @@ namespace SakuraFrpService
             while (!stopEvent.WaitOne(0))
             {
                 Thread.Sleep(50);
-                try
+                if (FetchTicks-- <= 0)
                 {
-                    if (FetchTicks-- <= 0)
+                    try
                     {
-                        var t = UpdateNodes();
-                        t.Wait();
-                        FetchTicks = t.Status == TaskStatus.RanToCompletion ? 20 * 3600 : 20 * 5;
+                        UpdateNodes().Wait();
+                        FetchTicks = 20 * 3600 * 6;
+                    }
+                    catch
+                    {
+                        FetchTicks = 20 * 5;
                     }
                 }
-                catch { }
             }
         }
 

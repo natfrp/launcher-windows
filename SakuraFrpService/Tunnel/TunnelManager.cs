@@ -19,7 +19,7 @@ namespace SakuraFrpService.Tunnel
         public readonly Thread MainThread;
 
         protected bool FirstFetch = true;
-        protected int FetchTicks = 20 * 3600;
+        protected int FetchTicks = 0;
         protected string UserToken = null;
         protected ManualResetEvent stopEvent = new ManualResetEvent(false);
 
@@ -48,6 +48,8 @@ namespace SakuraFrpService.Tunnel
             var tunnels = await Natfrp.Request("get_tunnels");
             lock (this)
             {
+                // TODO: May push changes
+
                 var tmp = new List<int>();
                 foreach (Dictionary<string, dynamic> j in tunnels["data"])
                 {
@@ -145,9 +147,15 @@ namespace SakuraFrpService.Tunnel
                 {
                     if (FetchTicks-- <= 0)
                     {
-                        var t = UpdateTunnels();
-                        t.Wait();
-                        FetchTicks = t.Status == TaskStatus.RanToCompletion ? 20 * 3600 : 20 * 5;
+                        try
+                        {
+                            UpdateTunnels().Wait();
+                            FetchTicks = 20 * 3600;
+                        }
+                        catch
+                        {
+                            FetchTicks = 20 * 5;
+                        }
                     }
                     foreach (var t in Values)
                     {
