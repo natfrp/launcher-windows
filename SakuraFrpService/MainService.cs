@@ -297,24 +297,6 @@ namespace SakuraFrpService
                     }
                     switch (req.Type)
                     {
-                    case MessageID.TunnelCreate:
-                        {
-                            var result = Natfrp.Request("create_tunnel", new StringBuilder()
-                                .Append("type=").Append(req.DataCreateTunnel.Type)
-                                .Append("&name=").Append(req.DataCreateTunnel.Name)
-                                .Append("&note=").Append(req.DataCreateTunnel.Note)
-                                .Append("&node=").Append(req.DataCreateTunnel.Node)
-                                .Append("&local_ip=").Append(req.DataCreateTunnel.LocalAddress)
-                                .Append("&local_port=").Append(req.DataCreateTunnel.LocalPort)
-                                .Append("&remote_port=").Append(req.DataCreateTunnel.RemotePort)
-                                .Append("&encryption=").Append(req.DataCreateTunnel.Encryption ? "true" : "false")
-                                .Append("&compression=").Append(req.DataCreateTunnel.Compression ? "true" : "false").ToString()).WaitResult();
-                            Tunnel.Tunnel t = TunnelManager.ParseJson(result["data"]);
-                            TunnelManager[t.Id] = t;
-                            TunnelManager.Push();
-                            resp.Message = "#" + t.Id + " " + t.Name;
-                        }
-                        break;
                     case MessageID.TunnelList:
                         resp.DataTunnelList = new TunnelList();
                         resp.DataTunnelList.Tunnels.Add(TunnelManager.Values.Select(t => t.CreateProto()));
@@ -332,6 +314,37 @@ namespace SakuraFrpService
                                 break;
                             }
                             TunnelManager[req.DataUpdateTunnel.Id].Enabled = req.DataUpdateTunnel.Status == 1;
+                        }
+                        break;
+                    case MessageID.TunnelDelete:
+                        {
+                            var result = Natfrp.Request("delete_tunnel", "tunnel=" + req.DataId).WaitResult();
+                            lock (TunnelManager)
+                            {
+                                TunnelManager.Remove(req.DataId);
+                                TunnelManager.Push();
+                            }
+                        }
+                        break;
+                    case MessageID.TunnelCreate:
+                        {
+                            var result = Natfrp.Request("create_tunnel", new StringBuilder()
+                                .Append("type=").Append(req.DataCreateTunnel.Type)
+                                .Append("&name=").Append(req.DataCreateTunnel.Name)
+                                .Append("&note=").Append(req.DataCreateTunnel.Note)
+                                .Append("&node=").Append(req.DataCreateTunnel.Node)
+                                .Append("&local_ip=").Append(req.DataCreateTunnel.LocalAddress)
+                                .Append("&local_port=").Append(req.DataCreateTunnel.LocalPort)
+                                .Append("&remote_port=").Append(req.DataCreateTunnel.RemotePort)
+                                .Append("&encryption=").Append(req.DataCreateTunnel.Encryption ? "true" : "false")
+                                .Append("&compression=").Append(req.DataCreateTunnel.Compression ? "true" : "false").ToString()).WaitResult();
+                            Tunnel.Tunnel t = TunnelManager.ParseJson(result["data"]);
+                            lock (TunnelManager)
+                            {
+                                TunnelManager[t.Id] = t;
+                                TunnelManager.Push();
+                            }
+                            resp.Message = "#" + t.Id + " " + t.Name;
                         }
                         break;
                     case MessageID.NodeList:
