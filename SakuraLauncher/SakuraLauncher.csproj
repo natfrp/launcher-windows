@@ -87,6 +87,7 @@
     <Compile Include="CreateTunnelWindow.xaml.cs">
       <DependentUpon>CreateTunnelWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\CreateTunnelModel.cs" />
     <Compile Include="Model\LauncherModel.cs" />
     <Compile Include="Model\LocalProcessModel.cs" />
     <Compile Include="Model\NodeModel.cs" />

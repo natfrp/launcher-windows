@@ -24,7 +24,7 @@
                     <Style TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignCircularProgressBar}">
                         <Setter Property="Visibility" Value="Collapsed"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Loading.Value}" Value="True">
+                            <DataTrigger Binding="{Binding Loading}" Value="True">
                                 <Setter Property="Visibility" Value="Visible"/>
                             </DataTrigger>
                         </Style.Triggers>
@@ -36,7 +36,7 @@
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Loading.Value}" Value="False">
+                                    <DataTrigger Binding="{Binding Loading}" Value="False">
                                         <Setter Property="Text" Value="刷新"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -71,21 +71,21 @@
                             <ColumnDefinition Width="160"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <TextBox materialDesign:HintAssist.Hint="本地IP" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding LocalAddress.Value}"/>
-                        <TextBox Grid.Column="1" materialDesign:HintAssist.Hint="端口" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding LocalPort.Value}"/>
+                        <TextBox materialDesign:HintAssist.Hint="本地IP" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding LocalAddress}"/>
+                        <TextBox Grid.Column="1" materialDesign:HintAssist.Hint="端口" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding LocalPort}"/>
                     </Grid>
-                    <TextBox materialDesign:HintAssist.Hint="隧道名称(留空随机)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding TunnelName.Value}"/>
-                    <TextBox materialDesign:HintAssist.Hint="备注(可空)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding Note.Value}" TextWrapping="Wrap" AcceptsReturn="True"/>
+                    <TextBox materialDesign:HintAssist.Hint="隧道名称(留空随机)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding TunnelName}"/>
+                    <TextBox materialDesign:HintAssist.Hint="备注(可空)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding Note}" TextWrapping="Wrap" AcceptsReturn="True"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="100"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <ComboBox Margin="8" materialDesign:HintAssist.Hint="隧道类型" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Text="{Binding Type.Value}" IsEditable="True">
+                        <ComboBox Margin="8" materialDesign:HintAssist.Hint="隧道类型" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Text="{Binding Type}" IsEditable="True">
                             <ComboBoxItem>TCP</ComboBoxItem>
                             <ComboBoxItem>UDP</ComboBoxItem>
                         </ComboBox>
-                        <TextBox Grid.Column="1" materialDesign:HintAssist.Hint="远程端口(0随机)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding RemotePort.Value}"/>
+                        <TextBox Grid.Column="1" materialDesign:HintAssist.Hint="远程端口(0随机)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding RemotePort}"/>
                     </Grid>
                     <ComboBox Name="node" Width="224" Margin="8" materialDesign:HintAssist.Hint="服务器" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ItemsSource="{Binding Nodes}"/>
                     <Grid Margin="6">
@@ -93,8 +93,8 @@
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <CheckBox Grid.Column="0" IsChecked="{Binding Compression.Value}" Style="{StaticResource MaterialDesignDarkCheckBox}" Content="压缩数据" />
-                        <CheckBox Grid.Column="1" IsChecked="{Binding Encryption.Value}" Style="{StaticResource MaterialDesignDarkCheckBox}" Content="加密传输" />
+                        <CheckBox Grid.Column="0" IsChecked="{Binding Compression}" Style="{StaticResource MaterialDesignDarkCheckBox}" Content="压缩数据" />
+                        <CheckBox Grid.Column="1" IsChecked="{Binding Encryption}" Style="{StaticResource MaterialDesignDarkCheckBox}" Content="加密传输" />
                     </Grid>
                 </StackPanel>
             </materialDesign:Card>
@@ -103,7 +103,7 @@
                     <Style TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignCircularProgressBar}">
                         <Setter Property="Visibility" Value="Collapsed"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Creating.Value}" Value="True">
+                            <DataTrigger Binding="{Binding Creating}" Value="True">
                                 <Setter Property="Visibility" Value="Visible"/>
                             </DataTrigger>
                         </Style.Triggers>
@@ -116,7 +116,7 @@
                             <Style TargetType="TextBlock">
                                 <Setter Property="Text" Value="创建"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Creating.Value}" Value="True">
+                                    <DataTrigger Binding="{Binding Creating}" Value="True">
                                         <Setter Property="Text" Value="创建中"/>
                                     </DataTrigger>
                                 </Style.Triggers>

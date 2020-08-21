@@ -15,7 +15,7 @@ namespace SakuraLauncher.View
             DataContext = Model = main;
         }
 
-        private void ButtonCreate_Click(object sender, RoutedEventArgs e) => new CreateTunnelWindow().ShowDialog();
+        private void ButtonCreate_Click(object sender, RoutedEventArgs e) => new CreateTunnelWindow(Model).ShowDialog();
 
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
         {
