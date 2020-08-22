@@ -1,20 +1,22 @@
 ﻿using System.IO;
 using System.Linq;
-using System.Threading;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
+using SakuraLibrary;
 using SakuraLibrary.Proto;
 using SakuraLibrary.Helper;
 
 using Tunnel = SakuraFrpService.Data.Tunnel;
-using SakuraLibrary;
 
 namespace SakuraFrpService.Manager
 {
     public class TunnelManager : Dictionary<int, Tunnel>, IAsyncManager
     {
         public const string FrpcExecutable = "frpc.exe";
+
+        public readonly int PID = Process.GetCurrentProcess().Id;
 
         public readonly MainService Main;
         public readonly AsyncManager AsyncManager;
@@ -29,7 +31,7 @@ namespace SakuraFrpService.Manager
             AsyncManager = new AsyncManager(Run);
         }
 
-        public string GetArguments(int tunnel) => "-n -f " + Natfrp.Token + ":" + tunnel;
+        public string GetArguments(int tunnel) => string.Format("-n -f {0}:{1} --watch {2}", Natfrp.Token, tunnel, PID);
 
         public void StopAll()
         {
