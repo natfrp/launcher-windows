@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -22,6 +23,8 @@ namespace LegacyLauncher
         [STAThread]
         static void Main(string[] args)
         {
+            Environment.CurrentDirectory = Path.GetDirectoryName(Utils.ExecutablePath);
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 

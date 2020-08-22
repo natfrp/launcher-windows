@@ -16,6 +16,7 @@ namespace SakuraFrpService
         /// </summary>
         static int Main(string[] argv)
         {
+            Environment.CurrentDirectory = Path.GetDirectoryName(Utils.ExecutablePath);
             if (Path.GetFileName(Utils.ExecutablePath) != Consts.ServiceExecutable)
             {
                 if (Environment.UserInteractive)

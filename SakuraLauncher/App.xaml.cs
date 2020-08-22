@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Threading;
 
@@ -26,6 +27,7 @@ namespace SakuraLauncher
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            Environment.CurrentDirectory = Path.GetDirectoryName(Utils.ExecutablePath);
             /*
         public static Version FrpcVersion = null;
         public static float FrpcVersionSakura = 0;
