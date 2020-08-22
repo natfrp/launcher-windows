@@ -31,7 +31,7 @@
             // 
             // Service1
             // 
-            this.ServiceName = "SakuraFrpService";
+            this.ServiceName = SakuraLibrary.Consts.ServiceName;
 
         }
 

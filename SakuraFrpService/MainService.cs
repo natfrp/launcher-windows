@@ -40,7 +40,7 @@ namespace SakuraFrpService
 
             InitializeComponent();
 
-            Pipe = new PipeServer(Consts.PipeName);
+            Pipe = new PipeServer(Utils.InstallationPipeName);
             Pipe.Connected += Pipe_Connected;
             Pipe.DataReceived += Pipe_DataReceived;
 

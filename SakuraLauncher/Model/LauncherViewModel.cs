@@ -26,7 +26,7 @@ namespace SakuraLauncher.Model
         public LauncherViewModel(MainWindow view)
         {
             View = view;
-            Dispatcher = new DispatcherWrapper(a => View.Dispatcher.Invoke(a), a => View.Dispatcher.BeginInvoke(a), () => View.Dispatcher.CheckAccess());
+            Dispatcher = new DispatcherWrapper(View.Dispatcher.Invoke, a => View.Dispatcher.BeginInvoke(a), View.Dispatcher.CheckAccess);
 
             LogView = new LogTab(this);
         }

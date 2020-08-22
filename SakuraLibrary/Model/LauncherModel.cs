@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
-using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 using SakuraLibrary.Pipe;
 using SakuraLibrary.Proto;
-using SakuraLibrary.Helper;
 
 namespace SakuraLibrary.Model
 {
     public abstract class LauncherModel : ModelBase
     {
-        public readonly PipeClient Pipe = new PipeClient(Consts.PipeName);
+        public readonly PipeClient Pipe = new PipeClient(Utils.InstallationPipeName);
 
         protected Thread PipeThread;
 
