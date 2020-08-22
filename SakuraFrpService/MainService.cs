@@ -58,7 +58,7 @@ namespace SakuraFrpService
                 settings.Token = Natfrp.Token;
                 settings.LoggedIn = UserInfo.Status == UserStatus.LoggedIn;
             }
-            if(TunnelManager.Running)
+            if (TunnelManager.Running)
             {
                 settings.EnabledTunnels = TunnelManager.GetEnabledTunnels();
             }
@@ -122,6 +122,7 @@ namespace SakuraFrpService
                     return "Token  无效";
                 }
                 UserInfo.Status = UserStatus.Pending;
+                PushUserInfo();
             }
             try
             {
@@ -169,6 +170,7 @@ namespace SakuraFrpService
                     return UserInfo.Status == UserStatus.Pending ? "操作进行中, 请稍候" : null;
                 }
                 UserInfo.Status = UserStatus.Pending;
+                PushUserInfo();
             }
             try
             {

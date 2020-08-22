@@ -3,6 +3,7 @@ using System.Windows;
 using System.Threading;
 
 using SakuraLibrary;
+using SakuraLibrary.Helper;
 
 namespace SakuraLauncher
 {
@@ -89,11 +90,11 @@ namespace SakuraLauncher
                 Environment.Exit(0);
             }
             */
+
             var minimize = false;
             foreach (var a in e.Args)
             {
-                var split = a.Split('=');
-                if (split[0] == "--minimize")
+                if (a == "--minimize")
                 {
                     minimize = true;
                 }
@@ -101,7 +102,7 @@ namespace SakuraLauncher
 
             // AutoRunFile = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\SakuraLauncher_" + Utils.Md5(Utils.ExecutablePath) + ".lnk";
 
-            AppMutex = new Mutex(true, "SakuraLauncher_" + Utils.ExecutablePath.GetHashCode(), out bool created);
+            AppMutex = new Mutex(true, "SakuraLauncher_" + Utils.InstallationHash, out bool created);
             if (!created)
             {
                 ShowMessage("请不要重复开启 SakuraFrp 客户端. 如果想运行多个实例请将软件复制到其他目录.", "Oops", MessageBoxImage.Warning);
@@ -121,6 +122,7 @@ namespace SakuraLauncher
         {
             // TODO: Exit & shut down daemon
             // IDK if we should stop the service or not
+            MainWindow.Close();
         }
     }
 }

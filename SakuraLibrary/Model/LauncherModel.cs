@@ -8,6 +8,8 @@ using SakuraLibrary.Pipe;
 using SakuraLibrary.Proto;
 using SakuraLibrary.Helper;
 
+using UserStatus = SakuraLibrary.Proto.User.Types.Status;
+
 namespace SakuraLibrary.Model
 {
     public abstract class LauncherModel : ModelBase, IAsyncManager
@@ -285,16 +287,17 @@ namespace SakuraLibrary.Model
         #region Settings
 
         [SourceBinding(nameof(UserInfo))]
-        public string UserToken { get => UserInfo.Status == User.Types.Status.LoggedIn ? "****************" : _userToken; set => SafeSet(out _userToken, value); }
+        public string UserToken { get => UserInfo.Status != UserStatus.NoLogin ? "****************" : _userToken; set => SafeSet(out _userToken, value); }
         private string _userToken = "";
 
         [SourceBinding(nameof(UserInfo))]
-        public bool LoggedIn => UserInfo.Status == User.Types.Status.LoggedIn;
+        public bool LoggedIn => UserInfo.Status == UserStatus.LoggedIn;
 
         [SourceBinding(nameof(LoggingIn))]
         public bool TokenEditable => !LoggingIn;
 
-        public bool LoggingIn { get => _loggingIn; set => SafeSet(out _loggingIn, value); }
+        [SourceBinding(nameof(UserInfo))]
+        public bool LoggingIn { get => _loggingIn || UserInfo.Status == UserStatus.Pending; set => SafeSet(out _loggingIn, value); }
         private bool _loggingIn;
 
         public bool SuppressInfo { get => _suppressInfo; set => Set(out _suppressInfo, value); }

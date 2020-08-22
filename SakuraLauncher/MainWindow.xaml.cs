@@ -36,7 +36,7 @@ namespace SakuraLauncher
                 new SettingsTab(Model),
                 new AboutTab()
             };
-            Model.SwitchTab(0);
+            Model.SwitchTab(2);
 
             // TODO: Check daemon status
         }

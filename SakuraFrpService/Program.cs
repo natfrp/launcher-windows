@@ -32,7 +32,6 @@ namespace SakuraFrpService
                     try
                     {
                         ManagedInstallerClass.InstallHelper(new string[] { Utils.ExecutablePath });
-                        return 0;
                     }
                     catch (Exception e) when (e.InnerException is Win32Exception w32 && w32.NativeErrorCode == 1073) // ERROR_SERVICE_EXISTS
                     {
@@ -41,13 +40,15 @@ namespace SakuraFrpService
                     catch (Exception e)
                     {
                         MessageBox.Show(e.ToString(), "操作失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return 2;
                     }
-                    return 2;
+                    // var sc = new ServiceController(Consts.ServiceName);
+                    // TODO: Set start permission
+                    return 0;
                 case "--uninstall":
                     try
                     {
                         ManagedInstallerClass.InstallHelper(new string[] { "/u", Utils.ExecutablePath });
-                        return 0;
                     }
                     catch (Exception e) when (e.InnerException is Win32Exception w32 && w32.NativeErrorCode == 1060) // ERROR_SERVICE_DOES_NOT_EXIST
                     {
@@ -56,8 +57,9 @@ namespace SakuraFrpService
                     catch (Exception e)
                     {
                         MessageBox.Show(e.ToString(), "操作失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return 2;
                     }
-                    return 2;
+                    return 0;
                 case "--daemon":
                     var args = new string[argv.Length - 1];
                     Array.Copy(argv, 1, args, 0, args.Length);
