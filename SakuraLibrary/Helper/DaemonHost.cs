@@ -47,12 +47,7 @@ namespace SakuraLibrary.Helper
                 catch { }
                 return false;
             }
-            BaseProcess = Process.Start(new ProcessStartInfo(ServicePath, "--daemon")
-            {
-                // ?
-            });
-            // BaseProcess.Exited += OnDaemonExit;
-            BaseProcess.EnableRaisingEvents = true;
+            BaseProcess = Process.Start(ServicePath, "--daemon");
             return !BaseProcess.HasExited;
         }
 
@@ -107,8 +102,6 @@ namespace SakuraLibrary.Helper
             if (BaseProcess == null)
             {
                 BaseProcess = processes[0];
-                // BaseProcess.Exited += OnDaemonExit;
-                BaseProcess.EnableRaisingEvents = true;
             }
             return true;
         }

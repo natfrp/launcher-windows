@@ -132,7 +132,7 @@ namespace SakuraLibrary.Model
                     Dispatcher.Invoke(() =>
                     {
                         Tunnels.Clear();
-                        var map = Nodes.ToDictionary(k => k.Id, v => v.ToString());
+                        var map = Nodes.ToDictionary(k => k.Id, v => v.Name);
                         foreach (var t in msg.DataTunnels.Tunnels)
                         {
                             Tunnels.Add(new TunnelModel(t, this, map));

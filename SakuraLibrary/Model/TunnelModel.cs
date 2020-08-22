@@ -22,7 +22,7 @@ namespace SakuraLibrary.Model
         public string Name => Proto.Name;
 
         [SourceBinding(nameof(Proto))]
-        public string Type => Proto.Type;
+        public string Type => Proto.Type.ToUpper();
 
         [SourceBinding(nameof(Proto))]
         public string Description => Proto.Description;
