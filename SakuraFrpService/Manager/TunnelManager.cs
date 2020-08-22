@@ -8,6 +8,7 @@ using SakuraLibrary.Proto;
 using SakuraLibrary.Helper;
 
 using Tunnel = SakuraFrpService.Data.Tunnel;
+using SakuraLibrary;
 
 namespace SakuraFrpService.Manager
 {
@@ -228,7 +229,18 @@ namespace SakuraFrpService.Manager
 
         public bool Running => AsyncManager.Running;
 
-        public void Start() => AsyncManager.Start();
+        public void Start()
+        {
+            foreach (var p in Utils.SearchProcess("frpc", FrpcPath))
+            {
+                try
+                {
+                    p.Kill();
+                }
+                catch { }
+            }
+            AsyncManager.Start();
+        }
 
         public void Stop(bool kill = false) => AsyncManager.Stop(kill);
 
