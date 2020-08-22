@@ -123,17 +123,17 @@ namespace SakuraFrpService
             {
                 Natfrp.Token = token;
 
-                var user = await Natfrp.Request("get_user");
-                if (!user["login"])
+                var user = await Natfrp.Request<Natfrp.GetUser>("get_user");
+                if (!user.Data.Login)
                 {
-                    return user["message"];
+                    return user.Message;
                 }
 
                 lock (UserInfo)
                 {
-                    UserInfo.Id = (int)user["data"]["uid"];
-                    UserInfo.Name = user["data"]["name"];
-                    UserInfo.Meta = user["data"]["meta"];
+                    UserInfo.Id = user.Data.Id;
+                    UserInfo.Name = user.Data.Name;
+                    UserInfo.Meta = user.Data.Meta;
 
                     UserInfo.Status = UserStatus.LoggedIn;
                 }
@@ -321,18 +321,16 @@ namespace SakuraFrpService
                         }
                         break;
                     case MessageID.TunnelDelete:
+                        Natfrp.Request<Natfrp.ApiResponse>("delete_tunnel", "tunnel=" + req.DataId).WaitResult();
+                        lock (TunnelManager)
                         {
-                            var result = Natfrp.Request("delete_tunnel", "tunnel=" + req.DataId).WaitResult();
-                            lock (TunnelManager)
-                            {
-                                TunnelManager.Remove(req.DataId);
-                                TunnelManager.Push();
-                            }
+                            TunnelManager.Remove(req.DataId);
+                            TunnelManager.Push();
                         }
                         break;
                     case MessageID.TunnelCreate:
                         {
-                            var result = Natfrp.Request("create_tunnel", new StringBuilder()
+                            var result = Natfrp.Request<Natfrp.CreateTunnel>("create_tunnel", new StringBuilder()
                                 .Append("type=").Append(req.DataCreateTunnel.Type)
                                 .Append("&name=").Append(req.DataCreateTunnel.Name)
                                 .Append("&note=").Append(req.DataCreateTunnel.Note)
@@ -342,7 +340,7 @@ namespace SakuraFrpService
                                 .Append("&remote_port=").Append(req.DataCreateTunnel.RemotePort)
                                 .Append("&encryption=").Append(req.DataCreateTunnel.Encryption ? "true" : "false")
                                 .Append("&compression=").Append(req.DataCreateTunnel.Compression ? "true" : "false").ToString()).WaitResult();
-                            Tunnel t = TunnelManager.ParseJson(result["data"]);
+                            var t = TunnelManager.CreateFromApi(result.Data);
                             lock (TunnelManager)
                             {
                                 TunnelManager[t.Id] = t;

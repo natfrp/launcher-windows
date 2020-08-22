@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-using SakuraLibrary;
 using SakuraLibrary.Proto;
 
 namespace SakuraFrpService.Manager
@@ -28,19 +27,18 @@ namespace SakuraFrpService.Manager
                 Type = PushMessageID.UpdateNodes,
                 DataNodes = new NodeList()
             };
-            var nodes = await Natfrp.Request("get_nodes");
+            var nodes = await Natfrp.Request<Natfrp.GetNodes>("get_nodes");
             lock (this)
             {
                 Clear();
-                foreach (Dictionary<string, dynamic> j in nodes["data"])
+                foreach (var j in nodes.Data)
                 {
-                    var n = new Node()
+                    this[j.Id] = new Node()
                     {
-                        Id = Utils.CastInt(j["id"]),
-                        Name = (string)j["name"],
-                        AcceptNew = j["accept_new"]
+                        Id = j.Id,
+                        Name = j.Name,
+                        AcceptNew = j.AcceptNew
                     };
-                    this[n.Id] = n;
                 }
                 msg.DataNodes.Nodes.Add(Values);
             }

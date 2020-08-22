@@ -64,29 +64,28 @@ namespace SakuraFrpService.Manager
             DataTunnel = t.CreateProto()
         });
 
-        public Tunnel ParseJson(dynamic j) => new Tunnel(this)
+        public Tunnel CreateFromApi(Natfrp.ApiTunnel j) => new Tunnel(this)
         {
-            Id = Utils.CastInt(j["id"]),
-            Node = Utils.CastInt(j["node"]),
-            Name = (string)j["name"],
-            Type = (string)j["type"],
-            Note = (string)j["note"],
-            Description = (string)j["description"]
+            Id = j.Id,
+            Node = j.Node,
+            Name = j.Name,
+            Type = j.Type,
+            Note = j.Note,
+            Description = j.Description
         };
 
         public async Task UpdateTunnels()
         {
-            var tunnels = await Natfrp.Request("get_tunnels");
+            var tunnels = await Natfrp.Request<Natfrp.GetTunnels>("get_tunnels");
             lock (this)
             {
                 var tmp = new List<int>();
-                foreach (Dictionary<string, dynamic> j in tunnels["data"])
+                foreach (var j in tunnels.Data)
                 {
-                    var id = Utils.CastInt(j["id"]);
-                    tmp.Add(id);
-                    if (!ContainsKey(id))
+                    tmp.Add(j.Id);
+                    if (!ContainsKey(j.Id))
                     {
-                        this[id] = ParseJson(j);
+                        this[j.Id] = CreateFromApi(j);
                     }
                 }
                 foreach (var k in Keys.Where(k => !tmp.Contains(k)))

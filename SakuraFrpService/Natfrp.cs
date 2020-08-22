@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-using fastJSON;
+using Newtonsoft.Json;
 
 namespace SakuraFrpService
 {
@@ -18,7 +18,7 @@ namespace SakuraFrpService
         public static string Endpoint = "https://api.natfrp.com/launcher/";
         public static string UserAgent = "SakuraFrpService/" + Assembly.GetExecutingAssembly().GetName().Version;
 
-        public static async Task<dynamic> Request(string action, string query = null)
+        public static async Task<T> Request<T>(string action, string query = null) where T : ApiResponse
         {
             try
             {
@@ -43,24 +43,115 @@ namespace SakuraFrpService
                     }
                     using (var reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
                     {
-                        var json = JSON.ToObject<Dictionary<string, dynamic>>(await reader.ReadToEndAsync());
-                        if (!json.ContainsKey("success"))
+                        var json = JsonConvert.DeserializeObject<T>(await reader.ReadToEndAsync());
+                        if (!json.Success)
                         {
-                            throw new NatfrpException("API 返回数据异常");
-                        }
-                        else if (!json["success"])
-                        {
-                            throw new NatfrpException(json.ContainsKey("message") ? json["message"] : "API 请求失败, 未知错误");
+                            throw new NatfrpException(json.Message ?? "API 请求失败, 未知错误");
                         }
                         return json;
                     }
                 }
+            }
+            catch (JsonException e)
+            {
+                throw new NatfrpException("API 返回数据异常", e);
             }
             catch (Exception e) when (!(e is NatfrpException))
             {
                 throw new NatfrpException("出现未知错误", e);
             }
         }
+
+        #region Api Data
+
+        public class ApiUser
+        {
+            [JsonProperty("login")]
+            public bool Login { get; set; }
+
+            [JsonProperty("uid")]
+            public int Id { get; set; }
+
+            [JsonProperty("name")]
+            public string Name { get; set; }
+
+            [JsonProperty("meta")]
+            public string Meta { get; set; }
+        }
+
+        public class ApiNode
+        {
+            [JsonProperty("id")]
+            public int Id { get; set; }
+
+            [JsonProperty("name")]
+            public string Name { get; set; }
+
+            [JsonProperty("accept_new")]
+            public bool AcceptNew { get; set; }
+        }
+
+        public class ApiTunnel
+        {
+            [JsonProperty("id")]
+            public int Id { get; set; }
+
+            [JsonProperty("node")]
+            public int Node { get; set; }
+
+            [JsonProperty("name")]
+            public string Name { get; set; }
+
+            [JsonProperty("type")]
+            public string Type { get; set; }
+
+            [JsonProperty("note")]
+            public string Note { get; set; }
+
+            [JsonProperty("description")]
+            public string Description { get; set; }
+        }
+
+        #endregion
+
+        #region Api Response
+
+        public class ApiResponse
+        {
+            public static string Path => null;
+
+            [JsonProperty("success", Required = Required.Always)]
+            public bool Success { get; set; }
+
+            [JsonProperty("message")]
+            public string Message { get; set; }
+        }
+
+        public class GetUser : ApiResponse
+        {
+            [JsonProperty("data")]
+            public ApiUser Data { get; set; }
+        }
+
+        public class GetNodes : ApiResponse
+        {
+            [JsonProperty("data")]
+            public List<ApiNode> Data { get; set; }
+        }
+
+        public class GetTunnels : ApiResponse
+        {
+            [JsonProperty("data")]
+            public List<ApiTunnel> Data { get; set; }
+        }
+
+        public class CreateTunnel : ApiResponse
+        {
+            [JsonProperty("data")]
+            public ApiTunnel Data { get; set; }
+        }
+
+        #endregion
     }
 
     public class NatfrpException : Exception
