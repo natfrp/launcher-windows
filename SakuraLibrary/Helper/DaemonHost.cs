@@ -1,7 +1,11 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Diagnostics;
 using System.ServiceProcess;
+
+using SakuraLibrary.Model;
+using SakuraLibrary.Proto;
 
 namespace SakuraLibrary.Helper
 {
@@ -9,16 +13,18 @@ namespace SakuraLibrary.Helper
     {
         public readonly bool Daemon;
         public readonly AsyncManager AsyncManager;
+        public readonly LauncherModel Launcher;
 
         public readonly string ServicePath;
 
         public Process BaseProcess = null;
         public ServiceController Controller = null;
 
-        public DaemonHost()
+        public DaemonHost(LauncherModel launcher)
         {
             Controller = ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == Consts.ServiceName);
             Daemon = Controller == null;
+            Launcher = launcher;
 
             ServicePath = Path.GetFullPath(Consts.ServiceExecutable);
 
@@ -68,7 +74,14 @@ namespace SakuraLibrary.Helper
             }
             try
             {
-                // TODO: IPC Exit
+                if (Launcher.Connected)
+                {
+                    ThreadPool.QueueUserWorkItem(s => Launcher.Pipe.Request(new RequestBase()
+                    {
+                        Type = MessageID.ControlExit
+                    }));
+                    BaseProcess.WaitForExit(10000);
+                }
                 BaseProcess.Kill();
             }
             catch { }

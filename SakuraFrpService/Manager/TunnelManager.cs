@@ -102,7 +102,6 @@ namespace SakuraFrpService.Manager
                         }
                     }
                 }
-                // TODO: We might need to update EnabledTunnels each time we fetch
             }
             Push();
         }
@@ -244,7 +243,18 @@ namespace SakuraFrpService.Manager
             AsyncManager.Start();
         }
 
-        public void Stop(bool kill = false) => AsyncManager.Stop(kill);
+        public void Stop(bool kill = false)
+        {
+            AsyncManager.Stop(kill);
+            foreach (var t in Values)
+            {
+                try
+                {
+                    t.Stop();
+                }
+                catch { }
+            }
+        }
 
         #endregion
     }

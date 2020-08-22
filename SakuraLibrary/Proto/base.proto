@@ -26,6 +26,7 @@ enum MessageID {
   LOG_CLEAR = 7;
   NODE_LIST = 10;
   NODE_RELOAD = 11;
+  CONTROL_EXIT = 12;
 }
 
 message ResponseBase {

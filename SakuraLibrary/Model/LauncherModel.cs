@@ -15,12 +15,12 @@ namespace SakuraLibrary.Model
     public abstract class LauncherModel : ModelBase, IAsyncManager
     {
         public readonly PipeClient Pipe = new PipeClient(Utils.InstallationPipeName);
-        public readonly DaemonHost Daemon = new DaemonHost();
+        public readonly DaemonHost Daemon;
         public readonly AsyncManager AsyncManager;
 
-        // TODO: Remove view
         public LauncherModel()
         {
+            Daemon = new DaemonHost(this);
             AsyncManager = new AsyncManager(Run);
 
             Pipe.ServerPush += Pipe_ServerPush;

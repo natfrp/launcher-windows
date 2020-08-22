@@ -41,7 +41,6 @@ namespace SakuraFrpService
             InitializeComponent();
 
             Pipe = new PipeServer(Utils.InstallationPipeName);
-            Pipe.Connected += Pipe_Connected;
             Pipe.DataReceived += Pipe_DataReceived;
 
             LogManager = new LogManager(this, 8192);
@@ -62,7 +61,6 @@ namespace SakuraFrpService
             {
                 settings.EnabledTunnels = TunnelManager.GetEnabledTunnels();
             }
-            // TODO: This setting should be saved when ToggleTunnel action performed ↑
 
             settings.Save();
             settings.Upgrade();
@@ -228,15 +226,26 @@ namespace SakuraFrpService
 
         protected override void OnStop()
         {
+            if (!Daemonize)
+            {
+                RequestAdditionalTime(60000);
+            }
             try
             {
                 Pipe.Stop();
                 TunnelManager.Stop(true);
                 NodeManager.Stop(true);
-                TickThread.Abort(); // Hmm, should we use ResetEvent?
+                if (TickThread != null)
+                {
+                    TickThread.Abort();
+                }
             }
             catch { }
             LogManager.Stop();
+            if (Daemonize)
+            {
+                Environment.Exit(0);
+            }
         }
 
         #endregion
@@ -248,11 +257,6 @@ namespace SakuraFrpService
             Success = success,
             Message = message ?? ""
         };
-
-        private void Pipe_Connected(PipeConnection connection)
-        {
-            // TODO: May authorize the client by signature, don't forget those compile from source users
-        }
 
         private void Pipe_DataReceived(PipeConnection connection, int count)
         {
@@ -296,6 +300,9 @@ namespace SakuraFrpService
                 case MessageID.LogClear:
                     LogManager.Clear();
                     break;
+                case MessageID.ControlExit:
+                    Stop();
+                    return;
                 default:
                     // Login required ↓
                     lock (UserInfo)

@@ -45,6 +45,10 @@ namespace SakuraLibrary.Helper
         public void Stop(bool kill)
         {
             StopEvent.Set();
+            if (!Running)
+            {
+                return;
+            }
             try
             {
                 if (kill)
