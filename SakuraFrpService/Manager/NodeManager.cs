@@ -11,8 +11,6 @@ namespace SakuraFrpService.Manager
         public readonly MainService Main;
         public readonly AsyncManager AsyncManager;
 
-        protected int FetchTicks = 0;
-
         public NodeManager(MainService main)
         {
             Main = main;
@@ -47,25 +45,28 @@ namespace SakuraFrpService.Manager
 
         protected void Run()
         {
+            int delayTicks = 0;
             while (!AsyncManager.StopEvent.WaitOne(0))
             {
                 Thread.Sleep(50);
-                if (FetchTicks-- <= 0)
+                if (delayTicks-- <= 0)
                 {
                     try
                     {
                         UpdateNodes().Wait();
-                        FetchTicks = 20 * 3600 * 6;
+                        delayTicks = 20 * 3600 * 6;
                     }
                     catch
                     {
-                        FetchTicks = 20 * 5;
+                        delayTicks = 20 * 5;
                     }
                 }
             }
         }
 
         #region IAsyncManager
+
+        public bool Running => AsyncManager.Running;
 
         public void Start() => AsyncManager.Start();
 

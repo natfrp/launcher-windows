@@ -58,10 +58,14 @@ namespace SakuraFrpService
                 settings.Token = Natfrp.Token;
                 settings.LoggedIn = UserInfo.Status == UserStatus.LoggedIn;
             }
-            settings.EnabledTunnels = TunnelManager.GetEnabledTunnels();
+            if(TunnelManager.Running)
+            {
+                settings.EnabledTunnels = TunnelManager.GetEnabledTunnels();
+            }
             // TODO: This setting should be saved when ToggleTunnel action performed ↑
 
             settings.Save();
+            settings.Upgrade();
         }
 
         public void Tick()
@@ -138,13 +142,14 @@ namespace SakuraFrpService
                     UserInfo.Status = UserStatus.LoggedIn;
                 }
 
+                Save();
+
                 NodeManager.Clear();
                 NodeManager.Start();
 
                 TunnelManager.Clear();
                 TunnelManager.Start();
 
-                Save();
                 PushUserInfo();
             }
             catch (Exception e)

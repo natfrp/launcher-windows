@@ -5,6 +5,8 @@ namespace SakuraFrpService.Manager
 {
     public interface IAsyncManager
     {
+        bool Running { get; }
+
         void Start();
         void Stop(bool kill);
     }
@@ -15,6 +17,8 @@ namespace SakuraFrpService.Manager
 
         public Thread MainThread = null;
         public ManualResetEvent StopEvent = new ManualResetEvent(false);
+
+        public bool Running => MainThread != null && MainThread.IsAlive;
 
         public AsyncManager(Action run)
         {

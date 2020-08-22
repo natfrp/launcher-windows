@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-using SakuraLibrary;
 using SakuraLibrary.Proto;
 
 using Tunnel = SakuraFrpService.Data.Tunnel;
@@ -19,9 +18,6 @@ namespace SakuraFrpService.Manager
         public readonly AsyncManager AsyncManager;
 
         public readonly string FrpcPath;
-
-        protected bool FirstFetch = true;
-        protected int FetchTicks = 0;
 
         public TunnelManager(MainService main)
         {
@@ -74,7 +70,7 @@ namespace SakuraFrpService.Manager
             Description = j.Description
         };
 
-        public async Task UpdateTunnels()
+        public async Task UpdateTunnels(bool loadEnabled = false)
         {
             var tunnels = await Natfrp.Request<Natfrp.GetTunnels>("get_tunnels");
             lock (this)
@@ -92,28 +88,19 @@ namespace SakuraFrpService.Manager
                 {
                     Remove(k);
                 }
-                if (FirstFetch)
+                if (loadEnabled && Properties.Settings.Default.EnabledTunnels != null)
                 {
-                    FirstFetch = false;
-                    SetEnabledTunnels(Properties.Settings.Default.EnabledTunnels);
+                    foreach (var i in Properties.Settings.Default.EnabledTunnels)
+                    {
+                        if (ContainsKey(i))
+                        {
+                            this[i].Enabled = true;
+                        }
+                    }
                 }
                 // TODO: We might need to update EnabledTunnels each time we fetch
             }
             Push();
-        }
-
-        public void SetEnabledTunnels(List<int> ids)
-        {
-            lock (this)
-            {
-                foreach (var i in ids)
-                {
-                    if (ContainsKey(i))
-                    {
-                        this[i].Enabled = true;
-                    }
-                }
-            }
         }
 
         public List<int> GetEnabledTunnels()
@@ -126,35 +113,37 @@ namespace SakuraFrpService.Manager
 
         protected void Run()
         {
-            FirstFetch = true;
+            bool first = true;
+            int delayTicks = 0;
             while (!AsyncManager.StopEvent.WaitOne(0))
             {
                 Thread.Sleep(50);
                 try
                 {
-                    if (FetchTicks-- <= 0)
+                    if (delayTicks-- <= 0)
                     {
                         try
                         {
-                            UpdateTunnels().Wait();
-                            FetchTicks = 20 * 3600;
+                            UpdateTunnels(first).Wait();
+                            first = false;
+                            delayTicks = 20 * 3600;
                         }
                         catch
                         {
-                            FetchTicks = 20 * 5;
+                            delayTicks = 20 * 5;
                         }
                     }
                     foreach (var t in Values)
                     {
+                        if (t.WaitTick > 0)
+                        {
+                            t.WaitTick--;
+                            continue;
+                        }
                         if (t.Enabled)
                         {
                             if (t.Running)
                             {
-                                continue;
-                            }
-                            if (t.WaitTick > 0)
-                            {
-                                t.WaitTick--;
                                 continue;
                             }
                             if (!t.Start())
@@ -173,13 +162,17 @@ namespace SakuraFrpService.Manager
                             {
                                 t.FailCount = 0;
                             }
-                            PushOne(t);
                         }
                         else if (t.Running)
                         {
                             t.Stop();
-                            PushOne(t);
                         }
+                        else
+                        {
+                            continue;
+                        }
+                        Main.Save();
+                        PushOne(t);
                     }
                 }
                 catch { }
@@ -232,6 +225,8 @@ namespace SakuraFrpService.Manager
         #endregion
 
         #region IAsyncManager
+
+        public bool Running => AsyncManager.Running;
 
         public void Start() => AsyncManager.Start();
 

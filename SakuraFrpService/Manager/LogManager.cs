@@ -88,6 +88,8 @@ namespace SakuraFrpService.Manager
 
         #region IAsyncManager
 
+        public bool Running => AsyncManager.Running;
+
         public void Start() => AsyncManager.Start();
 
         public void Stop(bool kill = false) => AsyncManager.Stop(kill);
