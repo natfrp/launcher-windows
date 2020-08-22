@@ -32,6 +32,12 @@ namespace SakuraFrpService
                     try
                     {
                         ManagedInstallerClass.InstallHelper(new string[] { Utils.ExecutablePath });
+                        var result = Utils.SetServicePermission();
+                        if (result != null)
+                        {
+                            MessageBox.Show("无法设置服务操作权限, 启动器某些功能可能无法正常运行\n请记录下面的错误并反馈给开发者:\n" + result, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return 3;
+                        }
                     }
                     catch (Exception e) when (e.InnerException is Win32Exception w32 && w32.NativeErrorCode == 1073) // ERROR_SERVICE_EXISTS
                     {
@@ -42,8 +48,6 @@ namespace SakuraFrpService
                         MessageBox.Show(e.ToString(), "操作失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return 2;
                     }
-                    // var sc = new ServiceController(Consts.ServiceName);
-                    // TODO: Set start permission
                     return 0;
                 case "--uninstall":
                     try
