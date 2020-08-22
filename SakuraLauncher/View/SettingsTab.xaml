@@ -5,17 +5,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              d:DesignHeight="315" d:DesignWidth="580">
     <StackPanel>
-        <TextBlock Foreground="#DDFFFFFF" FontSize="26" Margin="24,0,0,24">设置</TextBlock>
+        <TextBlock Foreground="#DDFFFFFF" FontSize="26" Margin="24,0,0,0">设置</TextBlock>
         <!--StackPanel Orientation="Horizontal" Margin="24,0,24,16">
             <ToggleButton IsChecked="{Binding AutoRun.Value}" Checked="ToggleButtonAutoRun_Checked" Unchecked="ToggleButtonAutoRun_Unchecked"/>
             <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">开机启动</TextBlock>
         </StackPanel-->
-        <StackPanel Orientation="Horizontal" Margin="24,0,24,16">
-            <ToggleButton IsChecked="{Binding SuppressInfo}"/>
+        <StackPanel Orientation="Horizontal" Margin="24,24,24,0">
+            <ToggleButton IsChecked="{Binding SuppressInfo}" Checked="Save" Unchecked="Save"/>
             <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">关闭连接提示</TextBlock>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="24,0,24,16">
-            <ToggleButton IsChecked="{Binding LogTextWrapping}"/>
+        <StackPanel Orientation="Horizontal" Margin="24,16,24,0">
+            <ToggleButton IsChecked="{Binding LogTextWrapping}" Checked="Save" Unchecked="Save"/>
             <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">日志自动换行</TextBlock>
         </StackPanel>
         <!--StackPanel Orientation="Horizontal" Margin="24,0,24,16">
@@ -60,8 +60,8 @@
                 </StackPanel>
             </Button>
         </StackPanel-->
-        <StackPanel Orientation="Horizontal">
-            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16" Margin="24,0,0,0">
+        <StackPanel Orientation="Horizontal" Margin="24,16,0,0">
+            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Setter Property="Visibility" Value="Collapsed"></Setter>
@@ -87,7 +87,7 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16" Margin="16,0,8,0">访问密钥:</TextBlock>
+                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16" Margin="0,0,8,0">访问密钥:</TextBlock>
                 <TextBox Text="{Binding UserToken}" MinWidth="256" FontSize="16" IsEnabled="{Binding TokenEditable}" />
             </StackPanel>
             <Button Margin="16,0,0,0" Click="ButtonLogin_Click">
@@ -120,6 +120,49 @@
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding LoggedIn}" Value="True">
                                         <Setter Property="Text" Value="退出"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="24,8,0,0">
+            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16">
+                <Run>运行模式:</Run>
+                <Run Text="{Binding WorkingMode, Mode=OneTime}" />
+            </TextBlock>
+            <Button Margin="16,0,0,0" Click="ButtonSwitchMode_Click">
+                <Button.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SwitchingMode}" Value="True">
+                                <Setter Property="Foreground" Value="White"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                    <Style TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignCircularProgressBar}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SwitchingMode}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Resources>
+                <StackPanel Orientation="Horizontal">
+                    <ProgressBar Value="0" IsIndeterminate="True" Foreground="White" Margin="0,0,8,0"/>
+                    <TextBlock VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="卸载服务"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SwitchingMode}" Value="True">
+                                        <Setter Property="Text" Value="切换中"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsDaemon, Mode=OneTime}" Value="True">
+                                        <Setter Property="Text" Value="安装服务"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>

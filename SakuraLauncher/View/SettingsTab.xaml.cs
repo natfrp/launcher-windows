@@ -36,5 +36,9 @@ namespace SakuraLauncher.View
             }
             Model.RequestLogin(Model.SimpleFailureHandler);
         }
+
+        private void ButtonSwitchMode_Click(object sender, RoutedEventArgs e) => Model.SwitchWorkingMode(Model.SimpleHandler, Model.SimpleConfirmHandler);
+
+        private void Save(object sender, RoutedEventArgs e) => Model.Save();
     }
 }

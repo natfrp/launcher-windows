@@ -25,8 +25,6 @@ namespace SakuraLibrary.Model
 
             Pipe.ServerPush += Pipe_ServerPush;
 
-            PropertyChanged += (s, e) => Save();
-
             Daemon.Start();
             Start();
         }
@@ -305,6 +303,51 @@ namespace SakuraLibrary.Model
 
         public bool LogTextWrapping { get => _logTextWrapping; set => Set(out _logTextWrapping, value); }
         private bool _logTextWrapping;
+
+        public bool IsDaemon => Daemon.Daemon;
+
+        public string WorkingMode => Daemon.Daemon ? "守护进程" : "系统服务";
+
+        public bool SwitchingMode { get => _switchingMode; set => SafeSet(out _switchingMode, value); }
+        private bool _switchingMode;
+
+        public void SwitchWorkingMode(Action<bool, string> callback, Func<string, bool> confirm)
+        {
+            if (SwitchingMode)
+            {
+                return;
+            }
+            if (LoggingIn || LoggedIn)
+            {
+                callback(false, "请先登出当前账户");
+                return;
+            }
+            if (!confirm("确定要切换运行模式吗?\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n\n注意事项:\n1. 切换运行模式后不要移动启动器到其他目录, 否则会造成严重错误\n2. 如需移动或卸载启动器, 请先切到 \"守护进程\" 模式来避免文件残留\n3. 切换过程可能需要十余秒, 请耐心等待, 不要做其他操作\n4. 切换操作即为 安装/卸载 系统服务, 需要管理员权限\n5. 切换完成后需要重启启动器"))
+            {
+                return;
+            }
+            SwitchingMode = true;
+            ThreadPool.QueueUserWorkItem(s =>
+            {
+                try
+                {
+                    Daemon.Stop();
+                    if (!Daemon.InstallService(!Daemon.Daemon))
+                    {
+                        callback(false, "运行模式切换失败, 请检查您是否有足够的权限 安装/卸载 服务.\n由于发生严重错误, 启动器即将退出.");
+                    }
+                    else
+                    {
+                        callback(true, "运行模式已切换, 启动器即将退出");
+                    }
+                    Environment.Exit(0);
+                }
+                finally
+                {
+                    SwitchingMode = false;
+                }
+            });
+        }
 
         public void RequestDeleteTunnel(int id, Action<bool, string> callback)
         {

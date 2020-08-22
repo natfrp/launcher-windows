@@ -25,7 +25,7 @@ namespace SakuraLauncher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("782")]
         public int Width {
             get {
                 return ((int)(this["Width"]));
@@ -37,7 +37,7 @@ namespace SakuraLauncher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
         public int Height {
             get {
                 return ((int)(this["Height"]));
@@ -68,6 +68,18 @@ namespace SakuraLauncher.Properties {
             }
             set {
                 this["LogTextWrapping"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SuppressInfo {
+            get {
+                return ((bool)(this["SuppressInfo"]));
+            }
+            set {
+                this["SuppressInfo"] = value;
             }
         }
     }

@@ -19,7 +19,7 @@ namespace SakuraLauncher
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly LauncherViewModel Model;
+        public readonly LauncherViewModel Model;
 
         public UserControl[] Tabs = null;
 

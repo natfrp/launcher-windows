@@ -3,7 +3,6 @@ using System.Windows;
 using System.Threading;
 
 using SakuraLibrary;
-using SakuraLibrary.Helper;
 
 namespace SakuraLauncher
 {
@@ -122,6 +121,12 @@ namespace SakuraLauncher
         {
             // TODO: Exit & shut down daemon
             // IDK if we should stop the service or not
+            MainWindow.Close();
+        }
+
+        private void TrayMenu_ExitAll(object sender, RoutedEventArgs e)
+        {
+            (MainWindow as MainWindow).Model.Daemon.Stop();
             MainWindow.Close();
         }
     }

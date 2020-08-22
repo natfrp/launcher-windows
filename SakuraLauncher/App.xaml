@@ -42,7 +42,8 @@
             <!--#region Menu-->
             <ContextMenu x:Key="TrayMenu" Placement="MousePoint">
                 <MenuItem Header="显示主窗口" Style="{StaticResource MaterialDesignMenuItem}" Click="TrayMenu_Show"/>
-                <MenuItem Header="退出" Style="{StaticResource MaterialDesignMenuItem}" Click="TrayMenu_Exit"/>
+                <MenuItem Header="退出启动器" Style="{StaticResource MaterialDesignMenuItem}" Click="TrayMenu_Exit"/>
+                <MenuItem Header="彻底退出" Style="{StaticResource MaterialDesignMenuItem}" Click="TrayMenu_ExitAll"/>
             </ContextMenu>
             <!--#endregion-->
         </ResourceDictionary>

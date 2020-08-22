@@ -132,7 +132,11 @@ namespace SakuraLibrary.Helper
 
         public void Start() => AsyncManager.Start(true);
 
-        public void Stop(bool kill = false) => AsyncManager.Stop(kill);
+        public void Stop(bool kill = false)
+        {
+            AsyncManager.Stop(kill);
+            StopDaemon();
+        }
 
         #endregion
     }

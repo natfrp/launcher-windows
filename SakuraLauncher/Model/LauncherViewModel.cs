@@ -12,6 +12,8 @@ namespace SakuraLauncher.Model
 {
     public class LauncherViewModel : LauncherModel
     {
+        public readonly Func<string, bool> SimpleConfirmHandler = message => App.ShowMessage(message, "操作确认", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK;
+        public readonly Action<bool, string> SimpleHandler = (success, message) => App.ShowMessage(message, success ? "操作成功" : "操作失败", success ? MessageBoxImage.Information : MessageBoxImage.Error, MessageBoxButton.OK);
         public readonly Action<bool, string> SimpleFailureHandler = (success, message) =>
         {
             if (!success)
@@ -29,6 +31,8 @@ namespace SakuraLauncher.Model
             Dispatcher = new DispatcherWrapper(View.Dispatcher.Invoke, a => View.Dispatcher.BeginInvoke(a), View.Dispatcher.CheckAccess);
 
             LogView = new LogTab(this);
+
+            Load();
         }
 
         public override void Log(Log l, bool init) => LogView.Log(l, init);
@@ -40,6 +44,7 @@ namespace SakuraLauncher.Model
             View.Width = settings.Width;
             View.Height = settings.Height;
 
+            SuppressInfo = settings.SuppressInfo;
             LogTextWrapping = settings.LogTextWrapping;
         }
 
@@ -55,9 +60,12 @@ namespace SakuraLauncher.Model
 
             settings.Width = (int)View.Width;
             settings.Height = (int)View.Height;
+
+            settings.SuppressInfo = SuppressInfo;
             settings.LogTextWrapping = LogTextWrapping;
 
             settings.Save();
+            settings.Upgrade();
         }
 
         public override bool Refresh()
