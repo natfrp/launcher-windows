@@ -55,7 +55,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Consts.cs" />
+    <Compile Include="Helper\AsyncManager.cs" />
     <Compile Include="Helper\DispatcherWrapper.cs" />
+    <Compile Include="Helper\DaemonHost.cs" />
     <Compile Include="Helper\TaskExtension.cs" />
     <Compile Include="Model\CreateTunnelModel.cs" />
     <Compile Include="Model\LauncherModel.cs" />

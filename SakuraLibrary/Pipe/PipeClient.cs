@@ -81,18 +81,16 @@ namespace SakuraLibrary.Pipe
 
         protected void OnPushPipeData(IAsyncResult ar)
         {
+            if (!PushPipe.Pipe.IsConnected)
+            {
+                Dispose();
+                return;
+            }
             try
             {
                 ServerPush?.Invoke(PushPipe, PushPipe.EnsureMessageComplete(PushPipe.Pipe.EndRead(ar)));
             }
-            catch
-            {
-                if (!PushPipe.Pipe.IsConnected)
-                {
-                    Dispose();
-                    return;
-                }
-            }
+            catch { }
             BeginPushPipeRead();
         }
 

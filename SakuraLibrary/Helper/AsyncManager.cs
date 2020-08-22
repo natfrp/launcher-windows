@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace SakuraFrpService.Manager
+namespace SakuraLibrary.Helper
 {
     public interface IAsyncManager
     {
@@ -25,7 +25,9 @@ namespace SakuraFrpService.Manager
             Run = run;
         }
 
-        public void Start()
+        public void Start() => Start(false);
+
+        public void Start(bool background)
         {
             if (MainThread != null && MainThread.IsAlive)
             {
@@ -33,7 +35,10 @@ namespace SakuraFrpService.Manager
             }
             StopEvent.Reset();
 
-            MainThread = new Thread(new ThreadStart(Run));
+            MainThread = new Thread(new ThreadStart(Run))
+            {
+                IsBackground = background
+            };
             MainThread.Start();
         }
 

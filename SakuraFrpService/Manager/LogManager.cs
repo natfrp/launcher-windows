@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 
 using SakuraLibrary.Proto;
+using SakuraLibrary.Helper;
 
 namespace SakuraFrpService.Manager
 {
@@ -57,9 +58,8 @@ namespace SakuraFrpService.Manager
                 Type = PushMessageID.AppendLog,
                 DataLog = new LogList()
             };
-            while (!AsyncManager.StopEvent.WaitOne(0))
+            while (!AsyncManager.StopEvent.WaitOne(50))
             {
-                Thread.Sleep(50);
                 try
                 {
                     lock (newLog)

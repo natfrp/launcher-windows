@@ -6,26 +6,27 @@ using System.Collections.ObjectModel;
 
 using SakuraLibrary.Pipe;
 using SakuraLibrary.Proto;
+using SakuraLibrary.Helper;
 
 namespace SakuraLibrary.Model
 {
-    public abstract class LauncherModel : ModelBase
+    public abstract class LauncherModel : ModelBase, IAsyncManager
     {
         public readonly PipeClient Pipe = new PipeClient(Utils.InstallationPipeName);
-
-        protected Thread PipeThread;
+        public readonly DaemonHost Daemon = new DaemonHost();
+        public readonly AsyncManager AsyncManager;
 
         // TODO: Remove view
         public LauncherModel()
         {
-            PipeThread = new Thread(new ThreadStart(PipeWork))
-            {
-                IsBackground = true
-            };
-            PipeThread.Start();
+            AsyncManager = new AsyncManager(Run);
 
             Pipe.ServerPush += Pipe_ServerPush;
+
             PropertyChanged += (s, e) => Save();
+
+            Daemon.Start();
+            Start();
         }
 
         public abstract void Log(Log l, bool init = false);
@@ -78,9 +79,9 @@ namespace SakuraLibrary.Model
 
         #region IPC Handling
 
-        protected void PipeWork()
+        protected void Run()
         {
-            while (true)
+            while (!AsyncManager.StopEvent.WaitOne(500))
             {
                 lock (Pipe)
                 {
@@ -100,7 +101,6 @@ namespace SakuraLibrary.Model
                         continue;
                     }
                 }
-                Thread.Sleep(500);
             }
         }
 
@@ -255,7 +255,18 @@ namespace SakuraLibrary.Model
         public bool Connected { get => _connected; set => Set(out _connected, value); }
         private bool _connected = false;
 
-        public User UserInfo { get => _userInfo; set => SafeSet(out _userInfo, value); }
+        public User UserInfo
+        {
+            get => _userInfo;
+            set
+            {
+                if (value == null)
+                {
+                    value = new User();
+                }
+                SafeSet(out _userInfo, value);
+            }
+        }
         private User _userInfo = new User();
 
         public int CurrentTab { get => _currentTab; set => Set(out _currentTab, value); }
@@ -343,6 +354,16 @@ namespace SakuraLibrary.Model
                 }
             });
         }
+
+        #endregion
+
+        #region IAsyncManager
+
+        public bool Running => AsyncManager.Running;
+
+        public void Start() => AsyncManager.Start(true);
+
+        public void Stop(bool kill = false) => AsyncManager.Stop(kill);
 
         #endregion
     }

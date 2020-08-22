@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using SakuraLibrary.Proto;
+using SakuraLibrary.Helper;
 
 using Tunnel = SakuraFrpService.Data.Tunnel;
 
@@ -115,9 +116,8 @@ namespace SakuraFrpService.Manager
         {
             bool first = true;
             int delayTicks = 0;
-            while (!AsyncManager.StopEvent.WaitOne(0))
+            while (!AsyncManager.StopEvent.WaitOne(50))
             {
-                Thread.Sleep(50);
                 try
                 {
                     if (delayTicks-- <= 0)

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using SakuraLibrary.Proto;
+using SakuraLibrary.Helper;
 
 namespace SakuraFrpService.Manager
 {
@@ -46,9 +47,8 @@ namespace SakuraFrpService.Manager
         protected void Run()
         {
             int delayTicks = 0;
-            while (!AsyncManager.StopEvent.WaitOne(0))
+            while (!AsyncManager.StopEvent.WaitOne(50))
             {
-                Thread.Sleep(50);
                 if (delayTicks-- <= 0)
                 {
                     try
