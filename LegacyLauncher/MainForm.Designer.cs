@@ -35,6 +35,7 @@
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.launcherModelBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.textBox_token = new System.Windows.Forms.TextBox();
             this.checkBox_autorun = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -50,6 +51,7 @@
             this.toolStripMenuItem_delete = new System.Windows.Forms.ToolStripMenuItem();
             this.checkBox_textwrap = new System.Windows.Forms.CheckBox();
             this.checkBox_update = new System.Windows.Forms.CheckBox();
+            ((System.ComponentModel.ISupportInitialize)(this.launcherModelBindingSource)).BeginInit();
             this.contextMenuStrip_tray.SuspendLayout();
             this.contextMenuStrip_tunnel.SuspendLayout();
             this.SuspendLayout();
@@ -62,6 +64,7 @@
             this.columnHeader2,
             this.columnHeader3,
             this.columnHeader4});
+            this.listView_tunnels.DataBindings.Add(new System.Windows.Forms.Binding("Enabled", this.launcherModelBindingSource, "LoggedIn", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.listView_tunnels.Enabled = false;
             this.listView_tunnels.FullRowSelect = true;
             this.listView_tunnels.GridLines = true;
@@ -97,13 +100,20 @@
             this.columnHeader4.Text = "详情";
             this.columnHeader4.Width = 220;
             // 
+            // launcherModelBindingSource
+            // 
+            this.launcherModelBindingSource.DataSource = typeof(SakuraLibrary.Model.LauncherModel);
+            // 
             // textBox_token
             // 
+            this.textBox_token.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.launcherModelBindingSource, "UserToken", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.textBox_token.DataBindings.Add(new System.Windows.Forms.Binding("Enabled", this.launcherModelBindingSource, "TokenEditable", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.textBox_token.Location = new System.Drawing.Point(311, 11);
             this.textBox_token.Name = "textBox_token";
             this.textBox_token.PasswordChar = '*';
             this.textBox_token.Size = new System.Drawing.Size(129, 21);
             this.textBox_token.TabIndex = 1;
+            this.textBox_token.TextChanged += new System.EventHandler(this.textBox_token_TextChanged);
             // 
             // checkBox_autorun
             // 
@@ -137,6 +147,7 @@
             // 
             // button_create
             // 
+            this.button_create.DataBindings.Add(new System.Windows.Forms.Binding("Enabled", this.launcherModelBindingSource, "LoggedIn", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.button_create.Enabled = false;
             this.button_create.Location = new System.Drawing.Point(588, 10);
             this.button_create.Name = "button_create";
@@ -258,9 +269,8 @@
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "SakuraFrp Launcher";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.Resize += new System.EventHandler(this.MainForm_Resize);
+            ((System.ComponentModel.ISupportInitialize)(this.launcherModelBindingSource)).EndInit();
             this.contextMenuStrip_tray.ResumeLayout(false);
             this.contextMenuStrip_tunnel.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -290,6 +300,7 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_delete;
         private System.Windows.Forms.CheckBox checkBox_textwrap;
         private System.Windows.Forms.CheckBox checkBox_update;
+        private System.Windows.Forms.BindingSource launcherModelBindingSource;
     }
 }
 
