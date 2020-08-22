@@ -108,6 +108,18 @@ namespace SakuraLauncher
                 Environment.Exit(0);
             }
 
+            string color = "Teal", materialColor = "Teal";
+            switch (SakuraLauncher.Properties.Settings.Default.Theme)
+            {
+            case 1:
+                color = "Gold";
+                materialColor = "Amber";
+                break;
+            }
+            Resources.MergedDictionaries[0].Source = new Uri("/Theme/" + color + ".xaml", UriKind.Relative);
+            Resources.MergedDictionaries[1].Source = new Uri("pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor." + materialColor + ".xaml", UriKind.Absolute);
+            Resources.MergedDictionaries[2].Source = new Uri("pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor." + materialColor + ".xaml", UriKind.Absolute);
+
             MainWindow = new MainWindow();
             if (!minimize)
             {
@@ -117,12 +129,7 @@ namespace SakuraLauncher
 
         private void TrayMenu_Show(object sender, RoutedEventArgs e) => MainWindow.Show();
 
-        private void TrayMenu_Exit(object sender, RoutedEventArgs e)
-        {
-            // TODO: Exit & shut down daemon
-            // IDK if we should stop the service or not
-            MainWindow.Close();
-        }
+        private void TrayMenu_Exit(object sender, RoutedEventArgs e) => MainWindow.Close();
 
         private void TrayMenu_ExitAll(object sender, RoutedEventArgs e)
         {

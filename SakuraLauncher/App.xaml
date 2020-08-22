@@ -4,48 +4,20 @@
              Exit="Application_Exit" Startup="Application_Startup">
     <Application.Resources>
         <ResourceDictionary>
-            <!--#region Material Design Framework-->
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Theme/Teal.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Teal.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Teal.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Teal.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Teal.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <!--#endregion-->
 
-            <!--#region Toggle Button Override-->
-            <!--#endregion-->
-
-            <!--  UyBWIEkgUCDphY0g6ImyCjxSZXNvdXJjZURpY3Rpb25hcnkgeDpLZXk9IkdPTEQiPgoJPExpbmVhckdyYWRpZW50QnJ1c2ggeDpLZXk9IkJhY2tncm91bmRfU2lkZVBhbmVsIiBTdGFydFBvaW50PSIwLDAiIEVuZFBvaW50PSIwLDEiPgoJCTxHcmFkaWVudFN0b3AgQ29sb3I9IiNmNWQ2OGEiIE9mZnNldD0iMCIvPgoJCTxHcmFkaWVudFN0b3AgQ29sb3I9IiNiZDg0M2MiIE9mZnNldD0iMSIvPgoJPC9MaW5lYXJHcmFkaWVudEJydXNoPgoJPExpbmVhckdyYWRpZW50QnJ1c2ggeDpLZXk9IkJhY2tncm91bmRfTWFpblBhbmVsIiBTdGFydFBvaW50PSIwLDAiIEVuZFBvaW50PSIxLDEiPgoJCTxHcmFkaWVudFN0b3AgQ29sb3I9IiMzYjNiM2IiIE9mZnNldD0iMCIvPgoJCTxHcmFkaWVudFN0b3AgQ29sb3I9IiMxMTExMTEiIE9mZnNldD0iMSIvPgoJPC9MaW5lYXJHcmFkaWVudEJydXNoPgoJPExpbmVhckdyYWRpZW50QnJ1c2ggeDpLZXk9IkJhY2tncm91bmRfVHVubmVsIiBTdGFydFBvaW50PSIwLDAiIEVuZFBvaW50PSIwLjUsMSI+CgkJPEdyYWRpZW50U3RvcCBDb2xvcj0iI2ZjY2M3ZSIgT2Zmc2V0PSIwIi8+CgkJPEdyYWRpZW50U3RvcCBDb2xvcj0iI2JlODUzZCIgT2Zmc2V0PSIxIi8+Cgk8L0xpbmVhckdyYWRpZW50QnJ1c2g+CgoJPENvbG9yIHg6S2V5PSJUYWJHcmFkaWVudF9TdGFydCI+I2ZlZTI2ZDwvQ29sb3I+Cgk8Q29sb3IgeDpLZXk9IlRhYkdyYWRpZW50X01pZGRsZSI+I2U2YTcyYzwvQ29sb3I+Cgk8Q29sb3IgeDpLZXk9IlRhYkdyYWRpZW50X0VuZCI+IzY2ZmVlMjZkPC9Db2xvcj4KCTxDb2xvciB4OktleT0iVGFiR3JhZGllbnRfRW5kTWlkZGxlIj4jZWVmZWUyNmQ8L0NvbG9yPgoJPENvbG9yIHg6S2V5PSJUYWJHcmFkaWVudF9FbmRUcmFuc3BhcmVudCI+IzAwZmVlMjZkPC9Db2xvcj4KPC9SZXNvdXJjZURpY3Rpb25hcnk+ -->
-
-            <!--#region Color-->
-            <LinearGradientBrush x:Key="Background_SidePanel" StartPoint="0,0" EndPoint="0,1">
-                <GradientStop Color="#1F5966" Offset="0"/>
-                <GradientStop Color="#0F2C33" Offset="1"/>
-            </LinearGradientBrush>
-            <LinearGradientBrush x:Key="Background_MainPanel" StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#0F2C33" Offset="0"/>
-                <GradientStop Color="#00151A" Offset="1"/>
-            </LinearGradientBrush>
-            <LinearGradientBrush x:Key="Background_Tunnel" StartPoint="0,0" EndPoint="0.5,1">
-                <GradientStop Color="#0092B3" Offset="0"/>
-                <GradientStop Color="#005366" Offset="1"/>
-            </LinearGradientBrush>
-
-            <Color x:Key="TabGradient_Start">#34e89e</Color>
-            <Color x:Key="TabGradient_Middle">#259f79</Color>
-            <Color x:Key="TabGradient_End">#0f6043</Color>
-            <Color x:Key="TabGradient_EndMiddle">#ee0f6043</Color>
-            <Color x:Key="TabGradient_EndTransparent">#000f6043</Color>
-            <!--#endregion-->
-
-            <!--#region Menu-->
             <ContextMenu x:Key="TrayMenu" Placement="MousePoint">
                 <MenuItem Header="显示主窗口" Style="{StaticResource MaterialDesignMenuItem}" Click="TrayMenu_Show"/>
+                <Separator />
                 <MenuItem Header="退出启动器" Style="{StaticResource MaterialDesignMenuItem}" Click="TrayMenu_Exit"/>
                 <MenuItem Header="彻底退出" Style="{StaticResource MaterialDesignMenuItem}" Click="TrayMenu_ExitAll"/>
             </ContextMenu>
-            <!--#endregion-->
         </ResourceDictionary>
     </Application.Resources>
 </Application>
