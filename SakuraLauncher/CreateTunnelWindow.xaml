@@ -9,7 +9,6 @@
         TextElement.FontWeight="Regular"
         TextOptions.TextRenderingMode="Auto"
         TextOptions.TextFormattingMode="Ideal" 
-        FontFamily="{DynamicResource MaterialDesignFont}"
         Background="{StaticResource MaterialDesignPaper}"
         Title="新建穿透隧道" Height="500" Width="800" 
         WindowStartupLocation="CenterOwner">

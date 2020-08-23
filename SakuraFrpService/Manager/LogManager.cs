@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Concurrent;
 
 using SakuraLibrary.Proto;

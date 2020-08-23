@@ -21,11 +21,28 @@ namespace SakuraLibrary.Pipe
 
         public List<PipeStream> PushPipes = new List<PipeStream>();
         public Dictionary<PipeStream, PipeConnection> Pipes = new Dictionary<PipeStream, PipeConnection>();
-
         public readonly string Name;
         public readonly int BufferSize;
 
-        public bool Running { get; protected set; }
+        public bool Running
+        {
+            get
+            {
+                lock (_runningLock)
+                {
+                    return _running;
+                }
+            }
+            protected set
+            {
+                lock (_runningLock)
+                {
+                    _running = value;
+                }
+            }
+        }
+        private bool _running;
+        private object _runningLock = new object();
 
         public PipeServer(string name, int bufferSize = 1048576)
         {
@@ -52,34 +69,33 @@ namespace SakuraLibrary.Pipe
                 return;
             }
             Running = false;
-
-            lock (Pipes)
-            {
-                lock (PushPipes)
-                {
-                    Dispose();
-                }
-            }
+            Dispose();
         }
 
         public void Dispose()
         {
-            ListeningPipe?.Dispose();
-            ListeningPipe = null;
-            ListeningPushPipe?.Dispose();
-            ListeningPushPipe = null;
-
-            foreach (var p in Pipes.Values)
+            lock (Pipes)
             {
-                p.Dispose();
-            }
-            Pipes.Clear();
+                ListeningPipe?.Dispose();
+                ListeningPipe = null;
 
-            foreach (var p in PushPipes)
-            {
-                p.Dispose();
+                foreach (var p in Pipes.Values)
+                {
+                    p.Dispose();
+                }
+                Pipes.Clear();
             }
-            PushPipes.Clear();
+            lock (PushPipes)
+            {
+                ListeningPushPipe?.Dispose();
+                ListeningPushPipe = null;
+
+                foreach (var p in PushPipes)
+                {
+                    p.Dispose();
+                }
+                PushPipes.Clear();
+            }
         }
 
         public PipeSecurity CreateSecurity()
@@ -97,18 +113,20 @@ namespace SakuraLibrary.Pipe
         {
             try
             {
-                PipeConnection conn;
                 lock (Pipes)
                 {
-                    ListeningPipe.EndWaitForConnection(ar);
-                    conn = new PipeConnection(new byte[BufferSize], ListeningPipe);
-                    ListeningPipe = null;
+                    if (ListeningPipe != null)
+                    {
+                        ListeningPipe.EndWaitForConnection(ar);
+                        var conn = new PipeConnection(new byte[BufferSize], ListeningPipe);
+                        ListeningPipe = null;
 
-                    Pipes.Add(conn.Pipe, conn);
+                        Pipes.Add(conn.Pipe, conn);
+
+                        BeginPipeRead(conn);
+                        Connected?.Invoke(conn);
+                    }
                 }
-
-                BeginPipeRead(conn);
-                Connected?.Invoke(conn);
             }
             catch { }
 
@@ -197,9 +215,12 @@ namespace SakuraLibrary.Pipe
             {
                 lock (PushPipes)
                 {
-                    ListeningPushPipe.EndWaitForConnection(ar);
-                    PushPipes.Add(ListeningPushPipe);
-                    ListeningPushPipe = null;
+                    if (ListeningPushPipe != null)
+                    {
+                        ListeningPushPipe.EndWaitForConnection(ar);
+                        PushPipes.Add(ListeningPushPipe);
+                        ListeningPushPipe = null;
+                    }
                 }
             }
             catch { }

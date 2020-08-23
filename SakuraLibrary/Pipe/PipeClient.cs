@@ -30,12 +30,12 @@ namespace SakuraLibrary.Pipe
             try
             {
                 var pipe = new NamedPipeClientStream(Host, Name, PipeDirection.InOut, PipeOptions.Asynchronous);
-                pipe.Connect();
+                pipe.Connect(1000);
                 pipe.ReadMode = PipeTransmissionMode.Message;
                 Pipe = new PipeConnection(new byte[BufferSize], pipe);
 
                 pipe = new NamedPipeClientStream(Host, Name + PipeConnection.PUSH_SUFFIX, PipeDirection.InOut, PipeOptions.Asynchronous);
-                pipe.Connect();
+                pipe.Connect(1000);
                 pipe.ReadMode = PipeTransmissionMode.Message;
                 PushPipe = new PipeConnection(new byte[BufferSize], pipe);
 

@@ -28,14 +28,7 @@ namespace SakuraLibrary.Pipe
 
         public void Send(byte[] data) => Pipe.Write(data, 0, data.Length);
 
-        public void SendProto(IMessage message)
-        {
-            using (var ms = new MemoryStream())
-            {
-                message.WriteTo(ms);
-                Send(ms.ToArray());
-            }
-        }
+        public void SendProto(IMessage message) => Send(message.ToByteArray());
 
         public void RespondFailure(string message = "") => SendProto(new ResponseBase()
         {
