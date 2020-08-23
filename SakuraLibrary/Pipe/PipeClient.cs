@@ -29,16 +29,18 @@ namespace SakuraLibrary.Pipe
         {
             try
             {
-                var pipe = new NamedPipeClientStream(Host, Name, PipeDirection.InOut, PipeOptions.Asynchronous);
-                pipe.Connect(1000);
-                pipe.ReadMode = PipeTransmissionMode.Message;
-                Pipe = new PipeConnection(new byte[BufferSize], pipe);
+                lock (this)
+                {
+                    var pipe = new NamedPipeClientStream(Host, Name, PipeDirection.InOut, PipeOptions.Asynchronous);
+                    pipe.Connect(1000);
+                    pipe.ReadMode = PipeTransmissionMode.Message;
+                    Pipe = new PipeConnection(new byte[BufferSize], pipe);
 
-                pipe = new NamedPipeClientStream(Host, Name + PipeConnection.PUSH_SUFFIX, PipeDirection.InOut, PipeOptions.Asynchronous);
-                pipe.Connect(1000);
-                pipe.ReadMode = PipeTransmissionMode.Message;
-                PushPipe = new PipeConnection(new byte[BufferSize], pipe);
-
+                    pipe = new NamedPipeClientStream(Host, Name + PipeConnection.PUSH_SUFFIX, PipeDirection.InOut, PipeOptions.Asynchronous);
+                    pipe.Connect(1000);
+                    pipe.ReadMode = PipeTransmissionMode.Message;
+                    PushPipe = new PipeConnection(new byte[BufferSize], pipe);
+                }
                 BeginPushPipeRead();
                 return true;
             }
@@ -51,12 +53,20 @@ namespace SakuraLibrary.Pipe
 
         public void Dispose()
         {
-            Pipe?.Dispose();
-            Pipe = null;
+            lock (this)
+            {
+                Pipe?.Dispose();
+                Pipe = null;
 
-            PushPipe?.Dispose();
-            PushPipe = null;
+                PushPipe?.Dispose();
+                PushPipe = null;
+            }
         }
+
+        public ResponseBase Request(MessageID id) => Request(new RequestBase()
+        {
+            Type = id
+        });
 
         public ResponseBase Request(RequestBase message)
         {
@@ -81,19 +91,36 @@ namespace SakuraLibrary.Pipe
 
         protected void OnPushPipeData(IAsyncResult ar)
         {
-            if (!PushPipe.Pipe.IsConnected)
+            lock (this)
             {
-                Dispose();
-                return;
+                if (PushPipe == null)
+                {
+                    return;
+                }
+                if (!PushPipe.Pipe.IsConnected)
+                {
+                    Dispose();
+                    return;
+                }
+                try
+                {
+                    ServerPush?.Invoke(PushPipe, PushPipe.EnsureMessageComplete(PushPipe.Pipe.EndRead(ar)));
+                }
+                catch { }
             }
-            try
-            {
-                ServerPush?.Invoke(PushPipe, PushPipe.EnsureMessageComplete(PushPipe.Pipe.EndRead(ar)));
-            }
-            catch { }
             BeginPushPipeRead();
         }
 
-        protected void BeginPushPipeRead() => PushPipe.Pipe.BeginRead(PushPipe.Buffer, 0, PushPipe.Buffer.Length, OnPushPipeData, null);
+        protected void BeginPushPipeRead()
+        {
+            lock (this)
+            {
+                if (PushPipe == null)
+                {
+                    return;
+                }
+                PushPipe.Pipe.BeginRead(PushPipe.Buffer, 0, PushPipe.Buffer.Length, OnPushPipeData, null);
+            }
+        }
     }
 }

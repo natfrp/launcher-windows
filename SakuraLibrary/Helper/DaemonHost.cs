@@ -71,10 +71,7 @@ namespace SakuraLibrary.Helper
             {
                 if (Launcher.Connected)
                 {
-                    ThreadPool.QueueUserWorkItem(s => Launcher.Pipe.Request(new RequestBase()
-                    {
-                        Type = MessageID.ControlExit
-                    }));
+                    ThreadPool.QueueUserWorkItem(s => Launcher.Pipe.Request(MessageID.ControlExit));
                     BaseProcess.WaitForExit(10000);
                 }
                 BaseProcess.Kill();

@@ -36,38 +36,40 @@ namespace SakuraLibrary.Model
 
         public virtual bool Refresh()
         {
-            var logs = Pipe.Request(new RequestBase()
+            var logs = Pipe.Request(MessageID.LogGet);
+            var config = Pipe.Request(MessageID.ControlConfigGet);
+            if (!logs.Success || !config.Success)
             {
-                Type = MessageID.LogGet
-            });
+                return false;
+            }
             Dispatcher.Invoke(() =>
             {
                 foreach (var l in logs.DataLog.Data)
                 {
                     Log(l, true);
                 }
+                Config = config.DataConfig;
             });
-            var nodes = Pipe.Request(new RequestBase()
+
+            var nodes = Pipe.Request(MessageID.NodeList);
+            if (nodes.Success)
             {
-                Type = MessageID.NodeList
-            });
-            var tunnels = Pipe.Request(new RequestBase()
-            {
-                Type = MessageID.TunnelList
-            });
-            if (!nodes.Success || !tunnels.Success)
-            {
-                return false;
-            }
-            Dispatcher.Invoke(() =>
-            {
-                Nodes.Clear();
-                foreach (var n in nodes.DataNodes.Nodes)
+                Dispatcher.Invoke(() =>
                 {
-                    Nodes.Add(new NodeModel(n));
-                }
-            });
-            LoadTunnels(tunnels.DataTunnels);
+                    Nodes.Clear();
+                    foreach (var n in nodes.DataNodes.Nodes)
+                    {
+                        Nodes.Add(new NodeModel(n));
+                    }
+                    Config = config.DataConfig;
+                });
+            }
+
+            var tunnels = Pipe.Request(MessageID.TunnelList);
+            if (tunnels.Success)
+            {
+                LoadTunnels(tunnels.DataTunnels);
+            }
             return true;
         }
 
@@ -89,21 +91,32 @@ namespace SakuraLibrary.Model
             {
                 lock (Pipe)
                 {
-                    if (!Pipe.Connected)
+                    if (Pipe.Connected)
                     {
-                        Connected = false;
-                        if (Pipe.Connect())
-                        {
-                            Connected = true;
-                            var resp = Pipe.Request(new RequestBase()
-                            {
-                                Type = MessageID.UserInfo
-                            });
-                            UserInfo = resp.DataUser;
-                            Refresh();
-                        }
                         continue;
                     }
+                    Connected = false;
+
+                    if (!Pipe.Connect())
+                    {
+                        continue;
+                    }
+
+                    var user = Pipe.Request(MessageID.UserInfo);
+                    if (!user.Success)
+                    {
+                        Pipe.Dispose();
+                        continue;
+                    }
+                    UserInfo = user.DataUser;
+
+                    if (!Refresh())
+                    {
+                        Pipe.Dispose();
+                        continue;
+                    }
+
+                    Connected = true;
                 }
             }
             while (!AsyncManager.StopEvent.WaitOne(500));
@@ -160,6 +173,9 @@ namespace SakuraLibrary.Model
                             Log(l);
                         }
                     });
+                    break;
+                case PushMessageID.PushUpdate:
+                    // TODO
                     break;
                 }
             }
@@ -239,10 +255,10 @@ namespace SakuraLibrary.Model
         [SourceBinding(nameof(Config))]
         public bool CheckUpdate
         {
-            get => Config.BypassProxy;
+            get => Config.UpdateInterval != -1;
             set
             {
-                Config.BypassProxy = value;
+                Config.UpdateInterval = value ? 86400 : -1;
                 PushServiceConfig();
             }
         }
@@ -298,10 +314,7 @@ namespace SakuraLibrary.Model
             {
                 try
                 {
-                    var resp = Pipe.Request(new RequestBase()
-                    {
-                        Type = MessageID.TunnelReload
-                    });
+                    var resp = Pipe.Request(MessageID.TunnelReload);
                     if (resp.DataTunnels != null)
                     {
                         LoadTunnels(resp.DataTunnels);
