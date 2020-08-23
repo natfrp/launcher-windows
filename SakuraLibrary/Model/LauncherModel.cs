@@ -36,9 +36,11 @@ namespace SakuraLibrary.Model
 
         public virtual bool Refresh()
         {
+            // TODO: May merge the following request into single one
             var logs = Pipe.Request(MessageID.LogGet);
             var config = Pipe.Request(MessageID.ControlConfigGet);
-            if (!logs.Success || !config.Success)
+            var update = Pipe.Request(MessageID.ControlGetUpdate);
+            if (!logs.Success || !config.Success || !update.Success)
             {
                 return false;
             }
@@ -49,6 +51,7 @@ namespace SakuraLibrary.Model
                     Log(l, true);
                 }
                 Config = config.DataConfig;
+                // TODO: update.DataUpdate
             });
 
             var nodes = Pipe.Request(MessageID.NodeList);

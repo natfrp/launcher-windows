@@ -347,6 +347,12 @@ namespace SakuraFrpService
                     UpdateManager.UpdateInterval = req.DataConfig.UpdateInterval;
                     Save();
                     break;
+                case MessageID.ControlCheckUpdate:
+                    resp.DataUpdate = UpdateManager.CheckUpdate().WaitResult();
+                    break;
+                case MessageID.ControlGetUpdate:
+                    resp.DataUpdate = UpdateManager.Status;
+                    break;
                 default:
                     // Login required ↓
                     lock (UserInfo)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+using SakuraLibrary.Proto;
 using SakuraLibrary.Helper;
 
 namespace SakuraFrpService.Manager
@@ -9,6 +10,8 @@ namespace SakuraFrpService.Manager
     {
         public readonly MainService Main;
         public readonly AsyncManager AsyncManager;
+
+        public UpdateStatus Status = new UpdateStatus();
 
         public int UpdateInterval { get => _updateInterval; set => _updateInterval = Math.Max(value, 3600); }
         private int _updateInterval;
@@ -23,13 +26,16 @@ namespace SakuraFrpService.Manager
             UpdateInterval = Properties.Settings.Default.UpdateInterval;
         }
 
-        public async Task CheckUpdate(bool loadEnabled = false)
+        public async Task<UpdateStatus> CheckUpdate(bool loadEnabled = false)
         {
+            var status = new UpdateStatus();
             lock (this)
             {
+                // TODO
                 // var result = await Natfrp.Request<>("get_version");
             }
             LastCheck = DateTime.Now;
+            return status;
         }
 
         protected void Run()
@@ -42,7 +48,15 @@ namespace SakuraFrpService.Manager
                     {
                         continue;
                     }
-                    CheckUpdate().Wait();
+                    Status = CheckUpdate().WaitResult();
+                    if (Status.UpdateFrpc || Status.UpdateLauncher)
+                    {
+                        Main.Pipe.PushMessage(new PushMessageBase()
+                        {
+                            Type = PushMessageID.PushUpdate,
+                            DataUpdate = Status
+                        });
+                    }
                 }
             }
             while (!AsyncManager.StopEvent.WaitOne(60 * 1000));
