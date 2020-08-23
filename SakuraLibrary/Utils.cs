@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Linq;
 using System.Reflection;
@@ -61,37 +62,35 @@ namespace SakuraLibrary
             }
         }
 
-        public static bool SetAutoRun(bool start)
+        public static string GetAutoRunFile(string prefix) => Environment.GetFolderPath(Environment.SpecialFolder.Startup) + "\\" + prefix + Md5(ExecutablePath) + ".lnk";
+
+        public static string SetAutoRun(bool start, string prefix)
         {
-            /* TODO
             try
             {
+                var file = GetAutoRunFile(prefix);
                 if (start)
                 {
-                    if (File.Exists(AutoRunFile))
+                    if (File.Exists(file))
                     {
-                        return true;
+                        return null;
                     }
-                    // Don't include IWshRuntimeLibrary here, IWshRuntimeLibrary.File will cause name conflict.
-                    var shortcut = (IWshRuntimeLibrary.IWshShortcut)new IWshRuntimeLibrary.WshShell().CreateShortcut(AutoRunFile);
+                    var shortcut = (IWshRuntimeLibrary.IWshShortcut)new IWshRuntimeLibrary.WshShell().CreateShortcut(file);
                     shortcut.TargetPath = ExecutablePath;
                     shortcut.Arguments = "--minimize";
-                    shortcut.Description = "SakuraFrp Launcher Auto Start";
-                    shortcut.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                    shortcut.Description = "SakuraFrp Launcher 开机自启";
                     shortcut.Save();
                 }
-                else if (File.Exists(AutoRunFile))
+                else if (File.Exists(file))
                 {
-                    File.Delete(AutoRunFile);
+                    File.Delete(file);
                 }
-                return true;
+                return null;
             }
             catch (Exception e)
             {
-                ShowMessage("无法设置开机启动, 请检查杀毒软件是否拦截了此操作.\n\n" + e.ToString(), "Oops", MessageBoxImage.Error);
+                return "无法设置开机启动, 请检查杀毒软件是否拦截了此操作\n\n" + e.ToString();
             }
-            */
-            return false;
         }
 
         public static string SetServicePermission()

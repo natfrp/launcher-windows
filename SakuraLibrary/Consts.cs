@@ -6,5 +6,8 @@
         public const string ServiceName = "SakuraFrpService";
 
         public const string ServiceExecutable = "SakuraFrpService.exe";
+
+        public const string SakuraLauncherPrefix = "SakuraLauncher_";
+        public const string LegacyLauncherPrefix = "LegacySakuraLauncher_";
     }
 }

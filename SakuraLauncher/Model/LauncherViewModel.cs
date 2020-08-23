@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Threading;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+using SakuraLibrary;
 using SakuraLibrary.Model;
 using SakuraLibrary.Proto;
 using SakuraLibrary.Helper;
@@ -17,12 +19,12 @@ namespace SakuraLauncher.Model
         public Dictionary<string, string> failedData = new Dictionary<string, string>();
 
         public readonly Func<string, bool> SimpleConfirmHandler = message => App.ShowMessage(message, "操作确认", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK;
-        public readonly Action<bool, string> SimpleHandler = (success, message) => App.ShowMessage(message, success ? "操作成功" : "操作失败", success ? MessageBoxImage.Information : MessageBoxImage.Error, MessageBoxButton.OK);
+        public readonly Action<bool, string> SimpleHandler = (success, message) => App.ShowMessage(message, success ? "操作成功" : "操作失败", success ? MessageBoxImage.Information : MessageBoxImage.Error);
         public readonly Action<bool, string> SimpleFailureHandler = (success, message) =>
         {
             if (!success)
             {
-                App.ShowMessage(message, "操作失败", MessageBoxImage.Error, MessageBoxButton.OK);
+                App.ShowMessage(message, "操作失败", MessageBoxImage.Error);
             }
         };
 
@@ -141,6 +143,20 @@ namespace SakuraLauncher.Model
                 return true;
             }
             return false;
+        }
+
+        public bool AutoRun
+        {
+            get => File.Exists(Utils.GetAutoRunFile(Consts.SakuraLauncherPrefix));
+            set
+            {
+                var result = Utils.SetAutoRun(!AutoRun, Consts.SakuraLauncherPrefix);
+                if (result != null)
+                {
+                    App.ShowMessage(result, "设置失败", MessageBoxImage.Error);
+                }
+                RaisePropertyChanged();
+            }
         }
 
         public ObservableCollection<LogModel> Logs { get; set; } = new ObservableCollection<LogModel>();

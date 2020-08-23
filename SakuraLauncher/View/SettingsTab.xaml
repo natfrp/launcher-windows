@@ -3,21 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              d:DesignHeight="315" d:DesignWidth="580">
     <StackPanel>
         <TextBlock Foreground="#DDFFFFFF" FontSize="26" Margin="24,0,0,0">设置</TextBlock>
-        <!--StackPanel Orientation="Horizontal" Margin="24,0,24,16">
-            <ToggleButton IsChecked="{Binding AutoRun.Value}" Checked="ToggleButtonAutoRun_Checked" Unchecked="ToggleButtonAutoRun_Unchecked"/>
-            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">开机启动</TextBlock>
-        </StackPanel-->
-        <StackPanel Orientation="Horizontal" Margin="24,24,24,0">
-            <ToggleButton IsChecked="{Binding SuppressInfo}" Checked="Save" Unchecked="Save"/>
-            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">关闭连接提示</TextBlock>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="24,16,24,0">
-            <ToggleButton IsChecked="{Binding LogTextWrapping}" Checked="Save" Unchecked="Save"/>
-            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">日志自动换行</TextBlock>
-        </StackPanel>
         <!--StackPanel Orientation="Horizontal" Margin="24,0,24,16">
             <ToggleButton IsChecked="{Binding BypassProxy.Value}"/>
             <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">启动器绕过系统代理</TextBlock>
@@ -127,6 +116,25 @@
                     </TextBlock>
                 </StackPanel>
             </Button>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="24,16,24,0">
+            <ToggleButton IsChecked="{Binding SuppressInfo}" Checked="Save" Unchecked="Save"/>
+            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">关闭连接提示</TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="24,16,24,0">
+            <ToggleButton IsChecked="{Binding LogTextWrapping}" Checked="Save" Unchecked="Save"/>
+            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">日志自动换行</TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="24,16,0,0">
+            <ToggleButton IsChecked="{Binding AutoRun}"/>
+            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">启动器开机自启</TextBlock>
+            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="守护进程模式下必须启用此选项来实现隧道自启" ToolTipService.InitialShowDelay="0">
+                <materialDesign:PackIcon Kind="HelpCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+            </TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="24,8,0,0">
             <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16">

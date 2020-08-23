@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 
 using SakuraLauncher.Model;
@@ -12,16 +11,12 @@ namespace SakuraLauncher.View
     public partial class SettingsTab : UserControl
     {
         private readonly LauncherViewModel Model;
-
+        
         public SettingsTab(LauncherViewModel main)
         {
             InitializeComponent();
             DataContext = Model = main;
         }
-
-        private void ToggleButtonAutoRun_Checked(object sender, RoutedEventArgs e) => throw new NotImplementedException(); // App.SetAutoRun(true);
-
-        private void ToggleButtonAutoRun_Unchecked(object sender, RoutedEventArgs e) => throw new NotImplementedException(); // App.SetAutoRun(false);
 
         private void ButtonUpdate_Click(object sender, RoutedEventArgs e)
         {

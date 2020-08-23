@@ -101,8 +101,6 @@ namespace SakuraLauncher
                 }
             }
 
-            // AutoRunFile = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\SakuraLauncher_" + Utils.Md5(Utils.ExecutablePath) + ".lnk";
-
             AppMutex = new Mutex(true, "SakuraLauncher_" + Utils.InstallationHash, out bool created);
             if (!created)
             {
