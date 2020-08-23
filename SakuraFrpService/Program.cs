@@ -3,7 +3,9 @@ using System.IO;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.ServiceProcess;
+using System.Security.Principal;
 using System.Configuration.Install;
+using System.Security.AccessControl;
 
 using SakuraLibrary;
 
@@ -32,7 +34,15 @@ namespace SakuraFrpService
                 case "--install":
                     try
                     {
+                        var dir = new DirectoryInfo(Path.GetDirectoryName(Utils.ExecutablePath));
+
+                        var acl = dir.GetAccessControl(AccessControlSections.Access);
+                        acl.SetAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.LocalServiceSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.None, AccessControlType.Allow));
+
+                        dir.SetAccessControl(acl);
+
                         ManagedInstallerClass.InstallHelper(new string[] { Utils.ExecutablePath });
+
                         var result = Utils.SetServicePermission();
                         if (result != null)
                         {
