@@ -29,6 +29,7 @@ namespace SakuraFrpService
         public readonly LogManager LogManager;
         public readonly NodeManager NodeManager;
         public readonly TunnelManager TunnelManager;
+        public readonly UpdateManager UpdateManager;
 
         public MainService(bool daemon)
         {
@@ -39,6 +40,7 @@ namespace SakuraFrpService
                 settings.UpgradeRequired = false;
                 settings.Save();
             }
+            Natfrp.BypassProxy = settings.BypassProxy;
 
             Daemonize = daemon;
             if (!daemon)
@@ -54,6 +56,7 @@ namespace SakuraFrpService
             LogManager = new LogManager(this, 8192);
             NodeManager = new NodeManager(this);
             TunnelManager = new TunnelManager(this);
+            UpdateManager = new UpdateManager(this);
         }
 
         public void Save()
@@ -69,6 +72,11 @@ namespace SakuraFrpService
             {
                 settings.EnabledTunnels = TunnelManager.GetEnabledTunnels();
             }
+            if (UpdateManager.Running)
+            {
+                settings.UpdateInterval = UpdateManager.UpdateInterval;
+            }
+            settings.BypassProxy = Natfrp.BypassProxy;
 
             settings.Save();
         }
@@ -327,6 +335,18 @@ namespace SakuraFrpService
                 case MessageID.ControlExit:
                     Stop();
                     return;
+                case MessageID.ControlConfigGet:
+                    resp.DataConfig = new ServiceConfig()
+                    {
+                        BypassProxy = Natfrp.BypassProxy,
+                        UpdateInterval = UpdateManager.UpdateInterval
+                    };
+                    break;
+                case MessageID.ControlConfigSet:
+                    Natfrp.BypassProxy = req.DataConfig.BypassProxy;
+                    UpdateManager.UpdateInterval = req.DataConfig.UpdateInterval;
+                    Save();
+                    break;
                 default:
                     // Login required ↓
                     lock (UserInfo)

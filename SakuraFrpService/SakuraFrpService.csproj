@@ -68,6 +68,7 @@
     <Compile Include="MainService.Designer.cs">
       <DependentUpon>MainService.cs</DependentUpon>
     </Compile>
+    <Compile Include="Manager\UpdateManager.cs" />
     <Compile Include="Natfrp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProjectInstaller.cs">

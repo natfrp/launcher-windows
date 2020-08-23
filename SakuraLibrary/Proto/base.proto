@@ -13,6 +13,11 @@ message Log {
 
 message LogList { repeated Log data = 3; }
 
+message ServiceConfig {
+  bool bypass_proxy = 1;
+  int32 update_interval = 2;
+}
+
 enum MessageID {
   USER_LOGIN = 0;
   USER_LOGOUT = 1;
@@ -27,6 +32,8 @@ enum MessageID {
   NODE_LIST = 10;
   NODE_RELOAD = 11;
   CONTROL_EXIT = 12;
+  CONTROL_CONFIG_GET = 13;
+  CONTROL_CONFIG_SET = 14;
 }
 
 message ResponseBase {
@@ -39,6 +46,7 @@ message ResponseBase {
     TunnelList data_tunnels = 5;
     LogList data_log = 7;
     NodeList data_nodes = 6;
+    ServiceConfig data_config = 8;
   }
 }
 
@@ -51,6 +59,7 @@ message RequestBase {
     UserLogin data_user_login = 3;
     UpdateTunnelStatus data_update_tunnel = 4;
     CreateTunnel data_create_tunnel = 5;
+    ServiceConfig data_config = 6;
   }
 }
 

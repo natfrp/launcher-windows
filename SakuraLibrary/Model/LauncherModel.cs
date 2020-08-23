@@ -168,85 +168,6 @@ namespace SakuraLibrary.Model
 
         #endregion
 
-        /* TODO: lul
-        public void TryCheckUpdate(bool silent = false)
-        {
-            if (!File.Exists("SakuraUpdater.exe"))
-            {
-                if (!silent)
-                {
-                    App.ShowMessage("自动更新程序不存在, 无法进行更新检查", "Oops", MessageBoxImage.Error);
-                }
-                return;
-            }
-            CheckingUpdate.Value = true;
-            App.ApiRequest("get_version", "legacy=false").ContinueWith(t =>
-            {
-                try
-                {
-                    var version = t.Result;
-                    if (version == null)
-                    {
-                        return;
-                    }
-                    var sb = new StringBuilder();
-                    bool launcher_update = false, frpc_update = false;
-                    if (Assembly.GetExecutingAssembly().GetName().Version.CompareTo(Version.Parse(version["launcher"]["version"] as string)) < 0)
-                    {
-                        launcher_update = true;
-                        sb.Append("启动器最新版: ")
-                            .AppendLine(version["launcher"]["version"] as string)
-                            .AppendLine("更新日志:")
-                            .AppendLine(version["launcher"]["note"] as string)
-                            .AppendLine();
-                    }
-
-                    var temp = (version["frpc"]["version"] as string).Split(new string[] { "-sakura-" }, StringSplitOptions.None);
-                    if (App.FrpcVersion.CompareTo(Version.Parse(temp[0])) < 0 || App.FrpcVersionSakura < float.Parse(temp[1]))
-                    {
-                        frpc_update = true;
-                        sb.Append("frpc 最新版: ")
-                            .AppendLine(version["frpc"]["version"] as string)
-                            .AppendLine("更新日志:")
-                            .AppendLine(version["frpc"]["note"] as string);
-                    }
-
-                    if (!launcher_update && !frpc_update)
-                    {
-                        if (!silent)
-                        {
-                            App.ShowMessage("您当前使用的启动器和 frpc 均为最新版本", "提示", MessageBoxImage.Information);
-                        }
-                    }
-                    else if (App.ShowMessage(sb.ToString(), "发现新版本, 是否更新", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-                    {
-                        ConfigPath = null;
-                        foreach (var l in Tunnels)
-                        {
-                            if (l.IsReal)
-                            {
-                                l.Real.Stop();
-                            }
-                        }
-                        Process.Start("SakuraUpdater.exe", (launcher_update ? "-launcher" : "") + (frpc_update ? " -frpc" : ""));
-                        Environment.Exit(0);
-                    }
-                }
-                catch (Exception e)
-                {
-                    if (!silent)
-                    {
-                        App.ShowMessage("检查更新出错:\n" + e.ToString(), "Oops", MessageBoxImage.Error);
-                    }
-                }
-                finally
-                {
-                    Dispatcher.Invoke(() => CheckingUpdate.Value = false);
-                }
-            });
-        }
-        */
-
         #region Main Window
 
         public bool Connected { get => _connected; set => Set(out _connected, value); }
@@ -300,6 +221,31 @@ namespace SakuraLibrary.Model
 
         public bool LogTextWrapping { get => _logTextWrapping; set => Set(out _logTextWrapping, value); }
         private bool _logTextWrapping;
+
+        public ServiceConfig Config { get => _config; set => Set(out _config, value); }
+        private ServiceConfig _config;
+
+        [SourceBinding(nameof(Config))]
+        public bool BypassProxy
+        {
+            get => Config.BypassProxy;
+            set
+            {
+                Config.BypassProxy = value;
+                PushServiceConfig();
+            }
+        }
+
+        [SourceBinding(nameof(Config))]
+        public bool CheckUpdate
+        {
+            get => Config.BypassProxy;
+            set
+            {
+                Config.BypassProxy = value;
+                PushServiceConfig();
+            }
+        }
 
         public bool IsDaemon => Daemon.Daemon;
 
@@ -420,6 +366,12 @@ namespace SakuraLibrary.Model
                 }
             });
         }
+
+        public ResponseBase PushServiceConfig() => Pipe.Request(new RequestBase()
+        {
+            Type = MessageID.ControlConfigSet,
+            DataConfig = Config
+        });
 
         #endregion
 
