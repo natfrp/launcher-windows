@@ -19,6 +19,16 @@ namespace SakuraLauncher.View
 
         private void ButtonCreate_Click(object sender, RoutedEventArgs e) => new CreateTunnelWindow(Model).ShowDialog();
 
+        private void ButtonReload_Click(object sender, RoutedEventArgs e)
+        {
+            IsEnabled = false;
+            Model.RequestReloadTunnels((a, b) =>
+            {
+                Dispatcher.Invoke(() => IsEnabled = true);
+                Model.SimpleFailureHandler(a, b);
+            });
+        }
+
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
         {
             if ((sender as Button).DataContext is TunnelModel tunnel)

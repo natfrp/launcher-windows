@@ -46,8 +46,6 @@ namespace SakuraLibrary.Model
                 {
                     Log(l, true);
                 }
-                Nodes.Clear();
-                Tunnels.Clear();
             });
             var nodes = Pipe.Request(new RequestBase()
             {
@@ -63,19 +61,25 @@ namespace SakuraLibrary.Model
             }
             Dispatcher.Invoke(() =>
             {
-                var map = new Dictionary<int, string>();
+                Nodes.Clear();
                 foreach (var n in nodes.DataNodes.Nodes)
                 {
                     Nodes.Add(new NodeModel(n));
-                    map.Add(n.Id, n.Name);
-                }
-                foreach (var t in tunnels.DataTunnels.Tunnels)
-                {
-                    Tunnels.Add(new TunnelModel(t, this, map));
                 }
             });
+            LoadTunnels(tunnels.DataTunnels);
             return true;
         }
+
+        protected void LoadTunnels(TunnelList list) => Dispatcher.Invoke(() =>
+        {
+            Tunnels.Clear();
+            var map = Nodes.ToDictionary(k => k.Id, v => v.Name);
+            foreach (var t in list.Tunnels)
+            {
+                Tunnels.Add(new TunnelModel(t, this, map));
+            }
+        });
 
         #region IPC Handling
 
@@ -129,15 +133,7 @@ namespace SakuraLibrary.Model
                     });
                     break;
                 case PushMessageID.UpdateTunnels:
-                    Dispatcher.Invoke(() =>
-                    {
-                        Tunnels.Clear();
-                        var map = Nodes.ToDictionary(k => k.Id, v => v.Name);
-                        foreach (var t in msg.DataTunnels.Tunnels)
-                        {
-                            Tunnels.Add(new TunnelModel(t, this, map));
-                        }
-                    });
+                    LoadTunnels(msg.DataTunnels);
                     break;
                 case PushMessageID.UpdateNodes:
                     Dispatcher.Invoke(() =>
@@ -345,6 +341,29 @@ namespace SakuraLibrary.Model
                 finally
                 {
                     SwitchingMode = false;
+                }
+            });
+        }
+
+        public void RequestReloadTunnels(Action<bool, string> callback)
+        {
+            ThreadPool.QueueUserWorkItem(s =>
+            {
+                try
+                {
+                    var resp = Pipe.Request(new RequestBase()
+                    {
+                        Type = MessageID.TunnelReload
+                    });
+                    if (resp.DataTunnels != null)
+                    {
+                        LoadTunnels(resp.DataTunnels);
+                    }
+                    callback(resp.Success, resp.Message);
+                }
+                catch (Exception e)
+                {
+                    callback(false, e.ToString());
                 }
             });
         }

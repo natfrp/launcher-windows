@@ -26,13 +26,12 @@
         </ScrollViewer.Template>
         <StackPanel>
             <StackPanel Orientation="Horizontal" Margin="24,0,0,0">
-                <TextBlock Foreground="#DDFFFFFF" FontSize="26" Margin="0,0,4,0">隧道</TextBlock>
-                <Button Height="28" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Center" VerticalAlignment="Center" Click="ButtonCreate_Click">
-                    <materialDesign:PackIcon Kind="Add" RenderTransformOrigin="0.5,0.6" Foreground="White">
-                        <materialDesign:PackIcon.RenderTransform>
-                            <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
-                        </materialDesign:PackIcon.RenderTransform>
-                    </materialDesign:PackIcon>
+                <TextBlock Foreground="#DDFFFFFF" FontSize="26">隧道</TextBlock>
+                <Button Style="{StaticResource MaterialDesignIconButton}" Width="33" Height="33" Click="ButtonCreate_Click" Margin="8,0,0,0">
+                    <materialDesign:PackIcon Kind="Add" Foreground="White"/>
+                </Button>
+                <Button Style="{StaticResource MaterialDesignIconButton}" Width="33" Height="33" Click="ButtonReload_Click" Margin="4,0,0,0">
+                    <materialDesign:PackIcon Kind="Refresh" Foreground="White"/>
                 </Button>
             </StackPanel>
             <ListView ItemsSource="{Binding Tunnels, Mode=OneWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="{x:Null}" BorderBrush="{x:Null}" Margin="8,0,0,0">
