@@ -79,7 +79,7 @@
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16" Margin="0,0,8,0">访问密钥:</TextBlock>
                 <TextBox Text="{Binding UserToken}" MinWidth="256" FontSize="16" IsEnabled="{Binding TokenEditable}" />
             </StackPanel>
-            <Button Margin="16,0,0,0" Click="ButtonLogin_Click">
+            <Button Margin="16,0,0,0" Click="ButtonLogin_Click" IsEnabled="{Binding Connected}">
                 <Button.Resources>
                     <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
                         <Style.Triggers>

@@ -241,20 +241,40 @@
         </Border>
         <Border Grid.Column="1" CornerRadius="0,3,3,0" Background="{StaticResource Background_MainPanel}">
             <Grid Grid.Column="1">
-                <Border Name="tabContents" Margin="0,24,0,0" RenderTransformOrigin="0.5,0.5">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition>
+                        <RowDefinition.Style>
+                            <Style TargetType="{x:Type RowDefinition}">
+                                <Setter Property="Height" Value="32" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Connected}" Value="True">
+                                        <Setter Property="Height" Value="0" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </RowDefinition.Style>
+                    </RowDefinition>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" Name="tabContents" Margin="0,24,0,0" RenderTransformOrigin="0.5,0.5">
                     <Border.RenderTransform>
                         <TranslateTransform Y="0"/>
                     </Border.RenderTransform>
                 </Border>
-                <Button HorizontalAlignment="Right" VerticalAlignment="Top" Width="32" Height="32" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Margin="0,5,5,0" Click="ButtonHide_Click">
+                <Button Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top" Width="32" Height="32" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Margin="0,5,5,0" Click="ButtonHide_Click">
                     <Grid>
                         <Line X2="16" Y2="16" Stroke="White" StrokeThickness="1.5" />
                         <Line X1="16" Y2="16"  Stroke="White" StrokeThickness="1.5" />
                     </Grid>
                 </Button>
-                <Button HorizontalAlignment="Right" VerticalAlignment="Top" Width="32" Height="32" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Margin="0,5,43,0" Click="ButtonMinimize_Click">
+                <Button Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top" Width="32" Height="32" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Margin="0,5,43,0" Click="ButtonMinimize_Click">
                     <Line X2="16" Stroke="White" StrokeThickness="1.5" Margin="0,8,0,0" />
                 </Button>
+                <Border Grid.Row="1" Background="OrangeRed">
+                    <TextBlock TextAlignment="Center" VerticalAlignment="Center" FontSize="18">
+                    未连接到守护进程, 大部分功能将不可用, 请尝试重启启动器
+                    </TextBlock>
+                </Border>
             </Grid>
         </Border>
         <tb:TaskbarIcon x:Name="trayIcon" TrayLeftMouseUp="TrayIcon_TrayLeftMouseUp" IconSource="Resources/icon.ico" ContextMenu="{StaticResource TrayMenu}">

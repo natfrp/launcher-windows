@@ -85,7 +85,7 @@ namespace SakuraLibrary.Model
 
         protected void Run()
         {
-            while (!AsyncManager.StopEvent.WaitOne(500))
+            do
             {
                 lock (Pipe)
                 {
@@ -106,6 +106,7 @@ namespace SakuraLibrary.Model
                     }
                 }
             }
+            while (!AsyncManager.StopEvent.WaitOne(500));
         }
 
         protected void Pipe_ServerPush(PipeConnection connection, int length)
