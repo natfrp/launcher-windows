@@ -39,7 +39,6 @@
             // 
             // serviceInstaller1
             // 
-            this.serviceInstaller1.DelayedAutoStart = true;
             this.serviceInstaller1.Description = "SakuraFrp 启动器后台服务, https://www.natfrp.com/";
             this.serviceInstaller1.DisplayName = "SakuraFrp Daemon Service";
             this.serviceInstaller1.ServiceName = "SakuraFrpService";

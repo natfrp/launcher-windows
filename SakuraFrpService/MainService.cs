@@ -75,15 +75,27 @@ namespace SakuraFrpService
 
         public void Tick()
         {
+            ulong tick = 0;
             try
             {
-                lock (UserInfo)
+                if (tick % 100 == 0)
                 {
-                    if (UserInfo.Status == UserStatus.NoLogin && Properties.Settings.Default.LoggedIn)
+                    lock (UserInfo)
                     {
-                        var _ = Login(Properties.Settings.Default.Token);
+                        if (UserInfo.Status == UserStatus.NoLogin && Properties.Settings.Default.LoggedIn)
+                        {
+                            var _ = Login(Properties.Settings.Default.Token);
+                        }
                     }
                 }
+                if (tick % 200 == 0)
+                {
+                    if (!Pipe.Running)
+                    {
+                        Pipe.Start();
+                    }
+                }
+                tick++;
             }
             catch { }
             Thread.Sleep(50);
@@ -129,6 +141,7 @@ namespace SakuraFrpService
                 UserInfo.Status = UserStatus.Pending;
                 PushUserInfo();
             }
+            LogManager.Log(1, "Service", "开始登录, Token: " + token.Substring(0, 4) + "********" + token.Substring(12));
             try
             {
                 Natfrp.Token = token;
@@ -157,9 +170,11 @@ namespace SakuraFrpService
                 TunnelManager.Start();
 
                 PushUserInfo();
+                LogManager.Log(1, "Service", "用户登录成功");
             }
             catch (Exception e)
             {
+                LogManager.Log(3, "Service", "用户登录失败: " + e.ToString());
                 Logout(true);
                 return e.ToString();
             }
@@ -197,6 +212,7 @@ namespace SakuraFrpService
                 Save();
                 PushUserInfo();
             }
+            LogManager.Log(1, "Service", "已退出登录");
             return null;
         }
 
@@ -216,8 +232,8 @@ namespace SakuraFrpService
         {
             try
             {
-                LogManager.Start();
                 Pipe.Start();
+                LogManager.Start();
                 if (!Daemonize)
                 {
                     TickThread.Start();
@@ -229,6 +245,7 @@ namespace SakuraFrpService
                 Stop();
                 return;
             }
+            LogManager.Log(1, "Service", "守护进程启动成功");
         }
 
         protected override void OnStop()

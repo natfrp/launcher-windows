@@ -79,18 +79,25 @@ namespace SakuraFrpService.Manager
             var tunnels = await Natfrp.Request<Natfrp.GetTunnels>("get_tunnels");
             lock (this)
             {
+                bool changed = false;
                 var tmp = new List<int>();
                 foreach (var j in tunnels.Data)
                 {
                     tmp.Add(j.Id);
                     if (!ContainsKey(j.Id))
                     {
+                        changed = true;
                         this[j.Id] = CreateFromApi(j);
                     }
                 }
                 foreach (var k in Keys.Where(k => !tmp.Contains(k)))
                 {
+                    changed = true;
                     Remove(k);
+                }
+                if (changed)
+                {
+                    Main.LogManager.Log(1, "Service", "TunnelManager: 隧道列表同步成功");
                 }
                 if (loadEnabled && Properties.Settings.Default.EnabledTunnels != null)
                 {

@@ -40,6 +40,7 @@ namespace SakuraFrpService.Manager
                 }
                 msg.DataNodes.Nodes.Add(Values);
             }
+            Main.LogManager.Log(1, "Service", "NodeManager: 节点信息同步成功");
             Main.Pipe.PushMessage(msg);
         }
 
