@@ -90,6 +90,7 @@
     <Compile Include="Helper\SelectableTextBlock.cs" />
     <Compile Include="Helper\TabIndexTester.cs" />
     <Compile Include="Model\LauncherViewModel.cs" />
+    <Compile Include="Model\LogModel.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

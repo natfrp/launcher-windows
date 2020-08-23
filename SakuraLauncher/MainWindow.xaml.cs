@@ -32,7 +32,7 @@ namespace SakuraLauncher
 
             Tabs = new UserControl[] {
                 new TunnelTab(Model),
-                Model.LogView,
+                new LogTab(Model),
                 new SettingsTab(Model),
                 new AboutTab()
             };

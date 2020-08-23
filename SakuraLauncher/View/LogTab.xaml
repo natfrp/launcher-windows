@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:local="clr-namespace:SakuraLauncher.View"
+             xmlns:Model="clr-namespace:SakuraLauncher.Model"
              xmlns:Helper="clr-namespace:SakuraLauncher.Helper"
              d:DesignHeight="315" d:DesignWidth="580"
              FontFamily="{DynamicResource MaterialDesignFont}">
@@ -14,34 +16,55 @@
             </StackPanel>
         </Grid>
         <Border Padding="8" BorderBrush="#FFAAAAAA" Background="#33000000" BorderThickness="2" Margin="16,8,16,16">
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Name="ScrollViewerLog">
-                <ScrollViewer.Style>
+            <ItemsControl ItemsSource="{Binding Logs, Mode=OneWay}">
+                <ItemsControl.Resources>
                     <Style TargetType="ScrollViewer">
-                        <Style.Setters>
-                            <Setter Property="HorizontalScrollBarVisibility" Value="Auto"></Setter>
-                        </Style.Setters>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding LogTextWrapping}" Value="True">
-                                <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"></Setter>
+                            <DataTrigger Binding="{Binding LogTextWrapping, Mode=OneWay}" Value="False">
+                                <Setter Property="HorizontalScrollBarVisibility" Value="Auto"></Setter>
                             </DataTrigger>
                         </Style.Triggers>
+                        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
                     </Style>
-                </ScrollViewer.Style>
-                <Helper:SelectableTextBlock x:Name="TextBlockLog" TextWrapping="WrapWithOverflow" FontFamily="Consolas">
-                    <Helper:SelectableTextBlock.Style>
-                        <Style TargetType="Helper:SelectableTextBlock">
-                            <Style.Setters>
-                                <Setter Property="TextWrapping" Value="NoWrap"></Setter>
-                            </Style.Setters>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding LogTextWrapping}" Value="True">
-                                    <Setter Property="TextWrapping" Value="WrapWithOverflow"></Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Helper:SelectableTextBlock.Style>
-                </Helper:SelectableTextBlock>
-            </ScrollViewer>
+                    <DataTemplate DataType="{x:Type Model:LogModel}">
+                        <Helper:SelectableTextBlock FontFamily="Consolas">
+                            <Helper:SelectableTextBlock.Style>
+                                <Style TargetType="Helper:SelectableTextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataContext.LogTextWrapping, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type local:LogTab}}}" Value="True">
+                                            <Setter Property="TextWrapping" Value="WrapWithOverflow"></Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                    <Setter Property="TextWrapping" Value="NoWrap"></Setter>
+                                </Style>
+                            </Helper:SelectableTextBlock.Style>
+                            <Helper:SelectableTextBlock.Inlines>
+                                <Run Foreground="Wheat" Text="{Binding Source, Mode=OneTime}"/>
+                                <Run Foreground="#508ddc" Text="{Binding Time, Mode=OneTime}"/>
+                                <Run Foreground="{Binding LevelColor, Mode=OneTime}" Text="{Binding Level, Mode=OneTime}"/>
+                                <Run Foreground="Silver" Text="{Binding Data, Mode=OneTime}"/>
+                            </Helper:SelectableTextBlock.Inlines>
+                        </Helper:SelectableTextBlock>
+                    </DataTemplate>
+                </ItemsControl.Resources>
+                <ItemsControl.Template>
+                    <ControlTemplate>
+                        <ScrollViewer CanContentScroll="True" ScrollChanged="ScrollViewer_ScrollChanged">
+                            <ScrollViewer.Resources>
+                                <Style TargetType="Rectangle">
+                                    <Setter Property="Opacity" Value="0.2" />
+                                </Style>
+                            </ScrollViewer.Resources>
+                            <ItemsPresenter/>
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel IsItemsHost="True"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
         </Border>
     </DockPanel>
 </UserControl>
