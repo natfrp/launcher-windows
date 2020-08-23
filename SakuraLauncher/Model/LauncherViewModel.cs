@@ -132,7 +132,6 @@ namespace SakuraLauncher.Model
             settings.LogTextWrapping = LogTextWrapping;
 
             settings.Save();
-            settings.Upgrade();
         }
 
         public override bool Refresh()

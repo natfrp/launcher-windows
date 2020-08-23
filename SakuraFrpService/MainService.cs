@@ -32,6 +32,14 @@ namespace SakuraFrpService
 
         public MainService(bool daemon)
         {
+            var settings = Properties.Settings.Default;
+            if (settings.UpgradeRequired)
+            {
+                settings.Upgrade();
+                settings.UpgradeRequired = false;
+                settings.Save();
+            }
+
             Daemonize = daemon;
             if (!daemon)
             {
@@ -63,7 +71,6 @@ namespace SakuraFrpService
             }
 
             settings.Save();
-            settings.Upgrade();
         }
 
         public void Tick()

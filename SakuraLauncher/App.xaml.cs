@@ -12,16 +12,11 @@ namespace SakuraLauncher
     /// </summary>
     public partial class App : Application
     {
-        public static App Instance = null;
+        public static new App Current => (App)Application.Current;
 
-        public static MessageBoxResult ShowMessage(string text, string title, MessageBoxImage icon, MessageBoxButton buttons = MessageBoxButton.OK) => Instance.Dispatcher.Invoke(() => MessageBox.Show(text, title, buttons, icon));
+        public static MessageBoxResult ShowMessage(string text, string title, MessageBoxImage icon, MessageBoxButton buttons = MessageBoxButton.OK) => Current.Dispatcher.Invoke(() => MessageBox.Show(text, title, buttons, icon));
 
         public Mutex AppMutex = null;
-
-        public App() : base()
-        {
-            Instance = this;
-        }
 
         private void Application_Exit(object sender, ExitEventArgs e) => AppMutex?.ReleaseMutex();
 
@@ -108,8 +103,16 @@ namespace SakuraLauncher
                 Environment.Exit(0);
             }
 
+            var settings = SakuraLauncher.Properties.Settings.Default;
+            if (settings.UpgradeRequired)
+            {
+                settings.Upgrade();
+                settings.UpgradeRequired = false;
+                settings.Save();
+            }
+
             string color = "Teal", materialColor = "Teal";
-            switch (SakuraLauncher.Properties.Settings.Default.Theme)
+            switch (settings.Theme)
             {
             case 1:
                 color = "Gold";
