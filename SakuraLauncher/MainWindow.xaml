@@ -248,7 +248,7 @@
                             <Style TargetType="{x:Type RowDefinition}">
                                 <Setter Property="Height" Value="32" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Connected}" Value="True">
+                                    <DataTrigger Binding="{Binding ShowNotification}" Value="False">
                                         <Setter Property="Height" Value="0" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -270,9 +270,34 @@
                 <Button Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top" Width="32" Height="32" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Margin="0,5,43,0" Click="ButtonMinimize_Click">
                     <Line X2="16" Stroke="White" StrokeThickness="1.5" Margin="0,8,0,0" />
                 </Button>
-                <Border Grid.Row="1" Background="OrangeRed">
+                <Border Grid.Row="1" Background="Teal" Cursor="Hand" MouseLeftButtonDown="Update_MouseLeftButtonDown">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HaveUpdate}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </Style>
+                    </Border.Style>
                     <TextBlock TextAlignment="Center" VerticalAlignment="Center" FontSize="18">
-                    未连接到守护进程, 大部分功能将不可用, 请尝试重启启动器
+                        发现新版本, 点击此处更新
+                    </TextBlock>
+                </Border>
+                <Border Grid.Row="1" Background="OrangeRed">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Connected}" Value="False">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </Style>
+                    </Border.Style>
+                    <TextBlock TextAlignment="Center" VerticalAlignment="Center" FontSize="18">
+                        未连接到守护进程, 大部分功能将不可用, 请尝试重启启动器
                     </TextBlock>
                 </Border>
             </Grid>

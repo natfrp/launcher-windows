@@ -16,7 +16,21 @@ namespace SakuraFrpService.Manager
 
         public UpdateStatus Status = new UpdateStatus();
 
-        public int UpdateInterval { get => _updateInterval; set => _updateInterval = value <= 0 ? -1 : Math.Max(value, 3600); }
+        public int UpdateInterval
+        {
+            get => _updateInterval;
+            set
+            {
+                _updateInterval = value <= 0 ? -1 : Math.Max(value, 3600);
+                if (_updateInterval == -1)
+                {
+                    lock (this)
+                    {
+                        Status.UpdateFrpc = Status.UpdateLauncher = false;
+                    }
+                }
+            }
+        }
         private int _updateInterval;
 
         private float FrpcSakura = 0;

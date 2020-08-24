@@ -37,8 +37,6 @@ namespace SakuraLauncher
                 new AboutTab()
             };
             Model.SwitchTab(2);
-
-            // TODO: Check daemon status
         }
 
         public void SetLogo(int index)
@@ -97,6 +95,8 @@ namespace SakuraLauncher
                 Properties.Settings.Default.Save();
             }
         }
+
+        private void Update_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) => Model.DoUpdate(false, Model.SimpleFailureHandler);
 
         #endregion
 

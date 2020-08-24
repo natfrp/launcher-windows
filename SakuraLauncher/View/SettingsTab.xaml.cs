@@ -29,7 +29,10 @@ namespace SakuraLauncher.View
                 App.ShowMessage("您当前使用的启动器与 frpc 均为最新版本", "提示", MessageBoxImage.Information);
                 return;
             }
-            // TODO: Update notice. Also check for Update binding
+            if (App.ShowMessage(string.Format("{0}{1}是否进行更新?", update.UpdateFrpc ? "frpc 有新版本\n" : "", update.UpdateLauncher ? "启动器有新版本\n" : ""), "提示", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            {
+                Model.DoUpdate(false, Model.SimpleFailureHandler);
+            }
         });
 
         private void ButtonLogin_Click(object sender, RoutedEventArgs e)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -9,6 +10,7 @@ using SakuraLibrary.Proto;
 using SakuraLibrary.Helper;
 
 using UserStatus = SakuraLibrary.Proto.User.Types.Status;
+using System.IO;
 
 namespace SakuraLibrary.Model
 {
@@ -75,16 +77,6 @@ namespace SakuraLibrary.Model
             }
             return true;
         }
-
-        protected void LoadTunnels(TunnelList list) => Dispatcher.Invoke(() =>
-        {
-            Tunnels.Clear();
-            var map = Nodes.ToDictionary(k => k.Id, v => v.Name);
-            foreach (var t in list.Tunnels)
-            {
-                Tunnels.Add(new TunnelModel(t, this, map));
-            }
-        });
 
         #region IPC Handling
 
@@ -251,6 +243,16 @@ namespace SakuraLibrary.Model
             }
         });
 
+        protected void LoadTunnels(TunnelList list) => Dispatcher.Invoke(() =>
+        {
+            Tunnels.Clear();
+            var map = Nodes.ToDictionary(k => k.Id, v => v.Name);
+            foreach (var t in list.Tunnels)
+            {
+                Tunnels.Add(new TunnelModel(t, this, map));
+            }
+        });
+
         #endregion
 
         #region Settings
@@ -356,6 +358,10 @@ namespace SakuraLibrary.Model
                     Config.UpdateInterval = value ? 86400 : -1;
                     PushServiceConfig();
                 }
+                if (!value)
+                {
+                    Update = null;
+                }
                 RaisePropertyChanged();
             }
         }
@@ -386,6 +392,19 @@ namespace SakuraLibrary.Model
                     CheckingUpdate = false;
                 }
             });
+        }
+
+        public void DoUpdate(bool legacy, Action<bool, string> callback)
+        {
+            if (!File.Exists("Updater.exe"))
+            {
+                callback(false, "更新程序不存在, 操作无法继续\n请重新下载完整的启动器手动覆盖当前版本");
+                return;
+            }
+            // TODO: May check updater signature
+            Daemon.Stop();
+            Process.Start("Updater.exe", string.Format("{0}{1}", Update.UpdateFrpc ? "-frpc " : "", Update.UpdateLauncher ? (legacy ? "-legacy" : "-launcher") : ""));
+            Environment.Exit(0);
         }
 
         // Working Mode Config

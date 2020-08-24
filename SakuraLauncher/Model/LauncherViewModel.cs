@@ -160,6 +160,9 @@ namespace SakuraLauncher.Model
 
         public ObservableCollection<LogModel> Logs { get; set; } = new ObservableCollection<LogModel>();
 
+        [SourceBinding(nameof(Connected), nameof(HaveUpdate))]
+        public bool ShowNotification => HaveUpdate || !Connected;
+
         [SourceBinding(nameof(CurrentTab))]
         public TabIndexTester CurrentTabTester { get; set; }
 
