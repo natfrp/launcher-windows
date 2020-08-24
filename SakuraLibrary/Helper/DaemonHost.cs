@@ -57,27 +57,27 @@ namespace SakuraLibrary.Helper
             {
                 return true;
             }
-            if (!Daemon)
+            try
             {
-                try
+                if (!Daemon)
                 {
                     Controller.Stop();
                     return true;
                 }
-                catch { }
-                return false;
-            }
-            try
-            {
                 if (Launcher.Connected)
                 {
                     ThreadPool.QueueUserWorkItem(s => Launcher.Pipe.Request(MessageID.ControlExit));
                     BaseProcess.WaitForExit(10000);
                 }
-                BaseProcess.Kill();
+                if (!BaseProcess.HasExited)
+                {
+                    BaseProcess.Kill();
+                }
+                BaseProcess.Dispose();
+                return true;
             }
             catch { }
-            return BaseProcess.HasExited;
+            return false;
         }
 
         public bool IsRunning()

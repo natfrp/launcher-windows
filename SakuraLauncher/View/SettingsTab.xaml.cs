@@ -22,10 +22,15 @@ namespace SakuraLauncher.View
             DataContext = Model = main;
         }
 
-        private void ButtonUpdate_Click(object sender, RoutedEventArgs e)
+        private void ButtonUpdate_Click(object sender, RoutedEventArgs e) => Model.RequestUpdateCheck(update =>
         {
-            // TODO: IPC
-        }
+            if (!update.UpdateFrpc && !update.UpdateLauncher)
+            {
+                App.ShowMessage("您当前使用的启动器与 frpc 均为最新版本", "提示", MessageBoxImage.Information);
+                return;
+            }
+            // TODO: Update notice. Also check for Update binding
+        });
 
         private void ButtonLogin_Click(object sender, RoutedEventArgs e)
         {

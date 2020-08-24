@@ -246,6 +246,14 @@ namespace SakuraFrpService
                 {
                     TickThread.Start();
                 }
+                if (UpdateManager.LoadFrpcVersion())
+                {
+                    UpdateManager.Start();
+                }
+                else
+                {
+                    LogManager.Log(2, "Service", "UpdateManager: 无法获取 frpc 版本, 更新检查将不会启用");
+                }
             }
             catch
             {
@@ -271,6 +279,7 @@ namespace SakuraFrpService
                 {
                     TickThread.Abort();
                 }
+                UpdateManager.Stop(true);
             }
             catch { }
             LogManager.Stop();

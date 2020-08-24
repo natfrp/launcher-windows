@@ -51,7 +51,7 @@ namespace SakuraLibrary.Model
                     Log(l, true);
                 }
                 Config = config.DataConfig;
-                // TODO: update.DataUpdate
+                Update = update.DataUpdate;
             });
 
             var nodes = Pipe.Request(MessageID.NodeList);
@@ -178,7 +178,7 @@ namespace SakuraLibrary.Model
                     });
                     break;
                 case PushMessageID.PushUpdate:
-                    // TODO
+                    Update = msg.DataUpdate;
                     break;
                 }
             }
@@ -217,9 +217,45 @@ namespace SakuraLibrary.Model
 
         public ObservableCollection<TunnelModel> Tunnels { get; set; } = new ObservableCollection<TunnelModel>();
 
+        public void RequestReloadTunnels(Action<bool, string> callback) => ThreadPool.QueueUserWorkItem(s =>
+         {
+             try
+             {
+                 var resp = Pipe.Request(MessageID.TunnelReload);
+                 if (resp.DataTunnels != null)
+                 {
+                     LoadTunnels(resp.DataTunnels);
+                 }
+                 callback(resp.Success, resp.Message);
+             }
+             catch (Exception e)
+             {
+                 callback(false, e.ToString());
+             }
+         });
+
+        public void RequestDeleteTunnel(int id, Action<bool, string> callback) => ThreadPool.QueueUserWorkItem(s =>
+        {
+            try
+            {
+                var resp = Pipe.Request(new RequestBase()
+                {
+                    Type = MessageID.TunnelDelete,
+                    DataId = id
+                });
+                callback(resp.Success, resp.Message);
+            }
+            catch (Exception e)
+            {
+                callback(false, e.ToString());
+            }
+        });
+
         #endregion
 
         #region Settings
+
+        // User Status
 
         [SourceBinding(nameof(UserInfo))]
         public string UserToken { get => UserInfo.Status != UserStatus.NoLogin ? "****************" : _userToken; set => SafeSet(out _userToken, value); }
@@ -235,36 +271,124 @@ namespace SakuraLibrary.Model
         public bool LoggingIn { get => _loggingIn || UserInfo.Status == UserStatus.Pending; set => SafeSet(out _loggingIn, value); }
         private bool _loggingIn;
 
+        public void RequestLogin(Action<bool, string> callback)
+        {
+            LoggingIn = true;
+            ThreadPool.QueueUserWorkItem(s =>
+            {
+                try
+                {
+                    var resp = Pipe.Request(LoggedIn ? new RequestBase()
+                    {
+                        Type = MessageID.UserLogout
+                    } : new RequestBase()
+                    {
+                        Type = MessageID.UserLogin,
+                        DataUserLogin = new UserLogin()
+                        {
+                            Token = UserToken
+                        }
+                    });
+                    callback(resp.Success, resp.Message);
+                    Refresh();
+                }
+                catch (Exception e)
+                {
+                    callback(false, e.ToString());
+                }
+                finally
+                {
+                    LoggingIn = false;
+                }
+            });
+        }
+
+        // Launcher Config
+
         public bool SuppressInfo { get => _suppressInfo; set => Set(out _suppressInfo, value); }
         private bool _suppressInfo;
 
         public bool LogTextWrapping { get => _logTextWrapping; set => Set(out _logTextWrapping, value); }
         private bool _logTextWrapping;
 
-        public ServiceConfig Config { get => _config; set => Set(out _config, value); }
+        // Service Config
+
+        public ServiceConfig Config { get => _config; set => SafeSet(out _config, value); }
         private ServiceConfig _config;
 
         [SourceBinding(nameof(Config))]
         public bool BypassProxy
         {
-            get => Config.BypassProxy;
+            get => Config != null && Config.BypassProxy;
             set
             {
-                Config.BypassProxy = value;
-                PushServiceConfig();
+                if (Config != null)
+                {
+                    Config.BypassProxy = value;
+                    PushServiceConfig();
+                }
+                RaisePropertyChanged();
             }
         }
+
+        public ResponseBase PushServiceConfig() => Pipe.Request(new RequestBase()
+        {
+            Type = MessageID.ControlConfigSet,
+            DataConfig = Config
+        });
+
+        // Update Checking
+
+        public UpdateStatus Update { get => _update; set => SafeSet(out _update, value); }
+        private UpdateStatus _update;
+
+        [SourceBinding(nameof(Update))]
+        public bool HaveUpdate => Update != null && (Update.UpdateFrpc || Update.UpdateLauncher);
 
         [SourceBinding(nameof(Config))]
         public bool CheckUpdate
         {
-            get => Config.UpdateInterval != -1;
+            get => Config != null && Config.UpdateInterval != -1;
             set
             {
-                Config.UpdateInterval = value ? 86400 : -1;
-                PushServiceConfig();
+                if (Config != null)
+                {
+                    Config.UpdateInterval = value ? 86400 : -1;
+                    PushServiceConfig();
+                }
+                RaisePropertyChanged();
             }
         }
+
+        public bool CheckingUpdate { get => _checkingUpdate; set => SafeSet(out _checkingUpdate, value); }
+        private bool _checkingUpdate;
+
+        public void RequestUpdateCheck(Action<UpdateStatus> callback)
+        {
+            if (CheckingUpdate)
+            {
+                return;
+            }
+            CheckingUpdate = true;
+            ThreadPool.QueueUserWorkItem(s =>
+            {
+                try
+                {
+                    var resp = Pipe.Request(MessageID.ControlCheckUpdate);
+                    if (resp.DataUpdate != null)
+                    {
+                        Update = resp.DataUpdate;
+                    }
+                    callback(Update);
+                }
+                finally
+                {
+                    CheckingUpdate = false;
+                }
+            });
+        }
+
+        // Working Mode Config
 
         public bool IsDaemon => Daemon.Daemon;
 
@@ -310,84 +434,6 @@ namespace SakuraLibrary.Model
                 }
             });
         }
-
-        public void RequestReloadTunnels(Action<bool, string> callback)
-        {
-            ThreadPool.QueueUserWorkItem(s =>
-            {
-                try
-                {
-                    var resp = Pipe.Request(MessageID.TunnelReload);
-                    if (resp.DataTunnels != null)
-                    {
-                        LoadTunnels(resp.DataTunnels);
-                    }
-                    callback(resp.Success, resp.Message);
-                }
-                catch (Exception e)
-                {
-                    callback(false, e.ToString());
-                }
-            });
-        }
-
-        public void RequestDeleteTunnel(int id, Action<bool, string> callback)
-        {
-            ThreadPool.QueueUserWorkItem(s =>
-            {
-                try
-                {
-                    var resp = Pipe.Request(new RequestBase()
-                    {
-                        Type = MessageID.TunnelDelete,
-                        DataId = id
-                    });
-                    callback(resp.Success, resp.Message);
-                }
-                catch (Exception e)
-                {
-                    callback(false, e.ToString());
-                }
-            });
-        }
-
-        public void RequestLogin(Action<bool, string> callback)
-        {
-            LoggingIn = true;
-            ThreadPool.QueueUserWorkItem(s =>
-            {
-                try
-                {
-                    var resp = Pipe.Request(LoggedIn ? new RequestBase()
-                    {
-                        Type = MessageID.UserLogout
-                    } : new RequestBase()
-                    {
-                        Type = MessageID.UserLogin,
-                        DataUserLogin = new UserLogin()
-                        {
-                            Token = UserToken
-                        }
-                    });
-                    callback(resp.Success, resp.Message);
-                    Refresh();
-                }
-                catch (Exception e)
-                {
-                    callback(false, e.ToString());
-                }
-                finally
-                {
-                    LoggingIn = false;
-                }
-            });
-        }
-
-        public ResponseBase PushServiceConfig() => Pipe.Request(new RequestBase()
-        {
-            Type = MessageID.ControlConfigSet,
-            DataConfig = Config
-        });
 
         #endregion
 

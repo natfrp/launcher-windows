@@ -44,9 +44,9 @@ namespace SakuraFrpService
                     using (var reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
                     {
                         var json = JsonConvert.DeserializeObject<T>(await reader.ReadToEndAsync());
-                        if (!json.Success)
+                        if (json == null || !json.Success)
                         {
-                            throw new NatfrpException(json.Message ?? "API 请求失败, 未知错误");
+                            throw new NatfrpException(json?.Message ?? "API 请求失败, 未知错误");
                         }
                         return json;
                     }
@@ -112,6 +112,18 @@ namespace SakuraFrpService
             public string Description { get; set; }
         }
 
+        public class ApiVersion
+        {
+            [JsonProperty("time")]
+            public long Time { get; set; }
+
+            [JsonProperty("version")]
+            public string Version { get; set; }
+
+            [JsonProperty("note")]
+            public string Note { get; set; }
+        }
+
         #endregion
 
         #region Api Response
@@ -149,6 +161,15 @@ namespace SakuraFrpService
         {
             [JsonProperty("data")]
             public ApiTunnel Data { get; set; }
+        }
+
+        public class GetVersion : ApiResponse
+        {
+            [JsonProperty("launcher")]
+            public ApiVersion Launcher { get; set; }
+
+            [JsonProperty("frpc")]
+            public ApiVersion Frpc { get; set; }
         }
 
         #endregion
