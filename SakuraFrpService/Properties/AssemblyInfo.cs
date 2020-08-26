@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("SakuraFrpService")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("SakuraFrp Service")]
+[assembly: AssemblyDescription("SakuraFrp 守护进程")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SakuraFrpService")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyProduct("SakuraFrp Service")]
+[assembly: AssemblyCopyright("Copyright © FENGberd 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

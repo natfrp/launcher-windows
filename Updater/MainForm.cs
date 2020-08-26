@@ -1,14 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Xml.Linq;
 using System.Threading;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.IO.Compression;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-
-using fastJSON;
 
 namespace SakuraUpdater
 {
@@ -21,7 +20,7 @@ namespace SakuraUpdater
         {
             InitializeComponent();
             Log("正在获取更新数据...");
-            Program.HttpGet("https://api.natfrp.com/launcher/get_version?legacy=" + (Program.UpdateLauncher == 2 ? "true" : "false")).ContinueWith(t =>
+            Program.HttpGet("https://api.natfrp.com/launcher/get_version?xml&legacy=" + (Program.UpdateLauncher == 2 ? "true" : "false")).ContinueWith(t =>
             {
                 if (t.Result == null)
                 {
@@ -34,31 +33,16 @@ namespace SakuraUpdater
                     using (var resp = t.Result)
                     using (var reader = new StreamReader(resp.GetResponseStream(), Encoding.UTF8))
                     {
-                        var json = JSON.ToObject<Dictionary<string, dynamic>>(reader.ReadToEnd());
-                        if (!json["success"])
-                        {
-                            Log(json["message"] as string ?? "出现未知错误, 请重试更新");
-                        }
-                        if (Program.UpdateFrpc)
+                        var xml = XDocument.Parse(reader.ReadToEnd());
+                        foreach (var task in xml.Element("tasks").Elements())
                         {
                             Jobs.Add(new UpdateJob()
                             {
-                                URL = json["frpc"]["url"] as string,
-                                Hash = json["frpc"]["hash"] as string,
-                                Name = "frpc " + json["frpc"]["version"] as string,
-                                Type = UpdateType.Binary,
-                                Target = "frpc.exe"
-                            });
-                        }
-                        if (Program.UpdateLauncher != 0)
-                        {
-                            Jobs.Add(new UpdateJob()
-                            {
-                                URL = json["launcher"]["url"] as string,
-                                Hash = json["launcher"]["hash"] as string,
-                                Name = (Program.UpdateLauncher == 2 ? "Legacy" : "SakuraFrp") + " Launcher " + json["launcher"]["version"] as string,
-                                Type = UpdateType.ZipPackage,
-                                Target = "./"
+                                URL = task.Attribute("url").Value,
+                                Hash = task.Attribute("hash").Value,
+                                Name = task.Attribute("name").Value,
+                                Type = (UpdateType)Enum.Parse(typeof(UpdateType), task.Attribute("type").Value, true),
+                                Target = task.Attribute("target").Value
                             });
                         }
                         Invoke(new Action(() =>
@@ -71,7 +55,7 @@ namespace SakuraUpdater
                                 Log("文件 Hash: " + j.Hash);
                             }
                             Log("-----");
-                            Log("请点击下方按钮开始更新");
+                            Log("请确认上述更新内容无误, 点击下方按钮开始更新");
                             button_start.Enabled = true;
                         }));
                     }

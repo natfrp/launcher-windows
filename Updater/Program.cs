@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Reflection;
+using System.Diagnostics;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 
@@ -17,6 +19,8 @@ namespace SakuraUpdater
         [STAThread]
         static void Main(string[] argv)
         {
+            Environment.CurrentDirectory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+
             foreach (var arg in argv)
             {
                 switch (arg)
