@@ -403,7 +403,7 @@ namespace SakuraLibrary.Model
             }
             // TODO: May check updater signature
             Daemon.Stop();
-            Process.Start("Updater.exe", string.Format("{0}{1}", Update.UpdateFrpc ? "-frpc " : "", Update.UpdateLauncher ? (legacy ? "-legacy" : "-launcher") : ""));
+            Process.Start("Updater.exe", string.Format("{0}{1}", Update.UpdateFrpc ? "-frpc " : "", Update.UpdateLauncher ? (legacy ? "-legacy -launch=legacy" : "-wpf -launch=wpf") : ""));
             Environment.Exit(0);
         }
 

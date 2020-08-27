@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Xml.Linq;
 using System.Threading;
+using System.Reflection;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.IO.Compression;
@@ -19,8 +20,13 @@ namespace SakuraUpdater
         public MainForm()
         {
             InitializeComponent();
+            Text += " v" + Assembly.GetExecutingAssembly().GetName().Version;
+
             Log("正在获取更新数据...");
-            Program.HttpGet("https://api.natfrp.com/launcher/get_version?xml&legacy=" + (Program.UpdateLauncher == 2 ? "true" : "false")).ContinueWith(t =>
+            Program.HttpGet("https://api.natfrp.com/launcher/get_version?xml" +
+                (Program.UpdateFrpc ? "&frpc" : "") +
+                (Program.UpdateLauncher == LauncherType.WPF ? "&launcher" : "") +
+                (Program.UpdateLauncher == LauncherType.Legacy ? "&legacy" : "")).ContinueWith(t =>
             {
                 if (t.Result == null)
                 {
@@ -40,7 +46,7 @@ namespace SakuraUpdater
                             {
                                 URL = task.Attribute("url").Value,
                                 Hash = task.Attribute("hash").Value,
-                                Name = task.Attribute("name").Value,
+                                Name = task.Attribute("name").Value + " v" + task.Attribute("version").Value,
                                 Type = (UpdateType)Enum.Parse(typeof(UpdateType), task.Attribute("type").Value, true),
                                 Target = task.Attribute("target").Value
                             });
@@ -50,9 +56,9 @@ namespace SakuraUpdater
                             foreach (var j in Jobs)
                             {
                                 Log("-----");
-                                Log("更新任务: " + j.Name);
-                                Log("文件URL: " + j.URL);
-                                Log("文件 Hash: " + j.Hash);
+                                Log(j.Name);
+                                Log("URL: " + j.URL);
+                                Log("Hash: " + j.Hash);
                             }
                             Log("-----");
                             Log("请确认上述更新内容无误, 点击下方按钮开始更新");
@@ -68,16 +74,14 @@ namespace SakuraUpdater
             });
         }
 
-        public void Log(object data)
+        private void Log(object data)
         {
             if (InvokeRequired)
             {
                 Invoke(new Action(() => Log(data)));
+                return;
             }
-            else
-            {
-                textBox_log.AppendText(DateTime.Now.ToString() + " " + data + Environment.NewLine);
-            }
+            textBox_log.AppendText(DateTime.Now.ToString() + " " + data + Environment.NewLine);
         }
 
         private void UpdateProgress(long complete, long total)
@@ -85,18 +89,16 @@ namespace SakuraUpdater
             if (InvokeRequired)
             {
                 Invoke(new Action(() => UpdateProgress(complete, total)));
+                return;
             }
-            else
-            {
-                progressBar_progress.Value = (int)((float)complete / total * 500);
-            }
+            progressBar_progress.Value = (int)((float)complete / total * 500);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (Working)
             {
-                if (MessageBox.Show("更新进行中, 取消操作可能导致文件损坏, 确定要退出吗?", "Oops", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
+                if (MessageBox.Show("更新进行中, 取消操作可能导致文件损坏, 确定要退出吗?", "确认", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
                 {
                     Environment.Exit(0);
                 }
@@ -108,7 +110,17 @@ namespace SakuraUpdater
         {
             if (button_start.Text != "开始更新")
             {
-                Process.Start(Program.UpdateLauncher == 2 ? "LegacyLauncher.exe" : "SakuraLauncher.exe");
+                switch (Program.LaunchLauncher)
+                {
+                case LauncherType.None:
+                    break;
+                case LauncherType.WPF:
+                    Process.Start("SakuraLauncher.exe");
+                    break;
+                case LauncherType.Legacy:
+                    Process.Start("LegacyLauncher.exe");
+                    break;
+                }
                 Close();
                 return;
             }
@@ -122,15 +134,8 @@ namespace SakuraUpdater
                     try
                     {
                         var sw = Stopwatch.StartNew();
-
                         var t = Program.HttpGet(job.URL);
                         t.Wait();
-                        if (t.Result == null)
-                        {
-                            Log("更新失败, 请重试");
-                            Log(t.Exception);
-                            continue;
-                        }
 
                         UpdateProgress(0, 1);
                         using (var ms = new MemoryStream())
@@ -144,7 +149,7 @@ namespace SakuraUpdater
                                 byte[] buffer = new byte[4096];
                                 long complete = 0, total = resp.ContentLength;
 
-                                Log("开始下载文件: " + Math.Round(total / 1024.0 / 1024, 2) + " MiB");
+                                Log("开始下载: " + Math.Round(total / 1024.0 / 1024, 2) + " MiB");
 
                                 while (complete < total)
                                 {
@@ -153,8 +158,8 @@ namespace SakuraUpdater
                                     hasher.TransformBlock(buffer, 0, count, null, 0);
                                     UpdateProgress(complete += count, total);
                                 }
-
                                 hasher.TransformFinalBlock(new byte[0], 0, 0);
+
                                 if (BitConverter.ToString(hasher.Hash).Replace("-", "").ToLowerInvariant() != job.Hash.ToLowerInvariant())
                                 {
                                     Log("更新失败: Hash 校验失败, 请重试");
@@ -200,12 +205,11 @@ namespace SakuraUpdater
                         continue;
                     }
                 }
-
-                Working = false;
-                Log("全部更新操作完成, 请点击下面的按钮打开启动器");
+                Log("操作完成, 请点击下方按钮" + (Program.LaunchLauncher == LauncherType.None ? "退出更新程序" : "打开启动器"));
                 Invoke(new Action(() =>
                 {
-                    button_start.Text = "打开启动器";
+                    Working = false;
+                    button_start.Text = Program.LaunchLauncher == LauncherType.None ? "退出" : "打开启动器";
                     button_start.Visible = true;
                 }));
             });

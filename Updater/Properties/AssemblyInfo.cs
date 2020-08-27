@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("SakuraFrp Updater")]
 [assembly: AssemblyDescription("SakuraFrp 客户端更新程序")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("FENGberd")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("")]
 [assembly: AssemblyCopyright("Copyright © FENGberd 2020")]
 [assembly: AssemblyTrademark("")]

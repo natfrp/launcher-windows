@@ -11,7 +11,7 @@ namespace SakuraUpdater
     static class Program
     {
         public static bool UpdateFrpc = false;
-        public static int UpdateLauncher = 0;
+        public static LauncherType UpdateLauncher = LauncherType.None, LaunchLauncher = LauncherType.None;
 
         /// <summary>
         /// 应用程序的主入口点。
@@ -23,16 +23,20 @@ namespace SakuraUpdater
 
             foreach (var arg in argv)
             {
-                switch (arg)
+                var split = arg.Split(new char[] { '=' }, 2);
+                switch (split[0])
                 {
-                case "-launcher":
-                    UpdateLauncher = 1;
+                case "-wpf":
+                    UpdateLauncher = LauncherType.WPF;
                     break;
                 case "-legacy":
-                    UpdateLauncher = 2;
+                    UpdateLauncher = LauncherType.Legacy;
                     break;
                 case "-frpc":
                     UpdateFrpc = true;
+                    break;
+                case "-launch":
+                    LaunchLauncher = split.Length > 1 && split[1] == "legacy" ? LauncherType.Legacy : LauncherType.WPF;
                     break;
                 }
             }
@@ -45,8 +49,9 @@ namespace SakuraUpdater
                 MessageBox.Show("SakuraFrp Updater v" + Assembly.GetExecutingAssembly().GetName().Version +
                     "\nUsage: SakuraUpdater <Args>" +
                     "\n-frpc\tUpdate frpc" +
+                    "\n-wpf\tUpdate SakuraLauncher" +
                     "\n-legacy\tUpdate LegacyLauncher" +
-                    "\n-launcher\tUpdate SakuraLauncher", "Usage", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    "\n-launch=<wpf|legacy>\tLaunch launcher after update", "Usage", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
