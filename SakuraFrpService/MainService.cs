@@ -30,6 +30,7 @@ namespace SakuraFrpService
         public readonly NodeManager NodeManager;
         public readonly TunnelManager TunnelManager;
         public readonly UpdateManager UpdateManager;
+        public readonly RemoteManager RemoteManager;
 
         public MainService(bool daemon)
         {
@@ -57,6 +58,7 @@ namespace SakuraFrpService
             NodeManager = new NodeManager(this);
             TunnelManager = new TunnelManager(this);
             UpdateManager = new UpdateManager(this);
+            RemoteManager = new RemoteManager(this);
         }
 
         public void Save()
@@ -179,6 +181,8 @@ namespace SakuraFrpService
 
                 PushUserInfo();
                 LogManager.Log(1, "Service", "用户登录成功");
+
+                RemoteManager.Start();
             }
             catch (Exception e)
             {
@@ -206,6 +210,7 @@ namespace SakuraFrpService
                 Properties.Settings.Default.LoggedIn = false;
                 TunnelManager.Stop();
                 NodeManager.Stop();
+                RemoteManager.Stop(true);
             }
             catch (Exception e)
             {
@@ -273,6 +278,7 @@ namespace SakuraFrpService
             try
             {
                 Pipe.Stop();
+                RemoteManager.Stop(true);
                 TunnelManager.Stop(true);
                 NodeManager.Stop(true);
                 if (TickThread != null)
@@ -299,7 +305,7 @@ namespace SakuraFrpService
             Message = message ?? ""
         };
 
-        private void Pipe_DataReceived(PipeConnection connection, int count)
+        public void Pipe_DataReceived(PipeConnection connection, int count)
         {
             try
             {

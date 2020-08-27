@@ -93,5 +93,41 @@ namespace SakuraFrpService.Properties {
                 this["BypassProxy"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EnableRemote {
+            get {
+                return ((bool)(this["EnableRemote"]));
+            }
+            set {
+                this["EnableRemote"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RemoteIdentifier {
+            get {
+                return ((string)(this["RemoteIdentifier"]));
+            }
+            set {
+                this["RemoteIdentifier"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RemoteKey {
+            get {
+                return ((string)(this["RemoteKey"]));
+            }
+            set {
+                this["RemoteKey"] = value;
+            }
+        }
     }
 }

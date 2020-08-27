@@ -26,7 +26,7 @@ namespace SakuraLibrary.Pipe
 
         public void Dispose() => Pipe?.Dispose();
 
-        public void Send(byte[] data) => Pipe.Write(data, 0, data.Length);
+        public virtual void Send(byte[] data) => Pipe.Write(data, 0, data.Length);
 
         public void SendProto(IMessage message) => Send(message.ToByteArray());
 
