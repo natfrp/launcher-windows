@@ -399,7 +399,7 @@ namespace SakuraFrpService
                         RemoteManager.EncryptKey = Sodium.PasswordHash.ArgonHashBinary(Encoding.UTF8.GetBytes(req.DataConfig.RemoteKeyNew), RemoteManager.SALT, 3, 268435456, 32);
                     }
                     RemoteManager.Enabled = req.DataConfig.RemoteManagement;
-                    if (RemoteManager.Enabled)
+                    if (RemoteManager.Enabled && UserInfo.Status == UserStatus.LoggedIn)
                     {
                         RemoteManager.Start();
                     }
