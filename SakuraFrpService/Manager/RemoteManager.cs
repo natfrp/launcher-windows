@@ -49,18 +49,22 @@ namespace SakuraFrpService.Manager
                         { "token", Natfrp.Token },
                         { "identifier", Identifier }
                     }))), WebSocketMessageType.Text, true, Source.Token).Wait();
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, "Service", "RemoteManager: 远程管理已连接");
 
                     byte[] nonce = new byte[24], buffer = new byte[8192], data = null;
                     var remote = new RemotePipeConnection();
-                    while (true)
+                    while (!Source.IsCancellationRequested)
                     {
                         var result = Socket.ReceiveAsync(new ArraySegment<byte>(buffer), Source.Token).WaitResult();
                         if (result.CloseStatus != null)
                         {
                             switch (result.CloseStatus.Value)
                             {
+                            case WebSocketCloseStatus.NormalClosure:
+                                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, "Service", "RemoteManager: 服务端正常断开 [" + result.CloseStatusDescription + "] 将在稍后重连");
+                                break;
                             case WebSocketCloseStatus.PolicyViolation:
-                                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 服务器拒绝请求, 已禁用远程控制功能: " + result.CloseStatusDescription);
+                                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 服务器拒绝请求, 已禁用远程管理功能: " + result.CloseStatusDescription);
                                 Stop();
                                 return;
                             case WebSocketCloseStatus.InternalServerError:
@@ -78,9 +82,9 @@ namespace SakuraFrpService.Manager
                             Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 数据长度异常");
                             continue;
                         }
-                        data = new byte[result.Count - 24];
-                        Buffer.BlockCopy(buffer, 0, nonce, 0, 24);
-                        Buffer.BlockCopy(buffer, 24, data, 0, data.Length);
+                        data = new byte[result.Count - nonce.Length];
+                        Buffer.BlockCopy(buffer, 0, nonce, 0, nonce.Length);
+                        Buffer.BlockCopy(buffer, nonce.Length, data, 0, data.Length);
 
                         try
                         {
@@ -88,7 +92,7 @@ namespace SakuraFrpService.Manager
                         }
                         catch
                         {
-                            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 数据解密失败, 原因可能为密钥错误");
+                            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 指令解密失败, 原因可能为密钥错误, 如果您无故看到此提示请检查账户是否被盗");
                             Socket.SendAsync(new ArraySegment<byte>(new byte[0]), WebSocketMessageType.Binary, true, Source.Token).Wait();
                             continue;
                         }
@@ -100,8 +104,8 @@ namespace SakuraFrpService.Manager
                         data = SecretBox.Create(remote.Buffer, nonce, EncryptKey);
 
                         var encrypted = new byte[data.Length + nonce.Length];
-                        Buffer.BlockCopy(nonce, 0, encrypted, 0, 24);
-                        Buffer.BlockCopy(data, 24, encrypted, 0, data.Length);
+                        Buffer.BlockCopy(nonce, 0, encrypted, 0, nonce.Length);
+                        Buffer.BlockCopy(data, 0, encrypted, nonce.Length, data.Length);
 
                         Socket.SendAsync(new ArraySegment<byte>(encrypted), WebSocketMessageType.Binary, true, Source.Token).Wait();
                     }
@@ -110,9 +114,15 @@ namespace SakuraFrpService.Manager
                 {
                     return;
                 }
+                catch (AggregateException e) when (e.InnerExceptions.Count == 1)
+                {
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, "Service", "RemoteManager: 未知错误, " + e.InnerExceptions[0].ToString());
+                    Socket.Dispose();
+                }
                 catch (Exception e)
                 {
                     Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, "Service", "RemoteManager: 未知错误, " + e.ToString());
+                    Socket.Dispose();
                 }
             }
             while (!AsyncManager.StopEvent.WaitOne(60 * 1000));

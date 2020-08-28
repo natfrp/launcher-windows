@@ -85,7 +85,11 @@ namespace SakuraLibrary.Pipe
                         Dispose();
                     }
                 }
-                return null;
+                return new ResponseBase()
+                {
+                    Success = false,
+                    Message = "未连接到守护进程"
+                };
             }
         }
 

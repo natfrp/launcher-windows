@@ -10,6 +10,7 @@ using SakuraLibrary.Pipe;
 using SakuraLibrary.Proto;
 using UserStatus = SakuraLibrary.Proto.User.Types.Status;
 
+using SakuraFrpService.Data;
 using SakuraFrpService.Manager;
 using Tunnel = SakuraFrpService.Data.Tunnel;
 
@@ -311,11 +312,17 @@ namespace SakuraFrpService
             {
                 var req = RequestBase.Parser.ParseFrom(connection.Buffer, 0, count);
                 var resp = ResponseBase(true);
+                var blockSensitive = connection is RemotePipeConnection;
 
                 switch (req.Type)
                 {
                 case MessageID.UserLogin:
                     {
+                        if (blockSensitive)
+                        {
+                            connection.RespondFailure("远程控制无法执行该操作");
+                            return;
+                        }
                         var result = Login(req.DataUserLogin.Token).WaitResult();
                         if (result != null)
                         {
@@ -326,6 +333,11 @@ namespace SakuraFrpService
                     break;
                 case MessageID.UserLogout:
                     {
+                        if (blockSensitive)
+                        {
+                            connection.RespondFailure("远程控制无法执行该操作");
+                            return;
+                        }
                         var result = Logout();
                         if (result != null)
                         {
@@ -348,9 +360,19 @@ namespace SakuraFrpService
                     LogManager.Clear();
                     break;
                 case MessageID.ControlExit:
+                    if (blockSensitive)
+                    {
+                        connection.RespondFailure("远程控制无法执行该操作");
+                        return;
+                    }
                     Stop();
                     return;
                 case MessageID.ControlConfigGet:
+                    if (blockSensitive)
+                    {
+                        connection.RespondFailure("远程控制无法执行该操作");
+                        return;
+                    }
                     resp.DataConfig = new ServiceConfig()
                     {
                         BypassProxy = Natfrp.BypassProxy,
@@ -358,14 +380,29 @@ namespace SakuraFrpService
                     };
                     break;
                 case MessageID.ControlConfigSet:
+                    if (blockSensitive)
+                    {
+                        connection.RespondFailure("远程控制无法执行该操作");
+                        return;
+                    }
                     Natfrp.BypassProxy = req.DataConfig.BypassProxy;
                     UpdateManager.UpdateInterval = req.DataConfig.UpdateInterval;
                     Save();
                     break;
                 case MessageID.ControlCheckUpdate:
+                    if (blockSensitive)
+                    {
+                        connection.RespondFailure("远程控制无法执行该操作");
+                        return;
+                    }
                     resp.DataUpdate = UpdateManager.CheckUpdate().WaitResult();
                     break;
                 case MessageID.ControlGetUpdate:
+                    if (blockSensitive)
+                    {
+                        connection.RespondFailure("远程控制无法执行该操作");
+                        return;
+                    }
                     resp.DataUpdate = UpdateManager.Status;
                     break;
                 default:
