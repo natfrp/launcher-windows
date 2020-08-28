@@ -108,22 +108,9 @@ namespace SakuraFrpService.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string RemoteIdentifier {
+        public byte[] RemoteKey {
             get {
-                return ((string)(this["RemoteIdentifier"]));
-            }
-            set {
-                this["RemoteIdentifier"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string RemoteKey {
-            get {
-                return ((string)(this["RemoteKey"]));
+                return ((byte[])(this["RemoteKey"]));
             }
             set {
                 this["RemoteKey"] = value;

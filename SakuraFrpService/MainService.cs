@@ -59,7 +59,11 @@ namespace SakuraFrpService
             NodeManager = new NodeManager(this);
             TunnelManager = new TunnelManager(this);
             UpdateManager = new UpdateManager(this);
-            RemoteManager = new RemoteManager(this);
+            RemoteManager = new RemoteManager(this)
+            {
+                Enabled = settings.EnableRemote,
+                EncryptKey = settings.RemoteKey
+            };
         }
 
         public void Save()
@@ -80,6 +84,9 @@ namespace SakuraFrpService
                 settings.UpdateInterval = UpdateManager.UpdateInterval;
             }
             settings.BypassProxy = Natfrp.BypassProxy;
+
+            settings.RemoteKey = RemoteManager.EncryptKey;
+            settings.EnableRemote = RemoteManager.Enabled;
 
             settings.Save();
         }
@@ -376,7 +383,9 @@ namespace SakuraFrpService
                     resp.DataConfig = new ServiceConfig()
                     {
                         BypassProxy = Natfrp.BypassProxy,
-                        UpdateInterval = UpdateManager.UpdateInterval
+                        UpdateInterval = UpdateManager.UpdateInterval,
+                        RemoteManagement = RemoteManager.Running,
+                        RemoteKeySet = RemoteManager.EncryptKey != null && RemoteManager.EncryptKey.Length > 0
                     };
                     break;
                 case MessageID.ControlConfigSet:
@@ -384,6 +393,19 @@ namespace SakuraFrpService
                     {
                         connection.RespondFailure("远程控制无法执行该操作");
                         return;
+                    }
+                    if (req.DataConfig.RemoteKeyNew != "")
+                    {
+                        RemoteManager.EncryptKey = Sodium.PasswordHash.ArgonHashBinary(Encoding.UTF8.GetBytes(req.DataConfig.RemoteKeyNew), RemoteManager.SALT, 3, 268435456, 32);
+                    }
+                    RemoteManager.Enabled = req.DataConfig.RemoteManagement;
+                    if (RemoteManager.Enabled)
+                    {
+                        RemoteManager.Start();
+                    }
+                    else
+                    {
+                        RemoteManager.Stop();
                     }
                     Natfrp.BypassProxy = req.DataConfig.BypassProxy;
                     UpdateManager.UpdateInterval = req.DataConfig.UpdateInterval;

@@ -46,6 +46,8 @@ namespace SakuraLauncher.View
 
         private void ButtonSwitchMode_Click(object sender, RoutedEventArgs e) => Model.SwitchWorkingMode(Model.SimpleHandler, Model.SimpleConfirmHandler);
 
+        private void ButtonRemotePassword_Click(object sender, RoutedEventArgs e) => new RemoteConfigWindow(Model).Show();
+
         private void Save(object sender, RoutedEventArgs e) => Model.Save();
 
         private void ButtonLOL_Click(object sender, RoutedEventArgs e) => Process.Start(Path.GetDirectoryName(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath));

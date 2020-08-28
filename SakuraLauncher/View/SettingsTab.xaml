@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             d:DesignHeight="315" d:DesignWidth="580">
+             d:DesignHeight="600" d:DesignWidth="580">
     <StackPanel>
         <TextBlock Foreground="#DDFFFFFF" FontSize="26" Margin="24,0,0,0">设置</TextBlock>
         <StackPanel Orientation="Horizontal" Margin="24,8,0,0">
@@ -192,6 +192,18 @@
                     </TextBlock>
                 </StackPanel>
             </Button>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="24,8,0,0">
+            <ToggleButton IsChecked="{Binding RemoteManagement}" IsEnabled="{Binding CanEnableRemoteManagement}"/>
+            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">启用远程管理</TextBlock>
+            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="通过 Sakura Frp 管理启动器, 该功能由端到端加密保护, 启用前需先设置密码" ToolTipService.InitialShowDelay="0">
+                <materialDesign:PackIcon Kind="HelpCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+            </TextBlock>
+            <Button Margin="16,0,0,0" Click="ButtonRemotePassword_Click" Content="设置密码" Style="{StaticResource MaterialDesignFlatButton}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="24,8,0,0">
             <Button Click="ButtonLOL_Click" Style="{StaticResource MaterialDesignFlatButton}" Content="不要点这个"/>

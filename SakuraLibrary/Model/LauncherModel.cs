@@ -341,6 +341,27 @@ namespace SakuraLibrary.Model
 
         // Update Checking
 
+        [SourceBinding(nameof(Config))]
+        public bool RemoteManagement
+        {
+            get => Config != null && Config.RemoteManagement;
+            set
+            {
+                if (Config != null)
+                {
+                    if (!value || Config.RemoteKeySet)
+                    {
+                        Config.RemoteManagement = value;
+                    }
+                    PushServiceConfig();
+                }
+                RaisePropertyChanged();
+            }
+        }
+
+        [SourceBinding(nameof(Config))]
+        public bool CanEnableRemoteManagement => Config != null && Config.RemoteKeySet;
+
         public UpdateStatus Update { get => _update; set => SafeSet(out _update, value); }
         private UpdateStatus _update;
 

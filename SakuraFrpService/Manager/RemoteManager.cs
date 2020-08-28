@@ -24,8 +24,9 @@ namespace SakuraFrpService.Manager
         public readonly MainService Main;
         public readonly AsyncManager AsyncManager;
 
-        protected byte[] EncryptKey = null;
-        protected string Identifier = "";
+        public bool Enabled = false;
+        public byte[] EncryptKey = null;
+        protected string Identifier = Environment.MachineName;
 
         protected ClientWebSocket Socket = null;
         protected CancellationTokenSource Source = null;
@@ -134,14 +135,10 @@ namespace SakuraFrpService.Manager
 
         public void Start()
         {
-            var settings = Properties.Settings.Default;
-            if (!settings.EnableRemote)
+            if (!Enabled || Running)
             {
                 return;
             }
-            Identifier = settings.RemoteIdentifier;
-            EncryptKey = PasswordHash.ArgonHashBinary(Encoding.UTF8.GetBytes(settings.RemoteKey), SALT, 3, 268435456, 32);
-
             Source = new CancellationTokenSource();
             AsyncManager.Start();
         }

@@ -1,0 +1,33 @@
+﻿<Window x:Class="SakuraLauncher.RemoteConfigWindow" mc:Ignorable="d"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.FontSize="15"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}" 
+        TextElement.FontWeight="Regular"
+        TextOptions.TextRenderingMode="Auto"
+        TextOptions.TextFormattingMode="Ideal" 
+        Background="{StaticResource MaterialDesignPaper}"
+        Title="远程管理配置" Width="440" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner">
+    <StackPanel>
+        <materialDesign:Card Margin="16" Padding="8">
+            <StackPanel>
+                <TextBox materialDesign:HintAssist.Hint="管理密码" x:Name="password" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding TunnelName}"/>
+                <TextBlock Padding="8" TextWrapping="WrapWithOverflow">
+                    该功能为高级功能，我们不推荐普通用户启用该功能，并且不为启用此功能造成的任何后果承担任何责任
+                    <LineBreak/>
+                    远程管理采用端到端加密进行通信，请设置一个安全的密码来确保其他人无法控制您的启动器
+                </TextBlock>
+                <CheckBox x:Name="agreement" Margin="8">
+                    <TextBlock TextWrapping="WrapWithOverflow">
+                        我已仔细阅读上述内容，并且同意承担该功能可能带来的安全风险
+                    </TextBlock>
+                </CheckBox>
+            </StackPanel>
+        </materialDesign:Card>
+        <Button Margin="16,0,16,16" Style="{StaticResource MaterialDesignRaisedDarkButton}" Click="ButtonUpdate_Click" Content="更新"/>
+    </StackPanel>
+</Window>

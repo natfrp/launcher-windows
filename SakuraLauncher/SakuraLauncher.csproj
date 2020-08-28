@@ -97,6 +97,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RemoteConfigWindow.xaml.cs">
+      <DependentUpon>RemoteConfigWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\LogTab.xaml.cs">
       <DependentUpon>LogTab.xaml</DependentUpon>
     </Compile>
@@ -125,6 +128,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="RemoteConfigWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Theme\Teal.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

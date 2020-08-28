@@ -16,6 +16,9 @@ message LogList { repeated Log data = 3; }
 message ServiceConfig {
   bool bypass_proxy = 1;
   int32 update_interval = 2;
+  bool remote_management = 3;
+  bool remote_key_set = 4;
+  string remote_key_new = 5;
 }
 
 message UpdateStatus {

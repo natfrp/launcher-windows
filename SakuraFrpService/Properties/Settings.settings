@@ -23,10 +23,7 @@
     <Setting Name="EnableRemote" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="RemoteIdentifier" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="RemoteKey" Type="System.String" Scope="User">
+    <Setting Name="RemoteKey" Type="System.Byte[]" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>
