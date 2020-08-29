@@ -132,11 +132,17 @@ namespace SakuraLauncher
 
         private void TrayMenu_Show(object sender, RoutedEventArgs e) => MainWindow.Show();
 
-        private void TrayMenu_Exit(object sender, RoutedEventArgs e) => Environment.Exit(0);
+        private void TrayMenu_Exit(object sender, RoutedEventArgs e)
+        {
+            (MainWindow as MainWindow).trayIcon.Visibility = Visibility.Collapsed;
+            Environment.Exit(0);
+        }
 
         private void TrayMenu_ExitAll(object sender, RoutedEventArgs e)
         {
-            (MainWindow as MainWindow).Model.Daemon.Stop();
+            var main = MainWindow as MainWindow;
+            main.trayIcon.Visibility = Visibility.Collapsed;
+            main.Model.Daemon.Stop();
             Environment.Exit(0);
         }
     }
