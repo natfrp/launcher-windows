@@ -209,15 +209,6 @@ namespace SakuraFrpService.Manager
             }
         }
 
-        public new void Clear()
-        {
-            lock (this)
-            {
-                StopAll();
-                base.Clear();
-            }
-        }
-
         public new void Remove(int k)
         {
             lock (this)
@@ -261,6 +252,7 @@ namespace SakuraFrpService.Manager
                 }
                 catch { }
             }
+            Clear();
         }
 
         #endregion

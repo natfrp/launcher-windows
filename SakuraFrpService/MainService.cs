@@ -232,6 +232,7 @@ namespace SakuraFrpService
                 }
                 Save();
                 PushUserInfo();
+                TunnelManager.Push();
             }
             LogManager.Log(1, "Service", "已退出登录");
             return null;

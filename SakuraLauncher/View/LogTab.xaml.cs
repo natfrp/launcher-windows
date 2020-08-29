@@ -25,10 +25,7 @@ namespace SakuraLauncher.View
         private void ButtonClear_Click(object sender, RoutedEventArgs e)
         {
             Model.Logs.Clear();
-            Model.Pipe.Request(new RequestBase()
-            {
-                Type = MessageID.LogClear
-            });
+            Model.Pipe.Request(MessageID.LogClear);
         }
 
         private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)

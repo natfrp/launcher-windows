@@ -477,7 +477,12 @@ namespace SakuraLibrary.Model
                 callback(false, "更新程序不存在, 操作无法继续\n请重新下载完整的启动器手动覆盖当前版本");
                 return;
             }
-            // TODO: May check updater signature
+            if (!WinTrust.VerifyFile("Updater.exe"))
+            {
+                callback(false, "@@@@@@@@@@@@@@@@@@\n       !!!  错误: 更新程序签名验证失败  !!!\n@@@@@@@@@@@@@@@@@@\n\n" +
+                    "您使用的更新程序未能通过签名验证, 该文件可能已损坏或被纂改\n您的电脑可能已经被病毒感染, 建议立即进行杀毒并重新下载完整的启动器压缩包覆盖当前版本");
+                return;
+            }
             Daemon.Stop();
             Process.Start("Updater.exe", string.Format("{0}{1}", Update.UpdateFrpc ? "-frpc " : "", Update.UpdateLauncher ? (legacy ? "-legacy -launch=legacy" : "-wpf -launch=wpf") : ""));
             Environment.Exit(0);
