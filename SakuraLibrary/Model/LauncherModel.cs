@@ -35,7 +35,6 @@ namespace SakuraLibrary.Model
         public abstract void ClearLog();
 
         public abstract void Save();
-        public abstract void Load();
 
         #region Daemon Sync
 
@@ -310,8 +309,8 @@ namespace SakuraLibrary.Model
         [SourceBinding(nameof(UserInfo))]
         public bool LoggedIn => UserInfo.Status == UserStatus.LoggedIn;
 
-        [SourceBinding(nameof(LoggingIn))]
-        public bool TokenEditable => !LoggingIn;
+        [SourceBinding(nameof(LoggingIn), nameof(LoggedIn))]
+        public bool TokenEditable => !LoggingIn && !LoggedIn;
 
         [SourceBinding(nameof(UserInfo))]
         public bool LoggingIn { get => _loggingIn || UserInfo.Status == UserStatus.Pending; set => SafeSet(out _loggingIn, value); }

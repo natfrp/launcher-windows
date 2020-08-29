@@ -35,7 +35,19 @@ namespace SakuraLauncher.Model
             View = view;
             Dispatcher = new DispatcherWrapper(View.Dispatcher.Invoke, a => View.Dispatcher.BeginInvoke(a), View.Dispatcher.CheckAccess);
 
-            Load();
+            var settings = Properties.Settings.Default;
+            if (settings.UpgradeRequired)
+            {
+                settings.Upgrade();
+                settings.UpgradeRequired = false;
+                settings.Save();
+            }
+
+            View.Width = settings.Width;
+            View.Height = settings.Height;
+
+            SuppressInfo = settings.SuppressInfo;
+            LogTextWrapping = settings.LogTextWrapping;
         }
 
         public override void ClearLog() => Dispatcher.Invoke(() => Logs.Clear());
@@ -107,17 +119,6 @@ namespace SakuraLauncher.Model
                 Logs.Add(entry);
                 while (Logs.Count > 4096) Logs.RemoveAt(0);
             });
-        }
-
-        public override void Load()
-        {
-            var settings = Properties.Settings.Default;
-
-            View.Width = settings.Width;
-            View.Height = settings.Height;
-
-            SuppressInfo = settings.SuppressInfo;
-            LogTextWrapping = settings.LogTextWrapping;
         }
 
         public override void Save()
