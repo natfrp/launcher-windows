@@ -415,8 +415,8 @@ namespace SakuraLibrary.Model
             }
         }
 
-        [SourceBinding(nameof(Config))]
-        public bool CanEnableRemoteManagement => Config != null && Config.RemoteKeySet;
+        [SourceBinding(nameof(Config), nameof(LoggedIn))]
+        public bool CanEnableRemoteManagement => LoggedIn && Config != null && Config.RemoteKeySet;
 
         public UpdateStatus Update { get => _update; set => SafeSet(out _update, value); }
         private UpdateStatus _update;
