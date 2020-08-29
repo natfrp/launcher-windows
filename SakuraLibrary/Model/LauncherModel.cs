@@ -32,30 +32,76 @@ namespace SakuraLibrary.Model
         }
 
         public abstract void Log(Log l, bool init = false);
+        public abstract void ClearLog();
 
         public abstract void Save();
         public abstract void Load();
 
-        public virtual bool Refresh()
+        #region Daemon Sync
+
+        public bool SyncUser()
         {
-            // TODO: May merge the following request into single one
-            var logs = Pipe.Request(MessageID.LogGet);
-            var config = Pipe.Request(MessageID.ControlConfigGet);
-            var update = Pipe.Request(MessageID.ControlGetUpdate);
-            if (!logs.Success || !config.Success || !update.Success)
+            var user = Pipe.Request(MessageID.UserInfo);
+            if (user.Success)
+            {
+                UserInfo = user.DataUser;
+            }
+            return user.Success;
+        }
+
+        /// <summary>
+        /// Sync all with daemon except UserInfo
+        /// </summary>
+        public virtual bool SyncAll()
+        {
+            if (!SyncLog() || !SyncConfig() || !SyncUpdate())
             {
                 return false;
             }
-            Dispatcher.Invoke(() =>
-            {
-                foreach (var l in logs.DataLog.Data)
-                {
-                    Log(l, true);
-                }
-                Config = config.DataConfig;
-                Update = update.DataUpdate;
-            });
+            SyncNodes();
+            SyncTunnels();
+            return true;
+        }
 
+        public bool SyncLog()
+        {
+            var logs = Pipe.Request(MessageID.LogGet);
+            if (logs.Success)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    ClearLog();
+                    foreach (var l in logs.DataLog.Data)
+                    {
+                        Log(l, true);
+                    }
+                });
+            }
+            return logs.Success;
+        }
+
+        public bool SyncConfig()
+        {
+            var config = Pipe.Request(MessageID.ControlConfigGet);
+            if (config.Success)
+            {
+                Config = config.DataConfig;
+            }
+            return config.Success;
+        }
+
+        public bool SyncUpdate()
+        {
+            var update = Pipe.Request(MessageID.ControlGetUpdate);
+            if (update.Success)
+            {
+                Update = update.DataUpdate;
+            }
+            return update.Success;
+        }
+
+        public bool SyncNodes()
+        {
             var nodes = Pipe.Request(MessageID.NodeList);
             if (nodes.Success)
             {
@@ -66,17 +112,22 @@ namespace SakuraLibrary.Model
                     {
                         Nodes.Add(new NodeModel(n));
                     }
-                    Config = config.DataConfig;
                 });
             }
+            return nodes.Success;
+        }
 
+        public bool SyncTunnels()
+        {
             var tunnels = Pipe.Request(MessageID.TunnelList);
             if (tunnels.Success)
             {
                 LoadTunnels(tunnels.DataTunnels);
             }
-            return true;
+            return tunnels.Success;
         }
+
+        #endregion
 
         #region IPC Handling
 
@@ -96,21 +147,11 @@ namespace SakuraLibrary.Model
                     {
                         continue;
                     }
-
-                    var user = Pipe.Request(MessageID.UserInfo);
-                    if (!user.Success)
+                    if (!SyncUser() || !SyncAll())
                     {
                         Pipe.Dispose();
                         continue;
                     }
-                    UserInfo = user.DataUser;
-
-                    if (!Refresh())
-                    {
-                        Pipe.Dispose();
-                        continue;
-                    }
-
                     Connected = true;
                 }
             }
@@ -295,7 +336,7 @@ namespace SakuraLibrary.Model
                         }
                     });
                     callback(resp.Success, resp.Message);
-                    Refresh();
+                    SyncAll();
                 }
                 catch (Exception e)
                 {
@@ -336,11 +377,23 @@ namespace SakuraLibrary.Model
             }
         }
 
-        public ResponseBase PushServiceConfig() => Pipe.Request(new RequestBase()
+        public void PushServiceConfig()
         {
-            Type = MessageID.ControlConfigSet,
-            DataConfig = Config
-        });
+            var result = Pipe.Request(new RequestBase()
+            {
+                Type = MessageID.ControlConfigSet,
+                DataConfig = Config
+            });
+            if (!result.Success)
+            {
+                Log(new Log()
+                {
+                    Category = 3,
+                    Source = "Launcher",
+                    Data = "无法更新守护进程配置: " + result.Message
+                });
+            }
+        }
 
         // Update Checking
 

@@ -38,6 +38,8 @@ namespace SakuraLauncher.Model
             Load();
         }
 
+        public override void ClearLog() => Dispatcher.Invoke(() => Logs.Clear());
+
         public override void Log(Log l, bool init)
         {
             var entry = new LogModel()
@@ -100,8 +102,11 @@ namespace SakuraLauncher.Model
                     break;
                 }
             }
-            Logs.Add(entry);
-            while (Logs.Count > 4096) Logs.RemoveAt(0);
+            Dispatcher.Invoke(() =>
+            {
+                Logs.Add(entry);
+                while (Logs.Count > 4096) Logs.RemoveAt(0);
+            });
         }
 
         public override void Load()
@@ -134,9 +139,9 @@ namespace SakuraLauncher.Model
             settings.Save();
         }
 
-        public override bool Refresh()
+        public override bool SyncAll()
         {
-            if (base.Refresh())
+            if (base.SyncAll())
             {
                 SwitchTab(LoggedIn ? 0 : 2);
                 return true;

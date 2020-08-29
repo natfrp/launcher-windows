@@ -25,6 +25,11 @@ namespace LegacyLauncher.Model
             Dispatcher = new DispatcherWrapper(a => View.Invoke(a), a => View.BeginInvoke(a), () => !View.InvokeRequired);
         }
 
+        public override void ClearLog()
+        {
+
+        }
+
         public override void Log(Log l, bool init)
         {
 
