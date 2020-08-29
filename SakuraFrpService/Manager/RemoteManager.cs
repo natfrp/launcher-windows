@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Net.WebSockets;
@@ -16,6 +17,8 @@ namespace SakuraFrpService.Manager
 {
     public class RemoteManager : IAsyncManager
     {
+        public const int OVERHEAD = 3;
+        public const string REMOTE_VERSION = "SAKURA_1";
         public static readonly byte[] SALT = new byte[]
         {
             0xc5, 0x23, 0xa3, 0xfe, 0x56, 0xee, 0x5b, 0x76, 0x77, 0x30, 0x99, 0x8d, 0x7c, 0xb6, 0x22, 0xc8
@@ -43,6 +46,7 @@ namespace SakuraFrpService.Manager
             await Socket.ConnectAsync(new Uri("ws://remote.natfrp.com:2333"), Source.Token);
             await Socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new Dictionary<string, object>
             {
+                { "version", REMOTE_VERSION },
                 { "token", Natfrp.Token },
                 { "identifier", Identifier }
             }))), WebSocketMessageType.Text, true, Source.Token);
@@ -50,11 +54,30 @@ namespace SakuraFrpService.Manager
             Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, "Service", "RemoteManager: 远程管理已连接");
 
             var remote = new RemotePipeConnection();
-            byte[] nonce = new byte[24], buffer = new byte[8192], data = null;
 
+            byte[] buffer = new byte[8192];
             while (!Source.IsCancellationRequested)
             {
-                var result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), Source.Token);
+                // Ensure message is complete
+                int length = 0;
+                WebSocketReceiveResult result = null;
+                while (true)
+                {
+                    result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer, length, buffer.Length - length), Source.Token);
+                    length += result.Count;
+                    if (result.EndOfMessage)
+                    {
+                        break;
+                    }
+                    else if (length >= buffer.Length)
+                    {
+                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 接收到过长消息, 已断开服务器连接, 将在稍后重连");
+                        await Socket.CloseAsync(WebSocketCloseStatus.MessageTooBig, "消息过长", Source.Token);
+                        return;
+                    }
+                }
+
+                // Handle close message
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
                     switch (result.CloseStatus.Value)
@@ -74,40 +97,65 @@ namespace SakuraFrpService.Manager
                         break;
                     }
                     await Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, Source.Token);
-                    break;
+                    return;
                 }
-                else if (result.Count < 24)
+
+                // Hmm, ensure something unexpected won't crash the socket
+                if (length < OVERHEAD)
                 {
-                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 数据长度异常");
-                    continue;
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 收到过短的消息");
+                    return;
                 }
 
-                data = new byte[result.Count - nonce.Length];
-                Buffer.BlockCopy(buffer, 0, nonce, 0, nonce.Length);
-                Buffer.BlockCopy(buffer, nonce.Length, data, 0, data.Length);
-
-                try
+                // Process payload
+                using (var ms = new MemoryStream())
                 {
-                    data = SecretBox.Open(data, nonce, EncryptKey);
+                    ms.Write(buffer, 0, OVERHEAD);
+                    switch (buffer[0])
+                    {
+                    case 0x01: // Heartbeat
+                        if (length != OVERHEAD)
+                        {
+                            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 心跳包长度异常");
+                            continue;
+                        }
+                        break;
+                    case 0x02: // Remote Command
+                        if (length < 24 + OVERHEAD)
+                        {
+                            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 收到过短的指令");
+                            continue;
+                        }
+
+                        byte[] nonce = new byte[24], data = new byte[length - nonce.Length - OVERHEAD];
+
+                        Buffer.BlockCopy(buffer, OVERHEAD, nonce, 0, nonce.Length);
+                        Buffer.BlockCopy(buffer, nonce.Length + OVERHEAD, data, 0, data.Length);
+
+                        try
+                        {
+                            data = SecretBox.Open(data, nonce, EncryptKey);
+                        }
+                        catch
+                        {
+                            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 指令解密失败, 原因可能为密钥错误, 如果您无故看到此错误请检查账户是否被盗");
+                            break;
+                        }
+                        remote.Buffer = data;
+                        Main.Pipe_DataReceived(remote, data.Length);
+
+                        nonce = SecretBox.GenerateNonce();
+                        ms.Write(nonce, 0, nonce.Length);
+
+                        data = SecretBox.Create(remote.Buffer, nonce, EncryptKey);
+                        ms.Write(data, 0, data.Length);
+                        break;
+                    default:
+                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 收到未知消息");
+                        continue;
+                    }
+                    await Socket.SendAsync(new ArraySegment<byte>(ms.ToArray()), WebSocketMessageType.Binary, true, Source.Token);
                 }
-                catch
-                {
-                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 指令解密失败, 原因可能为密钥错误, 如果您无故看到此错误请检查账户是否被盗");
-                    await Socket.SendAsync(new ArraySegment<byte>(new byte[0]), WebSocketMessageType.Binary, true, Source.Token);
-                    continue;
-                }
-
-                remote.Buffer = data;
-                Main.Pipe_DataReceived(remote, data.Length);
-
-                nonce = SecretBox.GenerateNonce();
-                data = SecretBox.Create(remote.Buffer, nonce, EncryptKey);
-
-                var encrypted = new byte[data.Length + nonce.Length];
-                Buffer.BlockCopy(nonce, 0, encrypted, 0, nonce.Length);
-                Buffer.BlockCopy(data, 0, encrypted, nonce.Length, data.Length);
-
-                await Socket.SendAsync(new ArraySegment<byte>(encrypted), WebSocketMessageType.Binary, true, Source.Token);
             }
         }
 
