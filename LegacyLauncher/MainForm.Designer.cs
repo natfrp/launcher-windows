@@ -45,12 +45,15 @@
             this.notifyIcon_tray = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip_tray = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem_show = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem_exit = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuItem_exitAll = new System.Windows.Forms.ToolStripMenuItem();
             this.button_clear = new System.Windows.Forms.Button();
             this.contextMenuStrip_tunnel = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem_delete = new System.Windows.Forms.ToolStripMenuItem();
             this.checkBox_textwrap = new System.Windows.Forms.CheckBox();
             this.checkBox_update = new System.Windows.Forms.CheckBox();
+            this.label_update = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.launcherModelBindingSource)).BeginInit();
             this.contextMenuStrip_tray.SuspendLayout();
             this.contextMenuStrip_tunnel.SuspendLayout();
@@ -110,10 +113,8 @@
             this.textBox_token.DataBindings.Add(new System.Windows.Forms.Binding("Enabled", this.launcherModelBindingSource, "TokenEditable", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.textBox_token.Location = new System.Drawing.Point(311, 11);
             this.textBox_token.Name = "textBox_token";
-            this.textBox_token.PasswordChar = '*';
             this.textBox_token.Size = new System.Drawing.Size(129, 21);
             this.textBox_token.TabIndex = 1;
-            this.textBox_token.TextChanged += new System.EventHandler(this.textBox_token_TextChanged);
             // 
             // checkBox_autorun
             // 
@@ -160,8 +161,9 @@
             // textBox_log
             // 
             this.textBox_log.BackColor = System.Drawing.Color.Black;
-            this.textBox_log.Font = new System.Drawing.Font("Consolas", 9F);
-            this.textBox_log.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.textBox_log.DataBindings.Add(new System.Windows.Forms.Binding("WordWrap", this.launcherModelBindingSource, "LogTextWrapping", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.textBox_log.Font = new System.Drawing.Font("Consolas", 10F);
+            this.textBox_log.ForeColor = System.Drawing.Color.Silver;
             this.textBox_log.Location = new System.Drawing.Point(12, 258);
             this.textBox_log.Multiline = true;
             this.textBox_log.Name = "textBox_log";
@@ -181,23 +183,37 @@
             // 
             this.contextMenuStrip_tray.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem_show,
-            this.toolStripMenuItem_exit});
+            this.toolStripMenuItem1,
+            this.toolStripMenuItem_exit,
+            this.ToolStripMenuItem_exitAll});
             this.contextMenuStrip_tray.Name = "contextMenuStrip1";
-            this.contextMenuStrip_tray.Size = new System.Drawing.Size(101, 48);
+            this.contextMenuStrip_tray.Size = new System.Drawing.Size(125, 76);
             // 
             // toolStripMenuItem_show
             // 
             this.toolStripMenuItem_show.Name = "toolStripMenuItem_show";
-            this.toolStripMenuItem_show.Size = new System.Drawing.Size(100, 22);
+            this.toolStripMenuItem_show.Size = new System.Drawing.Size(124, 22);
             this.toolStripMenuItem_show.Text = "显示";
             this.toolStripMenuItem_show.Click += new System.EventHandler(this.toolStripMenuItem_show_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(121, 6);
             // 
             // toolStripMenuItem_exit
             // 
             this.toolStripMenuItem_exit.Name = "toolStripMenuItem_exit";
-            this.toolStripMenuItem_exit.Size = new System.Drawing.Size(100, 22);
+            this.toolStripMenuItem_exit.Size = new System.Drawing.Size(124, 22);
             this.toolStripMenuItem_exit.Text = "退出";
             this.toolStripMenuItem_exit.Click += new System.EventHandler(this.toolStripMenuItem_exit_Click);
+            // 
+            // ToolStripMenuItem_exitAll
+            // 
+            this.ToolStripMenuItem_exitAll.Name = "ToolStripMenuItem_exitAll";
+            this.ToolStripMenuItem_exitAll.Size = new System.Drawing.Size(124, 22);
+            this.ToolStripMenuItem_exitAll.Text = "彻底退出";
+            this.ToolStripMenuItem_exitAll.Click += new System.EventHandler(this.ToolStripMenuItem_exitAll_Click);
             // 
             // button_clear
             // 
@@ -228,6 +244,7 @@
             this.checkBox_textwrap.AutoSize = true;
             this.checkBox_textwrap.Checked = true;
             this.checkBox_textwrap.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox_textwrap.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.launcherModelBindingSource, "LogTextWrapping", true));
             this.checkBox_textwrap.Location = new System.Drawing.Point(90, 14);
             this.checkBox_textwrap.Name = "checkBox_textwrap";
             this.checkBox_textwrap.Size = new System.Drawing.Size(72, 16);
@@ -241,6 +258,7 @@
             this.checkBox_update.AutoSize = true;
             this.checkBox_update.Checked = true;
             this.checkBox_update.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox_update.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.launcherModelBindingSource, "CheckUpdate", true));
             this.checkBox_update.Location = new System.Drawing.Point(168, 14);
             this.checkBox_update.Name = "checkBox_update";
             this.checkBox_update.Size = new System.Drawing.Size(72, 16);
@@ -249,11 +267,27 @@
             this.checkBox_update.UseVisualStyleBackColor = true;
             this.checkBox_update.CheckedChanged += new System.EventHandler(this.checkBox_update_CheckedChanged);
             // 
+            // label_update
+            // 
+            this.label_update.BackColor = System.Drawing.Color.Teal;
+            this.label_update.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.label_update.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label_update.ForeColor = System.Drawing.Color.White;
+            this.label_update.Location = new System.Drawing.Point(0, 492);
+            this.label_update.Name = "label_update";
+            this.label_update.Size = new System.Drawing.Size(665, 31);
+            this.label_update.TabIndex = 13;
+            this.label_update.Text = "发现新版本, 点击此处更新";
+            this.label_update.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label_update.Visible = false;
+            this.label_update.Click += new System.EventHandler(this.label_update_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(665, 523);
+            this.Controls.Add(this.label_update);
             this.Controls.Add(this.checkBox_update);
             this.Controls.Add(this.checkBox_textwrap);
             this.Controls.Add(this.button_clear);
@@ -290,7 +324,6 @@
         private System.Windows.Forms.Button button_login;
         private System.Windows.Forms.ColumnHeader columnHeader4;
         private System.Windows.Forms.Button button_create;
-        private System.Windows.Forms.TextBox textBox_log;
         private System.Windows.Forms.NotifyIcon notifyIcon_tray;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip_tray;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_show;
@@ -301,6 +334,10 @@
         private System.Windows.Forms.CheckBox checkBox_textwrap;
         private System.Windows.Forms.CheckBox checkBox_update;
         private System.Windows.Forms.BindingSource launcherModelBindingSource;
+        public System.Windows.Forms.TextBox textBox_log;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_exitAll;
+        private System.Windows.Forms.Label label_update;
     }
 }
 

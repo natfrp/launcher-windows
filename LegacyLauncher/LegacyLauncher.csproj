@@ -82,6 +82,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
+    <None Include="Properties\DataSources\SakuraLibrary.Model.CreateTunnelModel.datasource" />
     <None Include="Properties\DataSources\SakuraLibrary.Model.LauncherModel.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

@@ -1,8 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
+using System.ComponentModel;
 using System.Collections.Specialized;
 
+using SakuraLibrary;
 using SakuraLibrary.Model;
+using SakuraLibrary.Proto;
 
 using LegacyLauncher.Model;
 
@@ -20,11 +24,36 @@ namespace LegacyLauncher
             launcherModelBindingSource.DataSource = Model = new LauncherViewModel(this);
 
             Model.Tunnels.CollectionChanged += RefresnTunnels;
-            // listView_tunnels
+            Model.PropertyChanged += Model_PropertyChanged;
 
             notifyIcon_tray.Icon = Icon;
 
-            // TODO: checkBox_autorun.Checked = File.Exists(Program.AutoRunFile);
+            checkBox_autorun.Checked = File.Exists(Utils.GetAutoRunFile(Consts.LegacyLauncherPrefix));
+        }
+
+        private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+            case nameof(Model.LoggedIn):
+                button_login.Text = Model.LoggedIn ? "注销" : "登录";
+                break;
+            case nameof(Model.LogTextWrapping):
+                textBox_log.ScrollBars = Model.LogTextWrapping ? ScrollBars.Vertical : ScrollBars.Both;
+                break;
+            case nameof(Model.HaveUpdate):
+                if (Model.HaveUpdate)
+                {
+                    label_update.Visible = true;
+                    textBox_log.Height = 231;
+                }
+                else
+                {
+                    label_update.Visible = false;
+                    textBox_log.Height = 253;
+                }
+                break;
+            }
         }
 
         public void RefresnTunnels(object s = null, NotifyCollectionChangedEventArgs e = null)
@@ -33,14 +62,15 @@ namespace LegacyLauncher
             listView_tunnels.Items.Clear();
             foreach (var t in Model.Tunnels)
             {
-                listView_tunnels.Items.Add(new ListViewItem(new string[]
+                var item = new ListViewItem(new string[]
                 {
                     t.Id.ToString(), t.Name, "#" + t.Node + " " + t.NodeName, t.Description
                 })
                 {
-                    Tag = t,
                     Checked = t.Enabled
-                });
+                };
+                listView_tunnels.Items.Add(item);
+                item.Tag = t;
             }
             listView_tunnels.EndUpdate();
         }
@@ -58,7 +88,18 @@ namespace LegacyLauncher
 
         private void toolStripMenuItem_show_Click(object sender, EventArgs e) => Show();
 
-        private void toolStripMenuItem_exit_Click(object sender, EventArgs e) => Close();
+        private void toolStripMenuItem_exit_Click(object sender, EventArgs e)
+        {
+            notifyIcon_tray.Visible = false;
+            Environment.Exit(0);
+        }
+
+        private void ToolStripMenuItem_exitAll_Click(object sender, EventArgs e)
+        {
+            notifyIcon_tray.Visible = false;
+            Model.Daemon.Stop();
+            Environment.Exit(0);
+        }
 
         private void notifyIcon_tray_MouseClick(object sender, MouseEventArgs e)
         {
@@ -68,30 +109,31 @@ namespace LegacyLauncher
             }
         }
 
+        private void label_update_Click(object sender, EventArgs e) => Model.DoUpdate(true, Model.SimpleFailureHandler);
+
         private void checkBox_update_CheckedChanged(object sender, EventArgs e)
         {
-            // TODO
+            if (Model.CheckUpdate == checkBox_update.Checked)
+            {
+                return;
+            }
+            Model.CheckUpdate = checkBox_update.Checked;
+            Model.Save();
         }
 
-        private void checkBox_autorun_CheckedChanged(object sender, EventArgs e) => throw new NotImplementedException(); // TODO: Program.SetAutoRun(checkBox_autorun.Checked);
-
-        private void checkBox_textwrap_CheckedChanged(object sender = null, EventArgs e = null)
+        private void checkBox_textwrap_CheckedChanged(object sender, EventArgs e)
         {
-            textBox_log.WordWrap = checkBox_textwrap.Checked;
-            textBox_log.ScrollBars = checkBox_textwrap.Checked ? ScrollBars.Vertical : ScrollBars.Both;
-            // TODO: Save();
+            Model.LogTextWrapping = checkBox_textwrap.Checked;
+            Model.Save();
         }
+
+        private void checkBox_autorun_CheckedChanged(object sender, EventArgs e) => Utils.SetAutoRun(checkBox_autorun.Checked, Consts.LegacyLauncherPrefix);
 
         private void listView_tunnels_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
             if (e.Item.Tag is TunnelModel t)
             {
-                /*
-                tunnel.DisplayObject = null;
-                tunnel.Enabled = e.Item.Checked;
-                // TDOO: Save();
-                tunnel.DisplayObject = e.Item;
-                */
+                t.Enabled = e.Item.Checked;
             }
         }
 
@@ -114,7 +156,12 @@ namespace LegacyLauncher
                     {
                         return;
                     }
-                    // TODO
+                    listView_tunnels.Enabled = false;
+                    Model.RequestDeleteTunnel(tunnel.Id, (a, b) =>
+                    {
+                        Model.Dispatcher.Invoke(() => listView_tunnels.Enabled = true);
+                        Model.SimpleFailureHandler(a, b);
+                    });
                 }
             }
         }
@@ -125,17 +172,19 @@ namespace LegacyLauncher
 
         private void button_login_Click(object sender, EventArgs e)
         {
-            textBox_token.Text = "yay";
-
-            // TODO
+            if (Model.LoggingIn)
+            {
+                return;
+            }
+            Model.RequestLogin(Model.SimpleFailureHandler);
         }
 
         private void button_create_Click(object sender, EventArgs e) => new CreateTunnelForm(Model).ShowDialog();
 
         private void button_clear_Click(object sender, EventArgs e)
         {
-            // TODO: IPC
             textBox_log.Text = "";
+            Model.Pipe.Request(MessageID.LogClear);
         }
 
         #endregion
@@ -156,9 +205,5 @@ namespace LegacyLauncher
         }
 
         #endregion
-
-        private void textBox_token_TextChanged(object sender, EventArgs e)
-        {
-        }
     }
 }
