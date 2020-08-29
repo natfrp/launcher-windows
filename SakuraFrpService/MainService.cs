@@ -312,7 +312,7 @@ namespace SakuraFrpService
         {
             BypassProxy = Natfrp.BypassProxy,
             UpdateInterval = UpdateManager.UpdateInterval,
-            RemoteManagement = RemoteManager.Running,
+            RemoteManagement = RemoteManager.Enabled,
             RemoteKeySet = RemoteManager.EncryptKey != null && RemoteManager.EncryptKey.Length > 0
         };
 

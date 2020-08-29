@@ -71,6 +71,7 @@ namespace LegacyLauncher
                 };
                 listView_tunnels.Items.Add(item);
                 item.Tag = t;
+                // TODO: Sync listview when t changed
             }
             listView_tunnels.EndUpdate();
         }
