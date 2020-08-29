@@ -58,7 +58,7 @@ namespace SakuraFrpService.Manager
                     StandardOutputEncoding = Encoding.UTF8
                 }))
                 {
-                    if (!p.WaitForExit(100))
+                    if (!p.WaitForExit(1000))
                     {
                         p.Kill();
                     }

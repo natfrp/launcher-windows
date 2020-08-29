@@ -31,9 +31,6 @@ namespace SakuraLauncher
             }
             Model.Config.RemoteKeyNew = password.Text;
             Model.PushServiceConfig();
-            Model.Config.RemoteKeyNew = "";
-            Model.Config.RemoteKeySet = true;
-            Model.Config = Model.Config; // Hacky
             Close();
         }
     }

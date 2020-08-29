@@ -150,7 +150,7 @@ namespace SakuraFrpService.Manager
 
         public void Start()
         {
-            if (!Enabled || Running)
+            if (!Enabled || Running || EncryptKey == null || EncryptKey.Length == 0)
             {
                 return;
             }
@@ -160,6 +160,10 @@ namespace SakuraFrpService.Manager
 
         public void Stop(bool kill = false)
         {
+            if (!Running)
+            {
+                return;
+            }
             AsyncManager.StopEvent.Set();
             try
             {

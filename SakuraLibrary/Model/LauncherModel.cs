@@ -172,6 +172,9 @@ namespace SakuraLibrary.Model
                 case PushMessageID.PushUpdate:
                     Update = msg.DataUpdate;
                     break;
+                case PushMessageID.PushConfig:
+                    Config = msg.DataConfig;
+                    break;
                 }
             }
             catch { }

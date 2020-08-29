@@ -66,6 +66,7 @@ message RequestBase {
 
   oneof data {
     int32 data_id = 2;
+    string data_string = 7; // For frpc, currently unused in launcher
 
     UserLogin data_user_login = 3;
     UpdateTunnelStatus data_update_tunnel = 4;
@@ -81,6 +82,7 @@ enum PushMessageID {
   UPDATE_NODES = 3;
   APPEND_LOG = 4;
   PUSH_UPDATE = 5;
+  PUSH_CONFIG = 6;
 }
 
 message PushMessageBase {
@@ -93,5 +95,6 @@ message PushMessageBase {
     NodeList data_nodes = 6;
     LogList data_log = 7;
     UpdateStatus data_update = 8;
+    ServiceConfig data_config = 9;
   }
 }

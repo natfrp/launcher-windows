@@ -61,7 +61,7 @@ namespace SakuraFrpService
             UpdateManager = new UpdateManager(this);
             RemoteManager = new RemoteManager(this)
             {
-                Enabled = settings.EnableRemote,
+                Enabled = settings.EnableRemote && settings.RemoteKey != null && settings.RemoteKey.Length > 0,
                 EncryptKey = settings.RemoteKey
             };
         }
@@ -307,6 +307,20 @@ namespace SakuraFrpService
 
         #region IPC Handling
 
+        public ServiceConfig GetConfig() => new ServiceConfig()
+        {
+            BypassProxy = Natfrp.BypassProxy,
+            UpdateInterval = UpdateManager.UpdateInterval,
+            RemoteManagement = RemoteManager.Running,
+            RemoteKeySet = RemoteManager.EncryptKey != null && RemoteManager.EncryptKey.Length > 0
+        };
+
+        public void PushConfig() => Pipe.PushMessage(new PushMessageBase()
+        {
+            Type = PushMessageID.PushConfig,
+            DataConfig = GetConfig()
+        });
+
         protected ResponseBase ResponseBase(bool success, string message = null) => new ResponseBase()
         {
             Success = success,
@@ -380,13 +394,7 @@ namespace SakuraFrpService
                         connection.RespondFailure("远程控制无法执行该操作");
                         return;
                     }
-                    resp.DataConfig = new ServiceConfig()
-                    {
-                        BypassProxy = Natfrp.BypassProxy,
-                        UpdateInterval = UpdateManager.UpdateInterval,
-                        RemoteManagement = RemoteManager.Running,
-                        RemoteKeySet = RemoteManager.EncryptKey != null && RemoteManager.EncryptKey.Length > 0
-                    };
+                    resp.DataConfig = GetConfig();
                     break;
                 case MessageID.ControlConfigSet:
                     if (blockSensitive)
@@ -410,6 +418,7 @@ namespace SakuraFrpService
                     Natfrp.BypassProxy = req.DataConfig.BypassProxy;
                     UpdateManager.UpdateInterval = req.DataConfig.UpdateInterval;
                     Save();
+                    PushConfig();
                     break;
                 case MessageID.ControlCheckUpdate:
                     if (blockSensitive)
