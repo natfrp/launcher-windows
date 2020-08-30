@@ -31,6 +31,62 @@ namespace LegacyLauncher
             checkBox_autorun.Checked = File.Exists(Utils.GetAutoRunFile(Consts.LegacyLauncherPrefix));
         }
 
+        public void RefresnTunnels(object s = null, NotifyCollectionChangedEventArgs e = null)
+        {
+            listView_tunnels.BeginUpdate();
+            listView_tunnels.Items.Clear();
+            foreach (var t in Model.Tunnels)
+            {
+                var item = new ListViewItem(new string[]
+                {
+                    t.Id.ToString(), t.Name, "#" + t.Node + " " + t.NodeName, t.Description
+                })
+                {
+                    Checked = t.Enabled
+                };
+                listView_tunnels.Items.Add(item);
+                item.Tag = t;
+                t.PropertyChanged -= Tunnel_PropertyChanged;
+                t.PropertyChanged += Tunnel_PropertyChanged;
+            }
+            listView_tunnels.EndUpdate();
+        }
+
+        #region Property Events
+
+        private void Tunnel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var t = sender as TunnelModel;
+            foreach (ListViewItem item in listView_tunnels.Items)
+            {
+                if (item.Tag == t)
+                {
+                    switch (e.PropertyName)
+                    {
+                    case nameof(TunnelModel.Enabled):
+                        item.Tag = null;
+                        item.Checked = t.Enabled;
+                        item.Tag = t;
+                        break;
+                    case nameof(TunnelModel.Id):
+                        item.SubItems[0].Text = t.Id.ToString();
+                        break;
+                    case nameof(TunnelModel.Name):
+                        item.SubItems[1].Text = t.Name;
+                        break;
+                    case nameof(TunnelModel.Node):
+                    case nameof(TunnelModel.NodeName):
+                        item.SubItems[2].Text = "#" + t.Node + " " + t.NodeName;
+                        break;
+                    case nameof(TunnelModel.Description):
+                        item.SubItems[3].Text = t.Description;
+                        break;
+                    }
+                    return;
+                }
+            }
+        }
+
         private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -56,35 +112,14 @@ namespace LegacyLauncher
             }
         }
 
-        public void RefresnTunnels(object s = null, NotifyCollectionChangedEventArgs e = null)
-        {
-            listView_tunnels.BeginUpdate();
-            listView_tunnels.Items.Clear();
-            foreach (var t in Model.Tunnels)
-            {
-                var item = new ListViewItem(new string[]
-                {
-                    t.Id.ToString(), t.Name, "#" + t.Node + " " + t.NodeName, t.Description
-                })
-                {
-                    Checked = t.Enabled
-                };
-                listView_tunnels.Items.Add(item);
-                item.Tag = t;
-                // TODO: Sync listview when t changed
-            }
-            listView_tunnels.EndUpdate();
-        }
+        #endregion
 
         #region General Events
 
-        private void MainForm_Resize(object sender, EventArgs e)
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (WindowState == FormWindowState.Minimized)
-            {
-                WindowState = FormWindowState.Normal;
-                Visible = false;
-            }
+            e.Cancel = true;
+            Visible = false;
         }
 
         private void toolStripMenuItem_show_Click(object sender, EventArgs e) => Show();

@@ -303,7 +303,7 @@
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "SakuraFrp Launcher";
-            this.Resize += new System.EventHandler(this.MainForm_Resize);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.launcherModelBindingSource)).EndInit();
             this.contextMenuStrip_tray.ResumeLayout(false);
             this.contextMenuStrip_tunnel.ResumeLayout(false);
