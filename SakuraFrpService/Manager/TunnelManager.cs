@@ -90,7 +90,8 @@ namespace SakuraFrpService.Manager
                         this[j.Id] = CreateFromApi(j);
                     }
                 }
-                foreach (var k in Keys.Where(k => !tmp.Contains(k)))
+                var remove = Keys.Where(k => !tmp.Contains(k)).ToList();
+                foreach (var k in remove)
                 {
                     changed = true;
                     Remove(k);
