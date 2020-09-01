@@ -58,6 +58,7 @@ namespace SakuraLibrary.Helper
                 }
                 MainThread.Join();
             }
+            catch { }
             finally
             {
                 MainThread = null;
