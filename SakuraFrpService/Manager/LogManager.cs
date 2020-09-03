@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Concurrent;
 
+using SakuraLibrary;
 using SakuraLibrary.Proto;
 using SakuraLibrary.Helper;
 
@@ -45,7 +46,8 @@ namespace SakuraFrpService.Manager
                 {
                     Category = category,
                     Source = source,
-                    Data = data
+                    Data = data,
+                    Time = Utils.GetSakuraTime()
                 });
             }
         }

@@ -205,7 +205,7 @@
             // 
             this.toolStripMenuItem_exit.Name = "toolStripMenuItem_exit";
             this.toolStripMenuItem_exit.Size = new System.Drawing.Size(124, 22);
-            this.toolStripMenuItem_exit.Text = "退出";
+            this.toolStripMenuItem_exit.Text = "退出启动器";
             this.toolStripMenuItem_exit.Click += new System.EventHandler(this.toolStripMenuItem_exit_Click);
             // 
             // ToolStripMenuItem_exitAll

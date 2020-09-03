@@ -97,7 +97,7 @@ namespace SakuraLauncher.Model
             }
             else
             {
-                entry.Time = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+                entry.Time = Utils.ParseSakuraTime(l.Time).ToString("yyyy/MM/dd HH:mm:ss");
                 switch (l.Category)
                 {
                 case 1:

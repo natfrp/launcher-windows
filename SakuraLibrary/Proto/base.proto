@@ -9,6 +9,7 @@ message Log {
   string source = 1;
   string data = 2;
   int32 category = 3;
+  uint32 time = 4;
 }
 
 message LogList { repeated Log data = 3; }

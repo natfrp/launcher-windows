@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Windows.Forms;
 
 using SakuraLibrary;
@@ -60,6 +59,10 @@ namespace LegacyLauncher.Model
             case 3:
                 category = "ERROR ";
                 break;
+            }
+            if (l.Category != 0)
+            {
+                l.Data = Utils.ParseSakuraTime(l.Time).ToString("yyyy/MM/dd HH:mm:ss") + " " + l.Data;
             }
             Dispatcher.Invoke(() => View.textBox_log.AppendText(l.Source + " " + category + l.Data + Environment.NewLine));
         }
