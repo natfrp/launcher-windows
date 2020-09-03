@@ -33,6 +33,8 @@ namespace SakuraFrpService
         public readonly UpdateManager UpdateManager;
         public readonly RemoteManager RemoteManager;
 
+        protected ulong TotalTicks = 0;
+
         public MainService(bool daemon)
         {
             var settings = Properties.Settings.Default;
@@ -91,30 +93,29 @@ namespace SakuraFrpService
 
         public void Tick()
         {
-            ulong tick = 0;
             try
             {
-                if (tick % 100 == 0)
+                if (TotalTicks % 100 == 0)
                 {
-                    var token = Properties.Settings.Default.Token;
                     lock (UserInfo)
                     {
+                        var token = Properties.Settings.Default.Token;
                         if (UserInfo.Status == UserStatus.NoLogin && token != null && token.Length > 0)
                         {
                             var _ = Login(token, true);
                         }
                     }
                 }
-                if (tick % 200 == 0)
+                if (TotalTicks % 200 == 0)
                 {
                     if (!Pipe.Running)
                     {
                         Pipe.Start();
                     }
                 }
-                tick++;
             }
             catch { }
+            TotalTicks++;
             Thread.Sleep(50);
         }
 
@@ -218,7 +219,13 @@ namespace SakuraFrpService
             }
             try
             {
-                Properties.Settings.Default.Token = "";
+                lock (UserInfo)
+                {
+                    Natfrp.Token = "";
+                    UserInfo.Status = UserStatus.NoLogin;
+                }
+                Save();
+
                 TunnelManager.Stop();
                 NodeManager.Stop();
                 RemoteManager.Stop(true);
@@ -229,11 +236,6 @@ namespace SakuraFrpService
             }
             finally
             {
-                lock (UserInfo)
-                {
-                    UserInfo.Status = UserStatus.NoLogin;
-                }
-                Save();
                 PushUserInfo();
                 TunnelManager.Push();
             }
