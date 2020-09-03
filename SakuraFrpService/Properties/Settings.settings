@@ -8,9 +8,6 @@
     <Setting Name="EnabledTunnels" Type="System.Collections.Generic.List&lt;System.Int32&gt;" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="LoggedIn" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="UpgradeRequired" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>

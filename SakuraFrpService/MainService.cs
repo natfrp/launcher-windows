@@ -42,6 +42,7 @@ namespace SakuraFrpService
                 settings.UpgradeRequired = false;
                 settings.Save();
             }
+            Natfrp.Token = settings.Token; // Prevent possible token lost
             Natfrp.BypassProxy = settings.BypassProxy;
 
             Daemonize = daemon;
@@ -70,11 +71,6 @@ namespace SakuraFrpService
         {
             var settings = Properties.Settings.Default;
 
-            lock (UserInfo)
-            {
-                settings.Token = Natfrp.Token;
-                settings.LoggedIn = UserInfo.Status == UserStatus.LoggedIn;
-            }
             if (TunnelManager.Running)
             {
                 settings.EnabledTunnels = TunnelManager.GetEnabledTunnels();
@@ -83,6 +79,8 @@ namespace SakuraFrpService
             {
                 settings.UpdateInterval = UpdateManager.UpdateInterval;
             }
+
+            settings.Token = Natfrp.Token;
             settings.BypassProxy = Natfrp.BypassProxy;
 
             settings.RemoteKey = RemoteManager.EncryptKey;
@@ -98,11 +96,12 @@ namespace SakuraFrpService
             {
                 if (tick % 100 == 0)
                 {
+                    var token = Properties.Settings.Default.Token;
                     lock (UserInfo)
                     {
-                        if (UserInfo.Status == UserStatus.NoLogin && Properties.Settings.Default.LoggedIn)
+                        if (UserInfo.Status == UserStatus.NoLogin && token != null && token.Length > 0)
                         {
-                            var _ = Login(Properties.Settings.Default.Token);
+                            var _ = Login(token, true);
                         }
                     }
                 }
@@ -144,7 +143,7 @@ namespace SakuraFrpService
             }
         }
 
-        protected async Task<string> Login(string token)
+        protected async Task<string> Login(string token, bool isAuto = false)
         {
             lock (UserInfo)
             {
@@ -154,7 +153,7 @@ namespace SakuraFrpService
                 }
                 if (token.Length != 16)
                 {
-                    return "Token  无效";
+                    return "Token 无效";
                 }
                 UserInfo.Status = UserStatus.Pending;
                 PushUserInfo();
@@ -167,6 +166,8 @@ namespace SakuraFrpService
                 var user = await Natfrp.Request<Natfrp.GetUser>("get_user");
                 if (!user.Data.Login)
                 {
+                    LogManager.Log(3, "Service", "服务器拒绝登录: " + user.Message);
+                    Logout(true);
                     return user.Message;
                 }
 
@@ -195,7 +196,10 @@ namespace SakuraFrpService
             catch (Exception e)
             {
                 LogManager.Log(3, "Service", "用户登录失败: " + e.ToString());
-                Logout(true);
+                if (!isAuto)
+                {
+                    Logout(true);
+                }
                 return e.ToString();
             }
             return null;
@@ -215,7 +219,6 @@ namespace SakuraFrpService
             try
             {
                 Properties.Settings.Default.Token = "";
-                Properties.Settings.Default.LoggedIn = false;
                 TunnelManager.Stop();
                 NodeManager.Stop();
                 RemoteManager.Stop(true);
@@ -234,7 +237,10 @@ namespace SakuraFrpService
                 PushUserInfo();
                 TunnelManager.Push();
             }
-            LogManager.Log(1, "Service", "已退出登录");
+            if (!force)
+            {
+                LogManager.Log(1, "Service", "已退出登录");
+            }
             return null;
         }
 
