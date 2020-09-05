@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Windows;
-using System.Diagnostics;
-using System.Configuration;
+﻿using System.Windows;
 using System.Windows.Controls;
 
 using SakuraLauncher.Model;
@@ -49,16 +45,5 @@ namespace SakuraLauncher.View
         private void ButtonRemotePassword_Click(object sender, RoutedEventArgs e) => new RemoteConfigWindow(Model).ShowDialog();
 
         private void Save(object sender, RoutedEventArgs e) => Model.Save();
-
-        private void ButtonLOL_Click(object sender, RoutedEventArgs e) => Process.Start(Path.GetDirectoryName(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath));
-
-        private void ButtonLOL2_Click(object sender, RoutedEventArgs e) => Process.Start("calc.exe");
-
-        private void ButtonLOL3_Click(object sender, RoutedEventArgs e)
-        {
-            Properties.Settings.Default.Theme = Properties.Settings.Default.Theme == 1 ? 0 : 1;
-            Model.Save();
-            Environment.Exit(0);
-        }
     }
 }

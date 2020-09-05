@@ -205,10 +205,5 @@
             </TextBlock>
             <Button Margin="16,0,0,0" Click="ButtonRemotePassword_Click" Content="设置密码" Style="{StaticResource MaterialDesignFlatButton}"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="24,8,0,0">
-            <Button Click="ButtonLOL_Click" Style="{StaticResource MaterialDesignFlatButton}" Content="不要点这个"/>
-            <Button Click="ButtonLOL2_Click" Style="{StaticResource MaterialDesignFlatButton}" Content="也不要点这个" Margin="8,0,0,0"/>
-            <Button Click="ButtonLOL3_Click" Style="{StaticResource MaterialDesignFlatButton}" Content="这个也是" Margin="8,0,0,0"/>
-        </StackPanel>
     </StackPanel>
 </UserControl>
