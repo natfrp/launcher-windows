@@ -71,6 +71,7 @@
     <Compile Include="Pipe\PipeServer.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AssemblyBase.cs" />
     <Compile Include="WinTrust.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -85,6 +85,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="..\SakuraLibrary\AssemblyBase.cs">
+      <Link>Properties\AssemblyBase.cs</Link>
+    </Compile>
     <Compile Include="CreateTunnelWindow.xaml.cs">
       <DependentUpon>CreateTunnelWindow.xaml</DependentUpon>
     </Compile>

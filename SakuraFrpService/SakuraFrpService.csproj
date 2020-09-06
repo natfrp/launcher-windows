@@ -66,6 +66,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SakuraLibrary\AssemblyBase.cs">
+      <Link>Properties\AssemblyBase.cs</Link>
+    </Compile>
     <Compile Include="Data\RemotePipeConnection.cs" />
     <Compile Include="Manager\LogManager.cs" />
     <Compile Include="MainService.cs">

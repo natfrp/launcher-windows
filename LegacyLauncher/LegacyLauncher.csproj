@@ -50,6 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SakuraLibrary\AssemblyBase.cs">
+      <Link>Properties\AssemblyBase.cs</Link>
+    </Compile>
     <Compile Include="CreateTunnelForm.cs">
       <SubType>Form</SubType>
     </Compile>
