@@ -9,6 +9,8 @@ using System.Security.AccessControl;
 
 using SakuraLibrary;
 
+using SakuraFrpService.Manager;
+
 namespace SakuraFrpService
 {
     static class Program
@@ -19,11 +21,14 @@ namespace SakuraFrpService
         static int Main(string[] argv)
         {
             Environment.CurrentDirectory = Path.GetDirectoryName(Utils.ExecutablePath);
+
+            Utils.VerifySignature(Utils.LibraryPath, Utils.ExecutablePath, Path.GetFullPath(TunnelManager.FrpcExecutable));
+
             if (Path.GetFileName(Utils.ExecutablePath) != Consts.ServiceExecutable)
             {
                 if (Environment.UserInteractive)
                 {
-                    MessageBox.Show("Do NOT rename SakuraFrpService.exe.\n请不要重命名 SakuraFrpService.exe", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Do NOT rename SakuraFrpService.exe\n请不要重命名 SakuraFrpService.exe", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 return 1;
             }

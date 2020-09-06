@@ -16,7 +16,9 @@ namespace SakuraLibrary
     {
         public static readonly DateTime SakuraTimeBase = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+        public static readonly string LibraryPath = Assembly.GetExecutingAssembly().Location;
         public static readonly string ExecutablePath = Process.GetCurrentProcess().MainModule.FileName;
+
         public static readonly bool IsAdministrator = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
         public static readonly string InstallationHash = Md5(Assembly.GetExecutingAssembly().Location);
@@ -159,5 +161,23 @@ namespace SakuraLibrary
         public static uint GetSakuraTime() => (uint)DateTime.UtcNow.Subtract(SakuraTimeBase).TotalSeconds;
 
         public static DateTime ParseSakuraTime(uint seconds) => SakuraTimeBase.AddSeconds(seconds).ToLocalTime();
+
+        public static void VerifySignature(params string[] files)
+        {
+#if !DEBUG // && false
+            var failure = files.Where(f => !WinTrust.VerifyFile(f)).ToArray();
+            if (failure.Length == 0)
+            {
+                return;
+            }
+            NTAPI.MessageBox(0, "@@@@@@@@@@@@@@@@@@\n" +
+                "         !!!  警告: 文件签名验证失败  !!!\n" +
+                "@@@@@@@@@@@@@@@@@@\n\n" +
+                "下列文件未通过数字签名校验:\n" + string.Join("\n", failure) + "\n\n" +
+                "这些文件可能已损坏或被纂改, 这意味着您的电脑可能已经被病毒感染, 请立即进行杀毒并重新下载启动器\n\n" +
+                "如果您准备自己编译启动器或使用其他版本的 frpc, 请自行修改 SakuraLibrary\\Utils.cs 或使用 Debug 构建来禁用签名验证", "Error", 0x10);
+            Environment.Exit(0);
+#endif
+        }
     }
 }
