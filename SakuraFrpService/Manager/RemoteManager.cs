@@ -47,6 +47,7 @@ namespace SakuraFrpService.Manager
             await Socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new Dictionary<string, object>
             {
                 { "version", REMOTE_VERSION },
+                { "type", "launcher" },
                 { "token", Natfrp.Token },
                 { "identifier", Identifier }
             }))), WebSocketMessageType.Text, true, Source.Token);
