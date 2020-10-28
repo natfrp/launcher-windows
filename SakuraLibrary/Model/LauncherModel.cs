@@ -241,9 +241,6 @@ namespace SakuraLibrary.Model
         }
         private User _userInfo = new User();
 
-        public int CurrentTab { get => _currentTab; set => Set(out _currentTab, value); }
-        private int _currentTab = -1;
-
         public ObservableCollection<NodeModel> Nodes { get; set; } = new ObservableCollection<NodeModel>();
 
         #endregion

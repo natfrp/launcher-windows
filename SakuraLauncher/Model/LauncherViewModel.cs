@@ -169,6 +169,9 @@ namespace SakuraLauncher.Model
         [SourceBinding(nameof(Connected), nameof(HaveUpdate))]
         public bool ShowNotification => HaveUpdate || !Connected;
 
+        public int CurrentTab { get => _currentTab; set => Set(out _currentTab, value); }
+        private int _currentTab = -1;
+
         [SourceBinding(nameof(CurrentTab))]
         public TabIndexTester CurrentTabTester { get; set; }
 
