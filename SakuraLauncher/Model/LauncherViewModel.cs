@@ -35,6 +35,8 @@ namespace SakuraLauncher.Model
             View = view;
             Dispatcher = new DispatcherWrapper(View.Dispatcher.Invoke, a => View.Dispatcher.BeginInvoke(a), View.Dispatcher.CheckAccess);
 
+            CurrentTabTester = new TabIndexTester(this);
+
             var settings = Properties.Settings.Default;
             if (settings.UpgradeRequired)
             {
