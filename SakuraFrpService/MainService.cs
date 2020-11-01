@@ -33,7 +33,7 @@ namespace SakuraFrpService
         public readonly UpdateManager UpdateManager;
         public readonly RemoteManager RemoteManager;
 
-        protected ulong TotalTicks = 0;
+        protected bool AutoLogin = false;
 
         public MainService(bool daemon)
         {
@@ -47,10 +47,12 @@ namespace SakuraFrpService
             Natfrp.Token = settings.Token; // Prevent possible token lost
             Natfrp.BypassProxy = settings.BypassProxy;
 
+            AutoLogin = Natfrp.Token != null && Natfrp.Token.Length > 0;
+
             Daemonize = daemon;
             if (!daemon)
             {
-                TickThread = new Thread(new ThreadStart(Tick));
+                TickThread = new Thread(new ThreadStart(TickRun));
             }
 
             InitializeComponent();
@@ -91,32 +93,35 @@ namespace SakuraFrpService
             settings.Save();
         }
 
-        public void Tick()
+        public void TickRun()
         {
-            try
+            ulong ticks = 0;
+            while (true)
             {
-                if (TotalTicks % 100 == 0)
+                try
                 {
-                    lock (UserInfo)
+                    if (ticks % 600 == 0)
                     {
-                        var token = Properties.Settings.Default.Token;
-                        if (UserInfo.Status == UserStatus.NoLogin && token != null && token.Length > 0)
+                        lock (UserInfo)
                         {
-                            var _ = Login(token, true);
+                            if (UserInfo.Status == UserStatus.NoLogin && AutoLogin)
+                            {
+                                var _ = Login(Natfrp.Token, true);
+                            }
+                        }
+                    }
+                    if (ticks % 200 == 0)
+                    {
+                        if (!Pipe.Running)
+                        {
+                            Pipe.Start();
                         }
                     }
                 }
-                if (TotalTicks % 200 == 0)
-                {
-                    if (!Pipe.Running)
-                    {
-                        Pipe.Start();
-                    }
-                }
+                catch { }
+                ticks++;
+                Thread.Sleep(50);
             }
-            catch { }
-            TotalTicks++;
-            Thread.Sleep(50);
         }
 
         public void DaemonRun(string[] args)
@@ -126,10 +131,7 @@ namespace SakuraFrpService
                 throw new InvalidOperationException();
             }
             OnStart(args);
-            while (true)
-            {
-                Tick();
-            }
+            TickRun();
         }
 
         protected void PushUserInfo()
@@ -179,6 +181,8 @@ namespace SakuraFrpService
                     UserInfo.Meta = user.Data.Meta;
 
                     UserInfo.Status = UserStatus.LoggedIn;
+
+                    AutoLogin = false;
                 }
 
                 Save();
@@ -196,9 +200,18 @@ namespace SakuraFrpService
             }
             catch (Exception e)
             {
-                LogManager.Log(3, "Service", "用户登录失败: " + e.ToString());
-                if (!isAuto)
+                if (isAuto)
                 {
+                    LogManager.Log(3, "Service", "自动登录失败, 将在稍后重试: " + e.ToString());
+                    lock (UserInfo)
+                    {
+                        UserInfo.Status = UserStatus.NoLogin;
+                    }
+                    // Don't push here
+                }
+                else
+                {
+                    LogManager.Log(3, "Service", "用户登录失败: " + e.ToString());
                     Logout(true);
                 }
                 return e.ToString();
@@ -379,7 +392,15 @@ namespace SakuraFrpService
                 case MessageID.UserInfo:
                     lock (UserInfo)
                     {
-                        resp.DataUser = UserInfo;
+                        if (AutoLogin)
+                        {
+                            resp.DataUser = UserInfo.Clone();
+                            resp.DataUser.Status = UserStatus.Pending;
+                        }
+                        else
+                        {
+                            resp.DataUser = UserInfo;
+                        }
                     }
                     break;
                 case MessageID.LogGet:
