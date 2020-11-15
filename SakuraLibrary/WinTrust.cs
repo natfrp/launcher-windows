@@ -116,7 +116,7 @@ namespace SakuraLibrary
         public WinTrustDataStateAction StateAction = WinTrustDataStateAction.Ignore;
         public IntPtr StateData = IntPtr.Zero;
         public string URLReference = null;
-        public WinTrustDataProvFlags ProvFlags = WinTrustDataProvFlags.RevocationCheckChainExcludeRoot;
+        public WinTrustDataProvFlags ProvFlags = WinTrustDataProvFlags.RevocationCheckChainExcludeRoot | WinTrustDataProvFlags.CacheOnlyUrlRetrieval;
         public WinTrustDataUIContext UIContext = WinTrustDataUIContext.Execute;
 
         // constructor for silent WinTrustDataChoice.File check

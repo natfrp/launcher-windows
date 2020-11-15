@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Diagnostics;
@@ -10,7 +11,6 @@ using SakuraLibrary.Proto;
 using SakuraLibrary.Helper;
 
 using UserStatus = SakuraLibrary.Proto.User.Types.Status;
-using System.IO;
 
 namespace SakuraLibrary.Model
 {
