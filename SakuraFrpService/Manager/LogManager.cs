@@ -75,7 +75,10 @@ namespace SakuraFrpService.Manager
                         msg.DataLog.Data.Add(newLog);
                         foreach (var l in newLog)
                         {
-                            Enqueue(l);
+                            if (l.Category < CATEGORY_NOTICE_INFO)
+                            {
+                                Enqueue(l);
+                            }
                         }
                         newLog.Clear();
                     }

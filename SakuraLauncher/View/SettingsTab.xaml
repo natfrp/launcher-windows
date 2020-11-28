@@ -76,7 +76,7 @@
             </Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="24,16,24,0">
-            <ToggleButton IsChecked="{Binding SuppressInfo}" Checked="Save" Unchecked="Save"/>
+            <ToggleButton IsChecked="{Binding SuppressNotification}" Checked="Save" Unchecked="Save"/>
             <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">关闭隧道状态提示</TextBlock>
             <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="不再在右下角弹出隧道状态变更提示" ToolTipService.InitialShowDelay="0">
                 <materialDesign:PackIcon Kind="HelpCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
