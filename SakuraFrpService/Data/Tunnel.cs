@@ -30,7 +30,9 @@ namespace SakuraFrpService.Data
                 if (value)
                 {
                     FailCount = 0;
+                    StartState = 0;
                 }
+                WaitTick = 0; // Update of Enabled property should trigger state check immediately
             }
         }
         private bool _enabled = false;
@@ -105,6 +107,7 @@ namespace SakuraFrpService.Data
                 BaseProcess.Exited += (s, e) =>
                 {
                     WaitTick = 0;
+                    Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Name, "frpc 已退出");
                 };
                 BaseProcess.ErrorDataReceived += OnStderr;
                 BaseProcess.OutputDataReceived += OnStdout;
@@ -151,7 +154,6 @@ namespace SakuraFrpService.Data
                         BaseProcess.Kill();
                     }
                 }
-                Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Name, "frpc 已结束");
             }
             finally
             {
@@ -186,7 +188,7 @@ namespace SakuraFrpService.Data
 
         protected void OnStderr(object sender, DataReceivedEventArgs e)
         {
-            if (e.Data == null)
+            if (e.Data == null || e.Data.Length == 0)
             {
                 return;
             }

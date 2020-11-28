@@ -405,7 +405,10 @@ namespace SakuraFrpService
                     break;
                 case MessageID.LogGet:
                     resp.DataLog = new LogList();
-                    resp.DataLog.Data.Add(LogManager);
+                    lock (LogManager)
+                    {
+                        resp.DataLog.Data.Add(LogManager);
+                    }
                     break;
                 case MessageID.LogClear:
                     LogManager.Clear();

@@ -483,7 +483,7 @@ namespace SakuraLibrary.Model
             }
 #endif
             Daemon.Stop();
-            Process.Start("Updater.exe", string.Format("{0}{1}", Update.UpdateFrpc ? "-frpc " : "", Update.UpdateLauncher ? (legacy ? "-legacy -launch=legacy" : "-wpf -launch=wpf") : ""));
+            Process.Start("Updater.exe", string.Format("{0}{1}-launch={2}", Update.UpdateFrpc ? "-frpc " : "", Update.UpdateLauncher ? (legacy ? "-legacy " : "-wpf ") : "", (legacy ? "legacy" : "wpf")));
             Environment.Exit(0);
         }
 

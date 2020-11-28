@@ -65,27 +65,30 @@ namespace SakuraFrpService.Manager
             {
                 try
                 {
-                    lock (newLog)
+                    lock (this)
                     {
-                        if (newLog.Count == 0)
+                        lock (newLog)
                         {
-                            continue;
-                        }
-                        msg.DataLog.Data.Clear();
-                        msg.DataLog.Data.Add(newLog);
-                        foreach (var l in newLog)
-                        {
-                            if (l.Category < CATEGORY_NOTICE_INFO)
+                            if (newLog.Count == 0)
                             {
-                                Enqueue(l);
+                                continue;
                             }
+                            msg.DataLog.Data.Clear();
+                            msg.DataLog.Data.Add(newLog);
+                            foreach (var l in newLog)
+                            {
+                                if (l.Category < CATEGORY_NOTICE_INFO)
+                                {
+                                    Enqueue(l);
+                                }
+                            }
+                            newLog.Clear();
                         }
-                        newLog.Clear();
-                    }
-                    Main.Pipe.PushMessage(msg);
-                    while (Count > RotateSize)
-                    {
-                        TryDequeue(out Log _);
+                        Main.Pipe.PushMessage(msg);
+                        while (Count > RotateSize)
+                        {
+                            TryDequeue(out Log _);
+                        }
                     }
                 }
                 catch { }
