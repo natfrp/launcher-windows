@@ -347,8 +347,8 @@ namespace SakuraLibrary.Model
 
         // Launcher Config
 
-        public bool SuppressInfo { get => _suppressInfo; set => Set(out _suppressInfo, value); }
-        private bool _suppressInfo;
+        public bool SuppressNotification { get => _suppressNotification; set => Set(out _suppressNotification, value); }
+        private bool _suppressNotification;
 
         public bool LogTextWrapping { get => _logTextWrapping; set => Set(out _logTextWrapping, value); }
         private bool _logTextWrapping;

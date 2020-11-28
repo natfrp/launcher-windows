@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Text;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
+
+using Newtonsoft.Json.Linq;
 
 using TunnelProto = SakuraLibrary.Proto.Tunnel;
 using TunnelStatus = SakuraLibrary.Proto.Tunnel.Types.Status;
@@ -11,14 +14,56 @@ namespace SakuraFrpService.Data
 {
     public class Tunnel
     {
+        public static readonly Regex ReportPattern = new Regex(@"\b(?<Type>\d{2})(?<JSON>.+)$", RegexOptions.Compiled | RegexOptions.Singleline);
+
         public readonly TunnelManager Manager = null;
 
         public int Id, Node;
         public string Name, Type, Note, Description;
 
-        public int WaitTick = 0, FailCount = 0;
-        public bool Enabled = false;
+        public bool Enabled
+        {
+            get => _enabled;
+            set
+            {
+                _enabled = value;
+                if (value)
+                {
+                    FailCount = 0;
+                }
+            }
+        }
+        private bool _enabled = false;
+
         public bool Running => BaseProcess != null && !BaseProcess.HasExited;
+
+        /// <summary>
+        /// Tunnel start state. Thread Safe.
+        /// 0 = Idle, 1 = Pending, 2 = Success
+        /// </summary>
+        public byte StartState
+        {
+            get { lock (this) { return _startState; } }
+            set { lock (this) { _startState = value; } }
+        }
+        private byte _startState = 0;
+
+        /// <summary>
+        /// Tick delay, hang up ticking when positive. Thread Safe.
+        /// </summary>
+        public int WaitTick
+        {
+            get { lock (this) { return _waitTick; } }
+            set { lock (this) { _waitTick = value; } }
+        }
+        private int _waitTick;
+
+        protected int FailCount
+        {
+            get { lock (this) { return _failCount; } }
+            set { lock (this) { _failCount = value; } }
+        }
+        private int _failCount = 0;
 
         public Process BaseProcess = null;
 
@@ -57,12 +102,20 @@ namespace SakuraFrpService.Data
                     StandardOutputEncoding = Encoding.UTF8
                 });
 
-                BaseProcess.ErrorDataReceived += OnProcessData;
-                BaseProcess.OutputDataReceived += OnProcessData;
+                BaseProcess.Exited += (s, e) =>
+                {
+                    WaitTick = 0;
+                };
+                BaseProcess.ErrorDataReceived += OnStderr;
+                BaseProcess.OutputDataReceived += OnStdout;
+                BaseProcess.EnableRaisingEvents = true;
 
                 BaseProcess.BeginErrorReadLine();
                 BaseProcess.BeginOutputReadLine();
-                return true;
+
+                StartState = 1;
+
+                return !BaseProcess.HasExited;
             }
             catch (Exception e)
             {
@@ -72,7 +125,7 @@ namespace SakuraFrpService.Data
             return false;
         }
 
-        public void Stop()
+        public void Stop(bool kill = false)
         {
             if (!Running)
             {
@@ -85,11 +138,18 @@ namespace SakuraFrpService.Data
                 {
                     return;
                 }
-                BaseProcess.StandardInput.Write("stop\n");
-                if (!BaseProcess.WaitForExit(3500))
+                if (kill)
                 {
-                    Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Name, "frpc 未响应, 正在强制结束进程");
                     BaseProcess.Kill();
+                }
+                else
+                {
+                    BaseProcess.StandardInput.Write("stop\n");
+                    if (!BaseProcess.WaitForExit(3500))
+                    {
+                        Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Name, "frpc 未响应, 正在强制结束进程");
+                        BaseProcess.Kill();
+                    }
                 }
                 Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Name, "frpc 已结束");
             }
@@ -99,7 +159,24 @@ namespace SakuraFrpService.Data
             }
         }
 
-        protected void OnProcessData(object sender, DataReceivedEventArgs e)
+        public void Fail()
+        {
+            if (++FailCount >= 4)
+            {
+                Enabled = false;
+                FailCount = 0;
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Name, "隧道持续启动失败, 已关闭该隧道");
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_NOTICE_ERROR, "隧道 " + Name + " 被关闭", "隧道持续启动失败, 已关闭该隧道");
+            }
+            else
+            {
+                WaitTick = 20 * 5 * (int)Math.Pow(2, FailCount - 1);
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Name, "隧道启动失败, 将在 " + (5 * FailCount) + " 秒后重试");
+            }
+            Cleanup();
+        }
+
+        protected void OnStdout(object sender, DataReceivedEventArgs e)
         {
             if (e.Data != null)
             {
@@ -107,8 +184,57 @@ namespace SakuraFrpService.Data
             }
         }
 
+        protected void OnStderr(object sender, DataReceivedEventArgs e)
+        {
+            if (e.Data == null)
+            {
+                return;
+            }
+            if (e.Data[0] == '\b')
+            {
+                try
+                {
+                    var match = ReportPattern.Match(e.Data);
+                    if (match != null && match.Success)
+                    {
+                        HandleReport(int.Parse(match.Groups["Type"].Value), match.Groups["JSON"].Value);
+                        return;
+                    }
+                    throw new Exception("格式不匹配");
+                }
+                catch (Exception ex)
+                {
+                    Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Name, "上报数据解析失败: " + ex.Message);
+                }
+            }
+            Manager.Main.LogManager.Log(LogManager.CATEGORY_FRPC, Name, e.Data);
+        }
+
+        protected void HandleReport(int type, string j)
+        {
+            dynamic json = JToken.Parse(j);
+            switch (type)
+            {
+            case 1: // Launch success
+                FailCount = 0;
+                StartState = 2;
+                WaitTick = 0; // Do state check immediately
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_NOTICE_INFO, "隧道 " + Name + " 启动成功", (string)json.message);
+                break;
+            case 2: // Fatal launch failure
+                Enabled = false;
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_NOTICE_WARNING, "隧道 " + Name + " 启动失败", (string)json.message);
+                break;
+            default:
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Name, "未知上报类型: " + type);
+                return;
+            }
+            Manager.PushOne(this);
+        }
+
         protected void Cleanup()
         {
+            StartState = 0;
             if (BaseProcess != null)
             {
                 BaseProcess.Dispose();

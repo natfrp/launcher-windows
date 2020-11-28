@@ -39,8 +39,8 @@ namespace LegacyLauncher.Model
                 settings.Save();
             }
 
-            SuppressInfo = settings.SuppressInfo;
             LogTextWrapping = settings.LogTextWrapping;
+            SuppressNotification = settings.SuppressInfo;
         }
 
         public override void ClearLog() => Dispatcher.Invoke(() => View.textBox_log.Clear());
@@ -76,7 +76,7 @@ namespace LegacyLauncher.Model
             }
             var settings = Properties.Settings.Default;
 
-            settings.SuppressInfo = SuppressInfo;
+            settings.SuppressInfo = SuppressNotification;
             settings.LogTextWrapping = LogTextWrapping;
 
             settings.Save();

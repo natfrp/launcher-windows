@@ -14,7 +14,7 @@
     <Setting Name="LogTextWrapping" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="SuppressInfo" Type="System.Boolean" Scope="User">
+    <Setting Name="SuppressNotification" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="Theme" Type="System.Int32" Scope="User">

@@ -31,7 +31,7 @@ namespace SakuraFrpService.Manager
             AsyncManager = new AsyncManager(Run);
         }
 
-        public string GetArguments(int tunnel) => string.Format("-n -f {0}:{1} --watch {2}", Natfrp.Token, tunnel, PID);
+        public string GetArguments(int tunnel) => string.Format("-n -f {0}:{1} --watch {2} --report", Natfrp.Token, tunnel, PID);
 
         public void StopAll()
         {
@@ -152,25 +152,30 @@ namespace SakuraFrpService.Manager
                         }
                         if (t.Enabled)
                         {
-                            if (t.Running)
+                            if (!t.Running)
                             {
-                                continue;
-                            }
-                            if (!t.Start())
-                            {
-                                if (++t.FailCount >= 3)
+                                if(t.StartState == 1)
                                 {
-                                    t.Enabled = false;
-                                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, t.Name, "隧道持续启动失败, 已禁用该隧道");
+                                    t.Fail(); // Pending start, crash confirmed
                                 }
                                 else
                                 {
-                                    t.WaitTick = 20 * 5 * t.FailCount;
+                                    if (!t.Start())
+                                    {
+                                        t.Fail();
+                                    }
+                                    else
+                                    {
+                                        // Wait for report
+                                        t.WaitTick = 20 * 60;
+                                    }
                                 }
                             }
-                            else
+                            else if (t.StartState != 2)
                             {
-                                t.FailCount = 0;
+                                // No report for 60s
+                                t.Fail();
+                                t.Stop(true);
                             }
                         }
                         else if (t.Running)

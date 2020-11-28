@@ -16,8 +16,6 @@ namespace SakuraLauncher.Model
 {
     public class LauncherViewModel : LauncherModel
     {
-        public Dictionary<string, string> failedData = new Dictionary<string, string>();
-
         public readonly Func<string, bool> SimpleConfirmHandler = message => App.ShowMessage(message, "操作确认", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK;
         public readonly Action<bool, string> SimpleHandler = (success, message) => App.ShowMessage(message, success ? "操作成功" : "操作失败", success ? MessageBoxImage.Information : MessageBoxImage.Error);
         public readonly Action<bool, string> SimpleFailureHandler = (success, message) =>
@@ -48,8 +46,8 @@ namespace SakuraLauncher.Model
             View.Width = settings.Width;
             View.Height = settings.Height;
 
-            SuppressInfo = settings.SuppressInfo;
             LogTextWrapping = settings.LogTextWrapping;
+            SuppressNotification = settings.SuppressNotification;
         }
 
         public override void ClearLog() => Dispatcher.Invoke(() => Logs.Clear());
@@ -66,15 +64,6 @@ namespace SakuraLauncher.Model
                 var match = LogModel.Pattern.Match(l.Data);
                 if (match.Success)
                 {
-                    if (failedData.ContainsKey(l.Source))
-                    {
-                        if (View.IsVisible && !SuppressInfo)
-                        {
-                            string failedData_ = failedData[l.Source];
-                            ThreadPool.QueueUserWorkItem(s => App.ShowMessage(failedData_, "隧道日志", MessageBoxImage.Information));
-                        }
-                        failedData.Remove(l.Source);
-                    }
                     entry.Time = match.Groups["Time"].Value;
                     entry.Data = match.Groups["Content"].Value;
                     entry.Level = match.Groups["Level"].Value + ":" + match.Groups["Source"].Value;
@@ -87,14 +76,6 @@ namespace SakuraLauncher.Model
                         entry.LevelColor = LogModel.BrushError;
                         break;
                     }
-                }
-                else if (!init)
-                {
-                    if (!failedData.ContainsKey(l.Source))
-                    {
-                        failedData[l.Source] = "";
-                    }
-                    failedData[l.Source] += l.Data + "\n";
                 }
             }
             else
@@ -114,6 +95,14 @@ namespace SakuraLauncher.Model
                     entry.Level = "ERROR";
                     entry.LevelColor = LogModel.BrushError;
                     break;
+                case 4: // Notice INFO
+                case 5: // Notice WARNING
+                case 6: // Notice ERROR
+                    if (!SuppressNotification)
+                    {
+                        Dispatcher.Invoke(() => View.trayIcon.ShowBalloonTip(entry.Source, entry.Data, (Hardcodet.Wpf.TaskbarNotification.BalloonIcon)l.Category - 3));
+                    }
+                    return;
                 }
             }
             Dispatcher.Invoke(() =>
@@ -136,8 +125,8 @@ namespace SakuraLauncher.Model
             settings.Width = (int)View.Width;
             settings.Height = (int)View.Height;
 
-            settings.SuppressInfo = SuppressInfo;
             settings.LogTextWrapping = LogTextWrapping;
+            settings.SuppressNotification = SuppressNotification;
 
             settings.Save();
         }
