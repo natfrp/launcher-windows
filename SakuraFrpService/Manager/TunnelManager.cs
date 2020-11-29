@@ -177,6 +177,10 @@ namespace SakuraFrpService.Manager
                                 t.Fail();
                                 t.Stop(true);
                             }
+                            else
+                            {
+                                continue;
+                            }
                         }
                         else if (t.Running)
                         {
