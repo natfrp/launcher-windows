@@ -11,6 +11,7 @@ namespace LegacyLauncher.Model
     public class LauncherViewModel : LauncherModel
     {
         public readonly Func<string, bool> SimpleConfirmHandler;
+        public readonly Func<string, bool> SimpleWarningHandler;
         public readonly Action<bool, string> SimpleHandler;
         public readonly Action<bool, string> SimpleFailureHandler;
 
@@ -19,6 +20,7 @@ namespace LegacyLauncher.Model
         public LauncherViewModel(MainForm view)
         {
             SimpleConfirmHandler = message => MessageBox.Show(View, message, "操作确认", MessageBoxButtons.OKCancel, MessageBoxIcon.Asterisk) == DialogResult.OK;
+            SimpleWarningHandler = message => MessageBox.Show(View, message, "警告", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
             SimpleHandler = (success, message) => MessageBox.Show(View, message, success ? "操作成功" : "操作失败", MessageBoxButtons.OK, success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
             SimpleFailureHandler = (success, message) =>
             {

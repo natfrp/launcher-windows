@@ -33,6 +33,11 @@ namespace SakuraLibrary
         public IntPtr dacl;
     }
 
+    public enum SystemMetric : int
+    {
+        SM_REMOTESESSION = 0x1000
+    }
+
     public static class NTAPI
     {
         [DllImport("user32.dll")]
@@ -43,6 +48,9 @@ namespace SakuraLibrary
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern int MessageBox(int hWnd, string text, string caption, uint type);
+
+        [DllImport("user32.dll")]
+        public static extern int GetSystemMetrics(SystemMetric smIndex);
 
         [DllImport("kernel32.dll")]
         public static extern bool QueryFullProcessImageName([In] IntPtr hProcess, [In] uint dwFlags, [Out] StringBuilder lpExeName, [In, Out] ref uint lpdwSize);

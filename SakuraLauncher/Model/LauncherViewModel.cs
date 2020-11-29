@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
-using System.Threading;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 using SakuraLibrary;
@@ -17,6 +15,7 @@ namespace SakuraLauncher.Model
     public class LauncherViewModel : LauncherModel
     {
         public readonly Func<string, bool> SimpleConfirmHandler = message => App.ShowMessage(message, "操作确认", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK;
+        public readonly Func<string, bool> SimpleWarningHandler = message => App.ShowMessage(message, "警告", MessageBoxImage.Warning, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
         public readonly Action<bool, string> SimpleHandler = (success, message) => App.ShowMessage(message, success ? "操作成功" : "操作失败", success ? MessageBoxImage.Information : MessageBoxImage.Error);
         public readonly Action<bool, string> SimpleFailureHandler = (success, message) =>
         {

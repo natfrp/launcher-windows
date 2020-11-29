@@ -94,7 +94,11 @@ namespace SakuraFrpService.Manager
             var status = new UpdateStatus
             {
                 UpdateLauncher = Version.TryParse(result.Launcher.Version, out Version launcher) && launcher > Assembly.GetExecutingAssembly().GetName().Version,
-                UpdateFrpc = TryParseFrpcVersion(result.Frpc.Version, out Version frpc, out float sakura) && (frpc > FrpcVersion || (frpc == FrpcVersion && FrpcSakura != 0 && sakura > FrpcSakura))
+                UpdateFrpc = TryParseFrpcVersion(result.Frpc.Version, out Version frpc, out float sakura) && (frpc > FrpcVersion || (frpc == FrpcVersion && FrpcSakura != 0 && sakura > FrpcSakura)),
+                LauncherVersion = result.Launcher.Version,
+                FrpcVersion = result.Frpc.Version,
+                LauncherNote = result.Launcher.Note,
+                FrpcNote = result.Frpc.Note
             };
             lock (this)
             {

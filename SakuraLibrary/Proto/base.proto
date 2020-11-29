@@ -25,6 +25,10 @@ message ServiceConfig {
 message UpdateStatus {
   bool update_launcher = 1;
   bool update_frpc = 2;
+  string launcher_version = 3;
+  string frpc_version = 4;
+  string launcher_note = 5;
+  string frpc_note = 6;
 }
 
 enum MessageID {

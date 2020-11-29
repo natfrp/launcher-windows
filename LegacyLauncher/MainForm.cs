@@ -145,7 +145,7 @@ namespace LegacyLauncher
             }
         }
 
-        private void label_update_Click(object sender, EventArgs e) => Model.DoUpdate(true, Model.SimpleFailureHandler);
+        private void label_update_Click(object sender, EventArgs e) => Model.ConfirmUpdate(true, Model.SimpleFailureHandler, Model.SimpleConfirmHandler, Model.SimpleWarningHandler);
 
         private void checkBox_update_CheckedChanged(object sender, EventArgs e)
         {

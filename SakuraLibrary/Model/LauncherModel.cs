@@ -467,6 +467,33 @@ namespace SakuraLibrary.Model
             });
         }
 
+        public string GetUpdateNote()
+        {
+            var note = new List<string>();
+            if (Update.UpdateLauncher)
+            {
+                note.Add(string.Format("启动器 v{0}:\n{1}", Update.LauncherVersion, Update.LauncherNote));
+            }
+            if (Update.UpdateFrpc)
+            {
+                note.Add(string.Format("frpc v{0}:\n{1}", Update.FrpcVersion, Update.FrpcNote));
+            }
+            return string.Join("\n\n", note);
+        }
+
+        public void ConfirmUpdate(bool legacy, Action<bool, string> callback, Func<string, bool> confirm, Func<string, bool> warn)
+        {
+            if (!confirm(GetUpdateNote()))
+            {
+                return;
+            }
+            if (NTAPI.GetSystemMetrics(SystemMetric.SM_REMOTESESSION) != 0 && !warn("检测到当前正在使用远程桌面连接，若您正在通过 SakuraFrp 连接计算机，请勿进行更新\n进行更新时启动器和所有 frpc 将彻底退出并且需要手动确认操作，这会造成远程桌面断开并且无法恢复\n是否继续?"))
+            {
+                return;
+            }
+            DoUpdate(legacy, callback);
+        }
+
         public void DoUpdate(bool legacy, Action<bool, string> callback)
         {
             if (!File.Exists("Updater.exe"))
