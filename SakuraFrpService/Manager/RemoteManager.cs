@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using SakuraLibrary.Helper;
 
 using SakuraFrpService.Data;
-using wsShim = SakuraFrpService.WebSocketShim;
+using SakuraFrpService.WebSocketShim;
 
 namespace SakuraFrpService.Manager
 {
@@ -43,7 +43,7 @@ namespace SakuraFrpService.Manager
 
         protected async Task Connect()
         {
-            Socket = wsShim.SystemClientWebSocket.ConnectAsync(new Uri("ws://remote.natfrp.com:2333"), Source.Token).Result;
+            Socket = SystemClientWebSocket.ConnectAsync(new Uri("ws://remote.natfrp.com:2333"), Source.Token).Result;
             await Socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new Dictionary<string, object>
             {
                 { "version", REMOTE_VERSION },
