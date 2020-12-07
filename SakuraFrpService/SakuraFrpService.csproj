@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -52,6 +53,9 @@
     <Reference Include="System.Management" />
     <Reference Include="System.Memory, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.2\lib\netstandard1.1\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\portable-net45+win8+wp8+wpa81\System.Numerics.Vectors.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.2\lib\netstandard1.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
@@ -96,6 +100,24 @@
     <Compile Include="Manager\NodeManager.cs" />
     <Compile Include="Data\Tunnel.cs" />
     <Compile Include="Manager\TunnelManager.cs" />
+    <Compile Include="WebSocketShim\ClientWebSocket.cs" />
+    <Compile Include="WebSocketShim\ClientWebSocketOptions.cs" />
+    <Compile Include="WebSocketShim\HttpKnownHeaderNames.cs" />
+    <Compile Include="WebSocketShim\ManagedWebSocket.cs" />
+    <Compile Include="WebSocketShim\NET45Shims.cs" />
+    <Compile Include="WebSocketShim\NetEventSource.WebSockets.cs" />
+    <Compile Include="WebSocketShim\SecurityProtocol.cs" />
+    <Compile Include="WebSocketShim\SR.cs" />
+    <Compile Include="WebSocketShim\StringExtensions.cs" />
+    <Compile Include="WebSocketShim\Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+    <Compile Include="WebSocketShim\SystemClientWebSocket.cs" />
+    <Compile Include="WebSocketShim\UriScheme.cs" />
+    <Compile Include="WebSocketShim\WebSocketHandle.Managed.cs" />
+    <Compile Include="WebSocketShim\WebSocketValidate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -112,6 +134,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectInstaller.resx">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WebSocketShim\Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
