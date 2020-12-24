@@ -351,3 +351,5 @@ MigrationBackup/
 
 # protobuf generated stuffs
 **/Proto/Out/*.cs
+
+/_publish/**
