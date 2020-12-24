@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text;
 using System.Linq;
-using System.Threading;
 using System.Reflection;
 using System.Diagnostics;
 using System.ServiceProcess;
@@ -10,6 +9,7 @@ using System.Security.Principal;
 using System.Security.Cryptography;
 using System.Security.AccessControl;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SakuraLibrary
 {
@@ -166,38 +166,32 @@ namespace SakuraLibrary
         public static void VerifySignature(params string[] files)
         {
 #if !DEBUG // && false
-            bool failed = false;
-            var complete = new ManualResetEvent(false);
-            ThreadPool.QueueUserWorkItem(_ =>
+            try
             {
-                var failure = files.Where(f => !WinTrust.VerifyFile(f)).ToArray();
-                if (failure.Length == 0)
+                var key = new PublicKey(new Oid("1.2.840.113549.1.1.1"), new AsnEncodedData(new byte[] { 05, 00 }), new AsnEncodedData(Properties.Resources.sakura_sign));
+                using (var rsa = (RSACryptoServiceProvider)key.Key)
                 {
-                    complete.Set();
-                    return;
+                    var failure = files.Where(f => !File.Exists(f + ".sig") || !rsa.VerifyData(File.ReadAllBytes(f), "SHA256", File.ReadAllBytes(f + ".sig"))).ToList();
+                    if (failure.Count == 0)
+                    {
+                        return;
+                    }
+                    NTAPI.MessageBox(0, "@@@@@@@@@@@@@@@@@@\n" +
+                        "         !!!  警告: 文件签名验证失败  !!!\n" +
+                        "@@@@@@@@@@@@@@@@@@\n\n" +
+                        "下列文件未通过数字签名校验:\n" + string.Join("\n", failure) + "\n\n" +
+                        "这些文件可能已损坏或被纂改, 这意味着您的电脑可能已经被病毒感染, 请立即进行杀毒并重新下载启动器\n\n" +
+                        "如果您准备自己编译启动器或使用其他版本的 frpc, 请自行修改 SakuraLibrary\\Utils.cs 或使用 Debug 构建来禁用签名验证", "Error", 0x10);
                 }
-                failed = true;
-                complete.Set();
+            }
+            catch (Exception e)
+            {
                 NTAPI.MessageBox(0, "@@@@@@@@@@@@@@@@@@\n" +
                     "         !!!  警告: 文件签名验证失败  !!!\n" +
-                    "@@@@@@@@@@@@@@@@@@\n\n" +
-                    "下列文件未通过数字签名校验:\n" + string.Join("\n", failure) + "\n\n" +
-                    "这些文件可能已损坏或被纂改, 这意味着您的电脑可能已经被病毒感染, 请立即进行杀毒并重新下载启动器\n\n" +
-                    "如果您准备自己编译启动器或使用其他版本的 frpc, 请自行修改 SakuraLibrary\\Utils.cs 或使用 Debug 构建来禁用签名验证", "Error", 0x10);
-                Environment.Exit(0);
-            });
-            if (complete.WaitOne(12 * 1000))
-            {
-                if (failed)
-                {
-                    while (true)
-                    {
-                        Thread.Sleep(50);
-                    }
-                }
-                return;
+                    "@@@@@@@@@@@@@@@@@@\n" +
+                    "出现内部错误, 请截图此报错并联系管理员\n\n" + e, "Error", 0x10);
             }
-            ThreadPool.QueueUserWorkItem(_ => NTAPI.MessageBox(0, "签名校验超时, 为了确保您的使用体验, 该操作将在后台进行\n您可以忽略此警告并继续使用启动器, 但我们无法保证您的启动器文件完整性\n\n* 看到此提示说明您的系统存在问题导致数字签名验证过慢", "警告", 0x30));
+            Environment.Exit(0);
 #endif
         }
     }
