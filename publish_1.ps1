@@ -17,7 +17,7 @@ function PrepareVariation {
         $Variation
     )
 
-    $target = "${Variation}_$version";
+    $target = "${Variation}_v$version";
     
     PrepareDir $target;
     Get-ChildItem -Path $release_dir | Where-Object {
@@ -46,6 +46,6 @@ Get-ChildItem -Path $release_dir | Where-Object {
     $_.Name -eq "SakuraLibrary.dll"
 } | Copy-Item -Destination sign;
 
-Copy-Item frpc_windows_386.exe, frpc_windows_amd64.exe sign -ErrorAction SilentlyContinue;
+Copy-Item "frpc_*.exe" sign -ErrorAction SilentlyContinue;
 
 Compress-Archive -Force -CompressionLevel Optimal -Path sign -DestinationPath "sign_$version.zip";

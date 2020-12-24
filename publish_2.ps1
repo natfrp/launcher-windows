@@ -6,7 +6,7 @@ function DeployVariation {
         $Variation
     )
 
-    $target = "${Variation}_$version";
+    $target = "${Variation}_v$version";
     
     $files = Get-ChildItem -Path "sign" | Where-Object {
         $_.Name -eq "$Variation.exe" -or (
@@ -24,9 +24,21 @@ function DeployVariation {
 
     Copy-Item "sign\frpc_windows_386.exe" "$target\frpc.exe";
     openssl dgst -sign $env:SAKURA_SIGN_KEY -sha256 -out "$target\frpc.exe.sig" "sign\frpc_windows_386.exe";
+
+    Compress-Archive -Force -CompressionLevel Optimal -Path $target -DestinationPath "$Variation.zip";
+
+    Remove-Item -Path "$target\frpc.*", "$target\Updater.*" -ErrorAction SilentlyContinue;
+    Compress-Archive -Force -CompressionLevel Optimal -Path "$target\*" -DestinationPath "$($Variation -replace "Launcher", "Update").zip";
 }
 
 Set-Location _publish;
 
 DeployVariation SakuraLauncher
 DeployVariation LegacyLauncher
+
+# Create frpc update package
+New-Item -Name frpc -ItemType "directory" -ErrorAction SilentlyContinue;
+Copy-Item "sign\frpc_windows_386.exe" "frpc\frpc.exe";
+openssl dgst -sign $env:SAKURA_SIGN_KEY -sha256 -out "frpc\frpc.exe.sig" "frpc\frpc.exe";
+Compress-Archive -Force -CompressionLevel Optimal -Path "frpc\*" -DestinationPath "frpc_windows_386.zip";
+Remove-Item "frpc" -Recurse;
