@@ -33,7 +33,7 @@ namespace SakuraFrpService.Manager
         }
         private int _updateInterval;
 
-        private float FrpcSakura = 0;
+        private double FrpcSakura = 0;
         private Version FrpcVersion;
 
         private DateTime LastCheck = DateTime.MinValue;
@@ -72,10 +72,12 @@ namespace SakuraFrpService.Manager
             }
         }
 
-        public bool TryParseFrpcVersion(string data, out Version version, out float sakura)
+        // Actual version number for 0.34.2-sakura-[mainVersion]-[tag(alpha/beta/rc)]-[stateCode] will be
+        // [mainVersion] - [tagging(0.03/0.02/0.01)] + [stateCode]
+        public bool TryParseFrpcVersion(string data, out Version version, out double sakura)
         {
             sakura = 0;
-            var temp = data.Trim().Split(new string[] { "-sakura-" }, StringSplitOptions.RemoveEmptyEntries);
+            var temp = data.Trim().Split('-');
             if (temp.Length == 0 || temp[0].Length == 0)
             {
                 version = null;
@@ -85,16 +87,40 @@ namespace SakuraFrpService.Manager
             {
                 temp[0] = temp[0].Substring(1);
             }
-            return Version.TryParse(temp[0], out version) && (temp.Length == 1 || float.TryParse(temp[1], out sakura));
+            if (!Version.TryParse(temp[0], out version))
+            {
+                return false;
+            }
+            if (temp.Length >= 3 && double.TryParse(temp[2], out sakura))
+            {
+                // For testing versions
+                if (temp.Length == 5 && int.TryParse(temp[4], out int status))
+                {
+                    switch (temp[3])
+                    {
+                    case "alpha":
+                        sakura -= 0.03;
+                        break;
+                    case "beta":
+                        sakura -= 0.02;
+                        break;
+                    case "rc":
+                        sakura -= 0.01;
+                        break;
+                    }
+                    sakura += 0.001 * status;
+                }
+            }
+            return true;
         }
 
-        public async Task<UpdateStatus> CheckUpdate(bool loadEnabled = false)
+        public async Task<UpdateStatus> CheckUpdate()
         {
             var result = await Natfrp.Request<Natfrp.GetVersion>("get_version");
             var status = new UpdateStatus
             {
                 UpdateLauncher = Version.TryParse(result.Launcher.Version, out Version launcher) && launcher > Assembly.GetExecutingAssembly().GetName().Version,
-                UpdateFrpc = TryParseFrpcVersion(result.Frpc.Version, out Version frpc, out float sakura) && (frpc > FrpcVersion || (frpc == FrpcVersion && FrpcSakura != 0 && sakura > FrpcSakura)),
+                UpdateFrpc = TryParseFrpcVersion(result.Frpc.Version, out Version frpc, out double sakura) && (frpc > FrpcVersion || (frpc == FrpcVersion && FrpcSakura != 0 && sakura > FrpcSakura)),
                 LauncherVersion = result.Launcher.Version,
                 FrpcVersion = result.Frpc.Version,
                 LauncherNote = result.Launcher.Note,
