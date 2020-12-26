@@ -7,7 +7,7 @@ SakuraFrp 的 Windows 启动器, 提供了便捷的隧道操作功能和自启�
  - 安装 [.NET Framework 4.5](https://dotnet.microsoft.com/download/dotnet-framework/net45)
 
 远程管理功能:
- - Windows 8 及以上
+ - Windows 7 及以上
  - 安装 [Visual C++ 2015 Runtime (x86)](https://support.microsoft.com/zh-cn/help/2977003/the-latest-supported-visual-c-downloads)
 
 ### 使用方法
