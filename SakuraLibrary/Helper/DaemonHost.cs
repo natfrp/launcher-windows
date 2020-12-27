@@ -22,9 +22,9 @@ namespace SakuraLibrary.Helper
         public Process BaseProcess = null;
         public ServiceController Controller = null;
 
-        public DaemonHost(LauncherModel launcher)
+        public DaemonHost(LauncherModel launcher, bool forceDaemon)
         {
-            Controller = ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == Consts.ServiceName);
+            Controller = forceDaemon ? null : ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == Consts.ServiceName);
             Daemon = Controller == null;
             Launcher = launcher;
 

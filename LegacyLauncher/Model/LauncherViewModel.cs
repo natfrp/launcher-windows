@@ -17,7 +17,7 @@ namespace LegacyLauncher.Model
 
         public readonly MainForm View;
 
-        public LauncherViewModel(MainForm view)
+        public LauncherViewModel(MainForm view) : base(true)
         {
             SimpleConfirmHandler = message => MessageBox.Show(View, message, "操作确认", MessageBoxButtons.OKCancel, MessageBoxIcon.Asterisk) == DialogResult.OK;
             SimpleWarningHandler = message => MessageBox.Show(View, message, "警告", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;

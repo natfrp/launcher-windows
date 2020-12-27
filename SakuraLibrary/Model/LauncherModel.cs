@@ -20,9 +20,9 @@ namespace SakuraLibrary.Model
         public readonly DaemonHost Daemon;
         public readonly AsyncManager AsyncManager;
 
-        public LauncherModel()
+        public LauncherModel(bool forceDaemon = false)
         {
-            Daemon = new DaemonHost(this);
+            Daemon = new DaemonHost(this, forceDaemon);
             AsyncManager = new AsyncManager(Run);
 
             Pipe.ServerPush += Pipe_ServerPush;
