@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Management;
 using System.Diagnostics;
 using System.ServiceProcess;
 
@@ -29,6 +31,31 @@ namespace SakuraLibrary.Helper
             ServicePath = Path.GetFullPath(Consts.ServiceExecutable);
 
             AsyncManager = new AsyncManager(Run);
+
+            if (!Daemon)
+            {
+                try
+                {
+                    using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Service WHERE Name = '" + Consts.ServiceName + "'"))
+                    using (var collection = searcher.Get())
+                    {
+                        var service = collection.OfType<ManagementObject>().FirstOrDefault();
+                        if (service != null)
+                        {
+                            var oldPath = Path.GetFullPath((service.GetPropertyValue("PathName") as string).Trim('"'));
+                            var newPath = Path.GetFullPath(Consts.ServiceExecutable);
+                            if (oldPath != newPath)
+                            {
+                                NTAPI.MessageBox(0, "系统服务状态异常, 启动器可能无法正常运行\n请不要在安装系统服务后挪动启动器文件或在其他路径运行启动器\n\n如果无法正常连接到守护进程请卸载服务并重新安装\n如果无法正常连接到守护进程请卸载服务并重新安装\n如果无法正常连接到守护进程请卸载服务并重新安装\n\n服务路径:\n" + oldPath + "\n当前路径:\n" + newPath, "错误", 0x10);
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    NTAPI.MessageBox(0, "出现了一个神秘的错误, 建议截图此错误并联系管理员:\n" + e, "错误", 0x10);
+                }
+            }
         }
 
         public bool StartDaemon()
