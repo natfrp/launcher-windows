@@ -94,16 +94,6 @@ namespace LegacyLauncher
             Model.Type = comboBox_type.Text;
         }
 
-        private void checkBox_compress_CheckedChanged(object sender, EventArgs e)
-        {
-            Model.Compression = checkBox_compress.Checked;
-        }
-
-        private void checkBox_encrypt_CheckedChanged(object sender, EventArgs e)
-        {
-            Model.Encryption = checkBox_encrypt.Checked;
-        }
-
         private void button_reload_Click(object sender, EventArgs e) => Model.ReloadListening();
     }
 }

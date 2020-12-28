@@ -517,9 +517,7 @@ namespace SakuraFrpService
                                 .Append("&node=").Append(req.DataCreateTunnel.Node)
                                 .Append("&local_ip=").Append(req.DataCreateTunnel.LocalAddress)
                                 .Append("&local_port=").Append(req.DataCreateTunnel.LocalPort)
-                                .Append("&remote_port=").Append(req.DataCreateTunnel.RemotePort)
-                                .Append("&encryption=").Append(req.DataCreateTunnel.Encryption ? "true" : "false")
-                                .Append("&compression=").Append(req.DataCreateTunnel.Compression ? "true" : "false").ToString()).WaitResult();
+                                .Append("&remote_port=").Append(req.DataCreateTunnel.RemotePort).ToString()).WaitResult();
                             var t = TunnelManager.CreateFromApi(result.Data);
                             lock (TunnelManager)
                             {

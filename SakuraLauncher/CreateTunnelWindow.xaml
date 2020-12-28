@@ -92,8 +92,6 @@
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <CheckBox Grid.Column="0" IsChecked="{Binding Compression}" Style="{StaticResource MaterialDesignDarkCheckBox}" Content="压缩数据" />
-                        <CheckBox Grid.Column="1" IsChecked="{Binding Encryption}" Style="{StaticResource MaterialDesignDarkCheckBox}" Content="加密传输" />
                     </Grid>
                 </StackPanel>
             </materialDesign:Card>

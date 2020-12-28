@@ -37,11 +37,10 @@
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.textBox_local_ip = new System.Windows.Forms.TextBox();
+            this.createTunnelModelBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.textBox_local_port = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.checkBox_encrypt = new System.Windows.Forms.CheckBox();
-            this.checkBox_compress = new System.Windows.Forms.CheckBox();
             this.button_create = new System.Windows.Forms.Button();
             this.comboBox_node = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -53,9 +52,8 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.button_reload = new System.Windows.Forms.Button();
-            this.createTunnelModelBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.createTunnelModelBindingSource)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // listView_listening
@@ -110,6 +108,10 @@
             this.textBox_local_ip.Size = new System.Drawing.Size(136, 21);
             this.textBox_local_ip.TabIndex = 1;
             // 
+            // createTunnelModelBindingSource
+            // 
+            this.createTunnelModelBindingSource.DataSource = typeof(SakuraLibrary.Model.CreateTunnelModel);
+            // 
             // textBox_local_port
             // 
             this.textBox_local_port.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.createTunnelModelBindingSource, "LocalPort", true));
@@ -129,8 +131,6 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.checkBox_encrypt);
-            this.groupBox1.Controls.Add(this.checkBox_compress);
             this.groupBox1.Controls.Add(this.button_create);
             this.groupBox1.Controls.Add(this.comboBox_node);
             this.groupBox1.Controls.Add(this.label6);
@@ -150,30 +150,6 @@
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "隧道配置";
-            // 
-            // checkBox_encrypt
-            // 
-            this.checkBox_encrypt.AutoSize = true;
-            this.checkBox_encrypt.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.createTunnelModelBindingSource, "Encryption", true));
-            this.checkBox_encrypt.Location = new System.Drawing.Point(84, 135);
-            this.checkBox_encrypt.Name = "checkBox_encrypt";
-            this.checkBox_encrypt.Size = new System.Drawing.Size(72, 16);
-            this.checkBox_encrypt.TabIndex = 13;
-            this.checkBox_encrypt.Text = "加密传输";
-            this.checkBox_encrypt.UseVisualStyleBackColor = true;
-            this.checkBox_encrypt.CheckedChanged += new System.EventHandler(this.checkBox_encrypt_CheckedChanged);
-            // 
-            // checkBox_compress
-            // 
-            this.checkBox_compress.AutoSize = true;
-            this.checkBox_compress.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.createTunnelModelBindingSource, "Compression", true));
-            this.checkBox_compress.Location = new System.Drawing.Point(6, 135);
-            this.checkBox_compress.Name = "checkBox_compress";
-            this.checkBox_compress.Size = new System.Drawing.Size(72, 16);
-            this.checkBox_compress.TabIndex = 13;
-            this.checkBox_compress.Text = "压缩数据";
-            this.checkBox_compress.UseVisualStyleBackColor = true;
-            this.checkBox_compress.CheckedChanged += new System.EventHandler(this.checkBox_compress_CheckedChanged);
             // 
             // button_create
             // 
@@ -281,10 +257,6 @@
             this.button_reload.UseVisualStyleBackColor = true;
             this.button_reload.Click += new System.EventHandler(this.button_reload_Click);
             // 
-            // createTunnelModelBindingSource
-            // 
-            this.createTunnelModelBindingSource.DataSource = typeof(SakuraLibrary.Model.CreateTunnelModel);
-            // 
             // CreateTunnelForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -300,9 +272,9 @@
             this.Name = "CreateTunnelForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "新建穿透隧道";
+            ((System.ComponentModel.ISupportInitialize)(this.createTunnelModelBindingSource)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.createTunnelModelBindingSource)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -329,8 +301,6 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.ComboBox comboBox_node;
         private System.Windows.Forms.Button button_create;
-        private System.Windows.Forms.CheckBox checkBox_compress;
-        private System.Windows.Forms.CheckBox checkBox_encrypt;
         private System.Windows.Forms.Button button_reload;
         private System.Windows.Forms.BindingSource createTunnelModelBindingSource;
     }

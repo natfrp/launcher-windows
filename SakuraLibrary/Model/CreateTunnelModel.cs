@@ -30,8 +30,6 @@ namespace SakuraLibrary.Model
         private string _localAddress = "";
 
         public string Note { get; set; } = "";
-        public bool Encryption { get; set; }
-        public bool Compression { get; set; }
 
         public bool Loading { get => _loading; set => Set(out _loading, value); }
         private bool _loading = false;
