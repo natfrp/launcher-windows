@@ -80,6 +80,8 @@ namespace SakuraFrpService.Manager
             lock (this)
             {
                 bool changed = false;
+
+                // Add new tunnels
                 var tmp = new List<int>();
                 foreach (var j in tunnels.Data)
                 {
@@ -90,12 +92,35 @@ namespace SakuraFrpService.Manager
                         this[j.Id] = CreateFromApi(j);
                     }
                 }
+
+                // Remove deleted tunnels
                 var remove = Keys.Where(k => !tmp.Contains(k)).ToList();
                 foreach (var k in remove)
                 {
                     changed = true;
                     Remove(k);
                 }
+
+                // Update tunnel details and set the changed flag accordingly
+                void update<T>(ref T dst, T src)
+                {
+                    if (Comparer<T>.Default.Compare(dst, src) != 0)
+                    {
+                        changed = true;
+                        dst = src;
+                    }
+                }
+                foreach (var j in tunnels.Data)
+                {
+                    var r = this[j.Id];
+                    update(ref r.Id, j.Id);
+                    update(ref r.Node, j.Node);
+                    update(ref r.Name, j.Name);
+                    update(ref r.Type, j.Type);
+                    update(ref r.Note, j.Note);
+                    update(ref r.Description, j.Description);
+                }
+
                 if (changed)
                 {
                     Main.LogManager.Log(1, "Service", "TunnelManager: 隧道列表同步成功");
@@ -154,7 +179,7 @@ namespace SakuraFrpService.Manager
                         {
                             if (!t.Running)
                             {
-                                if(t.StartState == 1)
+                                if (t.StartState == 1)
                                 {
                                     t.Fail(); // Pending start, crash confirmed
                                 }
