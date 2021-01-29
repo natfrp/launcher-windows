@@ -57,7 +57,7 @@ namespace SakuraFrpService
                     }
                     catch (Exception e) when (e.InnerException is Win32Exception w32 && w32.NativeErrorCode == 1073) // ERROR_SERVICE_EXISTS
                     {
-                        MessageBox.Show("服务已存在", "操作失败", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        // Just ignore
                     }
                     catch (Exception e)
                     {
@@ -72,7 +72,7 @@ namespace SakuraFrpService
                     }
                     catch (Exception e) when (e.InnerException is Win32Exception w32 && w32.NativeErrorCode == 1060) // ERROR_SERVICE_DOES_NOT_EXIST
                     {
-                        MessageBox.Show("服务未安装", "操作失败", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        // Just ignore
                     }
                     catch (Exception e)
                     {
