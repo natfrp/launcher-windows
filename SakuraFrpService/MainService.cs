@@ -355,13 +355,13 @@ namespace SakuraFrpService
             {
                 var req = RequestBase.Parser.ParseFrom(connection.Buffer, 0, count);
                 var resp = ResponseBase(true);
-                var blockSensitive = connection is RemotePipeConnection;
+                var isRemote = connection is RemotePipeConnection;
 
                 switch (req.Type)
                 {
                 case MessageID.UserLogin:
                     {
-                        if (blockSensitive)
+                        if (isRemote)
                         {
                             connection.RespondFailure("远程控制无法执行该操作");
                             return;
@@ -376,7 +376,7 @@ namespace SakuraFrpService
                     break;
                 case MessageID.UserLogout:
                     {
-                        if (blockSensitive)
+                        if (isRemote)
                         {
                             connection.RespondFailure("远程控制无法执行该操作");
                             return;
@@ -407,14 +407,14 @@ namespace SakuraFrpService
                     resp.DataLog = new LogList();
                     lock (LogManager)
                     {
-                        resp.DataLog.Data.Add(LogManager);
+                        resp.DataLog.Data.Add(isRemote ? LogManager.Skip(LogManager.Count - 80) : LogManager);
                     }
                     break;
                 case MessageID.LogClear:
                     LogManager.Clear();
                     break;
                 case MessageID.ControlExit:
-                    if (blockSensitive)
+                    if (isRemote)
                     {
                         connection.RespondFailure("远程控制无法执行该操作");
                         return;
@@ -422,7 +422,7 @@ namespace SakuraFrpService
                     Stop();
                     return;
                 case MessageID.ControlConfigGet:
-                    if (blockSensitive)
+                    if (isRemote)
                     {
                         connection.RespondFailure("远程控制无法执行该操作");
                         return;
@@ -430,7 +430,7 @@ namespace SakuraFrpService
                     resp.DataConfig = GetConfig();
                     break;
                 case MessageID.ControlConfigSet:
-                    if (blockSensitive)
+                    if (isRemote)
                     {
                         connection.RespondFailure("远程控制无法执行该操作");
                         return;
@@ -454,7 +454,7 @@ namespace SakuraFrpService
                     PushConfig();
                     break;
                 case MessageID.ControlCheckUpdate:
-                    if (blockSensitive)
+                    if (isRemote)
                     {
                         connection.RespondFailure("远程控制无法执行该操作");
                         return;
@@ -462,7 +462,7 @@ namespace SakuraFrpService
                     resp.DataUpdate = UpdateManager.CheckUpdate().WaitResult();
                     break;
                 case MessageID.ControlGetUpdate:
-                    if (blockSensitive)
+                    if (isRemote)
                     {
                         connection.RespondFailure("远程控制无法执行该操作");
                         return;
