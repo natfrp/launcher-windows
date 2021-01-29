@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.ServiceProcess;
@@ -15,6 +16,8 @@ namespace SakuraFrpService
 {
     static class Program
     {
+        public static Mutex AppMutex = null;
+
         /// <summary>
         /// 应用程序的主入口点。
         /// </summary>
@@ -94,6 +97,17 @@ namespace SakuraFrpService
                 MessageBox.Show("You can't start the service directly.\nTo run as daemon, pass --daemon as the first parameter.\nKeep in mind that action above should be done by SakuraFrpLauncher automatically, not by user.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return -1;
             }
+
+            AppMutex = new Mutex(true, "SakuraFrpService_" + Utils.InstallationHash, out bool created);
+            if (!created)
+            {
+                if (Environment.UserInteractive)
+                {
+                    MessageBox.Show("请勿重复开启守护进程", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                return -1;
+            }
+
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {

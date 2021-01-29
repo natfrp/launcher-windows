@@ -35,7 +35,7 @@ namespace LegacyLauncher
                 }
             }
 
-            AppMutex = new Mutex(true, "LegacySakuraLauncher_" + Utils.Md5(Utils.ExecutablePath), out bool created);
+            AppMutex = new Mutex(true, "LegacySakuraLauncher_" + Utils.InstallationHash, out bool created);
 
             if (created)
             {
