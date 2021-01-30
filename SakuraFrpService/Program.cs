@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
+using System.Management;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.ServiceProcess;
@@ -17,6 +19,25 @@ namespace SakuraFrpService
     static class Program
     {
         public static Mutex AppMutex = null;
+
+        private static string InstallService()
+        {
+            var dir = new DirectoryInfo(Path.GetDirectoryName(Utils.ExecutablePath));
+
+            var acl = dir.GetAccessControl(AccessControlSections.Access);
+            acl.SetAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.LocalServiceSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.None, AccessControlType.Allow));
+
+            dir.SetAccessControl(acl);
+
+            ManagedInstallerClass.InstallHelper(new string[] { Utils.ExecutablePath });
+
+            return Utils.SetServicePermission();
+        }
+
+        private static void UninstallService()
+        {
+            ManagedInstallerClass.InstallHelper(new string[] { "/u", Utils.ExecutablePath });
+        }
 
         /// <summary>
         /// 应用程序的主入口点。
@@ -42,25 +63,40 @@ namespace SakuraFrpService
                 case "--install":
                     try
                     {
-                        var dir = new DirectoryInfo(Path.GetDirectoryName(Utils.ExecutablePath));
-
-                        var acl = dir.GetAccessControl(AccessControlSections.Access);
-                        acl.SetAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.LocalServiceSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.None, AccessControlType.Allow));
-
-                        dir.SetAccessControl(acl);
-
-                        ManagedInstallerClass.InstallHelper(new string[] { Utils.ExecutablePath });
-
-                        var result = Utils.SetServicePermission();
+                        var result = InstallService();
                         if (result != null)
                         {
-                            MessageBox.Show("无法设置服务操作权限, 启动器某些功能可能无法正常运行\n请记录下面的错误并反馈给开发者:\n" + result, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("无法设置服务操作权限, 启动器可能无法正常运行\n请截图此错误并联系管理员:\n" + result, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return 3;
                         }
                     }
                     catch (Exception e) when (e.InnerException is Win32Exception w32 && w32.NativeErrorCode == 1073) // ERROR_SERVICE_EXISTS
                     {
-                        // Just ignore
+                        // Ensure the service was installed correctly
+                        using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Service WHERE Name = '" + Consts.ServiceName + "'"))
+                        using (var collection = searcher.Get())
+                        {
+                            var service = collection.OfType<ManagementObject>().FirstOrDefault();
+                            if (service != null)
+                            {
+                                var oldPath = Path.GetFullPath((service.GetPropertyValue("PathName") as string).Trim('"'));
+                                var newPath = Path.GetFullPath(Consts.ServiceExecutable);
+                                if (oldPath != newPath)
+                                {
+                                    // Delete bad service and reinstall
+                                    try
+                                    {
+                                        UninstallService();
+                                        InstallService();
+                                    }
+                                    catch (Exception e1)
+                                    {
+                                        MessageBox.Show(e1.ToString(), "操作失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        return 2;
+                                    }
+                                }
+                            }
+                        }
                     }
                     catch (Exception e)
                     {
@@ -71,11 +107,11 @@ namespace SakuraFrpService
                 case "--uninstall":
                     try
                     {
-                        ManagedInstallerClass.InstallHelper(new string[] { "/u", Utils.ExecutablePath });
+                        UninstallService();
                     }
                     catch (Exception e) when (e.InnerException is Win32Exception w32 && w32.NativeErrorCode == 1060) // ERROR_SERVICE_DOES_NOT_EXIST
                     {
-                        // Just ignore
+                        // Can be safely ignored
                     }
                     catch (Exception e)
                     {

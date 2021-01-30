@@ -46,7 +46,7 @@ namespace SakuraLibrary.Helper
                             var newPath = Path.GetFullPath(Consts.ServiceExecutable);
                             if (oldPath != newPath)
                             {
-                                NTAPI.MessageBox(0, "系统服务状态异常, 启动器可能无法正常运行\n请不要在安装系统服务后挪动启动器文件或在其他路径运行启动器\n\n如果无法正常连接到守护进程请卸载服务并重新安装\n如果无法正常连接到守护进程请卸载服务并重新安装\n如果无法正常连接到守护进程请卸载服务并重新安装\n\n服务路径:\n" + oldPath + "\n当前路径:\n" + newPath, "错误", 0x10);
+                                NTAPI.MessageBox(0, "系统服务状态异常, 启动器可能无法正常运行\n请不要在安装系统服务后挪动启动器文件或在其他路径运行启动器\n\n如果无法正常连接到守护进程请点击 \"卸载服务\"\n如果无法正常连接到守护进程请点击 \"卸载服务\"\n如果无法正常连接到守护进程请点击 \"卸载服务\"\n\n服务路径:\n" + oldPath + "\n当前路径:\n" + newPath, "错误", 0x10);
                             }
                         }
                     }
