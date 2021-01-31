@@ -4,11 +4,8 @@ using System.Text;
 using System.Linq;
 using System.Reflection;
 using System.Diagnostics;
-using System.ServiceProcess;
 using System.Security.Principal;
 using System.Security.Cryptography;
-using System.Security.AccessControl;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 
 namespace SakuraLibrary
@@ -96,49 +93,6 @@ namespace SakuraLibrary
             {
                 return "无法设置开机启动, 请检查杀毒软件是否拦截了此操作\n\n" + e.ToString();
             }
-        }
-
-        public static string SetServicePermission()
-        {
-            var sc = ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == Consts.ServiceName);
-            if (sc == null)
-            {
-                return "Service not found";
-            }
-
-            var buffer = new byte[0];
-            if (!NTAPI.QueryServiceObjectSecurity(sc.ServiceHandle, SecurityInfos.DiscretionaryAcl, buffer, 0, out uint size))
-            {
-                int err = Marshal.GetLastWin32Error();
-                if (err != 122 && err != 0) // ERROR_INSUFFICIENT_BUFFER
-                {
-                    return "QueryServiceObjectSecurity[1] error: " + err;
-                }
-                buffer = new byte[size];
-                if (!NTAPI.QueryServiceObjectSecurity(sc.ServiceHandle, SecurityInfos.DiscretionaryAcl, buffer, size, out size))
-                {
-                    return "QueryServiceObjectSecurity[2] error: " + Marshal.GetLastWin32Error();
-                }
-            }
-
-            var rsd = new RawSecurityDescriptor(buffer, 0);
-
-            var dacl = new DiscretionaryAcl(false, false, rsd.DiscretionaryAcl);
-            dacl.SetAccess(AccessControlType.Allow, new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null), (int)(ServiceAccessRights.SERVICE_QUERY_STATUS | ServiceAccessRights.SERVICE_START | ServiceAccessRights.SERVICE_STOP | ServiceAccessRights.SERVICE_INTERROGATE), InheritanceFlags.None, PropagationFlags.None);
-
-            buffer = new byte[dacl.BinaryLength];
-            dacl.GetBinaryForm(buffer, 0);
-
-            rsd.DiscretionaryAcl = new RawAcl(buffer, 0);
-
-            buffer = new byte[rsd.BinaryLength];
-            rsd.GetBinaryForm(buffer, 0);
-
-            if (!NTAPI.SetServiceObjectSecurity(sc.ServiceHandle, SecurityInfos.DiscretionaryAcl, buffer))
-            {
-                return "SetServiceObjectSecurity error: " + Marshal.GetLastWin32Error();
-            }
-            return null;
         }
 
         public static Process[] SearchProcess(string name, string testPath = null)
