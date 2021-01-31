@@ -148,5 +148,21 @@ namespace SakuraLibrary
             Environment.Exit(0);
 #endif
         }
+
+        public static bool Is64OS()
+        {
+            if (IntPtr.Size == 8)
+            {
+                return true;
+            }
+            if (Environment.OSVersion.Version.Major < 5 || (Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor < 1))
+            {
+                return false;
+            }
+            using (Process p = Process.GetCurrentProcess())
+            {
+                return NTAPI.IsWow64Process(p.Handle, out bool retVal) && retVal;
+            }
+        }
     }
 }

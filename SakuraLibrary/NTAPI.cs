@@ -55,6 +55,9 @@ namespace SakuraLibrary
         [DllImport("kernel32.dll")]
         public static extern bool QueryFullProcessImageName([In] IntPtr hProcess, [In] uint dwFlags, [Out] StringBuilder lpExeName, [In, Out] ref uint lpdwSize);
 
+        [DllImport("kernel32.dll", CallingConvention = CallingConvention.Winapi)]
+        public static extern bool IsWow64Process([In] IntPtr hProcess, [Out] out bool wow64Process);
+
         [DllImport("advapi32.dll", SetLastError = true)]
         public static extern bool QueryServiceObjectSecurity(IntPtr serviceHandle, SecurityInfos secInfo, ref SECURITY_DESCRIPTOR lpSecDesrBuf, uint bufSize, out uint bufSizeNeeded);
 
