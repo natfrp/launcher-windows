@@ -103,6 +103,7 @@
     <Compile Include="RemoteConfigWindow.xaml.cs">
       <DependentUpon>RemoteConfigWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\DesignerData\TunnelTab.cs" />
     <Compile Include="View\LogTab.xaml.cs">
       <DependentUpon>LogTab.xaml</DependentUpon>
     </Compile>
