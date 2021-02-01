@@ -1,19 +1,17 @@
 ﻿#define AppName "SakuraFrp 启动器"
-#define AppVersion GetFileVersion("SakuraLibrary\bin\Release\SakuraLibrary.dll")
+#define AppVersion ""
 
 #define MainExecutable "SakuraLauncher.exe"
 
 #define LibraryNameNet ".NET Framework 4.8"
 #define LibraryNameVC "Visual C++ 2015-2019 Redistributable (x86)"
 
-#define DefaultExclude "*.pdb,*.xml"
-
 [Setup]
 ; Basics
 AppId=SakuraFrpLauncher
 AppName={#AppName}
 AppVersion={#AppVersion}
-AppVerName={#AppName} v{#AppVersion}
+AppVerName={#AppName} v{#GetFileVersion("_publish\SakuraLibrary\SakuraLibrary.dll")}
 AppCopyright=Copyright © FENGberd 2020-2021
 
 AppPublisher=SakuraFrp
@@ -21,10 +19,12 @@ AppPublisherURL=https://www.natfrp.com/
 AppSupportURL=https://www.natfrp.com/
 
 ; Wizard
-WizardStyle=classic
+WizardStyle=modern
 LicenseFile=LICENSE
+ShowComponentSizes=yes
 AlwaysShowDirOnReadyPage=yes
-;ShowComponentSizes
+UninstallDisplayName={#AppName}
+ArchitecturesInstallIn64BitMode=x64
 
 DefaultDirName={autopf}\SakuraFrpLauncher
 DefaultGroupName={#AppName}
@@ -51,6 +51,9 @@ Name: "custom"; Description: "自定义"; Flags: iscustom;
 
 [Components]
 Name: "frpc"; Description: "frpc"; Types: default custom; Flags: fixed
+Name: "frpc\x86"; Description: "frpc (32 位)"; Check: IsX86; Types: default custom; Flags: exclusive fixed
+Name: "frpc\x64"; Description: "frpc (64 位)"; Check: IsX64; Types: default custom; Flags: exclusive fixed
+
 Name: "launcher"; Description: "守护进程"; Types: default custom; Flags: fixed
 Name: "launcher\service"; Description: "安装为系统服务";
 
@@ -58,21 +61,18 @@ Name: "launcher_ui"; Description: "用户界面"; Types: default custom; Flags: 
 Name: "launcher_ui\wpf"; Description: "WPF 界面"; Types: default; Flags: exclusive
 Name: "launcher_ui\legacy"; Description: "传统界面 (不推荐)"; Types: custom; Flags: exclusive
 
-Name: "updater"; Description: "自动更新程序"; Types: default custom; Flags: fixed
-
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkedonce
 
 [Files]
-Source: "bin\frpc.*"; DestDir: "{app}"; Flags: ignoreversion; Components: "frpc"
+Source: "_publish\sign\frpc_windows_386.*"; DestDir: "{app}"; Flags: ignoreversion; Components: "frpc\x86"
+Source: "_publish\sign\frpc_windows_amd64.*"; DestDir: "{app}"; Flags: ignoreversion; Components: "frpc\x64"
 
-Source: "SakuraLibrary\bin\Release\SakuraLibrary.*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher"
-Source: "SakuraFrpService\bin\Release\*"; DestDir: "{app}"; Excludes: "{#DefaultExclude},libsodium-64.dll"; Flags: ignoreversion; Components: "launcher"
+Source: "_publish\SakuraLibrary\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher"
+Source: "_publish\SakuraFrpService\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher"
 
-Source: "SakuraLauncher\bin\Release\*"; DestDir: "{app}"; Excludes: "{#DefaultExclude}"; Flags: ignoreversion; Components: "launcher_ui\wpf"
-Source: "LegacyLauncher\bin\Release\*"; DestDir: "{app}"; Excludes: "{#DefaultExclude}"; Flags: ignoreversion; Components: "launcher_ui\legacy"
-
-Source: "Updater\bin\Release\*"; DestDir: "{app}"; Excludes: "{#DefaultExclude}"; Flags: ignoreversion; Components: "updater"
+Source: "_publish\SakuraLauncher\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui\wpf"
+Source: "_publish\LegacyLauncher\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui\legacy"
 
 [Icons]
 ; Start Menu
@@ -111,6 +111,16 @@ var
 
 	installVC: Boolean;
 	installNet: Boolean;
+	
+function IsX64: Boolean;
+begin
+	Result := Is64BitInstallMode and (ProcessorArchitecture = paX64);
+end;
+
+function IsX86: Boolean;
+begin
+	Result := (Is64BitInstallMode=false) and (ProcessorArchitecture = paX86);
+end;
 
 function TryInstall(const Name, File, Args: String): String;
 var

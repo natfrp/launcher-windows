@@ -1,44 +1,66 @@
-$version = Get-Content SakuraLibrary\AssemblyBase.cs | Select-String "AssemblyVersion\(`"(.+)`"\)";
-$version = $version.Matches[0].Groups[1].Value;
+$version = Get-Content "SakuraLibrary\AssemblyBase.cs" | Select-String "AssemblyVersion\(`"(.+)`"\)"
+$version = $version.Matches[0].Groups[1].Value
 
-function DeployVariation {
+$projects = "SakuraLibrary", "SakuraLauncher", "LegacyLauncher", "SakuraFrpService"
+
+function Sign {
     param (
-        $Variation
+        $File
     )
-
-    $target = "${Variation}_v$version";
-    
-    $files = Get-ChildItem -Path "sign" | Where-Object {
-        $_.Name -eq "$Variation.exe" -or (
-            $_.Extension -match "\.(exe)$" -and
-            $_.Name -notmatch "Launcher\.exe$" -and
-            $_.Name -notmatch "^frpc_"
-        ) -or (
-            $_.Extension -match "\.(dll)$"
-        )
-    };
-    $files | Copy-Item -Destination $target;
-    $files | ForEach-Object -Process {
-        openssl dgst -sign $env:SAKURA_SIGN_KEY -sha256 -out "$target\$($_.Name).sig" $_.FullName
-    };
-
-    Copy-Item "sign\frpc_windows_386.exe" "$target\frpc.exe";
-    openssl dgst -sign $env:SAKURA_SIGN_KEY -sha256 -out "$target\frpc.exe.sig" "sign\frpc_windows_386.exe";
-
-    Compress-Archive -Force -CompressionLevel Optimal -Path $target -DestinationPath "$Variation.zip";
-
-    Remove-Item -Path "$target\frpc.*", "$target\Updater.*" -ErrorAction SilentlyContinue;
-    Compress-Archive -Force -CompressionLevel Optimal -Path "$target\*" -DestinationPath "$($Variation -replace "Launcher", "Update").zip";
+    openssl dgst -sign $env:SAKURA_SIGN_KEY -sha256 -out "$File.sig" $File
 }
 
-Set-Location _publish;
+function PackLauncher {
+    param (
+        $Variation,
+        [String[]]$Files
+    )
+    New-Item -Name "launcher" -ItemType "directory" -ErrorAction SilentlyContinue
+    
+    Copy-Item -Recurse "SakuraLibrary\*" "launcher"
+    Copy-Item -Recurse "SakuraFrpService\*" "launcher"
+    Copy-Item -Recurse "$Variation\*" "launcher"
+    
+    Compress-Archive -Force -CompressionLevel Optimal -Path "launcher\*" -DestinationPath "$Variation.zip"
+    Remove-Item "launcher" -Recurse
+}
 
-DeployVariation SakuraLauncher
-DeployVariation LegacyLauncher
+function PackFrpc {
+    param (
+        $Architecture
+    )
+    New-Item -Name "frpc" -ItemType "directory" -ErrorAction SilentlyContinue
+    
+    Copy-Item "sign\frpc_windows_$Architecture.exe" "frpc\frpc.exe"
+    Copy-Item "sign\frpc_windows_$Architecture.exe.sig" "frpc\frpc.exe.sig"
 
-# Create frpc update package
-New-Item -Name frpc -ItemType "directory" -ErrorAction SilentlyContinue;
-Copy-Item "sign\frpc_windows_386.exe" "frpc\frpc.exe";
-openssl dgst -sign $env:SAKURA_SIGN_KEY -sha256 -out "frpc\frpc.exe.sig" "frpc\frpc.exe";
-Compress-Archive -Force -CompressionLevel Optimal -Path "frpc\*" -DestinationPath "frpc_windows_386.zip";
-Remove-Item "frpc" -Recurse;
+    Compress-Archive -Force -CompressionLevel Optimal -Path "frpc\*" -DestinationPath "frpc_windows_$Architecture.zip"
+    Remove-Item "frpc" -Recurse
+}
+
+try {
+    Push-Location -Path "_publish"
+    
+    foreach ($i in Get-ChildItem -Path "sign") {
+        if ($projects -contains $i.BaseName) {
+            Move-Item -Path $i.FullName -Destination $i.BaseName
+            Sign "$($i.BaseName)\$($i.Name)"
+        }
+        if ($i -match "^frpc_.+\.exe$") { 
+            Sign $i.FullName
+        }
+    }
+
+    ISCC "..\setup.iss"
+
+    # Create launcher update package
+    PackLauncher "SakuraLauncher"
+    PackLauncher "LegacyLauncher"
+
+    # Create frpc update package
+    PackFrpc "386"
+    PackFrpc "amd64"
+}
+finally {
+    Pop-Location
+}
