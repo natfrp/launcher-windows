@@ -65,8 +65,10 @@ Name: "launcher_ui\legacy"; Description: "传统界面 (不推荐)"; Types: cust
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkedonce
 
 [Files]
-Source: "_publish\sign\frpc_windows_386.*"; DestDir: "{app}"; Flags: ignoreversion; Components: "frpc\x86"
-Source: "_publish\sign\frpc_windows_amd64.*"; DestDir: "{app}"; Flags: ignoreversion; Components: "frpc\x64"
+Source: "_publish\sign\frpc_windows_386.exe"; DestDir: "{app}"; DestName: "frpc.exe"; Flags: ignoreversion; Components: "frpc\x86"
+Source: "_publish\sign\frpc_windows_386.exe.sig"; DestDir: "{app}"; DestName: "frpc.exe.sig"; Flags: ignoreversion; Components: "frpc\x86"
+Source: "_publish\sign\frpc_windows_amd64.exe"; DestDir: "{app}"; DestName: "frpc.exe"; Flags: ignoreversion; Components: "frpc\x64"
+Source: "_publish\sign\frpc_windows_amd64.exe.sig"; DestDir: "{app}"; DestName: "frpc.exe.sig"; Flags: ignoreversion; Components: "frpc\x64"
 
 Source: "_publish\SakuraLibrary\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher"
 Source: "_publish\SakuraFrpService\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher"
