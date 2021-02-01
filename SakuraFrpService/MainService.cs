@@ -459,7 +459,7 @@ namespace SakuraFrpService
                         connection.RespondFailure("远程控制无法执行该操作");
                         return;
                     }
-                    resp.DataUpdate = UpdateManager.CheckUpdate().WaitResult();
+                    UpdateManager.IssueUpdateCheck();
                     break;
                 case MessageID.ControlGetUpdate:
                     if (isRemote)

@@ -114,15 +114,15 @@
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="24,16,0,0" IsEnabled="{Binding Connected}">
             <ToggleButton IsChecked="{Binding CheckUpdate}"/>
-            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">自动检查更新</TextBlock>
-            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="启用后每天会在后台检查一次更新" ToolTipService.InitialShowDelay="0">
+            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">自动更新</TextBlock>
+            <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="启用后会在后台检查并自动下载更新, 更新前需手动确认" ToolTipService.InitialShowDelay="0">
                 <materialDesign:PackIcon Kind="HelpCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
                     <materialDesign:PackIcon.RenderTransform>
                         <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
                     </materialDesign:PackIcon.RenderTransform>
                 </materialDesign:PackIcon>
             </TextBlock>
-            <Button Margin="16,0,0,0" Click="ButtonUpdate_Click">
+            <Button Margin="16,0,0,0" Click="ButtonUpdate_Click" IsEnabled="{Binding CheckUpdate}">
                 <Button.Resources>
                     <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
                         <Style.Triggers>
@@ -145,12 +145,7 @@
                     <TextBlock VerticalAlignment="Center">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
-                                <Setter Property="Text" Value="立刻检查"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding CheckingUpdate}" Value="True">
-                                        <Setter Property="Text" Value="正在检查"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
+                                <Setter Property="Text" Value="立即检查"/>
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>

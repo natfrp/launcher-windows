@@ -159,6 +159,9 @@ namespace SakuraLauncher.Model
         [SourceBinding(nameof(Connected), nameof(HaveUpdate))]
         public bool ShowNotification => HaveUpdate || !Connected;
 
+        public bool CheckingUpdate { get => _checkingUpdate; set => SafeSet(out _checkingUpdate, value); }
+        private bool _checkingUpdate;
+
         public int CurrentTab { get => _currentTab; set => Set(out _currentTab, value); }
         private int _currentTab = -1;
 

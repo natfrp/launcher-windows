@@ -418,7 +418,24 @@ namespace SakuraLibrary.Model
         private UpdateStatus _update;
 
         [SourceBinding(nameof(Update))]
-        public bool HaveUpdate => Update != null && (Update.UpdateFrpc || Update.UpdateLauncher);
+        public bool HaveUpdate => Update != null && Update.UpdateAvailable;
+
+        [SourceBinding(nameof(Update))]
+        public string UpdateText
+        {
+            get
+            {
+                if (Update == null || !Update.UpdateAvailable)
+                {
+                    return "";
+                }
+                if (Update.UpdateReadyDir != "")
+                {
+                    return "更新准备完成, 点此进行更新";
+                }
+                return "下载更新中... " + Math.Round(Update.DownloadCurrent / 1048576f, 2) + " MiB/" + Math.Round(Update.DownloadTotal / 1048576f, 2) + " MiB";
+            }
+        }
 
         [SourceBinding(nameof(Config))]
         public bool CheckUpdate
@@ -439,51 +456,15 @@ namespace SakuraLibrary.Model
             }
         }
 
-        public bool CheckingUpdate { get => _checkingUpdate; set => SafeSet(out _checkingUpdate, value); }
-        private bool _checkingUpdate;
+        public void RequestUpdateCheck() => Pipe.Request(MessageID.ControlCheckUpdate);
 
-        public void RequestUpdateCheck(Action<UpdateStatus> callback)
+        public void ConfirmUpdate(Action<bool, string> callback, Func<string, bool> confirm, Func<string, bool> warn)
         {
-            if (CheckingUpdate)
+            if (Update.UpdateReadyDir == "")
             {
                 return;
             }
-            CheckingUpdate = true;
-            ThreadPool.QueueUserWorkItem(s =>
-            {
-                try
-                {
-                    var resp = Pipe.Request(MessageID.ControlCheckUpdate);
-                    if (resp.DataUpdate != null)
-                    {
-                        Update = resp.DataUpdate;
-                    }
-                    callback(Update);
-                }
-                finally
-                {
-                    CheckingUpdate = false;
-                }
-            });
-        }
-
-        public string GetUpdateNote()
-        {
-            var note = new List<string>();
-            if (Update.UpdateLauncher)
-            {
-                note.Add(string.Format("启动器 v{0}:\n{1}", Update.LauncherVersion, Update.LauncherNote));
-            }
-            if (Update.UpdateFrpc)
-            {
-                note.Add(string.Format("frpc v{0}:\n{1}", Update.FrpcVersion, Update.FrpcNote));
-            }
-            return string.Join("\n\n", note);
-        }
-
-        public void ConfirmUpdate(bool legacy, Action<bool, string> callback, Func<string, bool> confirm, Func<string, bool> warn)
-        {
-            if (!confirm(GetUpdateNote()))
+            if (!confirm(Update.Note))
             {
                 return;
             }
@@ -491,18 +472,18 @@ namespace SakuraLibrary.Model
             {
                 return;
             }
-            DoUpdate(legacy, callback);
+            DoUpdate(callback);
         }
 
-        public void DoUpdate(bool legacy, Action<bool, string> callback)
+        public void DoUpdate(Action<bool, string> callback)
         {
             if (!File.Exists("Updater.exe"))
             {
-                callback(false, "更新程序不存在, 操作无法继续\n请重新下载完整的启动器手动覆盖当前版本");
+                callback(false, "更新程序不存在, 操作无法继续\n请重新安装启动器");
                 return;
             }
             Daemon.Stop();
-            Process.Start("Updater.exe", string.Format("{0}{1}-launch={2}", Update.UpdateFrpc ? "-frpc " : "", Update.UpdateLauncher ? (legacy ? "-legacy " : "-wpf ") : "", (legacy ? "legacy" : "wpf")));
+            Process.Start("Updater.exe", '"' + Update.UpdateReadyDir + '"');
             Environment.Exit(0);
         }
 

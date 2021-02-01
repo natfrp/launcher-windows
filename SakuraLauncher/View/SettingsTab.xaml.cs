@@ -16,17 +16,28 @@ namespace SakuraLauncher.View
         {
             InitializeComponent();
             DataContext = Model = main;
+            Model.PropertyChanged += (s, e) =>
+            {
+                if (Model.CheckingUpdate && e.PropertyName == nameof(Model.Update))
+                {
+                    Model.CheckingUpdate = false;
+                    if (!Model.Update.UpdateAvailable)
+                    {
+                        App.ShowMessage("您当前使用的启动器与 frpc 均为最新版本", "提示", MessageBoxImage.Information);
+                    }
+                }
+            };
         }
 
-        private void ButtonUpdate_Click(object sender, RoutedEventArgs e) => Model.RequestUpdateCheck(update =>
+        private void ButtonUpdate_Click(object sender, RoutedEventArgs e)
         {
-            if (!update.UpdateFrpc && !update.UpdateLauncher)
+            if (Model.CheckingUpdate)
             {
-                App.ShowMessage("您当前使用的启动器与 frpc 均为最新版本", "提示", MessageBoxImage.Information);
                 return;
             }
-            Model.ConfirmUpdate(false, Model.SimpleFailureHandler, Model.SimpleConfirmHandler, Model.SimpleWarningHandler);
-        });
+            Model.CheckingUpdate = true;
+            Model.RequestUpdateCheck();
+        }
 
         private void ButtonLogin_Click(object sender, RoutedEventArgs e)
         {

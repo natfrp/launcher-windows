@@ -96,7 +96,7 @@ namespace SakuraLauncher
             }
         }
 
-        private void Update_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) => Model.ConfirmUpdate(false, Model.SimpleFailureHandler, Model.SimpleConfirmHandler, Model.SimpleWarningHandler);
+        private void Update_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) => Model.ConfirmUpdate(Model.SimpleFailureHandler, Model.SimpleConfirmHandler, Model.SimpleWarningHandler);
 
         #endregion
 

@@ -18,38 +18,60 @@ namespace SakuraFrpService
         public static string Endpoint = "https://api.natfrp.com/launcher/";
         public static string UserAgent = "SakuraFrpService/" + Assembly.GetExecutingAssembly().GetName().Version;
 
-        public static async Task<T> Request<T>(string action, string query = null) where T : ApiResponse
+        public static HttpWebRequest CreateRequest(string url)
+        {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+            var request = WebRequest.CreateHttp(url);
+            request.Method = "GET";
+            request.Timeout = 10 * 1000;
+            request.UserAgent = UserAgent;
+            request.AllowAutoRedirect = true;
+
+            if (BypassProxy)
+            {
+                request.Proxy = null;
+            }
+
+            return request;
+        }
+
+        public static async Task<MemoryStream> Request(string action, string query = null)
         {
             try
             {
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-
-                var request = WebRequest.CreateHttp(string.Format("{0}{1}?token={2}{3}{4}", Endpoint, action, Token, query == null ? null : "&", query));
-                request.Method = "GET";
-                request.Timeout = 10 * 1000;
-                request.UserAgent = UserAgent;
-                request.AllowAutoRedirect = true;
-
-                if (BypassProxy)
-                {
-                    request.Proxy = null;
-                }
-
+                var request = CreateRequest(string.Format("{0}{1}?token={2}{3}{4}", Endpoint, action, Token, query == null ? null : "&", query));
                 using (var response = await request.GetResponseAsync() as HttpWebResponse)
                 {
                     if (response.StatusCode != HttpStatusCode.OK)
                     {
                         throw new NatfrpException("API 状态异常: " + response.StatusCode + " " + response.StatusDescription);
                     }
-                    using (var reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+                    var ms = new MemoryStream();
+                    await response.GetResponseStream().CopyToAsync(ms);
+                    ms.Position = 0;
+                    return ms;
+                }
+            }
+            catch (Exception e) when (!(e is NatfrpException))
+            {
+                throw new NatfrpException("出现未知错误", e);
+            }
+        }
+
+        public static async Task<T> Request<T>(string action, string query = null) where T : ApiResponse
+        {
+            try
+            {
+                using (var ms = await Request(action, query))
+                using (var reader = new StreamReader(ms, Encoding.UTF8))
+                {
+                    var json = JsonConvert.DeserializeObject<T>(await reader.ReadToEndAsync());
+                    if (json == null || !json.Success)
                     {
-                        var json = JsonConvert.DeserializeObject<T>(await reader.ReadToEndAsync());
-                        if (json == null || !json.Success)
-                        {
-                            throw new NatfrpException(json?.Message ?? "API 请求失败, 未知错误");
-                        }
-                        return json;
+                        throw new NatfrpException(json?.Message ?? "API 请求失败, 未知错误");
                     }
+                    return json;
                 }
             }
             catch (JsonException e)

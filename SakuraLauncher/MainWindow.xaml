@@ -281,9 +281,7 @@
                             <Setter Property="Visibility" Value="Collapsed"/>
                         </Style>
                     </Border.Style>
-                    <TextBlock TextAlignment="Center" VerticalAlignment="Center" FontSize="18">
-                        发现新版本, 点击此处更新
-                    </TextBlock>
+                    <TextBlock TextAlignment="Center" VerticalAlignment="Center" FontSize="18" Text="{Binding UpdateText}"/>
                 </Border>
                 <Border Grid.Row="1" Background="OrangeRed">
                     <Border.Style>
