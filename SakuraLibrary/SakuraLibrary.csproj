@@ -104,9 +104,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Updater.exe" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>protoc -I"$(SolutionDir)$(ProjectName)\Proto" $(SolutionDir)$(ProjectName)\Proto\*.proto --csharp_out=$(SolutionDir)$(ProjectName)\Proto\Out</PreBuildEvent>

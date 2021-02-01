@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SakuraLibrary.Properties {
+namespace SakuraFrpService.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace SakuraLibrary.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SakuraLibrary.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SakuraFrpService.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -63,9 +63,9 @@ namespace SakuraLibrary.Properties {
         /// <summary>
         ///   查找 System.Byte[] 类型的本地化资源。
         /// </summary>
-        internal static byte[] sakura_sign {
+        internal static byte[] Updater {
             get {
-                object obj = ResourceManager.GetObject("sakura_sign", resourceCulture);
+                object obj = ResourceManager.GetObject("Updater", resourceCulture);
                 return ((byte[])(obj));
             }
         }

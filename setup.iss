@@ -78,7 +78,7 @@ Source: "_publish\SakuraFrpService\*"; DestDir: "{app}"; Flags: ignoreversion; C
 Source: "_publish\SakuraLauncher\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui\wpf"
 Source: "_publish\LegacyLauncher\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui\legacy"
 
-Source: "SakuraLibrary\Resources\Updater.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: "updater"
+Source: "SakuraFrpService\Resources\Updater.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: "updater"
 
 [Icons]
 ; Start Menu

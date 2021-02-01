@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Management;
+using System.Diagnostics;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.ServiceProcess;
@@ -167,6 +168,16 @@ namespace SakuraFrpService
                     var main = new MainService(true);
                     main.DaemonRun(args);
                     return main.ExitCode;
+                case "--update":
+                    if (argv.Length < 2)
+                    {
+                        MessageBox.Show("参数错误", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return 1;
+                    }
+                    File.WriteAllBytes(Consts.UpdaterExecutable, Properties.Resources.Updater);
+                    Process.Start(Consts.UpdaterExecutable, '"' + argv[1] + '"' + (argv.Length >= 3 ? ' ' + argv[2] : ""));
+                    Environment.Exit(0);
+                    return 0;
                 }
             }
             if (Environment.UserInteractive)
