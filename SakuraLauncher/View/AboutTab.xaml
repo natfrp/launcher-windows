@@ -15,7 +15,7 @@
                 <Run FontSize="16" Text="{Binding Version, Mode=OneWay}"/>
                 <LineBreak/>
                 <LineBreak/>
-                <Run FontSize="15" Text="版权所有 © 2020 iDea Leaper"/>
+                <Run FontSize="15" Text="版权所有 © 2020-2021 iDea Leaper"/>
                 <LineBreak/>
                 <Run FontSize="15">https://github.com/fengberd/SakuraFrpLauncher</Run>
             </TextBlock>

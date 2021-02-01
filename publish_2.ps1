@@ -21,7 +21,8 @@ function PackLauncher {
     Copy-Item -Recurse "SakuraFrpService\*" "launcher"
     Copy-Item -Recurse "$Variation\*" "launcher"
     
-    Compress-Archive -Force -CompressionLevel Optimal -Path "launcher\*" -DestinationPath "$Variation.zip"
+    $target = $Variation -replace "Launcher", "Update"
+    Compress-Archive -Force -CompressionLevel Optimal -Path "launcher\*" -DestinationPath "$target.zip"
     Remove-Item "launcher" -Recurse
 }
 
