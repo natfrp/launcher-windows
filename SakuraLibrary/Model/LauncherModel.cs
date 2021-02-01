@@ -464,6 +464,23 @@ namespace SakuraLibrary.Model
             {
                 return;
             }
+            if (!File.Exists(Consts.UpdaterExecutable))
+            {
+                callback(false, "自动更新程序未安装, 无法继续操作");
+                return;
+            }
+            if (!File.ReadAllBytes(Consts.UpdaterExecutable).SequenceEqual(Properties.Resources.Updater))
+            {
+                try
+                {
+                    File.WriteAllBytes(Consts.UpdaterExecutable, Properties.Resources.Updater);
+                }
+                catch (Exception e)
+                {
+                    callback(false, "无法更新更新程序:\n" + e.ToString());
+                    return;
+                }
+            }
             if (!confirm(Update.Note))
             {
                 return;
@@ -472,9 +489,8 @@ namespace SakuraLibrary.Model
             {
                 return;
             }
-            File.WriteAllBytes("Updater.exe", Properties.Resources.Updater);
             Daemon.Stop();
-            Process.Start("Updater.exe", '"' + Update.UpdateReadyDir.TrimEnd('\\') + "\" " + (legacy ? "legacy" : "wpf"));
+            Process.Start(Consts.UpdaterExecutable, '"' + Update.UpdateReadyDir.TrimEnd('\\') + "\" " + (legacy ? "legacy" : "wpf"));
             Environment.Exit(0);
         }
 

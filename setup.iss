@@ -61,6 +61,8 @@ Name: "launcher_ui"; Description: "用户界面"; Types: default custom; Flags: 
 Name: "launcher_ui\wpf"; Description: "WPF 界面"; Types: default; Flags: exclusive
 Name: "launcher_ui\legacy"; Description: "传统界面 (不推荐)"; Types: custom; Flags: exclusive
 
+Name: "updater"; Description: "自动更新程序"; Types: default custom
+
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkedonce
 
@@ -75,6 +77,8 @@ Source: "_publish\SakuraFrpService\*"; DestDir: "{app}"; Flags: ignoreversion; C
 
 Source: "_publish\SakuraLauncher\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui\wpf"
 Source: "_publish\LegacyLauncher\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui\legacy"
+
+Source: "SakuraLibrary\Resources\Updater.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: "updater"
 
 [Icons]
 ; Start Menu

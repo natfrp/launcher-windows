@@ -405,7 +405,11 @@ namespace SakuraFrpService.Manager
 
         public void Start()
         {
-            if (!LoadFrpcVersion())
+            if (!File.Exists(Consts.UpdaterExecutable))
+            {
+                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "更新程序未安装, 自动更新将不会启用");
+            }
+            else if (!LoadFrpcVersion())
             {
                 Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, ": 无法获取 frpc 版本, 自动更新将不会启用");
             }

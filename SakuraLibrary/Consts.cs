@@ -5,6 +5,7 @@
         public const string PipeName = "SakuraFrp_ServicePipe";
         public const string ServiceName = "SakuraFrpService";
 
+        public const string UpdaterExecutable = "Updater.exe";
         public const string ServiceExecutable = "SakuraFrpService.exe";
 
         public const string SakuraLauncherPrefix = "SakuraLauncher_";
