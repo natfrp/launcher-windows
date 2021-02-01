@@ -246,7 +246,9 @@ namespace SakuraFrpService.Manager
                 XDocument xml;
                 using (var ms = Natfrp.Request("get_version", string.Join("&", query)).WaitResult())
                 {
-                    xml = XDocument.Parse(Encoding.UTF8.GetString(ms.ToArray()));
+                    var tmp = ms.ToArray();
+                    File.WriteAllBytes(GetTempPath("tasks.xml"), tmp);
+                    xml = XDocument.Parse(Encoding.UTF8.GetString(tmp));
                 }
 
                 lock (this)
@@ -338,21 +340,28 @@ namespace SakuraFrpService.Manager
                     }
                 }
 
-                File.WriteAllText(GetTempPath("tasks.xml"), xml.ToString());
-
                 lock (this)
                 {
                     Status.UpdateReadyDir = TempDir;
                     PushStatus();
                 }
             }
-            catch (ThreadAbortException)
-            {
-                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "UpdateManager", "更新下载被终止");
-            }
             catch (Exception e)
             {
-                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, "UpdateManager", "下载失败: " + e.ToString());
+                if (e is ThreadAbortException || (e.InnerException != null && e.InnerException is ThreadAbortException))
+                {
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "UpdateManager", "更新下载被终止");
+                }
+                else
+                {
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, "UpdateManager", "下载失败: " + e.ToString());
+                }
+                lock (this)
+                {
+                    Status.UpdateAvailable = false;
+                    Status.UpdateReadyDir = "";
+                    PushStatus();
+                }
             }
         }
 

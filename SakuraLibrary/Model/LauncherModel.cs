@@ -458,7 +458,7 @@ namespace SakuraLibrary.Model
 
         public void RequestUpdateCheck() => Pipe.Request(MessageID.ControlCheckUpdate);
 
-        public void ConfirmUpdate(Action<bool, string> callback, Func<string, bool> confirm, Func<string, bool> warn)
+        public void ConfirmUpdate(bool legacy, Action<bool, string> callback, Func<string, bool> confirm, Func<string, bool> warn)
         {
             if (Update.UpdateReadyDir == "")
             {
@@ -472,18 +472,9 @@ namespace SakuraLibrary.Model
             {
                 return;
             }
-            DoUpdate(callback);
-        }
-
-        public void DoUpdate(Action<bool, string> callback)
-        {
-            if (!File.Exists("Updater.exe"))
-            {
-                callback(false, "更新程序不存在, 操作无法继续\n请重新安装启动器");
-                return;
-            }
+            File.WriteAllBytes("Updater.exe", Properties.Resources.Updater);
             Daemon.Stop();
-            Process.Start("Updater.exe", '"' + Update.UpdateReadyDir + '"');
+            Process.Start("Updater.exe", '"' + Update.UpdateReadyDir.TrimEnd('\\') + "\" " + (legacy ? "legacy" : "wpf"));
             Environment.Exit(0);
         }
 

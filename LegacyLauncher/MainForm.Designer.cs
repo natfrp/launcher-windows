@@ -271,13 +271,13 @@
             // 
             this.label_update.BackColor = System.Drawing.Color.Teal;
             this.label_update.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.label_update.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.launcherModelBindingSource, "UpdateText", true));
             this.label_update.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label_update.ForeColor = System.Drawing.Color.White;
             this.label_update.Location = new System.Drawing.Point(0, 492);
             this.label_update.Name = "label_update";
             this.label_update.Size = new System.Drawing.Size(665, 31);
             this.label_update.TabIndex = 13;
-            this.label_update.Text = "发现新版本, 点击此处更新";
             this.label_update.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label_update.Visible = false;
             this.label_update.Click += new System.EventHandler(this.label_update_Click);
