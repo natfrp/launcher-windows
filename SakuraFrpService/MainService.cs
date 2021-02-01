@@ -18,6 +18,8 @@ namespace SakuraFrpService
 {
     public partial class MainService : ServiceBase
     {
+        public const string Tag = "Service";
+
         public User UserInfo = new User()
         {
             Status = UserStatus.NoLogin
@@ -161,7 +163,7 @@ namespace SakuraFrpService
                 UserInfo.Status = UserStatus.Pending;
                 PushUserInfo();
             }
-            LogManager.Log(1, "Service", "开始登录, Token: " + token.Substring(0, 4) + "********" + token.Substring(12));
+            LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "开始登录, Token: " + token.Substring(0, 4) + "********" + token.Substring(12));
             try
             {
                 Natfrp.Token = token;
@@ -169,7 +171,7 @@ namespace SakuraFrpService
                 var user = await Natfrp.Request<Natfrp.GetUser>("get_user");
                 if (!user.Data.Login)
                 {
-                    LogManager.Log(3, "Service", "服务器拒绝登录: " + user.Message);
+                    LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "服务器拒绝登录: " + user.Message);
                     Logout(true);
                     return user.Message;
                 }
@@ -194,7 +196,7 @@ namespace SakuraFrpService
                 TunnelManager.Start();
 
                 PushUserInfo();
-                LogManager.Log(1, "Service", "用户登录成功");
+                LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "用户登录成功");
 
                 RemoteManager.Start();
             }
@@ -202,7 +204,7 @@ namespace SakuraFrpService
             {
                 if (isAuto)
                 {
-                    LogManager.Log(3, "Service", "自动登录失败, 将在稍后重试: " + e.ToString());
+                    LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "自动登录失败, 将在稍后重试: " + e.ToString());
                     lock (UserInfo)
                     {
                         UserInfo.Status = UserStatus.NoLogin;
@@ -211,7 +213,7 @@ namespace SakuraFrpService
                 }
                 else
                 {
-                    LogManager.Log(3, "Service", "用户登录失败: " + e.ToString());
+                    LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "用户登录失败: " + e.ToString());
                     Logout(true);
                 }
                 return e.ToString();
@@ -254,7 +256,7 @@ namespace SakuraFrpService
             }
             if (!force)
             {
-                LogManager.Log(1, "Service", "已退出登录");
+                LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "已退出登录");
             }
             return null;
         }
@@ -281,14 +283,7 @@ namespace SakuraFrpService
                 {
                     TickThread.Start();
                 }
-                if (UpdateManager.LoadFrpcVersion())
-                {
-                    UpdateManager.Start();
-                }
-                else
-                {
-                    LogManager.Log(2, "Service", "UpdateManager: 无法获取 frpc 版本, 更新检查将不会启用");
-                }
+                UpdateManager.Start();
             }
             catch
             {
@@ -296,7 +291,7 @@ namespace SakuraFrpService
                 Stop();
                 return;
             }
-            LogManager.Log(1, "Service", "守护进程启动成功");
+            LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "守护进程启动成功");
         }
 
         protected override void OnStop()

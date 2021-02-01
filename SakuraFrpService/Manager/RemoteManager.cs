@@ -18,6 +18,8 @@ namespace SakuraFrpService.Manager
 {
     public class RemoteManager : IAsyncManager
     {
+        public const string Tag = "Service/RemoteManager";
+
         public const int OVERHEAD = 3;
         public const string REMOTE_VERSION = "SAKURA_1";
         public static readonly byte[] SALT = new byte[]
@@ -52,7 +54,7 @@ namespace SakuraFrpService.Manager
                 { "identifier", Identifier }
             }))), WebSocketMessageType.Text, true, Source.Token);
 
-            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, "Service", "RemoteManager: 远程管理已连接");
+            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "远程管理已连接");
 
             var remote = new RemotePipeConnection();
 
@@ -72,7 +74,7 @@ namespace SakuraFrpService.Manager
                     }
                     else if (length >= buffer.Length)
                     {
-                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 接收到过长消息, 已断开服务器连接, 将在稍后重连");
+                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "接收到过长消息, 已断开服务器连接, 将在稍后重连");
                         await Socket.CloseAsync(WebSocketCloseStatus.MessageTooBig, "消息过长", Source.Token);
                         return;
                     }
@@ -84,17 +86,17 @@ namespace SakuraFrpService.Manager
                     switch (result.CloseStatus.Value)
                     {
                     case WebSocketCloseStatus.NormalClosure:
-                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, "Service", "RemoteManager: 服务端正常断开 [" + result.CloseStatusDescription + "] 将在稍后重连");
+                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "服务端正常断开 [" + result.CloseStatusDescription + "] 将在稍后重连");
                         break;
                     case WebSocketCloseStatus.PolicyViolation:
-                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 服务器拒绝请求, 已停止远程管理功能: " + result.CloseStatusDescription);
+                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "服务器拒绝请求, 已停止远程管理功能: " + result.CloseStatusDescription);
                         Stop();
                         return;
                     case WebSocketCloseStatus.InternalServerError:
-                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 服务器内部错误, " + result.CloseStatusDescription);
+                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "服务器内部错误, " + result.CloseStatusDescription);
                         break;
                     default:
-                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 未知错误 [" + result.CloseStatus + "], " + result.CloseStatusDescription);
+                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "未知错误 [" + result.CloseStatus + "], " + result.CloseStatusDescription);
                         break;
                     }
                     await Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, Source.Token);
@@ -104,7 +106,7 @@ namespace SakuraFrpService.Manager
                 // Hmm, ensure something unexpected won't crash the socket
                 if (length < OVERHEAD)
                 {
-                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 收到过短的消息");
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "收到过短的消息");
                     return;
                 }
 
@@ -117,14 +119,14 @@ namespace SakuraFrpService.Manager
                     case 0x01: // Heartbeat
                         if (length != OVERHEAD)
                         {
-                            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 心跳包长度异常");
+                            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "心跳包长度异常");
                             continue;
                         }
                         break;
                     case 0x02: // Remote Command
                         if (length < 24 + OVERHEAD)
                         {
-                            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 收到过短的指令");
+                            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "收到过短的指令");
                             continue;
                         }
 
@@ -139,7 +141,7 @@ namespace SakuraFrpService.Manager
                         }
                         catch
                         {
-                            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 指令解密失败, 原因可能为密钥错误, 如果您无故看到此错误请检查账户是否被盗");
+                            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "指令解密失败, 原因可能为密钥错误, 如果您无故看到此错误请检查账户是否被盗");
                             break;
                         }
                         remote.Buffer = data;
@@ -152,7 +154,7 @@ namespace SakuraFrpService.Manager
                         ms.Write(data, 0, data.Length);
                         break;
                     default:
-                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "Service", "RemoteManager: 收到未知消息");
+                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "收到未知消息");
                         continue;
                     }
                     await Socket.SendAsync(new ArraySegment<byte>(ms.ToArray()), WebSocketMessageType.Binary, true, Source.Token);
@@ -178,11 +180,11 @@ namespace SakuraFrpService.Manager
                 }
                 catch (AggregateException e) when (e.InnerExceptions.Count == 1)
                 {
-                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, "Service", "RemoteManager: 未知错误, " + e.InnerExceptions[0].ToString());
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "未知错误, " + e.InnerExceptions[0].ToString());
                 }
                 catch (Exception e)
                 {
-                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, "Service", "RemoteManager: 未知错误, " + e.ToString());
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "未知错误, " + e.ToString());
                 }
                 finally
                 {
@@ -221,7 +223,7 @@ namespace SakuraFrpService.Manager
             catch { }
             Source.Cancel();
             AsyncManager.Stop(kill);
-            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, "Service", "RemoteManager: 远程管理正常退出");
+            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "远程管理正常退出");
         }
 
         #endregion

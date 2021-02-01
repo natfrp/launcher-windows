@@ -18,6 +18,8 @@ namespace SakuraFrpService.Manager
 {
     public class UpdateManager : IAsyncManager
     {
+        public const string Tag = "Service/UpdateManager";
+
         public readonly MainService Main;
         public readonly AsyncManager AsyncManager;
 
@@ -92,7 +94,7 @@ namespace SakuraFrpService.Manager
             }
             catch (Exception e)
             {
-                Main.LogManager.Log(2, "Service", e.ToString());
+                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, e.ToString());
                 return false;
             }
         }
@@ -260,7 +262,7 @@ namespace SakuraFrpService.Manager
                     }
                 }
 
-                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, "UpdateManager", "开始下载更新, 临时目录: " + TempDir);
+                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "开始下载更新, 临时目录: " + TempDir);
                 foreach (var task in xml.Element("tasks").Elements())
                 {
                     int tries = 3;
@@ -269,7 +271,7 @@ namespace SakuraFrpService.Manager
                     {
                         if (tries-- <= 0)
                         {
-                            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, "UpdateManager", "下载重试次数超过上限, 更新失败");
+                            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "下载重试次数超过上限, 更新失败");
                         }
                         lock (this)
                         {
@@ -294,7 +296,7 @@ namespace SakuraFrpService.Manager
                             File.Delete(target);
                         }
 
-                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, "UpdateManager", "开始下载: " + url);
+                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "开始下载: " + url);
 
                         var request = Natfrp.CreateRequest(task.Attribute("url").Value);
                         using (var fs = File.OpenWrite(target))
@@ -302,7 +304,7 @@ namespace SakuraFrpService.Manager
                         {
                             if (response.StatusCode != HttpStatusCode.OK)
                             {
-                                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, "UpdateManager", "下载失败: HTTP 状态异常, " + response.StatusCode);
+                                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "下载失败: HTTP 状态异常, " + response.StatusCode);
                                 continue;
                             }
                             using (var ws = response.GetResponseStream())
@@ -329,11 +331,11 @@ namespace SakuraFrpService.Manager
                                 var test = BitConverter.ToString(hasher.Hash).Replace("-", "").ToLower();
                                 if (test != hash)
                                 {
-                                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, "UpdateManager", "下载失败: Hash 不匹配 [" + test + "!=" + hash + "]");
+                                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "下载失败: Hash 不匹配 [" + test + "!=" + hash + "]");
                                     continue;
                                 }
 
-                                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, "UpdateManager", "下载完成: " + Path.GetFileName(fs.Name) + ", " + Math.Round(complete / 1048576f, 2) + " MiB");
+                                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "下载完成: " + Path.GetFileName(fs.Name) + ", " + Math.Round(complete / 1048576f, 2) + " MiB");
                             }
                         }
                         break;
@@ -350,11 +352,11 @@ namespace SakuraFrpService.Manager
             {
                 if (e is ThreadAbortException || (e.InnerException != null && e.InnerException is ThreadAbortException))
                 {
-                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, "UpdateManager", "更新下载被终止");
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "更新下载被终止");
                 }
                 else
                 {
-                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, "UpdateManager", "下载失败: " + e.ToString());
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "下载失败: " + e.ToString());
                 }
                 lock (this)
                 {
@@ -387,11 +389,11 @@ namespace SakuraFrpService.Manager
                 }
                 catch (AggregateException e) when (e.InnerExceptions.Count == 1)
                 {
-                    Main.LogManager.Log(2, "Service", "UpdateManager: 更新检查失败, " + e.InnerExceptions[0].ToString());
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "更新检查失败, " + e.InnerExceptions[0].ToString());
                 }
                 catch (Exception e)
                 {
-                    Main.LogManager.Log(2, "Service", e.ToString());
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, e.ToString());
                 }
             }
             while (!AsyncManager.StopEvent.WaitOne(1000));
@@ -401,7 +403,17 @@ namespace SakuraFrpService.Manager
 
         public bool Running => AsyncManager.Running;
 
-        public void Start() => AsyncManager.Start();
+        public void Start()
+        {
+            if (!LoadFrpcVersion())
+            {
+                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, ": 无法获取 frpc 版本, 自动更新将不会启用");
+            }
+            else
+            {
+                AsyncManager.Start();
+            }
+        }
 
         public void Stop(bool kill = false) => AsyncManager.Stop(kill);
 

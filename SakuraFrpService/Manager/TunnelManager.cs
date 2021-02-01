@@ -14,6 +14,8 @@ namespace SakuraFrpService.Manager
 {
     public class TunnelManager : Dictionary<int, Tunnel>, IAsyncManager
     {
+        public const string Tag = "Service/TunnelManager";
+
         public const string FrpcExecutable = "frpc.exe";
 
         public readonly int PID = Process.GetCurrentProcess().Id;
@@ -123,7 +125,7 @@ namespace SakuraFrpService.Manager
 
                 if (changed)
                 {
-                    Main.LogManager.Log(1, "Service", "TunnelManager: 隧道列表同步成功");
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "隧道列表已更新");
                 }
                 if (loadEnabled && Properties.Settings.Default.EnabledTunnels != null)
                 {

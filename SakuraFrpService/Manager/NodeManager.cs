@@ -8,6 +8,8 @@ namespace SakuraFrpService.Manager
 {
     public class NodeManager : Dictionary<int, Node>, IAsyncManager
     {
+        public const string Tag = "Service/NodeManager";
+
         public readonly MainService Main;
         public readonly AsyncManager AsyncManager;
 
@@ -40,7 +42,7 @@ namespace SakuraFrpService.Manager
                 }
                 msg.DataNodes.Nodes.Add(Values);
             }
-            Main.LogManager.Log(1, "Service", "NodeManager: 节点信息同步成功");
+            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "节点信息同步成功");
             Main.Pipe.PushMessage(msg);
         }
 
