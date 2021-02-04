@@ -13,6 +13,7 @@ using SakuraLibrary.Helper;
 
 using SakuraFrpService.Data;
 using SakuraFrpService.WebSocketShim;
+using System.Net.Sockets;
 
 namespace SakuraFrpService.Manager
 {
@@ -170,20 +171,28 @@ namespace SakuraFrpService.Manager
                 {
                     Connect().Wait();
                 }
-                catch (Exception e) when (e is TaskCanceledException || e is ThreadAbortException)
-                {
-                    return;
-                }
-                catch (AggregateException e) when (e.InnerExceptions.Count == 1 && (e.InnerExceptions[0] is TaskCanceledException || e.InnerExceptions[0] is ThreadAbortException))
-                {
-                    return;
-                }
-                catch (AggregateException e) when (e.InnerExceptions.Count == 1)
-                {
-                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "未知错误, " + e.InnerExceptions[0].ToString());
-                }
                 catch (Exception e)
                 {
+                    if (e is AggregateException ae && ae.InnerExceptions.Count == 1)
+                    {
+                        e = ae.InnerExceptions[0];
+                    }
+                    if (e is TaskCanceledException || e is ThreadAbortException)
+                    {
+                        continue;
+                    }
+                    if (e is WebSocketException wse)
+                    {
+                        if (wse.InnerException is SocketException se)
+                        {
+                            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "WebSocket 断开, 将在稍后重连: " + se.Message);
+                        }
+                        else
+                        {
+                            Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "WebSocket 出现错误: " + wse.Message);
+                        }
+                        continue;
+                    }
                     Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "未知错误, " + e.ToString());
                 }
                 finally
