@@ -41,9 +41,9 @@
                                 </Style>
                             </Helper:SelectableTextBlock.Style>
                             <Helper:SelectableTextBlock.Inlines>
-                                <Run Foreground="Wheat" Text="{Binding Source, Mode=OneTime}"/>
                                 <Run Foreground="#508ddc" Text="{Binding Time, Mode=OneTime}"/>
                                 <Run Foreground="{Binding LevelColor, Mode=OneTime}" Text="{Binding Level, Mode=OneTime}"/>
+                                <Run Foreground="Wheat" Text="{Binding Source, Mode=OneTime}"/>
                                 <Run Foreground="Silver" Text="{Binding Data, Mode=OneTime}"/>
                             </Helper:SelectableTextBlock.Inlines>
                         </Helper:SelectableTextBlock>

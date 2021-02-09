@@ -60,12 +60,13 @@ namespace SakuraLauncher.Model
             };
             if (l.Category == 0) // CATEGORY_FRPC
             {
+                entry.Source = "Tunnel/" + entry.Source;
                 var match = LogModel.Pattern.Match(l.Data);
                 if (match.Success)
                 {
                     entry.Time = match.Groups["Time"].Value;
                     entry.Data = match.Groups["Content"].Value;
-                    entry.Level = match.Groups["Level"].Value + ":" + match.Groups["Source"].Value;
+                    entry.Level = match.Groups["Level"].Value;
                     switch (match.Groups["Level"].Value)
                     {
                     case "W":
@@ -84,14 +85,14 @@ namespace SakuraLauncher.Model
                 {
                 case 1:
                 default:
-                    entry.Level = "INFO";
+                    entry.Level = "I";
                     break;
                 case 2:
-                    entry.Level = "WARNING";
+                    entry.Level = "W";
                     entry.LevelColor = LogModel.BrushWarning;
                     break;
                 case 3:
-                    entry.Level = "ERROR";
+                    entry.Level = "E";
                     entry.LevelColor = LogModel.BrushError;
                     break;
                 case 4: // Notice INFO

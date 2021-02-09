@@ -53,13 +53,13 @@ namespace LegacyLauncher.Model
             switch (l.Category)
             {
             case 1:
-                category = "INFO ";
+                category = "I ";
                 break;
             case 2:
-                category = "WARNING ";
+                category = "W ";
                 break;
             case 3:
-                category = "ERROR ";
+                category = "E ";
                 break;
             }
             if (l.Category != 0)
