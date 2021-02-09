@@ -57,6 +57,22 @@ namespace SakuraLauncher
                 color = "Gold";
                 materialColor = "Amber";
                 break;
+            case 2:
+                color = "5Yuan";
+                materialColor = "Purple";
+                break;
+            case 3:
+                color = "10Yuan";
+                materialColor = "Blue";
+                break;
+            case 4:
+                color = "20Yuan";
+                materialColor = "Amber";
+                break;
+            case 5:
+                color = "50Yuan";
+                materialColor = "Teal";
+                break;
             }
             Resources.MergedDictionaries[0].Source = new Uri("/Theme/" + color + ".xaml", UriKind.Relative);
             Resources.MergedDictionaries[1].Source = new Uri("pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor." + materialColor + ".xaml", UriKind.Absolute);

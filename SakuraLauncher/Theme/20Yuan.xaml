@@ -1,0 +1,22 @@
+﻿<!-- 丰 收 时 节 -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <LinearGradientBrush x:Key="Background_SidePanel" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#9e5e45" Offset="0"/>
+        <GradientStop Color="#92513d" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="Background_MainPanel" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#92513d" Offset="0"/>
+        <GradientStop Color="#8e4b43" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="Background_Tunnel" StartPoint="0,0" EndPoint="0.5,1">
+        <GradientStop Color="#9e5e45" Offset="0"/>
+        <GradientStop Color="#92513d" Offset="1"/>
+    </LinearGradientBrush>
+
+    <Color x:Key="TabGradient_Start">#f2c987</Color>
+    <Color x:Key="TabGradient_Middle">#dea97f</Color>
+    <Color x:Key="TabGradient_End">#c69a75</Color>
+    <Color x:Key="TabGradient_EndMiddle">#eec69a75</Color>
+    <Color x:Key="TabGradient_EndTransparent">#00c69a75</Color>
+</ResourceDictionary>
