@@ -4,6 +4,7 @@ using System.Text;
 using System.Linq;
 using System.Reflection;
 using System.Diagnostics;
+using System.Configuration;
 using System.Security.Principal;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -163,6 +164,31 @@ namespace SakuraLibrary
             {
                 return NTAPI.IsWow64Process(p.Handle, out bool retVal) && retVal;
             }
+        }
+
+        public static bool VerifySettings()
+        {
+            try
+            {
+                var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
+                config.SaveAs(config.FilePath + ".bak", ConfigurationSaveMode.Full, true);
+                return true;
+            }
+            catch (ConfigurationErrorsException e)
+            {
+                if (!File.Exists(e.Filename))
+                {
+                    return true;
+                }
+                File.Delete(e.Filename);
+
+                var backup = e.Filename + ".bak";
+                if (File.Exists(backup))
+                {
+                    File.Move(backup, e.Filename);
+                }
+            }
+            return false;
         }
     }
 }

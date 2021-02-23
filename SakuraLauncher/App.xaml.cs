@@ -25,6 +25,7 @@ namespace SakuraLauncher
             Environment.CurrentDirectory = Path.GetDirectoryName(Utils.ExecutablePath);
 
             Utils.VerifySignature(Utils.LibraryPath, Utils.ExecutablePath, Path.GetFullPath(Consts.ServiceExecutable));
+            Utils.VerifySettings();
 
             var minimize = false;
             foreach (var a in e.Args)

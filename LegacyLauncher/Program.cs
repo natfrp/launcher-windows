@@ -24,6 +24,7 @@ namespace LegacyLauncher
             Application.SetCompatibleTextRenderingDefault(false);
 
             Utils.VerifySignature(Utils.LibraryPath, Utils.ExecutablePath, Path.GetFullPath(Consts.ServiceExecutable));
+            Utils.VerifySettings();
 
             var minimize = false;
             foreach (var a in args)

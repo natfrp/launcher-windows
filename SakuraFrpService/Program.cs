@@ -89,6 +89,7 @@ namespace SakuraFrpService
             Environment.CurrentDirectory = Path.GetDirectoryName(Utils.ExecutablePath);
 
             Utils.VerifySignature(Utils.LibraryPath, Utils.ExecutablePath, Path.GetFullPath(TunnelManager.FrpcExecutable));
+            Utils.VerifySettings();
 
             if (Path.GetFileName(Utils.ExecutablePath) != Consts.ServiceExecutable)
             {
