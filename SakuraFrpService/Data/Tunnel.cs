@@ -108,11 +108,7 @@ namespace SakuraFrpService.Data
                     StandardOutputEncoding = Encoding.UTF8
                 });
 
-                BaseProcess.Exited += (s, e) =>
-                {
-                    WaitTick = 0;
-                    Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Name, "frpc 已退出");
-                };
+                BaseProcess.Exited += OnProcessExit;
                 BaseProcess.ErrorDataReceived += OnStderr;
                 BaseProcess.OutputDataReceived += OnStdout;
                 BaseProcess.EnableRaisingEvents = true;
@@ -180,6 +176,20 @@ namespace SakuraFrpService.Data
                 Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Name, "隧道启动失败, 将在 " + (5 * FailCount) + " 秒后重试");
             }
             Cleanup();
+        }
+
+        protected void OnProcessExit(object sender, EventArgs e)
+        {
+            WaitTick = 0;
+            Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Name, "frpc 已退出");
+            try
+            {
+                if (BaseProcess != null)
+                {
+                    BaseProcess.Exited -= OnProcessExit;
+                }
+            }
+            catch { }
         }
 
         protected void OnStdout(object sender, DataReceivedEventArgs e)
