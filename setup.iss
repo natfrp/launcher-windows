@@ -215,7 +215,7 @@ begin
 				downloadPage.Add('https://download.visualstudio.microsoft.com/download/pr/014120d7-d689-4305-befd-3cb711108212/1f81f3962f75eff5d83a60abd3a3ec7b/ndp48-web.exe', 'dotnet.exe', 'b9821f28facfd6b11ffbf3703ff3f218cc3c31b85d6503d5c20570751ff08876');
 			
 			if installVC then
-				downloadPage.Add('https://aka.ms/vs/16/release/vc_redist.x86.exe', 'vcredist.exe', '50a3e92ade4c2d8f310a2812d46322459104039b9deadbd7fdd483b5c697c0c8');
+				downloadPage.Add('https://download.visualstudio.microsoft.com/download/pr/d64b93c3-f270-4750-9e75-bc12b2e899fb/4521ED84B9B1679A706E719423D54EF5E413DC50DDE1CF362232D7359D7E89C4/VC_redist.x86.exe', 'vcredist.exe', '4521ed84b9b1679a706e719423d54ef5e413dc50dde1cf362232d7359d7e89c4');
 			
 			retry := True;
 			while retry do begin
