@@ -2,18 +2,20 @@
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
-using Sodium;
 using Newtonsoft.Json;
 
+using SakuraLibrary;
 using SakuraLibrary.Helper;
 
 using SakuraFrpService.Data;
+using SakuraFrpService.Sodium;
 using SakuraFrpService.WebSocketShim;
-using System.Net.Sockets;
 
 namespace SakuraFrpService.Manager
 {
@@ -42,6 +44,23 @@ namespace SakuraFrpService.Manager
         {
             Main = main;
             AsyncManager = new AsyncManager(Run);
+
+            try
+            {
+                var sodium = RuntimeInformation.ProcessArchitecture.ToString().ToLower() + "\\libsodium.dll";
+                if (!File.Exists(sodium))
+                {
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "未找到架构匹配的 libsodium, 当前系统可能不支持远程管理");
+                }
+                else if (NTAPI.LoadLibraryEx(Path.GetFullPath(sodium), IntPtr.Zero, 0) == IntPtr.Zero)
+                {
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "libsodium 加载失败, 远程管理无法正常工作");
+                }
+            }
+            catch (Exception e)
+            {
+                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "libsodium 加载失败, 远程管理无法正常工作: " + e.ToString());
+            }
         }
 
         protected async Task Connect()
