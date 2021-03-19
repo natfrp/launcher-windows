@@ -24,7 +24,8 @@ LicenseFile=LICENSE
 ShowComponentSizes=yes
 AlwaysShowDirOnReadyPage=yes
 UninstallDisplayName={#AppName}
-ArchitecturesInstallIn64BitMode=x64
+ArchitecturesAllowed=x86 x64 arm64
+ArchitecturesInstallIn64BitMode=x64 arm64
 
 DefaultDirName={autopf}\SakuraFrpLauncher
 DefaultGroupName={#AppName}
@@ -53,6 +54,7 @@ Name: "custom"; Description: "自定义"; Flags: iscustom;
 Name: "frpc"; Description: "frpc"; Types: default custom; Flags: fixed
 Name: "frpc\x86"; Description: "frpc (32 位)"; Check: IsX86; Types: default custom; Flags: exclusive fixed
 Name: "frpc\x64"; Description: "frpc (64 位)"; Check: IsX64; Types: default custom; Flags: exclusive fixed
+Name: "frpc\arm64"; Description: "frpc (ARM64, 实验性)"; Check: IsARM64; Types: default custom; Flags: exclusive fixed
 
 Name: "launcher"; Description: "守护进程"; Types: default custom; Flags: fixed
 Name: "launcher\service"; Description: "安装为系统服务";
@@ -71,9 +73,11 @@ Source: "_publish\sign\frpc_windows_386.exe"; DestDir: "{app}"; DestName: "frpc.
 Source: "_publish\sign\frpc_windows_386.exe.sig"; DestDir: "{app}"; DestName: "frpc.exe.sig"; Flags: ignoreversion; Components: "frpc\x86"
 Source: "_publish\sign\frpc_windows_amd64.exe"; DestDir: "{app}"; DestName: "frpc.exe"; Flags: ignoreversion; Components: "frpc\x64"
 Source: "_publish\sign\frpc_windows_amd64.exe.sig"; DestDir: "{app}"; DestName: "frpc.exe.sig"; Flags: ignoreversion; Components: "frpc\x64"
+Source: "_publish\sign\frpc_windows_arm64.exe"; DestDir: "{app}"; DestName: "frpc.exe"; Flags: ignoreversion; Components: "frpc\arm64"
+Source: "_publish\sign\frpc_windows_arm64.exe.sig"; DestDir: "{app}"; DestName: "frpc.exe.sig"; Flags: ignoreversion; Components: "frpc\arm64"
 
 Source: "_publish\SakuraLibrary\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher"
-Source: "_publish\SakuraFrpService\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher"
+Source: "_publish\SakuraFrpService\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs; Components: "launcher"
 
 Source: "_publish\SakuraLauncher\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui\wpf"
 Source: "_publish\LegacyLauncher\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui\legacy"
@@ -115,18 +119,7 @@ var
 	requiresRestart: Boolean;
 	downloadPage: TDownloadWizardPage;
 
-	installVC: Boolean;
 	installNet: Boolean;
-	
-function IsX64: Boolean;
-begin
-	Result := Is64BitInstallMode and (ProcessorArchitecture = paX64);
-end;
-
-function IsX86: Boolean;
-begin
-	Result := (Is64BitInstallMode=false) and (ProcessorArchitecture = paX86);
-end;
 
 function TryInstall(const Name, File, Args: String): String;
 var
@@ -162,24 +155,15 @@ var
 begin
 	downloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
 	
-	installVC := not FileExists(ExpandConstant('{syswow64}\msvcp140.dll'));
-	installNet := (not RegQueryDWordValue(HKLM, 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full', 'Release', version)) or (version < 378389);
+	installNet := (not RegQueryDWordValue(HKLM, 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full', 'Release', version)) or (version < 528040);
 end;
 
 function UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
 begin
 	Result := '';
 	
-	if installVC or installNet then begin
-		Result := Result + '运行环境 (需要联网下载):';
-		
-		if installNet then
-			Result := Result + Newline + Space + '{#LibraryNameNet}';
-	
-		if installVC then
-			Result := Result + Newline + Space + '{#LibraryNameVC}';
-	
-		Result := Result + Newline + NewLine;
+	if installNet then begin
+		Result := Result + '运行环境 (需要联网下载):' + Newline + Space + '{#LibraryNameNet}' + Newline + NewLine;
 	end;
 	
 	if MemoUserInfoInfo <> '' then
@@ -206,16 +190,12 @@ var
 	retry: Boolean;
 begin
 	Result := True;
-	if (CurPageID = wpReady) and (installNet or installVC) then begin
+	if (CurPageID = wpReady) and installNet then begin
 		try
 			downloadPage.Show;
 			downloadPage.Clear;
 			
-			if installNet then
-				downloadPage.Add('https://download.visualstudio.microsoft.com/download/pr/014120d7-d689-4305-befd-3cb711108212/1f81f3962f75eff5d83a60abd3a3ec7b/ndp48-web.exe', 'dotnet.exe', 'b9821f28facfd6b11ffbf3703ff3f218cc3c31b85d6503d5c20570751ff08876');
-			
-			if installVC then
-				downloadPage.Add('https://download.visualstudio.microsoft.com/download/pr/d64b93c3-f270-4750-9e75-bc12b2e899fb/4521ED84B9B1679A706E719423D54EF5E413DC50DDE1CF362232D7359D7E89C4/VC_redist.x86.exe', 'vcredist.exe', '4521ed84b9b1679a706e719423d54ef5e413dc50dde1cf362232d7359d7e89c4');
+			downloadPage.Add('https://download.visualstudio.microsoft.com/download/pr/014120d7-d689-4305-befd-3cb711108212/1f81f3962f75eff5d83a60abd3a3ec7b/ndp48-web.exe', 'dotnet.exe', 'b9821f28facfd6b11ffbf3703ff3f218cc3c31b85d6503d5c20570751ff08876');
 			
 			retry := True;
 			while retry do begin
@@ -241,9 +221,6 @@ function PrepareToInstall(var NeedsRestart: Boolean): String;
 begin
 	if installNet then
 		Result := TryInstall('{#LibraryNameNet}', 'dotnet.exe', '/passive /norestart /showrmui /showfinalerror');
-
-	if (Result = '') and installVC then
-		Result := TryInstall('{#LibraryNameVC}', 'vcredist.exe', '/passive /norestart');
 end;
 
 function NeedRestart(): Boolean;

@@ -164,10 +164,6 @@
     <None Include="Resources\Updater.exe" />
   </ItemGroup>
   <ItemGroup>
-    <ContentWithTargetPath Include="Sodium\libsodium\libsodium-arm.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>arm\libsodium.dll</TargetPath>
-    </ContentWithTargetPath>
     <ContentWithTargetPath Include="Sodium\libsodium\libsodium-arm64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>arm64\libsodium.dll</TargetPath>

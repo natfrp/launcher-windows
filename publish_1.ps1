@@ -19,12 +19,9 @@ try {
     
         Get-ChildItem -Path "..\$name\bin\Release" | Where-Object {
             $_.Name -notmatch "\.(xml|pdb)$" -and (
-                $name -eq "SakuraLibrary" -or (
-                    $libraryFiles -notcontains $_.Name -and
-                    $_.Name -notmatch "-64\.dll$"
-                )
+                $name -eq "SakuraLibrary" -or $libraryFiles -notcontains $_.Name
             )
-        } | Copy-Item -Destination $name
+        } | Copy-Item -Recurse -Destination $name
     
         Move-Item -Path "$name\$name.exe", "$name\$name.dll" -Destination "sign" -ErrorAction SilentlyContinue
     }
