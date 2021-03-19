@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Runtime.InteropServices;
 
 using SakuraLibrary;
 using SakuraLibrary.Proto;
@@ -241,7 +242,7 @@ namespace SakuraFrpService.Manager
                     }
                     if (UpdateFrpc)
                     {
-                        query.Add(Utils.Is64OS() ? "frpc64" : "frpc");
+                        query.Add("frpc_" + RuntimeInformation.ProcessArchitecture.ToString().ToLower());
                     }
                 }
 
