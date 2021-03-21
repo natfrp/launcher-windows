@@ -25,45 +25,18 @@ namespace SakuraLibrary
 
         public static string Md5(byte[] data)
         {
-            try
+            var result = new StringBuilder();
+            using (var md5 = MD5.Create())
             {
-                StringBuilder Result = new StringBuilder();
-                foreach (byte Temp in new MD5CryptoServiceProvider().ComputeHash(data))
+                foreach (var b in md5.ComputeHash(data))
                 {
-                    if (Temp < 16)
-                    {
-                        Result.Append("0");
-                        Result.Append(Temp.ToString("x"));
-                    }
-                    else
-                    {
-                        Result.Append(Temp.ToString("x"));
-                    }
+                    result.Append(b.ToString("x2"));
                 }
-                return Result.ToString();
             }
-            catch
-            {
-                return "0000000000000000";
-            }
+            return result.ToString();
         }
 
         public static string Md5(string Data) => Md5(Encoding.UTF8.GetBytes(Data));
-
-        public static int CastInt(dynamic item)
-        {
-            switch (item)
-            {
-            case int i:
-                return i;
-            case long l:
-                return (int)l;
-            case string s:
-                return int.Parse(s);
-            default:
-                return (int)item;
-            }
-        }
 
         public static string GetAutoRunFile(string prefix) => Environment.GetFolderPath(Environment.SpecialFolder.Startup) + "\\" + prefix + Md5(ExecutablePath) + ".lnk";
 
@@ -96,23 +69,20 @@ namespace SakuraLibrary
             }
         }
 
-        public static Process[] SearchProcess(string name, string testPath = null)
+        public static Process[] SearchProcess(string name, string testPath = null) => Process.GetProcessesByName(name).Where(p =>
         {
-            return Process.GetProcessesByName(name).Where(p =>
+            try
             {
-                try
+                uint size = 256;
+                var sb = new StringBuilder((int)size - 1);
+                if (NTAPI.QueryFullProcessImageName(p.Handle, 0, sb, ref size))
                 {
-                    uint size = 256;
-                    var sb = new StringBuilder((int)size - 1);
-                    if (NTAPI.QueryFullProcessImageName(p.Handle, 0, sb, ref size))
-                    {
-                        return testPath == null || Path.GetFullPath(sb.ToString()) == testPath;
-                    }
+                    return testPath == null || Path.GetFullPath(sb.ToString()) == testPath;
                 }
-                catch { }
-                return false;
-            }).ToArray();
-        }
+            }
+            catch { }
+            return false;
+        }).ToArray();
 
         public static uint GetSakuraTime() => (uint)DateTime.UtcNow.Subtract(SakuraTimeBase).TotalSeconds;
 
@@ -120,13 +90,27 @@ namespace SakuraLibrary
 
         public static void VerifySignature(params string[] files)
         {
+            // 如果您准备自己编译启动器或使用其他版本的 frpc
+            // 请自行修改此部分代码或使用 Debug 构建来禁用签名验证
+
 #if !DEBUG // && false
             try
             {
+                var failure = files.Where(f => !File.Exists(f)).ToList();
+                if (failure.Count != 0)
+                {
+                    NTAPI.MessageBox(0, "@@@@@@@@@@@@@@@@@@\n" +
+                        "         !!!  错误: 启动器文件损坏  !!!\n" +
+                        "@@@@@@@@@@@@@@@@@@\n\n" +
+                        "下列文件不存在:\n" + string.Join("\n", failure) + "\n\n" +
+                        "请重新安装启动器\n如果重装后还看到此提示，请检查杀毒软件是否删除了启动器文件", "错误", 0x10);
+                    Environment.Exit(1);
+                }
+
                 var key = new PublicKey(new Oid("1.2.840.113549.1.1.1"), new AsnEncodedData(new byte[] { 05, 00 }), new AsnEncodedData(Properties.Resources.sakura_sign));
                 using (var rsa = (RSACryptoServiceProvider)key.Key)
                 {
-                    var failure = files.Where(f => !File.Exists(f + ".sig") || !rsa.VerifyData(File.ReadAllBytes(f), "SHA256", File.ReadAllBytes(f + ".sig"))).ToList();
+                    failure = files.Where(f => !File.Exists(f + ".sig") || !rsa.VerifyData(File.ReadAllBytes(f), "SHA256", File.ReadAllBytes(f + ".sig"))).ToList();
                     if (failure.Count == 0)
                     {
                         return;
@@ -135,8 +119,8 @@ namespace SakuraLibrary
                         "         !!!  警告: 文件签名验证失败  !!!\n" +
                         "@@@@@@@@@@@@@@@@@@\n\n" +
                         "下列文件未通过数字签名校验:\n" + string.Join("\n", failure) + "\n\n" +
-                        "这些文件可能已损坏或被纂改, 这意味着您的电脑可能已经被病毒感染, 请立即进行杀毒并重新下载启动器\n\n" +
-                        "如果您准备自己编译启动器或使用其他版本的 frpc, 请自行修改 SakuraLibrary\\Utils.cs 或使用 Debug 构建来禁用签名验证", "Error", 0x10);
+                        "这些文件可能已损坏或被纂改, 这意味着您的电脑可能已经被病毒感染\n\n" +
+                        "请立即进行全盘杀毒并重新安装启动器", "错误", 0x10);
                 }
             }
             catch (Exception e)
@@ -144,13 +128,13 @@ namespace SakuraLibrary
                 NTAPI.MessageBox(0, "@@@@@@@@@@@@@@@@@@\n" +
                     "         !!!  警告: 文件签名验证失败  !!!\n" +
                     "@@@@@@@@@@@@@@@@@@\n" +
-                    "出现内部错误, 请截图此报错并联系管理员\n\n" + e, "Error", 0x10);
+                    "出现内部错误, 请截图此报错并联系管理员\n\n" + e, "错误", 0x10);
             }
-            Environment.Exit(0);
+            Environment.Exit(1);
 #endif
         }
 
-        public static bool VerifySettings()
+        public static bool ValidateSettings()
         {
             try
             {
