@@ -61,6 +61,7 @@ try {
     # Create frpc update package
     PackFrpc "386"
     PackFrpc "amd64"
+    PackFrpc "arm64"
 }
 finally {
     Pop-Location
