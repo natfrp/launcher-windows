@@ -21,6 +21,8 @@ namespace SakuraFrpService.Manager
     {
         public const string Tag = "Service/UpdateManager";
 
+        public readonly string TempDir = Path.Combine(Path.GetTempPath(), "Sakura-" + Guid.NewGuid());
+
         public readonly MainService Main;
         public readonly AsyncManager AsyncManager;
 
@@ -54,7 +56,6 @@ namespace SakuraFrpService.Manager
         private DateTime LastCheck = DateTime.MinValue;
 
         private bool UpdateFrpc = false, UpdateLauncher = false;
-        private string TempDir = Path.Combine(Path.GetTempPath(), "Sakura-" + Guid.NewGuid());
         private Thread DownloadThread = null;
 
         public UpdateManager(MainService main)
@@ -67,6 +68,12 @@ namespace SakuraFrpService.Manager
 
         public void IssueUpdateCheck()
         {
+            if (!AsyncManager.Running)
+            {
+                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "自动更新功能未启用, 无法检查更新");
+                PushStatus();
+                return;
+            }
             lock (this)
             {
                 AbortDownload();
@@ -157,6 +164,23 @@ namespace SakuraFrpService.Manager
             }
         }
 
+        public void EmptyTempPath()
+        {
+            try
+            {
+                var dir = new DirectoryInfo(TempDir);
+                foreach (var f in dir.GetFiles())
+                {
+                    f.Delete();
+                }
+                foreach (var d in dir.GetDirectories())
+                {
+                    d.Delete(true);
+                }
+            }
+            catch { }
+        }
+
         public void PushStatus() => Main.Pipe.PushMessage(new PushMessageBase()
         {
             Type = PushMessageID.PushUpdate,
@@ -218,6 +242,7 @@ namespace SakuraFrpService.Manager
             try
             {
                 Directory.CreateDirectory(TempDir);
+                EmptyTempPath();
 
                 var query = new List<string>()
                 {
@@ -351,18 +376,19 @@ namespace SakuraFrpService.Manager
             }
             catch (Exception e)
             {
-                if (e is ThreadAbortException || (e.InnerException != null && e.InnerException is ThreadAbortException))
-                {
-                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "更新下载被终止");
-                }
-                else
-                {
-                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "下载失败: " + e.ToString());
-                }
+                EmptyTempPath();
                 lock (this)
                 {
-                    Status.UpdateAvailable = false;
                     Status.UpdateReadyDir = "";
+                    if (e is ThreadAbortException || (e.InnerException != null && e.InnerException is ThreadAbortException))
+                    {
+                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "更新下载被终止");
+                    }
+                    else
+                    {
+                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "下载失败: " + e.ToString());
+                        Status.UpdateAvailable = false;
+                    }
                     PushStatus();
                 }
             }
@@ -406,11 +432,7 @@ namespace SakuraFrpService.Manager
 
         public void Start()
         {
-            if (!File.Exists(Consts.UpdaterExecutable))
-            {
-                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "更新程序未安装, 自动更新将不会启用");
-            }
-            else if (!LoadFrpcVersion())
+            if (!LoadFrpcVersion())
             {
                 Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, ": 无法获取 frpc 版本, 自动更新将不会启用");
             }
@@ -420,7 +442,11 @@ namespace SakuraFrpService.Manager
             }
         }
 
-        public void Stop(bool kill = false) => AsyncManager.Stop(kill);
+        public void Stop(bool kill = false)
+        {
+            AsyncManager.Stop(kill);
+            AbortDownload();
+        }
 
         #endregion
     }
