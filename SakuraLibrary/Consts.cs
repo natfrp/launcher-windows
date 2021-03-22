@@ -2,6 +2,8 @@
 {
     public static class Consts
     {
+        public const string Version = "2.0.3.0";
+
         public const string PipeName = "SakuraFrp_ServicePipe";
         public const string ServiceName = "SakuraFrpService";
 
