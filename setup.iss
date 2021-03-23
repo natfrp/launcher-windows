@@ -4,7 +4,6 @@
 #define MainExecutable "SakuraLauncher.exe"
 
 #define LibraryNameNet ".NET Framework 4.8"
-#define LibraryNameVC "Visual C++ 2015-2019 Redistributable (x86)"
 
 [Setup]
 ; Basics

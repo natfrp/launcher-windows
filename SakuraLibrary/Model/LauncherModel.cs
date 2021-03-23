@@ -464,11 +464,6 @@ namespace SakuraLibrary.Model
             {
                 return;
             }
-            if (!File.Exists(Consts.UpdaterExecutable))
-            {
-                callback(false, "自动更新程序未安装, 无法继续操作");
-                return;
-            }
             if (!confirm(Update.Note))
             {
                 return;

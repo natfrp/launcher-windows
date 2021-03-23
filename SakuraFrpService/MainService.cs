@@ -156,14 +156,14 @@ namespace SakuraFrpService
                 {
                     return UserInfo.Status == UserStatus.Pending ? "操作进行中, 请稍候" : "用户已登录";
                 }
-                if (token.Length != 16)
+                if (token.Length < 16)
                 {
-                    return "Token 无效";
+                    return "访问密钥无效, 请检查您的输入是否正确";
                 }
                 UserInfo.Status = UserStatus.Pending;
                 PushUserInfo();
             }
-            LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "开始登录, Token: " + token.Substring(0, 4) + "********" + token.Substring(12));
+            LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "开始登录, 访问密钥: " + token.Substring(0, 3) + "********" + token.Substring(token.Length - 3));
             try
             {
                 Natfrp.Token = token;
