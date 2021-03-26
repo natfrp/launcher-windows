@@ -112,7 +112,7 @@
                 </materialDesign:PackIcon>
             </TextBlock>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="24,16,0,0" IsEnabled="{Binding Connected}">
+        <StackPanel Orientation="Horizontal" Margin="24,16,0,0" IsEnabled="{Binding UpdateEnabled}">
             <ToggleButton IsChecked="{Binding CheckUpdate}"/>
             <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">自动更新</TextBlock>
             <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="启用后会在后台检查并自动下载更新, 更新前需手动确认" ToolTipService.InitialShowDelay="0">

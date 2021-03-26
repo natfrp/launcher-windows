@@ -30,6 +30,8 @@ message UpdateStatus {
   uint32 download_total = 4;
 
   string note = 5;
+  
+  bool update_manager_running = 6;
 }
 
 enum MessageID {

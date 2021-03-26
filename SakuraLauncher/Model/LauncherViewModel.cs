@@ -160,6 +160,9 @@ namespace SakuraLauncher.Model
         [SourceBinding(nameof(Connected), nameof(HaveUpdate))]
         public bool ShowNotification => HaveUpdate || !Connected;
 
+        [SourceBinding(nameof(Update), nameof(Connected))]
+        public bool UpdateEnabled => Connected && Update != null && Update.UpdateManagerRunning;
+
         public bool CheckingUpdate { get => _checkingUpdate; set => SafeSet(out _checkingUpdate, value); }
         private bool _checkingUpdate;
 

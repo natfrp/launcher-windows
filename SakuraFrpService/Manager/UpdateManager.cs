@@ -212,7 +212,8 @@ namespace SakuraFrpService.Manager
                     UpdateReadyDir = "",
                     DownloadCurrent = 0,
                     DownloadTotal = 0,
-                    Note = string.Join("\n\n", note)
+                    Note = string.Join("\n\n", note),
+                    UpdateManagerRunning = true
                 };
                 if (Status.UpdateAvailable)
                 {
@@ -438,6 +439,7 @@ namespace SakuraFrpService.Manager
             }
             else
             {
+                Status.UpdateManagerRunning = true;
                 AsyncManager.Start();
             }
         }

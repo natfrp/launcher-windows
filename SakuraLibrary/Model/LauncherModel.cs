@@ -295,9 +295,7 @@ namespace SakuraLibrary.Model
 
         #endregion
 
-        #region Settings
-
-        // User Status
+        #region Settings - User Status
 
         [SourceBinding(nameof(UserInfo))]
         public string UserToken { get => UserInfo.Status != UserStatus.NoLogin ? "****************" : _userToken; set => SafeSet(out _userToken, value); }
@@ -345,7 +343,9 @@ namespace SakuraLibrary.Model
             });
         }
 
-        // Launcher Config
+        #endregion
+
+        #region Settings - Launcher
 
         public bool SuppressNotification { get => _suppressNotification; set => Set(out _suppressNotification, value); }
         private bool _suppressNotification;
@@ -353,7 +353,9 @@ namespace SakuraLibrary.Model
         public bool LogTextWrapping { get => _logTextWrapping; set => Set(out _logTextWrapping, value); }
         private bool _logTextWrapping;
 
-        // Service Config
+        #endregion
+
+        #region Settings - Service
 
         public ServiceConfig Config { get => _config; set => SafeSet(out _config, value); }
         private ServiceConfig _config;
@@ -391,7 +393,9 @@ namespace SakuraLibrary.Model
             }
         }
 
-        // Update Checking
+        #endregion
+
+        #region Settings - Auto Update
 
         [SourceBinding(nameof(Config))]
         public bool RemoteManagement
@@ -418,7 +422,7 @@ namespace SakuraLibrary.Model
         private UpdateStatus _update;
 
         [SourceBinding(nameof(Update))]
-        public bool HaveUpdate => Update != null && Update.UpdateAvailable;
+        public bool HaveUpdate => Update != null && Update.UpdateManagerRunning && Update.UpdateAvailable;
 
         [SourceBinding(nameof(Update))]
         public string UpdateText
@@ -437,10 +441,10 @@ namespace SakuraLibrary.Model
             }
         }
 
-        [SourceBinding(nameof(Config))]
+        [SourceBinding(nameof(Config), nameof(Update))]
         public bool CheckUpdate
         {
-            get => Config != null && Config.UpdateInterval != -1;
+            get => Config != null && Config.UpdateInterval != -1 && Update != null && Update.UpdateManagerRunning;
             set
             {
                 if (Config != null)
@@ -486,7 +490,9 @@ namespace SakuraLibrary.Model
             }
         }
 
-        // Working Mode Config
+        #endregion
+
+        #region Settings - Working Mode
 
         public bool IsDaemon => Daemon.Daemon;
 
