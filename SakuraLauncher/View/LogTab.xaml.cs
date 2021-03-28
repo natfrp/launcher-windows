@@ -24,7 +24,7 @@ namespace SakuraLauncher.View
 
         private void ButtonClear_Click(object sender, RoutedEventArgs e)
         {
-            Model.Logs.Clear();
+            Model.ClearLog();
             Model.Pipe.Request(MessageID.LogClear);
         }
 
@@ -42,5 +42,7 @@ namespace SakuraLauncher.View
                 }
             }
         }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => Model.LogsViewSource.Refresh();
     }
 }

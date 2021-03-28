@@ -7,7 +7,7 @@
              xmlns:Model="clr-namespace:SakuraLauncher.Model"
              xmlns:Helper="clr-namespace:SakuraLauncher.Helper"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             d:DesignHeight="315" d:DesignWidth="580">
+             d:DataContext="{d:DesignInstance Type=Model:LauncherViewModel}" d:DesignHeight="315" d:DesignWidth="580">
     <DockPanel>
         <Grid DockPanel.Dock="Top">
             <StackPanel Orientation="Horizontal" Margin="24,0,0,0">
@@ -15,10 +15,17 @@
                 <Button Style="{StaticResource MaterialDesignIconButton}" Width="33" Height="33" Click="ButtonClear_Click" Margin="8,1,0,0" IsEnabled="{Binding Connected}">
                     <materialDesign:PackIcon Kind="TrashCanOutline" Foreground="White"/>
                 </Button>
+                <ComboBox MinWidth="150" ItemsSource="{Binding LogSourceList, Mode=OneWay}" Margin="8,0,0,0" SelectedItem="{Binding LogSourceFilter}" SelectionChanged="ComboBox_SelectionChanged">
+                    <ComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ComboBox.ItemsPanel>
+                </ComboBox>
             </StackPanel>
         </Grid>
         <Border Padding="8" BorderBrush="#FFAAAAAA" Background="#33000000" BorderThickness="2" Margin="16,8,16,16">
-            <ItemsControl ItemsSource="{Binding Logs, Mode=OneWay}">
+            <ItemsControl ItemsSource="{Binding LogsViewSource, Mode=OneWay}">
                 <ItemsControl.Resources>
                     <Style TargetType="ScrollViewer">
                         <Style.Triggers>

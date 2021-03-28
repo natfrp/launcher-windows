@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
+using System.Windows.Data;
+using System.ComponentModel;
 using System.Collections.ObjectModel;
 
 using SakuraLibrary;
@@ -47,9 +49,82 @@ namespace SakuraLauncher.Model
 
             LogTextWrapping = settings.LogTextWrapping;
             SuppressNotification = settings.SuppressNotification;
+
+            LogsViewSource.Filter += e =>
+            {
+                var item = e as LogModel;
+                return LogSourceFilter == "" || item.Source == LogSourceFilter;
+            };
         }
 
-        public override void ClearLog() => Dispatcher.Invoke(() => Logs.Clear());
+        public override void Save()
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(() => Save());
+                return;
+            }
+
+            var settings = Properties.Settings.Default;
+
+            settings.Width = (int)View.Width;
+            settings.Height = (int)View.Height;
+
+            settings.LogTextWrapping = LogTextWrapping;
+            settings.SuppressNotification = SuppressNotification;
+
+            settings.Save();
+        }
+
+        public override bool SyncAll()
+        {
+            if (base.SyncAll())
+            {
+                SwitchTab(LoggedIn ? 0 : 2);
+                return true;
+            }
+            return false;
+        }
+
+        #region Generic Properties
+
+        public bool AutoRun
+        {
+            get => File.Exists(Utils.GetAutoRunFile(Consts.SakuraLauncherPrefix));
+            set
+            {
+                var result = Utils.SetAutoRun(!AutoRun, Consts.SakuraLauncherPrefix);
+                if (result != null)
+                {
+                    App.ShowMessage(result, "设置失败", MessageBoxImage.Error);
+                }
+                RaisePropertyChanged();
+            }
+        }
+
+        [SourceBinding(nameof(Connected), nameof(HaveUpdate))]
+        public bool ShowNotification => HaveUpdate || !Connected;
+
+        [SourceBinding(nameof(Update), nameof(Connected))]
+        public bool UpdateEnabled => Connected && Update != null && Update.UpdateManagerRunning;
+
+        public bool CheckingUpdate { get => _checkingUpdate; set => SafeSet(out _checkingUpdate, value); }
+        private bool _checkingUpdate;
+
+        #endregion
+
+        #region Logging
+
+        public string LogSourceFilter { get => _logSourceFilter; set => Set(out _logSourceFilter, value); }
+        private string _logSourceFilter = "";
+
+        public ObservableCollection<string> LogSourceList { get; set; } = new ObservableCollection<string>()
+        {
+            { "" }
+        };
+
+        public ICollectionView LogsViewSource => CollectionViewSource.GetDefaultView(Logs);
+        public ObservableCollection<LogModel> Logs { get; } = new ObservableCollection<LogModel>();
 
         public override void Log(Log l, bool init)
         {
@@ -107,64 +182,26 @@ namespace SakuraLauncher.Model
             }
             Dispatcher.Invoke(() =>
             {
+                if (!LogSourceList.Contains(entry.Source))
+                {
+                    LogSourceList.Add(entry.Source);
+                }
                 Logs.Add(entry);
                 while (Logs.Count > 4096) Logs.RemoveAt(0);
             });
         }
 
-        public override void Save()
+        public override void ClearLog() => Dispatcher.Invoke(() =>
         {
-            if (!Dispatcher.CheckAccess())
-            {
-                Dispatcher.Invoke(() => Save());
-                return;
-            }
+            Logs.Clear();
+            LogSourceList.Clear();
+            LogSourceList.Add("");
+            LogSourceFilter = "";
+        });
 
-            var settings = Properties.Settings.Default;
+        #endregion
 
-            settings.Width = (int)View.Width;
-            settings.Height = (int)View.Height;
-
-            settings.LogTextWrapping = LogTextWrapping;
-            settings.SuppressNotification = SuppressNotification;
-
-            settings.Save();
-        }
-
-        public override bool SyncAll()
-        {
-            if (base.SyncAll())
-            {
-                SwitchTab(LoggedIn ? 0 : 2);
-                return true;
-            }
-            return false;
-        }
-
-        public bool AutoRun
-        {
-            get => File.Exists(Utils.GetAutoRunFile(Consts.SakuraLauncherPrefix));
-            set
-            {
-                var result = Utils.SetAutoRun(!AutoRun, Consts.SakuraLauncherPrefix);
-                if (result != null)
-                {
-                    App.ShowMessage(result, "设置失败", MessageBoxImage.Error);
-                }
-                RaisePropertyChanged();
-            }
-        }
-
-        public ObservableCollection<LogModel> Logs { get; set; } = new ObservableCollection<LogModel>();
-
-        [SourceBinding(nameof(Connected), nameof(HaveUpdate))]
-        public bool ShowNotification => HaveUpdate || !Connected;
-
-        [SourceBinding(nameof(Update), nameof(Connected))]
-        public bool UpdateEnabled => Connected && Update != null && Update.UpdateManagerRunning;
-
-        public bool CheckingUpdate { get => _checkingUpdate; set => SafeSet(out _checkingUpdate, value); }
-        private bool _checkingUpdate;
+        #region Tab Switching
 
         public int CurrentTab { get => _currentTab; set => Set(out _currentTab, value); }
         private int _currentTab = -1;
@@ -185,5 +222,7 @@ namespace SakuraLauncher.Model
                 View.BeginTabStoryboard("TabHideAnimation");
             }
         }
+
+        #endregion
     }
 }
