@@ -3,6 +3,8 @@ using System.IO;
 using System.Windows;
 using System.Threading;
 
+using MaterialDesignThemes.Wpf;
+
 using SakuraLibrary;
 
 namespace SakuraLauncher
@@ -75,9 +77,12 @@ namespace SakuraLauncher
                 materialColor = "Teal";
                 break;
             }
-            Resources.MergedDictionaries[0].Source = new Uri("/Theme/" + color + ".xaml", UriKind.Relative);
-            Resources.MergedDictionaries[1].Source = new Uri("pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor." + materialColor + ".xaml", UriKind.Absolute);
-            Resources.MergedDictionaries[2].Source = new Uri("pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor." + materialColor + ".xaml", UriKind.Absolute);
+
+            var theme = Resources.MergedDictionaries[0] as BundledTheme;
+            theme.PrimaryColor = (MaterialDesignColors.PrimaryColor)Enum.Parse(typeof(MaterialDesignColors.PrimaryColor), materialColor);
+            theme.SecondaryColor = (MaterialDesignColors.SecondaryColor)Enum.Parse(typeof(MaterialDesignColors.SecondaryColor), materialColor);
+
+            Resources.MergedDictionaries[1].Source = new Uri("/Theme/" + color + ".xaml", UriKind.Relative);
 
             MainWindow = new MainWindow();
             if (!minimize)
