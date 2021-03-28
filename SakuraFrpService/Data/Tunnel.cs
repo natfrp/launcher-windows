@@ -21,6 +21,8 @@ namespace SakuraFrpService.Data
         public int Id, Node;
         public string Name, Type, Note, Description;
 
+        public string Tag => "Tunnel/" + Name;
+
         public bool Enabled
         {
             get => _enabled;
@@ -122,7 +124,7 @@ namespace SakuraFrpService.Data
             }
             catch (Exception e)
             {
-                Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Name, "隧道启动失败: " + e.Message);
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "隧道启动失败: " + e.Message);
                 Stop();
             }
             return false;
@@ -150,7 +152,7 @@ namespace SakuraFrpService.Data
                     BaseProcess.StandardInput.Write("stop\n");
                     if (!BaseProcess.WaitForExit(3500))
                     {
-                        Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Name, "frpc 未响应, 正在强制结束进程");
+                        Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "frpc 未响应, 正在强制结束进程");
                         BaseProcess.Kill();
                     }
                 }
@@ -167,13 +169,13 @@ namespace SakuraFrpService.Data
             {
                 Enabled = false;
                 FailCount = 0;
-                Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Name, "隧道持续启动失败, 已关闭该隧道");
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "隧道持续启动失败, 已关闭该隧道");
                 Manager.Main.LogManager.Log(LogManager.CATEGORY_NOTICE_ERROR, "隧道 " + Name + " 被关闭", "隧道持续启动失败, 已关闭该隧道");
             }
             else
             {
                 WaitTick = 20 * 5 * (int)Math.Pow(2, FailCount - 1);
-                Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Name, "隧道启动失败, 将在 " + (5 * FailCount) + " 秒后重试");
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "隧道启动失败, 将在 " + (5 * FailCount) + " 秒后重试");
             }
             Cleanup();
         }
@@ -181,7 +183,7 @@ namespace SakuraFrpService.Data
         protected void OnProcessExit(object sender, EventArgs e)
         {
             WaitTick = 0;
-            Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Name, "frpc 已退出");
+            Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "frpc 已退出");
             try
             {
                 if (BaseProcess != null)
@@ -220,7 +222,7 @@ namespace SakuraFrpService.Data
                 }
                 catch (Exception ex)
                 {
-                    Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Name, "上报数据解析失败: " + ex.Message);
+                    Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "上报数据解析失败: " + ex.Message);
                 }
             }
             Manager.Main.LogManager.Log(LogManager.CATEGORY_FRPC, Name, e.Data);
@@ -242,7 +244,7 @@ namespace SakuraFrpService.Data
                 Manager.Main.LogManager.Log(LogManager.CATEGORY_NOTICE_WARNING, "隧道 " + Name + " 启动失败", (string)json.message);
                 break;
             default:
-                Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Name, "未知上报类型: " + type);
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "未知上报类型: " + type);
                 return;
             }
             Manager.PushOne(this);
