@@ -47,6 +47,7 @@ namespace SakuraLauncher.Model
             View.Width = settings.Width;
             View.Height = settings.Height;
 
+            Theme = settings.Theme;
             LogTextWrapping = settings.LogTextWrapping;
             SuppressNotification = settings.SuppressNotification;
 
@@ -70,6 +71,7 @@ namespace SakuraLauncher.Model
             settings.Width = (int)View.Width;
             settings.Height = (int)View.Height;
 
+            settings.Theme = Theme;
             settings.LogTextWrapping = LogTextWrapping;
             settings.SuppressNotification = SuppressNotification;
 
@@ -116,6 +118,9 @@ namespace SakuraLauncher.Model
 
         [SourceBinding(nameof(UserInfo))]
         public string UserMeta => UserInfo.Meta;
+
+        public int Theme { get => _theme; set => Set(out _theme, value); }
+        private int _theme;
 
         #endregion
 
