@@ -47,14 +47,14 @@
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <materialDesign:Card Margin="0,0,8,0">
                     <StackPanel>
-                        <ListView ItemsSource="{Binding Listening}" SelectionMode="Single" Name="listening" SelectionChanged="Listening_SelectionChanged">
+                        <ListView ItemsSource="{Binding Listening, Mode=OneWay}" SelectionMode="Single" Name="listening" SelectionChanged="Listening_SelectionChanged">
                             <ListView.View>
                                 <GridView>
-                                    <GridViewColumn Header="协议" DisplayMemberBinding="{Binding Protocol}" />
-                                    <GridViewColumn Header="监听地址" DisplayMemberBinding="{Binding Address}" />
-                                    <GridViewColumn Header="监听端口" DisplayMemberBinding="{Binding Port}" />
-                                    <GridViewColumn Header="PID" DisplayMemberBinding="{Binding PID}" />
-                                    <GridViewColumn Header="进程名" DisplayMemberBinding="{Binding ProcessName}" />
+                                    <GridViewColumn Header="协议" DisplayMemberBinding="{Binding Protocol, Mode=OneTime}" />
+                                    <GridViewColumn Header="监听地址" DisplayMemberBinding="{Binding Address, Mode=OneTime}" />
+                                    <GridViewColumn Header="监听端口" DisplayMemberBinding="{Binding Port, Mode=OneTime}" />
+                                    <GridViewColumn Header="PID" DisplayMemberBinding="{Binding PID, Mode=OneTime}" />
+                                    <GridViewColumn Header="进程名" DisplayMemberBinding="{Binding ProcessName, Mode=OneTime}" />
                                 </GridView>
                             </ListView.View>
                         </ListView>

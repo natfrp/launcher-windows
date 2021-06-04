@@ -111,6 +111,12 @@ namespace SakuraLauncher.Model
         public bool CheckingUpdate { get => _checkingUpdate; set => SafeSet(out _checkingUpdate, value); }
         private bool _checkingUpdate;
 
+        [SourceBinding(nameof(UserInfo))]
+        public string UserName => UserInfo.Name;
+
+        [SourceBinding(nameof(UserInfo))]
+        public string UserMeta => UserInfo.Meta;
+
         #endregion
 
         #region Logging

@@ -15,7 +15,7 @@
     <StackPanel>
         <materialDesign:Card Margin="16" Padding="8">
             <StackPanel>
-                <TextBox materialDesign:HintAssist.Hint="管理密码" x:Name="password" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding TunnelName}"/>
+                <TextBox materialDesign:HintAssist.Hint="管理密码" x:Name="password" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" />
                 <TextBlock Padding="8" TextWrapping="WrapWithOverflow">
                     该功能为高级功能，我们不推荐普通用户启用该功能，并且不为启用此功能造成的任何后果承担任何责任
                     <LineBreak/>

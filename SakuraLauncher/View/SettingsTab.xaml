@@ -19,9 +19,9 @@
                         </Style.Triggers>
                     </Style>
                 </TextBlock.Style>
-                <Run Text="{Binding UserInfo.Name}" />
+                <Run Text="{Binding UserName, Mode=OneWay}" />
                 <Run> - </Run>
-                <Run Text="{Binding UserInfo.Meta}" />
+                <Run Text="{Binding UserMeta, Mode=OneWay}" />
             </TextBlock>
             <StackPanel Orientation="Horizontal">
                 <StackPanel.Style>
