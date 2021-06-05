@@ -109,6 +109,9 @@ namespace SakuraFrpService
             [JsonProperty("name")]
             public string Name { get; set; }
 
+            [JsonProperty("host")]
+            public string Host { get; set; }
+
             [JsonProperty("accept_new")]
             public bool AcceptNew { get; set; }
         }

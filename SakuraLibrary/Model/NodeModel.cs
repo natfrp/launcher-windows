@@ -8,6 +8,7 @@ namespace SakuraLibrary.Model
 
         public int Id => Proto.Id;
         public string Name => Proto.Name;
+        public string Host => Proto.Host;
         public bool AcceptNew => Proto.AcceptNew;
 
         public bool Enabled => Proto.Id >= 0;

@@ -37,6 +37,7 @@ namespace SakuraFrpService.Manager
                     {
                         Id = j.Id,
                         Name = j.Name,
+                        Host = j.Host ?? "",
                         AcceptNew = j.AcceptNew
                     };
                 }
