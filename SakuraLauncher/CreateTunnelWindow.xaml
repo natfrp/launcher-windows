@@ -107,33 +107,40 @@
                     </Grid>
                 </StackPanel>
             </materialDesign:Card>
-            <Button Margin="8,0,16,0" Style="{StaticResource MaterialDesignRaisedDarkButton}" Click="ButtonCreate_Click">
-                <Button.Resources>
-                    <Style TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignCircularProgressBar}">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Creating}" Value="True">
-                                <Setter Property="Visibility" Value="Visible"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Resources>
-                <StackPanel Orientation="Horizontal">
-                    <ProgressBar Value="0" IsIndeterminate="True" Foreground="White" Margin="0,0,8,0"/>
-                    <TextBlock VerticalAlignment="Center">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Text" Value="创建"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Creating}" Value="True">
-                                        <Setter Property="Text" Value="创建中"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </StackPanel>
-            </Button>
+            <Grid Margin="8,0,16,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Click="ButtonPingTest_Click" Style="{StaticResource MaterialDesignFlatButton}">延迟测试</Button>
+                <Button Grid.Column="1" Margin="8,0,0,0" Style="{StaticResource MaterialDesignRaisedDarkButton}" Click="ButtonCreate_Click">
+                    <Button.Resources>
+                        <Style TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignCircularProgressBar}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Creating}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Resources>
+                    <StackPanel Orientation="Horizontal">
+                        <ProgressBar Value="0" IsIndeterminate="True" Foreground="White" Margin="0,0,8,0"/>
+                        <TextBlock VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="创建"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Creating}" Value="True">
+                                            <Setter Property="Text" Value="创建中"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+            </Grid>
         </StackPanel>
     </Grid>
 </Window>

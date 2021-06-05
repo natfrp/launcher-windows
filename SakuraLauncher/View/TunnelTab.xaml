@@ -79,13 +79,13 @@
                                         <ToggleButton DockPanel.Dock="Right" IsChecked="{Binding Enabled}" IsEnabled="{Binding NotPending, Mode=OneWay}"/>
                                     </DockPanel>
                                     <StackPanel DockPanel.Dock="Bottom" Margin="16">
-                                        <DockPanel LastChildFill="False" Grid.Row="1">
-                                            <TextBlock DockPanel.Dock="Left" Grid.Row="0" Foreground="White" FontSize="14" Margin="0,0,0,4">
+                                        <DockPanel LastChildFill="False">
+                                            <TextBlock DockPanel.Dock="Left" Foreground="White" FontSize="14" Margin="0,0,0,4">
                                                 #<Run Text="{Binding Node, Mode=OneWay}"></Run>
                                                 <Run Text="{Binding NodeName, Mode=OneWay}"></Run>
                                             </TextBlock>
                                         </DockPanel>
-                                        <DockPanel LastChildFill="False" Grid.Row="1">
+                                        <DockPanel LastChildFill="False">
                                             <TextBlock DockPanel.Dock="Left" FontSize="13" Foreground="White" Opacity="0.8" Text="{Binding Description, Mode=OneWay}" />
                                             <TextBlock DockPanel.Dock="Right" Foreground="White" FontSize="13" Text="{Binding Type, Mode=OneWay}"/>
                                         </DockPanel>

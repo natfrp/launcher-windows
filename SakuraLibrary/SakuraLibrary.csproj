@@ -71,6 +71,8 @@
     <Compile Include="Model\LocalProcessModel.cs" />
     <Compile Include="Model\ModelBase.cs" />
     <Compile Include="Model\NodeModel.cs" />
+    <Compile Include="Model\NodePingModel.cs" />
+    <Compile Include="Model\PingTestModel.cs" />
     <Compile Include="Model\TunnelModel.cs" />
     <Compile Include="NTAPI.cs" />
     <Compile Include="Pipe\PipeClient.cs" />

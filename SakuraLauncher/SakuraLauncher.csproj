@@ -95,6 +95,9 @@
     <Compile Include="Helper\TabIndexTester.cs" />
     <Compile Include="Model\LauncherViewModel.cs" />
     <Compile Include="Model\LogModel.cs" />
+    <Compile Include="PingTestWindow.xaml.cs">
+      <DependentUpon>PingTestWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -132,6 +135,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="PingTestWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="RemoteConfigWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
