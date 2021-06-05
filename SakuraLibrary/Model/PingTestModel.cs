@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading;
@@ -15,6 +16,8 @@ namespace SakuraLibrary.Model
         public ObservableCollection<NodePingModel> Nodes { get => _nodes; set => Set(out _nodes, value); }
         private ObservableCollection<NodePingModel> _nodes = new ObservableCollection<NodePingModel>();
 
+        private ManualResetEvent stopTest = new ManualResetEvent(false);
+
         public PingTestModel(LauncherModel launcher) : base(launcher.Dispatcher)
         {
             Launcher = launcher;
@@ -24,10 +27,13 @@ namespace SakuraLibrary.Model
             }
         }
 
+        public void Stop() => stopTest.Set();
+
         public void DoTest()
         {
             if (Testing)
             {
+                Stop();
                 return;
             }
             Testing = true;
@@ -36,34 +42,70 @@ namespace SakuraLibrary.Model
             {
                 node.TTL = "-";
                 node.Ping = "-";
+                node.Loss = "-";
+
+                node.pingTime.Clear();
+
+                node.complete = false;
+                node.Sent = node.lossPackets = 0;
             }
-            ThreadPool.QueueUserWorkItem(s =>
+
+            stopTest.Reset();
+            ThreadPool.QueueUserWorkItem(_ =>
             {
                 var ping = new Ping();
-                foreach (var node in Nodes)
+                var queue = new List<NodePingModel>(Nodes);
+                while (!stopTest.WaitOne(1000) && queue.Count > 0)
                 {
-                    node.Ping = "测试中";
-                    try
+                    foreach (var node in queue)
                     {
-                        var result = ping.Send(node.Node.Host, 5000);
-                        switch (result.Status)
+                        Thread.Sleep(200);
+                        if (node.Sent++ == 0)
                         {
-                        case IPStatus.Success:
-                            node.TTL = result.Options.Ttl.ToString();
-                            node.Ping = result.RoundtripTime + "ms";
-                            break;
-                        case IPStatus.TimedOut:
-                            node.Ping = "超时";
-                            break;
-                        default:
-                            node.Ping = "错误: " + result.Status;
-                            break;
+                            node.Ping = "测试中";
+                        }
+                        try
+                        {
+                            var result = ping.Send(node.Node.Host, 1000);
+                            switch (result.Status)
+                            {
+                            case IPStatus.Success:
+                                node.TTL = result.Options.Ttl.ToString();
+                                node.pingTime.Add(result.RoundtripTime);
+                                if (node.Sent >= 20)
+                                {
+                                    node.complete = true;
+                                }
+                                break;
+                            case IPStatus.TimedOut:
+                                node.lossPackets++;
+                                break;
+                            default:
+                                node.Ping = "错误: " + result.Status;
+                                node.Loss = "-";
+                                node.complete = true;
+                                continue;
+                            }
+                            node.Loss = ((float)node.lossPackets / node.Sent * 100).ToString("F1") + "%";
+                            if (node.Sent > 3 && node.lossPackets >= node.Sent)
+                            {
+                                node.Ping = "超时";
+                                node.complete = true;
+                                continue;
+                            }
+                            if (node.pingTime.Count > 0)
+                            {
+                                node.Ping = (node.pingTime.Sum() / node.pingTime.Count).ToString();
+                            }
+                        }
+                        catch
+                        {
+                            node.Ping = "未知错误";
+                            node.Loss = "-";
+                            node.complete = true;
                         }
                     }
-                    catch
-                    {
-                        node.Ping = "错误";
-                    }
+                    queue.RemoveAll(n => n.complete);
                 }
                 Launcher.Dispatcher.BeginInvoke(() => Testing = false);
             });

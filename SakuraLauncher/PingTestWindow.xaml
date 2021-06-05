@@ -10,8 +10,8 @@
         TextOptions.TextRenderingMode="Auto"
         TextOptions.TextFormattingMode="Ideal" 
         Background="{StaticResource MaterialDesignPaper}"
-        Title="节点延迟测试" Height="600" Width="600" 
-        WindowStartupLocation="CenterOwner">
+        Title="节点延迟测试" Height="600" Width="750" 
+        WindowStartupLocation="CenterOwner" Closing="Window_Closing">
     <Grid>
         <DockPanel Margin="16">
             <Button DockPanel.Dock="Bottom" Margin="0,8,0,0" Style="{StaticResource MaterialDesignFlatButton}" Click="Button_Click" Width="96" HorizontalAlignment="Right">
@@ -31,10 +31,12 @@
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Testing}" Value="False">
-                                        <Setter Property="Text" Value="重新测试"/>
+                                    <DataTrigger Binding="{Binding Testing}" Value="True">
+                                        <Setter Property="Text" Value="停止"/>
+                                        <Setter Property="Foreground" Value="White"/>
                                     </DataTrigger>
                                 </Style.Triggers>
+                                <Setter Property="Text" Value="重新测试"/>
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
@@ -54,6 +56,8 @@
                                     <GridViewColumn Header="节点" DisplayMemberBinding="{Binding Name, Mode=OneTime}"  />
                                     <GridViewColumn Header="延迟" DisplayMemberBinding="{Binding Ping, Mode=OneWay}" />
                                     <GridViewColumn Header="TTL" DisplayMemberBinding="{Binding TTL, Mode=OneWay}" />
+                                    <GridViewColumn Header="丢包率" DisplayMemberBinding="{Binding Loss, Mode=OneWay}" />
+                                    <GridViewColumn Header="已发送" DisplayMemberBinding="{Binding Sent, Mode=OneWay}" />
                                     <GridViewColumn Header="新隧道" DisplayMemberBinding="{Binding AcceptNew, Mode=OneTime}" />
                                 </GridView>
                             </ListView.View>
