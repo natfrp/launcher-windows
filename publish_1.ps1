@@ -1,4 +1,4 @@
-$version = Get-Content "SakuraLibrary\AssemblyBase.cs" | Select-String "AssemblyVersion\(`"(.+)`"\)"
+$version = Get-Content "SakuraLibrary\Consts.cs" | Select-String "Version = `"(.+)`";"
 $version = $version.Matches[0].Groups[1].Value
 
 $projects = "SakuraLibrary", "SakuraLauncher", "LegacyLauncher", "SakuraFrpService"
