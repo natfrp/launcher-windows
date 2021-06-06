@@ -59,7 +59,10 @@ namespace SakuraLibrary.Model
                 {
                     foreach (var node in queue)
                     {
-                        Thread.Sleep(200);
+                        if (stopTest.WaitOne(200))
+                        {
+                            break;
+                        }
                         if (node.Sent++ == 0)
                         {
                             node.Ping = "测试中";

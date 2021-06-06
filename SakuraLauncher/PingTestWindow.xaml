@@ -10,7 +10,7 @@
         TextOptions.TextRenderingMode="Auto"
         TextOptions.TextFormattingMode="Ideal" 
         Background="{StaticResource MaterialDesignPaper}"
-        Title="节点延迟测试" Height="600" Width="750" 
+        Title="节点延迟测试" Height="600" Width="790" 
         WindowStartupLocation="CenterOwner" Closing="Window_Closing">
     <Grid>
         <DockPanel Margin="16">

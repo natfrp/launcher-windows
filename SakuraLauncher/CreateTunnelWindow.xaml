@@ -10,7 +10,7 @@
         TextOptions.TextRenderingMode="Auto"
         TextOptions.TextFormattingMode="Ideal" 
         Background="{StaticResource MaterialDesignPaper}"
-        Title="新建穿透隧道" Height="500" Width="800" 
+        Title="新建穿透隧道" Height="500" Width="880" 
         WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.ColumnDefinitions>
