@@ -72,6 +72,8 @@
     <Compile Include="Model\PingTestModel.cs" />
     <Compile Include="Model\TunnelModel.cs" />
     <Compile Include="NTAPI.cs" />
+    <Compile Include="Pipe\PipeClient.cs" />
+    <Compile Include="Pipe\PipeConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs" />
     <Compile Include="UtilsWindows.cs" />

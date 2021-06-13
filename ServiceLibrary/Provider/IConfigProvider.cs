@@ -4,8 +4,6 @@ namespace SakuraFrpService.Provider
 {
     public interface IConfigProvider
     {
-        string PipeName { get; }
-
         string Token { get; set; }
 
         bool BypassProxy { get; set; }

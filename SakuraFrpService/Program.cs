@@ -165,7 +165,7 @@ namespace SakuraFrpService
                     }
                     return 0;
                 case "--daemon":
-                    var main = new SakuraService(new ConfigProvider(), new UtilsProvider(), new SodiumProvider());
+                    var main = new SakuraService(new ConfigProvider(), new UtilsProvider(), new CommunicationProvider(UtilsWindows.InstallationPipeName), new SodiumProvider());
                     main.Start(true);
                     return Environment.ExitCode;
                 case "--update":

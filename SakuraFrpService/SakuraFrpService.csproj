@@ -100,6 +100,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Provider\ConfigProvider.cs" />
+    <Compile Include="Provider\CommunicationProvider.cs" />
     <Compile Include="Provider\SodiumProvider.cs" />
     <Compile Include="Provider\UtilsProvider.cs" />
     <Compile Include="Sodium\SodiumLibrary.cs" />

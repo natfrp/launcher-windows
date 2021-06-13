@@ -2,20 +2,14 @@
 using System.IO;
 using System.IO.Pipes;
 
-using Google.Protobuf;
-
-using SakuraLibrary.Proto;
+using SakuraLibrary.Helper;
 
 namespace SakuraLibrary.Pipe
 {
-    public class PipeConnection : IDisposable
+    public class PipeConnection : ServiceConnection
     {
         public const string PUSH_SUFFIX = "_PUSH";
 
-        public delegate void PipeConnectionEventHandler(PipeConnection connection);
-        public delegate void PipeDataEventHandler(PipeConnection connection, int length);
-
-        public byte[] Buffer = null;
         public PipeStream Pipe = null;
 
         public PipeConnection(byte[] buffer, PipeStream pipe)
@@ -24,17 +18,9 @@ namespace SakuraLibrary.Pipe
             Pipe = pipe;
         }
 
-        public void Dispose() => Pipe?.Dispose();
+        public override void Dispose() => Pipe?.Dispose();
 
-        public virtual void Send(byte[] data) => Pipe.Write(data, 0, data.Length);
-
-        public void SendProto(IMessage message) => Send(message.ToByteArray());
-
-        public void RespondFailure(string message = "") => SendProto(new ResponseBase()
-        {
-            Success = false,
-            Message = message ?? ""
-        });
+        public override void Send(byte[] data) => Pipe.Write(data, 0, data.Length);
 
         public int EnsureMessageComplete(int read)
         {

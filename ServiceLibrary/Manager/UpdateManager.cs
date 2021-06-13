@@ -181,7 +181,7 @@ namespace SakuraFrpService.Manager
             catch { }
         }
 
-        public void PushStatus() => Main.Pipe.PushMessage(new PushMessageBase()
+        public void PushStatus() => Main.Communication.PushMessage(new PushMessageBase()
         {
             Type = PushMessageID.PushUpdate,
             DataUpdate = Status

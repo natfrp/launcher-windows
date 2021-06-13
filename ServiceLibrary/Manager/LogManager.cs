@@ -84,7 +84,7 @@ namespace SakuraFrpService.Manager
                             }
                             newLog.Clear();
                         }
-                        Main.Pipe.PushMessage(msg);
+                        Main.Communication.PushMessage(msg);
                         while (Count > RotateSize)
                         {
                             TryDequeue(out Log _);

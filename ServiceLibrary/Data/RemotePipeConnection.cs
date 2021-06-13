@@ -1,14 +1,14 @@
-﻿using SakuraLibrary.Pipe;
+﻿using SakuraLibrary.Helper;
 
 namespace SakuraFrpService.Data
 {
-    class RemotePipeConnection : PipeConnection
+    public class RemotePipeConnection : ServiceConnection
     {
-        public RemotePipeConnection() : base(null, null) { }
-
         public override void Send(byte[] data)
         {
             Buffer = data;
         }
+
+        public override void Dispose() { }
     }
 }

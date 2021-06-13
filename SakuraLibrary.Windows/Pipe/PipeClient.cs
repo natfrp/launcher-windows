@@ -9,7 +9,7 @@ namespace SakuraLibrary.Pipe
 {
     public class PipeClient : IDisposable
     {
-        public event PipeConnection.PipeDataEventHandler ServerPush;
+        public Action<PipeConnection, int> ServerPush;
 
         public PipeConnection Pipe = null, PushPipe = null;
 

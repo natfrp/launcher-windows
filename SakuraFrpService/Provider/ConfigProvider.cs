@@ -1,13 +1,9 @@
 ﻿using System.Collections.Generic;
 
-using SakuraLibrary;
-
 namespace SakuraFrpService.Provider
 {
     public class ConfigProvider : IConfigProvider
     {
-        public string PipeName => UtilsWindows.InstallationPipeName;
-
         public string Token { get => Settings.Token; set => Settings.Token = value; }
 
         public bool BypassProxy { get => Settings.BypassProxy; set => Settings.BypassProxy = value; }

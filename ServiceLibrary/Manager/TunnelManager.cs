@@ -57,10 +57,10 @@ namespace SakuraFrpService.Manager
             {
                 msg.DataTunnels.Tunnels.Add(Values.Select(t => t.CreateProto()));
             }
-            Main.Pipe.PushMessage(msg);
+            Main.Communication.PushMessage(msg);
         }
 
-        public void PushOne(Tunnel t) => Main.Pipe.PushMessage(new PushMessageBase()
+        public void PushOne(Tunnel t) => Main.Communication.PushMessage(new PushMessageBase()
         {
             Type = PushMessageID.UpdateTunnel,
             DataTunnel = t.CreateProto()

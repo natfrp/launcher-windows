@@ -44,7 +44,7 @@ namespace SakuraFrpService.Manager
                 msg.DataNodes.Nodes.Add(Values);
             }
             Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "节点信息同步成功");
-            Main.Pipe.PushMessage(msg);
+            Main.Communication.PushMessage(msg);
         }
 
         protected void Run()

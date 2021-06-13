@@ -1,5 +1,7 @@
 ﻿using System.ServiceProcess;
 
+using SakuraLibrary;
+
 using SakuraFrpService.Provider;
 
 namespace SakuraFrpService
@@ -11,7 +13,7 @@ namespace SakuraFrpService
         public MainService()
         {
             InitializeComponent();
-            Main = new SakuraService(new ConfigProvider(), new UtilsProvider(), new SodiumProvider());
+            Main = new SakuraService(new ConfigProvider(), new UtilsProvider(), new CommunicationProvider(UtilsWindows.InstallationPipeName), new SodiumProvider());
         }
 
         protected override void OnStart(string[] args)

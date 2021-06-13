@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using SakuraLibrary.Pipe;
 using SakuraLibrary.Proto;
+using SakuraLibrary.Helper;
 using UserStatus = SakuraLibrary.Proto.User.Types.Status;
 
 using SakuraFrpService.Data;
@@ -24,7 +24,8 @@ namespace SakuraFrpService
             Status = UserStatus.NoLogin
         };
 
-        public readonly PipeServer Pipe;
+        public readonly ICommunicationProvider Communication;
+
         public readonly LogManager LogManager;
         public readonly NodeManager NodeManager;
         public readonly TunnelManager TunnelManager;
@@ -40,7 +41,7 @@ namespace SakuraFrpService
         protected Thread TickThread = null;
         protected ManualResetEvent StopEvent = new ManualResetEvent(false);
 
-        public SakuraService(IConfigProvider config, IUtilsProvider utils, ISodiumProvider sodium)
+        public SakuraService(IConfigProvider config, IUtilsProvider utils, ICommunicationProvider communication, ISodiumProvider sodium)
         {
             Config = config;
             Sodium = sodium;
@@ -51,8 +52,8 @@ namespace SakuraFrpService
 
             AutoLogin = Natfrp.Token != null && Natfrp.Token.Length > 0;
 
-            Pipe = new PipeServer(config.PipeName);
-            Pipe.DataReceived += Pipe_DataReceived;
+            Communication = communication;
+            Communication.DataReceived = Pipe_DataReceived;
 
             LogManager = new LogManager(this, 8192);
             NodeManager = new NodeManager(this);
@@ -70,7 +71,7 @@ namespace SakuraFrpService
             StopEvent.Reset();
             try
             {
-                Pipe.Start();
+                Communication.Start();
                 LogManager.Start();
                 if (!blocking)
                 {
@@ -97,7 +98,7 @@ namespace SakuraFrpService
             StopEvent.Set();
             try
             {
-                Pipe.Stop();
+                Communication.Stop();
                 RemoteManager.Stop(true);
                 TunnelManager.Stop(true);
                 NodeManager.Stop(true);
@@ -130,9 +131,9 @@ namespace SakuraFrpService
                     }
                     if (ticks % 200 == 0)
                     {
-                        if (!Pipe.Running)
+                        if (!Communication.Running)
                         {
-                            Pipe.Start();
+                            Communication.Start();
                         }
                     }
                 }
@@ -145,7 +146,7 @@ namespace SakuraFrpService
         {
             lock (UserInfo)
             {
-                Pipe.PushMessage(new PushMessageBase()
+                Communication.PushMessage(new PushMessageBase()
                 {
                     Type = PushMessageID.UpdateUser,
                     DataUser = UserInfo
@@ -276,7 +277,7 @@ namespace SakuraFrpService
             RemoteKeySet = RemoteManager.EncryptKey != null && RemoteManager.EncryptKey.Length > 0
         };
 
-        public void PushConfig() => Pipe.PushMessage(new PushMessageBase()
+        public void PushConfig() => Communication.PushMessage(new PushMessageBase()
         {
             Type = PushMessageID.PushConfig,
             DataConfig = GetConfig()
@@ -288,7 +289,7 @@ namespace SakuraFrpService
             Message = message ?? ""
         };
 
-        public void Pipe_DataReceived(PipeConnection connection, int count)
+        public void Pipe_DataReceived(ServiceConnection connection, int count)
         {
             try
             {
