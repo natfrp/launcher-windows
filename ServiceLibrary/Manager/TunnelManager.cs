@@ -20,12 +20,12 @@ namespace SakuraFrpService.Manager
 
         public readonly int PID = Process.GetCurrentProcess().Id;
 
-        public readonly MainService Main;
+        public readonly SakuraService Main;
         public readonly AsyncManager AsyncManager;
 
         public readonly string FrpcPath;
 
-        public TunnelManager(MainService main)
+        public TunnelManager(SakuraService main)
         {
             Main = main;
             FrpcPath = Path.GetFullPath(FrpcExecutable);
@@ -127,9 +127,9 @@ namespace SakuraFrpService.Manager
                 {
                     Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "隧道列表已更新");
                 }
-                if (loadEnabled && Properties.Settings.Default.EnabledTunnels != null)
+                if (loadEnabled && Main.Config.EnabledTunnels != null)
                 {
-                    foreach (var i in Properties.Settings.Default.EnabledTunnels)
+                    foreach (var i in Main.Config.EnabledTunnels)
                     {
                         if (ContainsKey(i))
                         {
@@ -217,7 +217,7 @@ namespace SakuraFrpService.Manager
                         {
                             continue;
                         }
-                        Main.Save();
+                        Main.Config.Save();
                         PushOne(t);
                     }
                 }
@@ -267,7 +267,7 @@ namespace SakuraFrpService.Manager
 
         public void Start()
         {
-            foreach (var p in Utils.SearchProcess("frpc", FrpcPath))
+            foreach (var p in Main.ExtraUtils.SearchProcess("frpc", FrpcPath))
             {
                 try
                 {

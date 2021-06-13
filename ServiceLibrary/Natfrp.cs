@@ -155,8 +155,6 @@ namespace SakuraFrpService
 
         public class ApiResponse
         {
-            public static string Path => null;
-
             [JsonProperty("success", Required = Required.Always)]
             public bool Success { get; set; }
 

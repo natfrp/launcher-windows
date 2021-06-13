@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:Data="clr-namespace:SakuraLibrary.Model;assembly=SakuraLibrary"
+             xmlns:Data="clr-namespace:SakuraLibrary.Model;assembly=SakuraLibrary.Windows"
              xmlns:DesignerData="clr-namespace:SakuraLauncher.View.DesignerData;assembly=SakuraLauncher"
              d:DataContext="{d:DesignInstance {x:Type DesignerData:TunnelTab}, IsDesignTimeCreatable=True}"
              d:DesignWidth="900" d:DesignHeight="600">

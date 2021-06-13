@@ -23,7 +23,7 @@ namespace SakuraFrpService.Manager
 
         public readonly string TempDir = Path.Combine(Path.GetTempPath(), "Sakura-" + Guid.NewGuid());
 
-        public readonly MainService Main;
+        public readonly SakuraService Main;
         public readonly AsyncManager AsyncManager;
 
         public UpdateStatus Status = new UpdateStatus();
@@ -58,12 +58,12 @@ namespace SakuraFrpService.Manager
         private bool UpdateFrpc = false, UpdateLauncher = false;
         private Thread DownloadThread = null;
 
-        public UpdateManager(MainService main)
+        public UpdateManager(SakuraService main)
         {
             Main = main;
             AsyncManager = new AsyncManager(Run);
 
-            UpdateInterval = Properties.Settings.Default.UpdateInterval;
+            UpdateInterval = main.Config.UpdateInterval;
         }
 
         public void IssueUpdateCheck()
@@ -193,7 +193,7 @@ namespace SakuraFrpService.Manager
             var result = await Natfrp.Request<Natfrp.GetVersion>("get_version");
             lock (this)
             {
-                UpdateLauncher = Version.TryParse(result.Launcher.Version, out Version launcher) && launcher > Assembly.GetExecutingAssembly().GetName().Version;
+                UpdateLauncher = Version.TryParse(result.Launcher.Version, out Version launcher) && launcher > Assembly.GetEntryAssembly().GetName().Version;
                 UpdateFrpc = TryParseFrpcVersion(result.Frpc.Version, out Version frpc, out double sakura) && (frpc > FrpcVersion || (frpc == FrpcVersion && FrpcSakura != 0 && sakura > FrpcSakura));
 
                 var note = new List<string>();

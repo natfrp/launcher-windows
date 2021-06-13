@@ -6,15 +6,13 @@ using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 using Newtonsoft.Json;
 
-using SakuraLibrary;
 using SakuraLibrary.Helper;
 
 using SakuraFrpService.Data;
-using SakuraFrpService.Sodium;
+using SakuraFrpService.Provider;
 using SakuraFrpService.WebSocketShim;
 
 namespace SakuraFrpService.Manager
@@ -30,7 +28,9 @@ namespace SakuraFrpService.Manager
             0xc5, 0x23, 0xa3, 0xfe, 0x56, 0xee, 0x5b, 0x76, 0x77, 0x30, 0x99, 0x8d, 0x7c, 0xb6, 0x22, 0xc8
         };
 
-        public readonly MainService Main;
+        public readonly SakuraService Main;
+        public readonly ISodiumProvider Sodium;
+
         public readonly AsyncManager AsyncManager;
 
         public bool Enabled = false;
@@ -40,26 +40,20 @@ namespace SakuraFrpService.Manager
         protected WebSocket Socket = null;
         protected CancellationTokenSource Source = null;
 
-        public RemoteManager(MainService main)
+        public RemoteManager(SakuraService main, ISodiumProvider sodium)
         {
             Main = main;
+            Sodium = sodium;
+
             AsyncManager = new AsyncManager(Run);
 
             try
             {
-                var sodium = RuntimeInformation.ProcessArchitecture.ToString().ToLower() + "\\libsodium.dll";
-                if (!File.Exists(sodium))
-                {
-                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "未找到架构匹配的 libsodium, 当前系统可能不支持远程管理");
-                }
-                else if (NTAPI.LoadLibraryEx(Path.GetFullPath(sodium), IntPtr.Zero, 0) == IntPtr.Zero)
-                {
-                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "libsodium 加载失败, 远程管理无法正常工作");
-                }
+                Sodium.Init();
             }
             catch (Exception e)
             {
-                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "libsodium 加载失败, 远程管理无法正常工作: " + e.ToString());
+                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "无法初始化 Sodium, 远程管理无法正常工作: " + e.Message);
             }
         }
 
@@ -157,7 +151,7 @@ namespace SakuraFrpService.Manager
 
                         try
                         {
-                            data = SecretBox.Open(data, nonce, EncryptKey);
+                            data = Sodium.SecretBoxOpen(data, nonce, EncryptKey);
                         }
                         catch
                         {
@@ -167,10 +161,10 @@ namespace SakuraFrpService.Manager
                         remote.Buffer = data;
                         Main.Pipe_DataReceived(remote, data.Length);
 
-                        nonce = SecretBox.GenerateNonce();
+                        nonce = Sodium.GenerateNonce();
                         ms.Write(nonce, 0, nonce.Length);
 
-                        data = SecretBox.Create(remote.Buffer, nonce, EncryptKey);
+                        data = Sodium.SecretBoxCreate(remote.Buffer, nonce, EncryptKey);
                         ms.Write(data, 0, data.Length);
                         break;
                     default:

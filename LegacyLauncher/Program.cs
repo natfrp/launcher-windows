@@ -18,13 +18,13 @@ namespace LegacyLauncher
         [STAThread]
         static void Main(string[] args)
         {
-            Environment.CurrentDirectory = Path.GetDirectoryName(Utils.ExecutablePath);
+            Environment.CurrentDirectory = Path.GetDirectoryName(UtilsWindows.ExecutablePath);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            Utils.VerifySignature(Utils.LibraryPath, Utils.ExecutablePath, Path.GetFullPath(Consts.ServiceExecutable));
-            Utils.ValidateSettings();
+            UtilsWindows.VerifySignature(UtilsWindows.LibraryPath, UtilsWindows.ExecutablePath, Path.GetFullPath(Consts.ServiceExecutable));
+            UtilsWindows.ValidateSettings();
 
             var minimize = false;
             foreach (var a in args)
@@ -36,7 +36,7 @@ namespace LegacyLauncher
                 }
             }
 
-            AppMutex = new Mutex(true, "LegacySakuraLauncher_" + Utils.InstallationHash, out bool created);
+            AppMutex = new Mutex(true, "LegacySakuraLauncher_" + UtilsWindows.InstallationHash, out bool created);
 
             if (created)
             {

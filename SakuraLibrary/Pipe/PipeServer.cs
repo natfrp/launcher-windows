@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO.Pipes;
-using System.Security.Principal;
 using System.Collections.Generic;
-using System.Security.AccessControl;
 
 using Google.Protobuf;
 
@@ -98,14 +96,15 @@ namespace SakuraLibrary.Pipe
             }
         }
 
-        public PipeSecurity CreateSecurity()
-        {
-            var security = new PipeSecurity();
-            security.AddAccessRule(new PipeAccessRule(WindowsIdentity.GetCurrent().User, PipeAccessRights.FullControl, AccessControlType.Allow));
-            security.AddAccessRule(new PipeAccessRule(new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null), PipeAccessRights.ReadWrite, AccessControlType.Allow));
-            security.AddAccessRule(new PipeAccessRule(new SecurityIdentifier(WellKnownSidType.NetworkSid, null), PipeAccessRights.FullControl, AccessControlType.Deny));
-            return security;
-        }
+        // TODO: ?
+        //public PipeSecurity CreateSecurity()
+        //{
+        //    var security = new PipeSecurity();
+        //    security.AddAccessRule(new PipeAccessRule(WindowsIdentity.GetCurrent().User, PipeAccessRights.FullControl, AccessControlType.Allow));
+        //    security.AddAccessRule(new PipeAccessRule(new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null), PipeAccessRights.ReadWrite, AccessControlType.Allow));
+        //    security.AddAccessRule(new PipeAccessRule(new SecurityIdentifier(WellKnownSidType.NetworkSid, null), PipeAccessRights.FullControl, AccessControlType.Deny));
+        //    return security;
+        //}
 
         #region RESTful API Pipe
 
@@ -168,7 +167,7 @@ namespace SakuraLibrary.Pipe
                 {
                     ListeningPipe.Dispose(); // Shouldn't happen
                 }
-                ListeningPipe = new NamedPipeServerStream(Name, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Message, PipeOptions.Asynchronous, BufferSize, BufferSize, CreateSecurity())
+                ListeningPipe = new NamedPipeServerStream(Name, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Message, PipeOptions.Asynchronous, BufferSize, BufferSize)
                 {
                     ReadMode = PipeTransmissionMode.Message
                 };
@@ -241,7 +240,7 @@ namespace SakuraLibrary.Pipe
                     ListeningPushPipe.Dispose(); // Shouldn't happen too
                 }
                 // Note: PipeDirection.InOut ensures the client can set ReadMode, IDK why but it works this way
-                ListeningPushPipe = new NamedPipeServerStream(Name + PipeConnection.PUSH_SUFFIX, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Message, PipeOptions.Asynchronous, 0, BufferSize, CreateSecurity());
+                ListeningPushPipe = new NamedPipeServerStream(Name + PipeConnection.PUSH_SUFFIX, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Message, PipeOptions.Asynchronous, 0, BufferSize);
                 ListeningPushPipe.BeginWaitForConnection(OnPushPipeConnect, null);
             }
         }

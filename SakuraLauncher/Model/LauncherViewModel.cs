@@ -92,10 +92,10 @@ namespace SakuraLauncher.Model
 
         public bool AutoRun
         {
-            get => File.Exists(Utils.GetAutoRunFile(Consts.SakuraLauncherPrefix));
+            get => File.Exists(UtilsWindows.GetAutoRunFile(Consts.SakuraLauncherPrefix));
             set
             {
-                var result = Utils.SetAutoRun(!AutoRun, Consts.SakuraLauncherPrefix);
+                var result = UtilsWindows.SetAutoRun(!AutoRun, Consts.SakuraLauncherPrefix);
                 if (result != null)
                 {
                     App.ShowMessage(result, "设置失败", MessageBoxImage.Error);

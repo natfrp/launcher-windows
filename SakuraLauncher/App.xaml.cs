@@ -24,10 +24,10 @@ namespace SakuraLauncher
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            Environment.CurrentDirectory = Path.GetDirectoryName(Utils.ExecutablePath);
+            Environment.CurrentDirectory = Path.GetDirectoryName(UtilsWindows.ExecutablePath);
 
-            Utils.VerifySignature(Utils.LibraryPath, Utils.ExecutablePath, Path.GetFullPath(Consts.ServiceExecutable));
-            Utils.ValidateSettings();
+            UtilsWindows.VerifySignature(UtilsWindows.LibraryPath, UtilsWindows.ExecutablePath, Path.GetFullPath(Consts.ServiceExecutable));
+            UtilsWindows.ValidateSettings();
 
             var minimize = false;
             foreach (var a in e.Args)
@@ -38,7 +38,7 @@ namespace SakuraLauncher
                 }
             }
 
-            AppMutex = new Mutex(true, "SakuraLauncher_" + Utils.InstallationHash, out bool created);
+            AppMutex = new Mutex(true, "SakuraLauncher_" + UtilsWindows.InstallationHash, out bool created);
             if (!created)
             {
                 ShowMessage("请不要重复开启 SakuraFrp 客户端. 如果想运行多个实例请将软件复制到其他目录.", "Oops", MessageBoxImage.Warning);

@@ -15,6 +15,7 @@ using System.Runtime.InteropServices;
 using SakuraLibrary;
 
 using SakuraFrpService.Manager;
+using SakuraFrpService.Provider;
 
 namespace SakuraFrpService
 {
@@ -25,14 +26,14 @@ namespace SakuraFrpService
         private static string InstallService()
         {
             // Install service
-            var dir = new DirectoryInfo(Path.GetDirectoryName(Utils.ExecutablePath));
+            var dir = new DirectoryInfo(Path.GetDirectoryName(UtilsWindows.ExecutablePath));
 
             var acl = dir.GetAccessControl(AccessControlSections.Access);
             acl.SetAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.LocalServiceSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.None, AccessControlType.Allow));
 
             dir.SetAccessControl(acl);
 
-            ManagedInstallerClass.InstallHelper(new string[] { Utils.ExecutablePath });
+            ManagedInstallerClass.InstallHelper(new string[] { UtilsWindows.ExecutablePath });
 
             // Set permission
             var sc = ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == Consts.ServiceName);
@@ -78,7 +79,7 @@ namespace SakuraFrpService
 
         private static void UninstallService()
         {
-            ManagedInstallerClass.InstallHelper(new string[] { "/u", Utils.ExecutablePath });
+            ManagedInstallerClass.InstallHelper(new string[] { "/u", UtilsWindows.ExecutablePath });
         }
 
         /// <summary>
@@ -86,12 +87,12 @@ namespace SakuraFrpService
         /// </summary>
         static int Main(string[] argv)
         {
-            Environment.CurrentDirectory = Path.GetDirectoryName(Utils.ExecutablePath);
+            Environment.CurrentDirectory = Path.GetDirectoryName(UtilsWindows.ExecutablePath);
 
-            Utils.VerifySignature(Utils.LibraryPath, Utils.ExecutablePath, Path.GetFullPath(TunnelManager.FrpcExecutable));
-            Utils.ValidateSettings();
+            UtilsWindows.VerifySignature(UtilsWindows.LibraryPath, UtilsWindows.ExecutablePath, Path.GetFullPath(TunnelManager.FrpcExecutable));
+            UtilsWindows.ValidateSettings();
 
-            if (Path.GetFileName(Utils.ExecutablePath) != Consts.ServiceExecutable)
+            if (Path.GetFileName(UtilsWindows.ExecutablePath) != Consts.ServiceExecutable)
             {
                 if (Environment.UserInteractive)
                 {
@@ -99,6 +100,7 @@ namespace SakuraFrpService
                 }
                 return 1;
             }
+
             if (argv.Length != 0)
             {
                 switch (argv[0])
@@ -163,12 +165,9 @@ namespace SakuraFrpService
                     }
                     return 0;
                 case "--daemon":
-                    var args = new string[argv.Length - 1];
-                    Array.Copy(argv, 1, args, 0, args.Length);
-
-                    var main = new MainService(true);
-                    main.DaemonRun(args);
-                    return main.ExitCode;
+                    var main = new SakuraService(new ConfigProvider(), new UtilsProvider(), new SodiumProvider());
+                    main.Start(true);
+                    return Environment.ExitCode;
                 case "--update":
                     if (argv.Length < 2)
                     {
@@ -181,13 +180,14 @@ namespace SakuraFrpService
                     return 0;
                 }
             }
+
             if (Environment.UserInteractive)
             {
                 MessageBox.Show("You can't start the service directly.\nTo run as daemon, pass --daemon as the first parameter.\nKeep in mind that action above should be done by SakuraFrpLauncher automatically, not by user.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return -1;
             }
 
-            AppMutex = new Mutex(true, "SakuraFrpService_" + Utils.InstallationHash, out bool created);
+            AppMutex = new Mutex(true, "SakuraFrpService_" + UtilsWindows.InstallationHash, out bool created);
             if (!created)
             {
                 if (Environment.UserInteractive)
@@ -197,12 +197,7 @@ namespace SakuraFrpService
                 return -1;
             }
 
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[]
-            {
-                new MainService(false)
-            };
-            ServiceBase.Run(ServicesToRun);
+            ServiceBase.Run(new MainService());
             return 0;
         }
     }

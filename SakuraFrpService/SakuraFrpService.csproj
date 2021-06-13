@@ -39,11 +39,11 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Google.Protobuf, Version=3.15.6.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Protobuf.3.15.6\lib\net45\Google.Protobuf.dll</HintPath>
+    <Reference Include="Google.Protobuf, Version=3.17.3.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Protobuf.3.17.3\lib\net45\Google.Protobuf.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -72,20 +72,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SakuraLibrary\AssemblyBase.cs">
+    <Compile Include="..\SakuraLibrary.Windows\AssemblyBase.cs">
       <Link>Properties\AssemblyBase.cs</Link>
     </Compile>
-    <Compile Include="Data\RemotePipeConnection.cs" />
-    <Compile Include="Manager\LogManager.cs" />
     <Compile Include="MainService.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="MainService.Designer.cs">
       <DependentUpon>MainService.cs</DependentUpon>
     </Compile>
-    <Compile Include="Manager\RemoteManager.cs" />
-    <Compile Include="Manager\UpdateManager.cs" />
-    <Compile Include="Natfrp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
@@ -104,30 +99,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Manager\NodeManager.cs" />
-    <Compile Include="Data\Tunnel.cs" />
-    <Compile Include="Manager\TunnelManager.cs" />
-    <Compile Include="Sodium\PasswordHash.cs" />
-    <Compile Include="Sodium\SecretBox.cs" />
+    <Compile Include="Provider\ConfigProvider.cs" />
+    <Compile Include="Provider\SodiumProvider.cs" />
+    <Compile Include="Provider\UtilsProvider.cs" />
     <Compile Include="Sodium\SodiumLibrary.cs" />
-    <Compile Include="WebSocketShim\ClientWebSocket.cs" />
-    <Compile Include="WebSocketShim\ClientWebSocketOptions.cs" />
-    <Compile Include="WebSocketShim\HttpKnownHeaderNames.cs" />
-    <Compile Include="WebSocketShim\ManagedWebSocket.cs" />
-    <Compile Include="WebSocketShim\NET45Shims.cs" />
-    <Compile Include="WebSocketShim\NetEventSource.WebSockets.cs" />
-    <Compile Include="WebSocketShim\SecurityProtocol.cs" />
-    <Compile Include="WebSocketShim\SR.cs" />
-    <Compile Include="WebSocketShim\StringExtensions.cs" />
-    <Compile Include="WebSocketShim\Strings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Strings.resx</DependentUpon>
-    </Compile>
-    <Compile Include="WebSocketShim\SystemClientWebSocket.cs" />
-    <Compile Include="WebSocketShim\UriScheme.cs" />
-    <Compile Include="WebSocketShim\WebSocketHandle.Managed.cs" />
-    <Compile Include="WebSocketShim\WebSocketValidate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -149,15 +124,19 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="WebSocketShim\Strings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SakuraLibrary.Windows\SakuraLibrary.Windows.csproj">
+      <Project>{6973b012-7e69-4956-81c2-11d3d76b39b8}</Project>
+      <Name>SakuraLibrary.Windows</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SakuraLibrary\SakuraLibrary.csproj">
-      <Project>{ec113dee-c0b2-4e52-a318-fd44dad67ea3}</Project>
+      <Project>{e75ecfa5-be26-42df-9f6f-50d7376ace48}</Project>
       <Name>SakuraLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ServiceLibrary\ServiceLibrary.csproj">
+      <Project>{24504949-8152-4420-b06a-bd6d894230db}</Project>
+      <Name>ServiceLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

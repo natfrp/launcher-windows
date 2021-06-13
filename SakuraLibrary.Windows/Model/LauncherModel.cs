@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Diagnostics;
@@ -16,7 +15,7 @@ namespace SakuraLibrary.Model
 {
     public abstract class LauncherModel : ModelBase, IAsyncManager
     {
-        public readonly PipeClient Pipe = new PipeClient(Utils.InstallationPipeName);
+        public readonly PipeClient Pipe = new PipeClient(UtilsWindows.InstallationPipeName);
         public readonly DaemonHost Daemon;
         public readonly AsyncManager AsyncManager;
 

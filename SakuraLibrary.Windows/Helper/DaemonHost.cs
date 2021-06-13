@@ -118,7 +118,7 @@ namespace SakuraLibrary.Helper
             {
                 return true;
             }
-            var processes = Utils.SearchProcess("SakuraFrpService", ServicePath);
+            var processes = UtilsWindows.SearchProcess("SakuraFrpService", ServicePath);
             if (processes.Length == 0)
             {
                 return false;

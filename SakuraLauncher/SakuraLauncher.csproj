@@ -85,7 +85,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="..\SakuraLibrary\AssemblyBase.cs">
+    <Compile Include="..\SakuraLibrary.Windows\AssemblyBase.cs">
       <Link>Properties\AssemblyBase.cs</Link>
     </Compile>
     <Compile Include="CreateTunnelWindow.xaml.cs">
@@ -241,8 +241,12 @@
     <Resource Include="Resources\fishcake.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SakuraLibrary.Windows\SakuraLibrary.Windows.csproj">
+      <Project>{6973b012-7e69-4956-81c2-11d3d76b39b8}</Project>
+      <Name>SakuraLibrary.Windows</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SakuraLibrary\SakuraLibrary.csproj">
-      <Project>{ec113dee-c0b2-4e52-a318-fd44dad67ea3}</Project>
+      <Project>{e75ecfa5-be26-42df-9f6f-50d7376ace48}</Project>
       <Name>SakuraLibrary</Name>
     </ProjectReference>
   </ItemGroup>

@@ -10,10 +10,10 @@ namespace SakuraFrpService.Manager
     {
         public const string Tag = "Service/NodeManager";
 
-        public readonly MainService Main;
+        public readonly SakuraService Main;
         public readonly AsyncManager AsyncManager;
 
-        public NodeManager(MainService main)
+        public NodeManager(SakuraService main)
         {
             Main = main;
 

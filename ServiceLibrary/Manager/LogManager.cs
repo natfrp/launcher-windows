@@ -13,14 +13,14 @@ namespace SakuraFrpService.Manager
             CATEGORY_SERVICE_INFO = 1, CATEGORY_SERVICE_WARNING = 2, CATEGORY_SERVICE_ERROR = 3,
             CATEGORY_NOTICE_INFO = 4, CATEGORY_NOTICE_WARNING = 5, CATEGORY_NOTICE_ERROR = 6;
 
-        public readonly MainService Main;
+        public readonly SakuraService Main;
         public readonly AsyncManager AsyncManager;
 
         public int RotateSize;
 
         protected List<Log> newLog = new List<Log>();
 
-        public LogManager(MainService main, int bufferSize)
+        public LogManager(SakuraService main, int bufferSize)
         {
             Main = main;
             RotateSize = bufferSize;

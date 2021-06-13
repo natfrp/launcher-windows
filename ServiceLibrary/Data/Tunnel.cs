@@ -230,18 +230,18 @@ namespace SakuraFrpService.Data
 
         protected void HandleReport(int type, string j)
         {
-            dynamic json = JToken.Parse(j);
+            var json = JToken.Parse(j);
             switch (type)
             {
             case 1: // Launch success
                 FailCount = 0;
                 StartState = 2;
                 WaitTick = 0; // Do state check immediately
-                Manager.Main.LogManager.Log(LogManager.CATEGORY_NOTICE_INFO, "隧道 " + Name + " 启动成功", (string)json.message);
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_NOTICE_INFO, "隧道 " + Name + " 启动成功", json.Value<string>("message"));
                 break;
             case 2: // Fatal launch failure
                 Enabled = false;
-                Manager.Main.LogManager.Log(LogManager.CATEGORY_NOTICE_WARNING, "隧道 " + Name + " 启动失败", (string)json.message);
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_NOTICE_WARNING, "隧道 " + Name + " 启动失败", json.Value<string>("message"));
                 break;
             default:
                 Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "未知上报类型: " + type);

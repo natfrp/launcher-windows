@@ -28,7 +28,7 @@ namespace LegacyLauncher
 
             notifyIcon_tray.Icon = Icon;
 
-            checkBox_autorun.Checked = File.Exists(Utils.GetAutoRunFile(Consts.LegacyLauncherPrefix));
+            checkBox_autorun.Checked = File.Exists(UtilsWindows.GetAutoRunFile(Consts.LegacyLauncherPrefix));
         }
 
         public void RefresnTunnels(object s = null, NotifyCollectionChangedEventArgs e = null)
@@ -163,7 +163,7 @@ namespace LegacyLauncher
             Model.Save();
         }
 
-        private void checkBox_autorun_CheckedChanged(object sender, EventArgs e) => Utils.SetAutoRun(checkBox_autorun.Checked, Consts.LegacyLauncherPrefix);
+        private void checkBox_autorun_CheckedChanged(object sender, EventArgs e) => UtilsWindows.SetAutoRun(checkBox_autorun.Checked, Consts.LegacyLauncherPrefix);
 
         private void listView_tunnels_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
