@@ -16,7 +16,7 @@ namespace SakuraFrpService
 
         public static string Token = "";
         public static string Endpoint = "https://api.natfrp.com/launcher/";
-        public static string UserAgent = "SakuraFrpService/" + Assembly.GetExecutingAssembly().GetName().Version;
+        public static string UserAgent = Assembly.GetEntryAssembly().GetName().Name + "/" + Assembly.GetEntryAssembly().GetName().Version;
 
         public static HttpWebRequest CreateRequest(string url)
         {

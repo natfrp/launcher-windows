@@ -1,11 +1,19 @@
 ﻿using System;
 using System.Text;
 using System.Security.Cryptography;
+using System.Reflection;
+using System.IO;
 
 namespace SakuraLibrary
 {
     public static class Utils
     {
+        public static readonly string LibraryPath = Assembly.GetExecutingAssembly().Location;
+        public static readonly string ExecutablePath = Assembly.GetEntryAssembly().Location;
+
+        public static readonly string InstallationPath = Path.GetDirectoryName(LibraryPath);
+        public static readonly string InstallationHash = Md5(InstallationPath);
+
         public static readonly DateTime SakuraTimeBase = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         public static string Md5(byte[] data)

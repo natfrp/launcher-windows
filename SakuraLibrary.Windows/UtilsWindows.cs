@@ -13,15 +13,11 @@ namespace SakuraLibrary
 {
     public static class UtilsWindows
     {
-        public static readonly string LibraryPath = Assembly.GetExecutingAssembly().Location;
-        public static readonly string ExecutablePath = Process.GetCurrentProcess().MainModule.FileName;
-
         public static readonly bool IsAdministrator = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
-        public static readonly string InstallationHash = Utils.Md5(Assembly.GetExecutingAssembly().Location);
-        public static readonly string InstallationPipeName = InstallationHash + "_" + Consts.PipeName;
+        public static readonly string InstallationPipeName = Utils.InstallationHash + "_" + Consts.PipeName;
 
-        public static string GetAutoRunFile(string prefix) => Environment.GetFolderPath(Environment.SpecialFolder.Startup) + "\\" + prefix + Utils.Md5(ExecutablePath) + ".lnk";
+        public static string GetAutoRunFile(string prefix) => Environment.GetFolderPath(Environment.SpecialFolder.Startup) + "\\" + prefix + Utils.Md5(Utils.ExecutablePath) + ".lnk";
 
         public static string SetAutoRun(bool start, string prefix)
         {
@@ -35,7 +31,7 @@ namespace SakuraLibrary
                         return null;
                     }
                     var shortcut = (IWshRuntimeLibrary.IWshShortcut)new IWshRuntimeLibrary.WshShell().CreateShortcut(file);
-                    shortcut.TargetPath = ExecutablePath;
+                    shortcut.TargetPath = Utils.ExecutablePath;
                     shortcut.Arguments = "--minimize";
                     shortcut.Description = "SakuraFrp Launcher 开机自启";
                     shortcut.Save();
