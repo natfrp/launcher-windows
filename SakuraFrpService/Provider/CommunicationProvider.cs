@@ -1,14 +1,14 @@
 ﻿using System;
-using System.IO.Pipes;
 using System.Collections.Generic;
+using System.IO.Pipes;
+using System.Security.Principal;
+using System.Security.AccessControl;
 
 using Google.Protobuf;
 
 using SakuraLibrary.Pipe;
 using SakuraLibrary.Proto;
 using SakuraLibrary.Helper;
-using System.Security.Principal;
-using System.Security.AccessControl;
 
 namespace SakuraFrpService.Provider
 {
@@ -17,7 +17,7 @@ namespace SakuraFrpService.Provider
         public readonly string Name;
         public readonly int BufferSize;
 
-        public Action<ServiceConnection, int> DataReceived { get; set; }
+        public Action<ServiceConnection, RequestBase> DataReceived { get; set; }
 
         protected NamedPipeServerStream ListeningPipe = null, ListeningPushPipe = null;
 
@@ -137,7 +137,7 @@ namespace SakuraFrpService.Provider
             var conn = ar.AsyncState as PipeConnection;
             try
             {
-                DataReceived?.Invoke(conn, conn.EnsureMessageComplete(conn.Pipe.EndRead(ar)));
+                DataReceived?.Invoke(conn, RequestBase.Parser.ParseFrom(conn.Buffer, 0, conn.EnsureMessageComplete(conn.Pipe.EndRead(ar))));
             }
             catch
             {

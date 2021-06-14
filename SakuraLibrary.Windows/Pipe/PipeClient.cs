@@ -9,7 +9,7 @@ namespace SakuraLibrary.Pipe
 {
     public class PipeClient : IDisposable
     {
-        public Action<PipeConnection, int> ServerPush;
+        public Action<PipeConnection, PushMessageBase> ServerPush;
 
         public PipeConnection Pipe = null, PushPipe = null;
 
@@ -108,7 +108,7 @@ namespace SakuraLibrary.Pipe
                 }
                 try
                 {
-                    ServerPush?.Invoke(PushPipe, PushPipe.EnsureMessageComplete(PushPipe.Pipe.EndRead(ar)));
+                    ServerPush?.Invoke(PushPipe, PushMessageBase.Parser.ParseFrom(PushPipe.Buffer, 0, PushPipe.EnsureMessageComplete(PushPipe.Pipe.EndRead(ar))));
                 }
                 catch { }
             }

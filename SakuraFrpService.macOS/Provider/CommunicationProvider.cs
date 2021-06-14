@@ -17,7 +17,7 @@ namespace SakuraFrpService.Provider
         public readonly string Path;
         public readonly int BufferSize;
 
-        public Action<ServiceConnection, int> DataReceived { get; set; }
+        public Action<ServiceConnection, RequestBase> DataReceived { get; set; }
 
         protected Socket MainListener = null, PushListener = null;
 
@@ -58,8 +58,11 @@ namespace SakuraFrpService.Provider
             }
             Running = true;
 
-            BeginListen();
-            BeginPushListen();
+            MainListener = CreateSocket(Path + "service.sock");
+            PushListener = CreateSocket(Path + "service-push.sock");
+
+            BeginAccept();
+            BeginPushAccept();
         }
 
         public void Stop()
@@ -104,24 +107,59 @@ namespace SakuraFrpService.Provider
             }
         }
 
+        protected Socket CreateSocket(string file)
+        {
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+            }
+            var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+            socket.Bind(new UnixDomainSocketEndPoint(file));
+            socket.Listen(50);
+            return socket;
+        }
+
         #region RESTful API Socket
+
+        protected void BeginAccept()
+        {
+            if (!Running)
+            {
+                return;
+            }
+            MainListener.BeginAccept(OnConnect, null);
+        }
 
         protected void OnConnect(IAsyncResult ar)
         {
             try
             {
-                var sock = MainListener.EndAccept(ar);
-                var conn = new SocketConnection(new byte[BufferSize], sock);
-
+                var conn = new SocketConnection(new byte[BufferSize], MainListener.EndAccept(ar));
                 lock (Sockets)
                 {
                     Sockets.Add(conn.Socket, conn);
                 }
 
-                BeginPipeRead(conn);
+                BeginReceive(conn);
             }
             catch { }
-            BeginListen();
+            BeginAccept();
+        }
+
+        protected void BeginReceive(SocketConnection conn)
+        {
+            try
+            {
+                conn.Socket.BeginReceive(conn.Buffer, 4, conn.Buffer.Length, SocketFlags.None, OnDataReceived, conn);
+            }
+            catch
+            {
+                lock (Sockets)
+                {
+                    Sockets.Remove(conn.Socket);
+                }
+                conn.Dispose();
+            }
         }
 
         protected void OnDataReceived(IAsyncResult ar)
@@ -129,45 +167,19 @@ namespace SakuraFrpService.Provider
             var conn = ar.AsyncState as SocketConnection;
             try
             {
-                DataReceived?.Invoke(conn, conn.EnsureMessageComplete(conn.Socket.EndReceive(ar)));
+                DataReceived?.Invoke(conn, conn.FinishReceive(conn.Socket.EndReceive(ar)));
             }
             catch
             {
-                if (!conn.Socket.Connected)
+                lock (Sockets)
                 {
-                    lock (Sockets)
-                    {
-                        Sockets.Remove(conn.Socket);
-                    }
-                    conn.Dispose();
-                    return;
+                    Sockets.Remove(conn.Socket);
                 }
-            }
-            BeginPipeRead(conn);
-        }
-
-        protected void BeginListen()
-        {
-            if (!Running)
-            {
+                conn.Dispose();
                 return;
             }
-            if (MainListener == null)
-            {
-                var file = Path + "service.sock";
-                if (File.Exists(file))
-                {
-                    File.Delete(file);
-                }
-                MainListener = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
-                MainListener.Bind(new UnixDomainSocketEndPoint(file));
-
-                MainListener.Listen(50);
-            }
-            MainListener.BeginAccept(OnConnect, null);
+            BeginReceive(conn);
         }
-
-        protected void BeginPipeRead(SocketConnection conn) => conn.Socket.BeginReceive(conn.Buffer, 0, conn.Buffer.Length, SocketFlags.None, OnDataReceived, conn);
 
         #endregion
 
@@ -187,10 +199,8 @@ namespace SakuraFrpService.Provider
                     }
                     catch
                     {
-                        if (!p.Connected)
-                        {
-                            remove.Add(p);
-                        }
+                        p.Dispose();
+                        remove.Add(p);
                     }
                 }
                 foreach (var r in remove)
@@ -198,6 +208,15 @@ namespace SakuraFrpService.Provider
                     PushSockets.Remove(r);
                 }
             }
+        }
+
+        protected void BeginPushAccept()
+        {
+            if (!Running)
+            {
+                return;
+            }
+            PushListener.BeginAccept(OnPushConnect, null);
         }
 
         protected void OnPushConnect(IAsyncResult ar)
@@ -210,28 +229,7 @@ namespace SakuraFrpService.Provider
                 }
             }
             catch { }
-            BeginPushListen();
-        }
-
-        protected void BeginPushListen()
-        {
-            if (!Running)
-            {
-                return;
-            }
-            if (PushListener == null)
-            {
-                var file = Path + "service-push.sock";
-                if (File.Exists(file))
-                {
-                    File.Delete(file);
-                }
-                PushListener = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
-                PushListener.Bind(new UnixDomainSocketEndPoint(file));
-
-                PushListener.Listen(50);
-            }
-            PushListener.BeginAccept(OnPushConnect, null);
+            BeginPushAccept();
         }
 
         #endregion

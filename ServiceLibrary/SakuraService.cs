@@ -290,11 +290,10 @@ namespace SakuraFrpService
             Message = message ?? ""
         };
 
-        public void Pipe_DataReceived(ServiceConnection connection, int count)
+        public void Pipe_DataReceived(ServiceConnection connection, RequestBase req)
         {
             try
             {
-                var req = RequestBase.Parser.ParseFrom(connection.Buffer, 0, count);
                 var resp = ResponseBase(true);
                 var isRemote = connection is RemotePipeConnection;
 

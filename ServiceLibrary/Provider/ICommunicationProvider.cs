@@ -7,7 +7,7 @@ namespace SakuraFrpService.Provider
 {
     public interface ICommunicationProvider : IDisposable
     {
-        Action<ServiceConnection, int> DataReceived { get; set; }
+        Action<ServiceConnection, RequestBase> DataReceived { get; set; }
 
         bool Running { get; }
 

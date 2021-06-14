@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.IO.Pipes;
 
 using SakuraLibrary.Helper;
@@ -24,29 +23,16 @@ namespace SakuraLibrary.Pipe
 
         public int EnsureMessageComplete(int read)
         {
-            if (Pipe.IsMessageComplete)
+            int index = read;
+            while (!Pipe.IsMessageComplete)
             {
-                return read;
+                index += Pipe.Read(Buffer, index, Buffer.Length - index);
+                if (index == Buffer.Length)
+                {
+                    throw new Exception("Data too long");
+                }
             }
-            using (var ms = new MemoryStream())
-            {
-                ms.Write(Buffer, 0, read);
-                while (!Pipe.IsMessageComplete)
-                {
-                    ms.Write(Buffer, 0, Pipe.Read(Buffer, 0, Buffer.Length));
-                }
-
-                var final = ms.ToArray();
-                if (Buffer.Length < ms.Position)
-                {
-                    Buffer = final;
-                }
-                else
-                {
-                    Array.Copy(final, Buffer, final.Length);
-                }
-                return final.Length;
-            }
+            return index;
         }
     }
 }
