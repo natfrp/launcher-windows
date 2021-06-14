@@ -78,6 +78,7 @@
     <Folder Include="Provider\" />
     <Folder Include="Sodium\" />
     <Folder Include="Sodium\x64\" />
+    <Folder Include="Helper\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -92,6 +93,7 @@
     <Compile Include="Provider\UtilsProvider.cs" />
     <Compile Include="Provider\CommunicationProvider.cs" />
     <Compile Include="Sodium\SodiumLibrary.cs" />
+    <Compile Include="Helper\KeychainHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ServiceLibrary\ServiceLibrary.csproj">

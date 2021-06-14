@@ -1,6 +1,5 @@
 ﻿using AppKit;
 
-using SakuraFrpService;
 using SakuraFrpService.Provider;
 
 namespace SakuraFrpService

@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>SakuraLauncher</string>
+	<string>SakuraFrpService</string>
 	<key>CFBundleIdentifier</key>
 	<string>moe.berd.SakuraLauncher.Service</string>
 	<key>CFBundleShortVersionString</key>
@@ -24,7 +24,7 @@
 	<string></string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>LSUIElement</key>
+	<key>LSBackgroundOnly</key>
 	<true/>
 </dict>
 </plist>

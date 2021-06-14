@@ -1,12 +1,26 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using Foundation;
+
+using SakuraFrpService.Helper;
 
 namespace SakuraFrpService.Provider
 {
     public class ConfigProvider : IConfigProvider
     {
+        public const string KEYCHAIN_TOKEN = KeychainHelper.Service + ".Token",
+            KEYCHAIN_REMOTEKEY = KeychainHelper.Service + ".RemoteKey";
+
+        private SakuraService Main;
+
+        public void Init(SakuraService main)
+        {
+            Main = main;
+        }
+
+        public string FrpcExecutable => "frpc";
+
         public string Token { get; set; }
 
         public bool BypassProxy { get; set; }
@@ -21,7 +35,8 @@ namespace SakuraFrpService.Provider
 
         public ConfigProvider()
         {
-            Token = "";
+            Token = KeychainHelper.LoadString(KEYCHAIN_TOKEN) ?? "";
+            RemoteKey = KeychainHelper.Load(KEYCHAIN_REMOTEKEY);
 
             BypassProxy = Settings.BoolForKey("BypassProxy");
             EnableRemote = Settings.BoolForKey("EnableRemote");
@@ -36,15 +51,17 @@ namespace SakuraFrpService.Provider
 
         public void Save()
         {
+            KeychainHelper.Save(KEYCHAIN_TOKEN, Token = Natfrp.Token);
+            KeychainHelper.Save(KEYCHAIN_REMOTEKEY, RemoteKey);
+
             Settings.SetBool(BypassProxy, "BypassProxy");
             Settings.SetBool(EnableRemote, "EnableRemote");
             Settings.SetInt(UpdateInterval, "UpdateInterval");
 
-            // TODO:
-            //if(EnabledTunnels != null && EnabledTunnels.Length != 0)
-            //{
-            //    Settings.SetValueForKey(NSObject.FromObject(EnabledTunnels.ToArray()), new NSString("EnabledTunnels"));
-            //}
+            if (Main.TunnelManager.Running)
+            {
+                Settings.SetValueForKey(NSObject.FromObject(Main.TunnelManager.GetEnabledTunnels()), new NSString("EnabledTunnels"));
+            }
         }
     }
 }
