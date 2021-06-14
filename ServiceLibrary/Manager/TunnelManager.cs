@@ -16,8 +16,6 @@ namespace SakuraFrpService.Manager
     {
         public const string Tag = "Service/TunnelManager";
 
-        public const string FrpcExecutable = "frpc.exe";
-
         public readonly int PID = Process.GetCurrentProcess().Id;
 
         public readonly SakuraService Main;
@@ -28,7 +26,7 @@ namespace SakuraFrpService.Manager
         public TunnelManager(SakuraService main)
         {
             Main = main;
-            FrpcPath = Path.GetFullPath(FrpcExecutable);
+            FrpcPath = Path.GetFullPath(main.Config.FrpcExecutable);
 
             AsyncManager = new AsyncManager(Run);
         }

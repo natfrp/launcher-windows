@@ -11,6 +11,8 @@ namespace SakuraFrpService.Provider
             Main = main;
         }
 
+        public string FrpcExecutable => "frpc.exe";
+
         public string Token { get => Settings.Token; set => Settings.Token = value; }
 
         public bool BypassProxy { get => Settings.BypassProxy; set => Settings.BypassProxy = value; }

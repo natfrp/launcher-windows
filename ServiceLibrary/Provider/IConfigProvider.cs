@@ -6,6 +6,8 @@ namespace SakuraFrpService.Provider
     {
         void Init(SakuraService main);
 
+        string FrpcExecutable { get; }
+
         string Token { get; set; }
 
         bool BypassProxy { get; set; }
