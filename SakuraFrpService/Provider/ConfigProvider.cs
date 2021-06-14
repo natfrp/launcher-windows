@@ -4,6 +4,13 @@ namespace SakuraFrpService.Provider
 {
     public class ConfigProvider : IConfigProvider
     {
+        private SakuraService Main;
+
+        public void Init(SakuraService main)
+        {
+            Main = main;
+        }
+
         public string Token { get => Settings.Token; set => Settings.Token = value; }
 
         public bool BypassProxy { get => Settings.BypassProxy; set => Settings.BypassProxy = value; }
@@ -14,20 +21,27 @@ namespace SakuraFrpService.Provider
 
         public List<int> EnabledTunnels { get => Settings.EnabledTunnels; set => Settings.EnabledTunnels = value; }
 
-        private Properties.Settings Settings => Properties.Settings.Default;
+        private Properties.Settings Settings = Properties.Settings.Default;
 
         public ConfigProvider()
         {
-            if (Settings.UpgradeRequired)
+            if (!Settings.UpgradeRequired)
             {
-                Settings.Upgrade();
-                Settings.UpgradeRequired = false;
-                Settings.Save();
+                return;
             }
+            Settings.Upgrade();
+            Settings.UpgradeRequired = false;
+            Settings.Save();
         }
 
         public void Save()
         {
+            Token = Natfrp.Token;
+            if (Main.TunnelManager.Running)
+            {
+                EnabledTunnels = Main.TunnelManager.GetEnabledTunnels();
+            }
+
             Settings.Save();
         }
     }

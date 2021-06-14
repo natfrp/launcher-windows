@@ -47,6 +47,8 @@ namespace SakuraFrpService
             Sodium = sodium;
             ExtraUtils = utils;
 
+            Config.Init(this);
+
             Natfrp.Token = config.Token; // Prevent possible token lost
             Natfrp.BypassProxy = config.BypassProxy;
 
@@ -377,9 +379,9 @@ namespace SakuraFrpService
                     }
                     if (req.DataConfig.RemoteKeyNew != "")
                     {
-                        RemoteManager.EncryptKey = Sodium.ArgonHashBinary(Encoding.UTF8.GetBytes(req.DataConfig.RemoteKeyNew), RemoteManager.SALT, 3, 268435456, 32);
+                        Config.RemoteKey = RemoteManager.EncryptKey = Sodium.ArgonHashBinary(Encoding.UTF8.GetBytes(req.DataConfig.RemoteKeyNew), RemoteManager.SALT, 3, 268435456, 32);
                     }
-                    RemoteManager.Enabled = req.DataConfig.RemoteManagement;
+                    Config.EnableRemote = RemoteManager.Enabled = req.DataConfig.RemoteManagement;
                     if (RemoteManager.Enabled && UserInfo.Status == UserStatus.LoggedIn)
                     {
                         RemoteManager.Start();
@@ -388,8 +390,8 @@ namespace SakuraFrpService
                     {
                         RemoteManager.Stop();
                     }
-                    Natfrp.BypassProxy = req.DataConfig.BypassProxy;
-                    UpdateManager.UpdateInterval = req.DataConfig.UpdateInterval;
+                    Config.BypassProxy = Natfrp.BypassProxy = req.DataConfig.BypassProxy;
+                    Config.UpdateInterval = UpdateManager.UpdateInterval = req.DataConfig.UpdateInterval;
                     Config.Save();
                     PushConfig();
                     break;
