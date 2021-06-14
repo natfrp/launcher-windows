@@ -84,9 +84,8 @@ namespace SakuraFrpService
             }
             catch
             {
-                Environment.ExitCode = 1;
                 Stop();
-                return;
+                Environment.Exit(1);
             }
             LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "守护进程启动成功");
             if (blocking)
