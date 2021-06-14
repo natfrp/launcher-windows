@@ -99,6 +99,7 @@
     <Compile Include="Provider\CommunicationProvider.cs" />
     <Compile Include="Sodium\SodiumLibrary.cs" />
     <Compile Include="Helper\KeychainHelper.cs" />
+    <Compile Include="Helper\SocketConnection.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ServiceLibrary\ServiceLibrary.csproj">

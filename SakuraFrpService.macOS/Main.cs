@@ -9,7 +9,7 @@ namespace SakuraFrpService
         static void Main(string[] args)
         {
             NSApplication.Init();
-            new SakuraService(new ConfigProvider(), new UtilsProvider(), new CommunicationProvider(), new SodiumProvider()).Start(false);
+            new SakuraService(new ConfigProvider(), new UtilsProvider(), new CommunicationProvider("../../../"), new SodiumProvider()).Start(false);
             NSApplication.Main(args);
         }
     }
