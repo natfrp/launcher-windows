@@ -1,14 +1,19 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.IO;
+using System.Linq;
 
 namespace SakuraFrpService.Provider
 {
-    public class UtilsProvider :IUtilsProvider
+    public class UtilsProvider : IUtilsProvider
     {
-        public Process[] SearchProcess(string name, string path)
+        public Process[] SearchProcess(string name, string path) => Process.GetProcessesByName(name).Where(p =>
         {
-            // TODO: 
-            return new Process[0];
-        }
+            try
+            {
+                return Path.GetFullPath(p.MainModule.FileName) == path;
+            }
+            catch { }
+            return false;
+        }).ToArray();
     }
 }
