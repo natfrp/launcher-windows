@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows;
 using System.Threading;
+using System.Linq;
 
 using MaterialDesignThemes.Wpf;
 
@@ -26,7 +27,13 @@ namespace SakuraLauncher
         {
             Environment.CurrentDirectory = Utils.InstallationPath;
 
-            UtilsWindows.VerifySignature(Utils.LibraryPath, Utils.ExecutablePath, Path.GetFullPath(Consts.ServiceExecutable));
+            UtilsWindows.VerifySignature(new string[]
+            {
+                Path.GetFileName(Utils.ExecutablePath),
+                Consts.Library,
+                Consts.LibraryWindows,
+                Consts.ServiceExecutable
+            }.Select(f => Path.Combine(Utils.InstallationPath, f)).ToArray());
             UtilsWindows.ValidateSettings();
 
             var minimize = false;

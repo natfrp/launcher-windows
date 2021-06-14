@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -23,7 +24,13 @@ namespace LegacyLauncher
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            UtilsWindows.VerifySignature(Utils.LibraryPath, Utils.ExecutablePath, Path.GetFullPath(Consts.ServiceExecutable));
+            UtilsWindows.VerifySignature(new string[]
+            {
+                Path.GetFileName(Utils.ExecutablePath),
+                Consts.Library,
+                Consts.LibraryWindows,
+                Consts.ServiceExecutable
+            }.Select(f => Path.Combine(Utils.InstallationPath, f)).ToArray());
             UtilsWindows.ValidateSettings();
 
             var minimize = false;

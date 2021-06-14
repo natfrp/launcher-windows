@@ -14,7 +14,6 @@ using System.Runtime.InteropServices;
 
 using SakuraLibrary;
 
-using SakuraFrpService.Manager;
 using SakuraFrpService.Provider;
 
 namespace SakuraFrpService
@@ -88,8 +87,15 @@ namespace SakuraFrpService
         static int Main(string[] argv)
         {
             Environment.CurrentDirectory = Utils.InstallationPath;
-            
-            UtilsWindows.VerifySignature(Utils.LibraryPath, Utils.ExecutablePath, Path.GetFullPath(TunnelManager.FrpcExecutable));
+
+            UtilsWindows.VerifySignature(new string[]
+            {
+                Consts.ServiceExecutable,
+                Consts.ServiceLibrary,
+                Consts.Library,
+                Consts.LibraryWindows,
+                "frpc.exe"
+            }.Select(f => Path.Combine(Utils.InstallationPath, f)).ToArray());
             UtilsWindows.ValidateSettings();
 
             if (Path.GetFileName(Utils.ExecutablePath) != Consts.ServiceExecutable)

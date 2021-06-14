@@ -10,6 +10,11 @@
         public const string UpdaterExecutable = "Updater.exe";
         public const string ServiceExecutable = "SakuraFrpService.exe";
 
+        public const string ServiceLibrary = "ServiceLibrary.dll";
+
+        public const string Library = "SakuraLibrary.dll";
+        public const string LibraryWindows = "SakuraLibrary.Windows.dll";
+
         public const string SakuraLauncherPrefix = "SakuraLauncher_";
         public const string LegacyLauncherPrefix = "LegacySakuraLauncher_";
     }
