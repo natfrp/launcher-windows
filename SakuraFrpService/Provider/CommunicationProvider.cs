@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Pipes;
 using System.Security.Principal;
 using System.Security.AccessControl;
+using System.Threading;
 
 using Google.Protobuf;
 
@@ -24,25 +25,9 @@ namespace SakuraFrpService.Provider
         protected List<PipeStream> PushPipes = new List<PipeStream>();
         protected Dictionary<PipeStream, PipeConnection> Pipes = new Dictionary<PipeStream, PipeConnection>();
 
-        public bool Running
-        {
-            get
-            {
-                lock (_runningLock)
-                {
-                    return _running;
-                }
-            }
-            protected set
-            {
-                lock (_runningLock)
-                {
-                    _running = value;
-                }
-            }
-        }
-        private bool _running;
-        private object _runningLock = new object();
+        public bool Running => !StopEvent.WaitOne(0);
+
+        protected ManualResetEvent StopEvent = new ManualResetEvent(true);
 
         public CommunicationProvider(string name, int bufferSize = 1048576)
         {
@@ -56,7 +41,7 @@ namespace SakuraFrpService.Provider
             {
                 return;
             }
-            Running = true;
+            StopEvent.Reset();
 
             BeginPipeListen();
             BeginPushPipeListen();
@@ -68,7 +53,8 @@ namespace SakuraFrpService.Provider
             {
                 return;
             }
-            Running = false;
+            StopEvent.Set();
+
             Dispose();
         }
 
@@ -98,36 +84,71 @@ namespace SakuraFrpService.Provider
             }
         }
 
-        protected PipeSecurity CreateSecurity()
+        protected NamedPipeServerStream CreateListenerPipe(bool push, AsyncCallback callback)
         {
-            var security = new PipeSecurity();
-            security.AddAccessRule(new PipeAccessRule(WindowsIdentity.GetCurrent().User, PipeAccessRights.FullControl, AccessControlType.Allow));
-            security.AddAccessRule(new PipeAccessRule(new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null), PipeAccessRights.ReadWrite, AccessControlType.Allow));
-            security.AddAccessRule(new PipeAccessRule(new SecurityIdentifier(WellKnownSidType.NetworkSid, null), PipeAccessRights.FullControl, AccessControlType.Deny));
-            return security;
+            if (!Running)
+            {
+                return null;
+            }
+            try
+            {
+                var security = new PipeSecurity();
+                security.AddAccessRule(new PipeAccessRule(WindowsIdentity.GetCurrent().User, PipeAccessRights.FullControl, AccessControlType.Allow));
+                security.AddAccessRule(new PipeAccessRule(new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null), PipeAccessRights.ReadWrite, AccessControlType.Allow));
+                security.AddAccessRule(new PipeAccessRule(new SecurityIdentifier(WellKnownSidType.NetworkSid, null), PipeAccessRights.FullControl, AccessControlType.Deny));
+
+                // PipeDirection.InOut enables the client to read message, DON'T TOUCH IT
+                var pipe = new NamedPipeServerStream(push ? Name + PipeConnection.PUSH_SUFFIX : Name, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Message, PipeOptions.Asynchronous, push ? 0 : BufferSize, BufferSize, security);
+
+                if (!push)
+                {
+                    pipe.ReadMode = PipeTransmissionMode.Message;
+                }
+                pipe.BeginWaitForConnection(callback, pipe);
+                return pipe;
+            }
+            catch
+            {
+                Stop();
+                return null;
+            }
         }
 
         #region RESTful API Pipe
 
         protected void OnPipeConnect(IAsyncResult ar)
         {
+            var pipe = ar.AsyncState as NamedPipeServerStream;
             try
             {
-                lock (Pipes)
+                pipe.EndWaitForConnection(ar);
+            }
+            catch
+            {
+                Stop();
+                return;
+            }
+
+            if (!Running)
+            {
+                pipe.Dispose();
+                return;
+            }
+            lock (Pipes)
+            {
+                var conn = new PipeConnection(new byte[BufferSize], pipe);
+                ListeningPipe = null;
+
+                try
                 {
-                    if (ListeningPipe != null)
-                    {
-                        ListeningPipe.EndWaitForConnection(ar);
-                        var conn = new PipeConnection(new byte[BufferSize], ListeningPipe);
-                        ListeningPipe = null;
-
-                        Pipes.Add(conn.Pipe, conn);
-
-                        BeginPipeRead(conn);
-                    }
+                    BeginPipeRead(conn);
+                    Pipes.Add(conn.Pipe, conn);
+                }
+                catch
+                {
+                    conn.Dispose();
                 }
             }
-            catch { }
 
             BeginPipeListen();
         }
@@ -135,46 +156,53 @@ namespace SakuraFrpService.Provider
         protected void OnPipeData(IAsyncResult ar)
         {
             var conn = ar.AsyncState as PipeConnection;
+            int count;
             try
             {
-                DataReceived?.Invoke(conn, RequestBase.Parser.ParseFrom(conn.Buffer, 0, conn.EnsureMessageComplete(conn.Pipe.EndRead(ar))));
+                count = conn.Pipe.EndRead(ar);
             }
             catch
             {
-                if (!conn.Pipe.IsConnected)
-                {
-                    lock (Pipes)
-                    {
-                        Pipes.Remove(conn.Pipe);
-                    }
-                    conn.Dispose();
-                    return;
-                }
+                Stop();
+                return;
             }
-            BeginPipeRead(conn);
+
+            if (!Running)
+            {
+                return;
+            }
+            try
+            {
+                DataReceived?.Invoke(conn, RequestBase.Parser.ParseFrom(conn.Buffer, 0, conn.EnsureMessageComplete(count)));
+                BeginPipeRead(conn);
+            }
+            catch
+            {
+                conn.Dispose();
+                lock (Pipes)
+                {
+                    Pipes.Remove(conn.Pipe);
+                }
+                return;
+            }
         }
 
         protected void BeginPipeListen()
+        {
+            lock (Pipes)
+            {
+                ListeningPipe = CreateListenerPipe(false, OnPipeConnect);
+            }
+        }
+
+        protected void BeginPipeRead(PipeConnection conn)
         {
             if (!Running)
             {
                 return;
             }
-            lock (Pipes)
-            {
-                if (ListeningPipe != null)
-                {
-                    ListeningPipe.Dispose(); // Shouldn't happen
-                }
-                ListeningPipe = new NamedPipeServerStream(Name, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Message, PipeOptions.Asynchronous, BufferSize, BufferSize, CreateSecurity())
-                {
-                    ReadMode = PipeTransmissionMode.Message
-                };
-                ListeningPipe.BeginWaitForConnection(OnPipeConnect, null);
-            }
+            conn.Pipe.BeginRead(conn.Buffer, 0, conn.Buffer.Length, OnPipeData, conn);
         }
-
-        protected void BeginPipeRead(PipeConnection conn) => conn.Pipe.BeginRead(conn.Buffer, 0, conn.Buffer.Length, OnPipeData, conn);
 
         #endregion
 
@@ -182,6 +210,10 @@ namespace SakuraFrpService.Provider
 
         public void PushMessage(PushMessageBase msg)
         {
+            if (!Running)
+            {
+                return;
+            }
             var buffer = msg.ToByteArray();
             var remove = new List<PipeStream>();
             lock (PushPipes)
@@ -209,38 +241,36 @@ namespace SakuraFrpService.Provider
 
         protected void OnPushPipeConnect(IAsyncResult ar)
         {
+            var pipe = ar.AsyncState as NamedPipeServerStream;
             try
             {
-                lock (PushPipes)
-                {
-                    if (ListeningPushPipe != null)
-                    {
-                        ListeningPushPipe.EndWaitForConnection(ar);
-                        PushPipes.Add(ListeningPushPipe);
-                        ListeningPushPipe = null;
-                    }
-                }
+                pipe.EndWaitForConnection(ar);
             }
-            catch { }
+            catch
+            {
+                Stop();
+                return;
+            }
+
+            if (!Running)
+            {
+                pipe.Dispose();
+                return;
+            }
+            lock (PushPipes)
+            {
+                PushPipes.Add(pipe);
+                ListeningPushPipe = null;
+            }
 
             BeginPushPipeListen();
         }
 
         protected void BeginPushPipeListen()
         {
-            if (!Running)
-            {
-                return;
-            }
             lock (PushPipes)
             {
-                if (ListeningPushPipe != null)
-                {
-                    ListeningPushPipe.Dispose(); // Shouldn't happen too
-                }
-                // Note: PipeDirection.InOut ensures the client can set ReadMode, IDK why but it works this way
-                ListeningPushPipe = new NamedPipeServerStream(Name + PipeConnection.PUSH_SUFFIX, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Message, PipeOptions.Asynchronous, 0, BufferSize, CreateSecurity());
-                ListeningPushPipe.BeginWaitForConnection(OnPushPipeConnect, null);
+                ListeningPushPipe = CreateListenerPipe(true, OnPushPipeConnect);
             }
         }
 
