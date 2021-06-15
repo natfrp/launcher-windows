@@ -150,7 +150,7 @@ namespace SakuraFrpService.Provider
         {
             try
             {
-                conn.Socket.BeginReceive(conn.Buffer, 4, conn.Buffer.Length, SocketFlags.None, OnDataReceived, conn);
+                conn.Socket.BeginReceive(conn.Buffer, 0, 4, SocketFlags.None, OnDataReceived, conn);
             }
             catch
             {

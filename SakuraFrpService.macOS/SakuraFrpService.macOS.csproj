@@ -36,13 +36,12 @@
     <UseHardenedRuntime>false</UseHardenedRuntime>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <EnableCodeSigning>false</EnableCodeSigning>
+    <EnableCodeSigning>true</EnableCodeSigning>
     <CreatePackage>true</CreatePackage>
     <EnablePackageSigning>false</EnablePackageSigning>
     <IncludeMonoRuntime>true</IncludeMonoRuntime>
@@ -52,6 +51,9 @@
     <LinkMode>None</LinkMode>
     <HttpClientHandler>HttpClientHandler</HttpClientHandler>
     <AOTMode>None</AOTMode>
+    <CodeSigningKey>Developer ID Application: iDea Leaper Innovation Inc. (C78T4CMK47)</CodeSigningKey>
+    <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
+    <XamMacArch>x86_64</XamMacArch>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
