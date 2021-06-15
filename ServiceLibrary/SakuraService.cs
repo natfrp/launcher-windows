@@ -347,7 +347,7 @@ namespace SakuraFrpService
                     resp.DataLog = new LogList();
                     lock (LogManager)
                     {
-                        resp.DataLog.Data.Add(isRemote ? LogManager.Skip(LogManager.Count - 80) : LogManager);
+                        resp.DataLog.Data.Add(isRemote ? LogManager.Skip(Math.Max(LogManager.Count - 80, 0)) : LogManager);
                     }
                     break;
                 case MessageID.LogClear:
@@ -402,11 +402,6 @@ namespace SakuraFrpService
                     UpdateManager.IssueUpdateCheck();
                     break;
                 case MessageID.ControlGetUpdate:
-                    if (isRemote)
-                    {
-                        connection.RespondFailure("远程控制无法执行该操作");
-                        return;
-                    }
                     resp.DataUpdate = UpdateManager.Status;
                     break;
                 default:
