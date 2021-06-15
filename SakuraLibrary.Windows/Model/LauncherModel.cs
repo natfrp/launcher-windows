@@ -35,6 +35,14 @@ namespace SakuraLibrary.Model
 
         public abstract void Save();
 
+        protected void launcherError(string message) => Log(new Log()
+        {
+            Category = 3,
+            Source = "Launcher",
+            Data = message,
+            Time = Utils.GetSakuraTime()
+        });
+
         #region Daemon Sync
 
         public bool SyncUser()
@@ -75,6 +83,10 @@ namespace SakuraLibrary.Model
                     }
                 });
             }
+            else
+            {
+                launcherError("SyncLog 失败: " + logs.Message);
+            }
             return logs.Success;
         }
 
@@ -85,6 +97,10 @@ namespace SakuraLibrary.Model
             {
                 Config = config.DataConfig;
             }
+            else
+            {
+                launcherError("SyncConfig 失败: " + config.Message);
+            }
             return config.Success;
         }
 
@@ -94,6 +110,10 @@ namespace SakuraLibrary.Model
             if (update.Success)
             {
                 Update = update.DataUpdate;
+            }
+            else
+            {
+                launcherError("SyncUpdate 失败: " + update.Message);
             }
             return update.Success;
         }
