@@ -13,7 +13,16 @@ namespace SakuraLibrary.Pipe
 
         public PipeConnection Pipe = null, PushPipe = null;
 
-        public bool Connected => Pipe != null && PushPipe != null && Pipe.Pipe.IsConnected && PushPipe.Pipe.IsConnected;
+        public bool Connected
+        {
+            get
+            {
+                lock (this)
+                {
+                    return Pipe != null && PushPipe != null && Pipe.Pipe.IsConnected && PushPipe.Pipe.IsConnected;
+                }
+            }
+        }
 
         public readonly int BufferSize;
         public readonly string Name, Host;
@@ -31,6 +40,12 @@ namespace SakuraLibrary.Pipe
             {
                 lock (this)
                 {
+                    if (Connected)
+                    {
+                        return true;
+                    }
+                    Dispose();
+
                     var pipe = new NamedPipeClientStream(Host, Name, PipeDirection.InOut, PipeOptions.Asynchronous);
                     pipe.Connect(1000);
                     pipe.ReadMode = PipeTransmissionMode.Message;
@@ -97,18 +112,17 @@ namespace SakuraLibrary.Pipe
         {
             lock (this)
             {
-                if (PushPipe == null)
-                {
-                    return;
-                }
-                if (!PushPipe.Pipe.IsConnected)
+                var pipe = ar.AsyncState as PipeStream;
+                var count = pipe.EndRead(ar);
+
+                if (!pipe.IsConnected || PushPipe == null)
                 {
                     Dispose();
                     return;
                 }
                 try
                 {
-                    ServerPush?.Invoke(PushPipe, PushMessageBase.Parser.ParseFrom(PushPipe.Buffer, 0, PushPipe.EnsureMessageComplete(PushPipe.Pipe.EndRead(ar))));
+                    ServerPush?.Invoke(PushPipe, PushMessageBase.Parser.ParseFrom(PushPipe.Buffer, 0, PushPipe.EnsureMessageComplete(count)));
                 }
                 catch { }
             }
@@ -123,7 +137,7 @@ namespace SakuraLibrary.Pipe
                 {
                     return;
                 }
-                PushPipe.Pipe.BeginRead(PushPipe.Buffer, 0, PushPipe.Buffer.Length, OnPushPipeData, null);
+                PushPipe.Pipe.BeginRead(PushPipe.Buffer, 0, PushPipe.Buffer.Length, OnPushPipeData, PushPipe.Pipe);
             }
         }
     }
