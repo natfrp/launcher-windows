@@ -58,8 +58,9 @@ namespace SakuraFrpService.Provider
             }
             Running = true;
 
-            MainListener = CreateSocket(Path + "service.sock");
-            PushListener = CreateSocket(Path + "service-push.sock");
+            // There's a stupid 104 character length limit for unix socket path
+            MainListener = CreateSocket(Path + "/rest");
+            PushListener = CreateSocket(Path + "/push");
 
             BeginAccept();
             BeginPushAccept();
@@ -187,7 +188,7 @@ namespace SakuraFrpService.Provider
 
         public void PushMessage(PushMessageBase msg)
         {
-            var buffer = msg.ToByteArray();
+            byte[] buffer = msg.ToByteArray(), size = BitConverter.GetBytes(buffer.Length);
             var remove = new List<Socket>();
             lock (PushSockets)
             {
@@ -195,6 +196,7 @@ namespace SakuraFrpService.Provider
                 {
                     try
                     {
+                        p.Send(size);
                         p.Send(buffer);
                     }
                     catch
