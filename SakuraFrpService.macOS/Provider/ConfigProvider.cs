@@ -41,6 +41,10 @@ namespace SakuraFrpService.Provider
             BypassProxy = Settings.BoolForKey("BypassProxy");
             EnableRemote = Settings.BoolForKey("EnableRemote");
             UpdateInterval = (int)Settings.IntForKey("UpdateInterval");
+            if (UpdateInterval == 0)
+            {
+                UpdateInterval = 86400;
+            }
 
             var t = Settings.ArrayForKey("EnabledTunnels");
             if (t != null)
@@ -60,7 +64,13 @@ namespace SakuraFrpService.Provider
 
             if (Main.TunnelManager.Running)
             {
-                Settings.SetValueForKey(NSObject.FromObject(Main.TunnelManager.GetEnabledTunnels()), new NSString("EnabledTunnels"));
+                var tunnels = Main.TunnelManager.GetEnabledTunnels().ToArray();
+                var array = new NSMutableArray((System.nuint)tunnels.Length);
+                foreach (int i in tunnels)
+                {
+                    array.Add(NSObject.FromObject(i));
+                }
+                Settings.SetValueForKey(array, new NSString("EnabledTunnels"));
             }
         }
     }

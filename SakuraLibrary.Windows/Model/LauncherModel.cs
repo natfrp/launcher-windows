@@ -272,10 +272,6 @@ namespace SakuraLibrary.Model
              try
              {
                  var resp = Pipe.Request(MessageID.TunnelReload);
-                 if (resp.DataTunnels != null)
-                 {
-                     LoadTunnels(resp.DataTunnels);
-                 }
                  callback(resp.Success, resp.Message);
              }
              catch (Exception e)
@@ -402,12 +398,7 @@ namespace SakuraLibrary.Model
             });
             if (!result.Success)
             {
-                Log(new Log()
-                {
-                    Category = 3,
-                    Source = "Launcher",
-                    Data = "无法更新守护进程配置: " + result.Message
-                });
+                launcherError("无法更新守护进程配置: " + result.Message);
             }
         }
 
