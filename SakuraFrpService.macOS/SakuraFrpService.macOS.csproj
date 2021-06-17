@@ -114,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Sodium\libsodium.dylib" />
+    <BundleResource Include="Resources\frpc" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>
