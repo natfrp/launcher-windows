@@ -99,7 +99,6 @@ namespace SakuraFrpService
             StopEvent.Set();
             try
             {
-                Communication.Stop();
                 RemoteManager.Stop(true);
                 TunnelManager.Stop(true);
                 NodeManager.Stop(true);
@@ -108,6 +107,7 @@ namespace SakuraFrpService
                     TickThread.Abort();
                 }
                 UpdateManager.Stop(true);
+                Communication.Stop(); // Stop CommunicationProvider in the end
             }
             catch { }
             LogManager.Stop();

@@ -31,7 +31,6 @@ namespace SakuraFrpService
             }
 
             new SakuraService(new ConfigProvider(), new UtilsProvider(), new CommunicationProvider(NSFileManager.DefaultManager.GetContainerUrl("moe.berd.SakuraL").Path + "/Library/Caches"), new SodiumProvider()).Start(false);
-            NSApplication.Main(args);
         }
     }
 }
