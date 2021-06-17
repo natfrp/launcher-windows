@@ -84,7 +84,6 @@
     <Folder Include="Resources\" />
     <Folder Include="Provider\" />
     <Folder Include="Sodium\" />
-    <Folder Include="Sodium\x64\" />
     <Folder Include="Helper\" />
   </ItemGroup>
   <ItemGroup>
@@ -114,7 +113,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <BundleResource Include="Sodium\x64\libsodium.dylib" />
+    <BundleResource Include="Sodium\libsodium.dylib" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>

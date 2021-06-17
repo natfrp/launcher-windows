@@ -1,7 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using ObjCRuntime;
 
 using SakuraFrpService.Sodium;
 
@@ -9,18 +6,7 @@ namespace SakuraFrpService.Provider
 {
     public class SodiumProvider : ISodiumProvider
     {
-        public void Init()
-        {
-            var sodium = "Sodium/" + RuntimeInformation.ProcessArchitecture.ToString().ToLower() + "/libsodium.dylib";
-            if (!File.Exists(sodium))
-            {
-                throw new Exception("未找到架构匹配的 libsodium, 当前系统可能不支持远程管理");
-            }
-            else if (Dlfcn.dlopen(Path.GetFullPath(sodium), 0x102) == IntPtr.Zero)
-            {
-                throw new Exception("libsodium 加载失败");
-            }
-        }
+        public void Init() { }
 
         public byte[] GenerateNonce()
         {

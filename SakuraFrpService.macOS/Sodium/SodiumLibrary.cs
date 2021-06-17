@@ -4,7 +4,7 @@ namespace SakuraFrpService.Sodium
 {
     public static class SodiumLibrary
     {
-        private const string Name = "libsodium";
+        private const string Name = "Sodium/libsodium.dylib";
 
         static SodiumLibrary()
         {
