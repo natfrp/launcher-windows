@@ -15,5 +15,7 @@ namespace SakuraFrpService.Provider
             catch { }
             return false;
         }).ToArray();
+
+        public bool IsMacOS => true;
     }
 }

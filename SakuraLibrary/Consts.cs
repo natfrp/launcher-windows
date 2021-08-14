@@ -3,6 +3,7 @@
     public static class Consts
     {
         public const string Version = "2.1.0.0";
+        public const string VersionMac = "0.0.0.1";
 
         public const string PipeName = "SakuraFrp_ServicePipe";
         public const string ServiceName = "SakuraFrpService";

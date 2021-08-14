@@ -191,6 +191,9 @@ namespace SakuraFrpService
             [JsonProperty("launcher")]
             public ApiVersion Launcher { get; set; }
 
+            [JsonProperty("launcher_mac")]
+            public ApiVersion LauncherMac { get; set; }
+
             [JsonProperty("frpc")]
             public ApiVersion Frpc { get; set; }
         }

@@ -42,7 +42,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <EnableCodeSigning>true</EnableCodeSigning>
-    <CreatePackage>true</CreatePackage>
+    <CreatePackage>false</CreatePackage>
     <EnablePackageSigning>false</EnablePackageSigning>
     <IncludeMonoRuntime>true</IncludeMonoRuntime>
     <UseSGen>true</UseSGen>
@@ -54,6 +54,7 @@
     <CodeSigningKey>Developer ID Application: iDea Leaper Innovation Inc. (C78T4CMK47)</CodeSigningKey>
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
     <XamMacArch>x86_64</XamMacArch>
+    <I18n>cjk</I18n>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -101,6 +102,7 @@
     <Compile Include="Sodium\SodiumLibrary.cs" />
     <Compile Include="Helper\KeychainHelper.cs" />
     <Compile Include="Helper\SocketConnection.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ServiceLibrary\ServiceLibrary.csproj">

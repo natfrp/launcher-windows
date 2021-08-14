@@ -193,13 +193,14 @@ namespace SakuraFrpService.Manager
             var result = await Natfrp.Request<Natfrp.GetVersion>("get_version");
             lock (this)
             {
-                UpdateLauncher = Version.TryParse(result.Launcher.Version, out Version launcher) && launcher > Assembly.GetEntryAssembly().GetName().Version;
+                var launcherMeta = Main.ExtraUtils.IsMacOS ? result.LauncherMac : result.Launcher;
+                UpdateLauncher = Version.TryParse(launcherMeta.Version, out Version launcher) && launcher > Assembly.GetEntryAssembly().GetName().Version;
                 UpdateFrpc = TryParseFrpcVersion(result.Frpc.Version, out Version frpc, out double sakura) && (frpc > FrpcVersion || (frpc == FrpcVersion && FrpcSakura != 0 && sakura > FrpcSakura));
 
                 var note = new List<string>();
                 if (UpdateLauncher)
                 {
-                    note.Add(string.Format("启动器 v{0}:\n{1}", result.Launcher.Version, result.Launcher.Note));
+                    note.Add(string.Format("启动器 v{0}:\n{1}", launcherMeta.Version, launcherMeta.Note));
                 }
                 if (UpdateFrpc)
                 {
@@ -208,7 +209,7 @@ namespace SakuraFrpService.Manager
 
                 Status = new UpdateStatus
                 {
-                    UpdateAvailable = UpdateFrpc || UpdateLauncher,
+                    UpdateAvailable = UpdateLauncher || (!Main.ExtraUtils.IsMacOS && UpdateFrpc),
                     UpdateReadyDir = "",
                     DownloadCurrent = 0,
                     DownloadTotal = 0,
@@ -240,6 +241,38 @@ namespace SakuraFrpService.Manager
 
         private void DownloadUpdate()
         {
+            if (Main.ExtraUtils.IsMacOS)
+            {
+                try
+                {
+                    XDocument xml;
+                    using (var ms = Natfrp.Request("get_version", "xml&installer_mac").WaitResult())
+                    {
+                        xml = XDocument.Parse(Encoding.UTF8.GetString(ms.ToArray()));
+                    }
+                    var task = xml.Element("tasks").Element("task");
+                    if (task.Attribute("type").Value != "MacPackage")
+                    {
+                        throw new Exception("Unexptected task type");
+                    }
+                    lock (this)
+                    {
+                        Status.UpdateReadyDir = task.Attribute("url").Value;
+                        PushStatus();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "更新 URL 读取失败: " + e.ToString());
+                    lock (this)
+                    {
+                        Status.UpdateReadyDir = "";
+                        Status.UpdateAvailable = false;
+                        PushStatus();
+                    }
+                }
+                return;
+            }
             try
             {
                 Directory.CreateDirectory(TempDir);
