@@ -72,6 +72,12 @@ namespace SakuraLauncher
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e) => Model.Save();
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Hide();
+            e.Cancel = true;
+        }
+
         private void ButtonHide_Click(object sender, RoutedEventArgs e) => Hide();
 
         private void ButtonMinimize_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
