@@ -55,6 +55,8 @@
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
     <XamMacArch>x86_64</XamMacArch>
     <I18n>cjk</I18n>
+    <UseHardenedRuntime>true</UseHardenedRuntime>
+    <MonoBundlingExtraArgs>--optimize=-trim-architectures</MonoBundlingExtraArgs>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -84,13 +86,13 @@
   <ItemGroup>
     <Folder Include="Resources\" />
     <Folder Include="Provider\" />
-    <Folder Include="Sodium\" />
     <Folder Include="Helper\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
     <None Include="Entitlements.plist" />
     <None Include="packages.config" />
+    <None Include="libsodium.dylib" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
@@ -99,7 +101,6 @@
     <Compile Include="Provider\SodiumProvider.cs" />
     <Compile Include="Provider\UtilsProvider.cs" />
     <Compile Include="Provider\CommunicationProvider.cs" />
-    <Compile Include="Sodium\SodiumLibrary.cs" />
     <Compile Include="Helper\KeychainHelper.cs" />
     <Compile Include="Helper\SocketConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -115,7 +116,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <BundleResource Include="Sodium\libsodium.dylib" />
     <BundleResource Include="Resources\frpc" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />

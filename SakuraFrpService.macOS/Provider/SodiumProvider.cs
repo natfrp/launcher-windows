@@ -1,17 +1,36 @@
 ﻿using System;
-
-using SakuraFrpService.Sodium;
+using System.Runtime.InteropServices;
 
 namespace SakuraFrpService.Provider
 {
     public class SodiumProvider : ISodiumProvider
     {
-        public void Init() { }
+        private const string Name = "libsodium.dylib";
+
+        [DllImport(Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void sodium_init();
+
+        [DllImport(Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void randombytes_buf(byte[] buffer, int size);
+
+        [DllImport(Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int crypto_pwhash(byte[] buffer, long bufferLen, byte[] password, long passwordLen, byte[] salt, long opsLimit, int memLimit, int alg);
+
+        [DllImport(Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int crypto_secretbox_easy(byte[] buffer, byte[] message, long messageLength, byte[] nonce, byte[] key);
+
+        [DllImport(Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int crypto_secretbox_open_easy(byte[] buffer, byte[] cipherText, long cipherTextLength, byte[] nonce, byte[] key);
+
+        public void Init()
+        {
+            sodium_init();
+        }
 
         public byte[] GenerateNonce()
         {
             var buffer = new byte[SECRETBOX_NONCE_BYTES];
-            SodiumLibrary.randombytes_buf(buffer, SECRETBOX_NONCE_BYTES);
+            randombytes_buf(buffer, SECRETBOX_NONCE_BYTES);
             return buffer;
         }
 
@@ -33,7 +52,7 @@ namespace SakuraFrpService.Provider
             }
 
             var buffer = new byte[SECRETBOX_MAC_BYTES + message.Length];
-            if (SodiumLibrary.crypto_secretbox_easy(buffer, message, message.Length, nonce, key) != 0)
+            if (crypto_secretbox_easy(buffer, message, message.Length, nonce, key) != 0)
             {
                 throw new Exception("Failed to create SecretBox");
             }
@@ -74,7 +93,7 @@ namespace SakuraFrpService.Provider
             }
 
             var buffer = new byte[cipherText.Length - SECRETBOX_MAC_BYTES];
-            if (SodiumLibrary.crypto_secretbox_open_easy(buffer, cipherText, cipherText.Length, nonce, key) != 0)
+            if (crypto_secretbox_open_easy(buffer, cipherText, cipherText.Length, nonce, key) != 0)
             {
                 throw new Exception("Failed to open SecretBox");
             }
@@ -96,7 +115,7 @@ namespace SakuraFrpService.Provider
                 throw new Exception("Salt size must be " + ARGON_SALTBYTES);
             }
             var buffer = new byte[outputLength];
-            if (SodiumLibrary.crypto_pwhash(buffer, buffer.Length, password, password.GetLongLength(0), salt, opsLimit, memLimit, ARGON_ALGORITHM_DEFAULT) != 0)
+            if (crypto_pwhash(buffer, buffer.Length, password, password.GetLongLength(0), salt, opsLimit, memLimit, ARGON_ALGORITHM_DEFAULT) != 0)
             {
                 throw new Exception("Sodium hash failed");
             }
