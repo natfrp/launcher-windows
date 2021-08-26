@@ -214,6 +214,17 @@
                 </TextBlock>
                 <Button Margin="16,0,0,0" Click="ButtonRemotePassword_Click" Content="设置密码" Style="{StaticResource MaterialDesignFlatButton}"/>
             </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="16,4,16,0" IsEnabled="{Binding Connected}" Height="32">
+                <ToggleButton IsChecked="{Binding EnableFrpcTls}"/>
+                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">通过 TLS 连接隧道</TextBlock>
+                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="让 frpc 通过 TLS 连接节点, 有助于缓解上游防火墙拦截 frp 协议的问题, 修改后需手动重启隧道" ToolTipService.InitialShowDelay="0">
+                <materialDesign:PackIcon Kind="HelpCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                </TextBlock>
+            </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="16,4,16,0" Height="32">
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16">
                 <Run>运行模式:</Run>

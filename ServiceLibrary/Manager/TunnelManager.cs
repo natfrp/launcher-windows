@@ -22,15 +22,23 @@ namespace SakuraFrpService.Manager
 
         public readonly string FrpcPath;
 
+        public bool EnableTLS;
+
         public TunnelManager(SakuraService main)
         {
             Main = main;
             FrpcPath = Path.GetFullPath(main.Config.FrpcExecutable);
 
+            EnableTLS = main.Config.EnableFrpcTLS;
+
             AsyncManager = new AsyncManager(Run);
         }
 
-        public string GetArguments(int tunnel) => string.Format("-n -f {0}:{1} --watch {2} --report", Natfrp.Token, tunnel, PID);
+        public string GetArguments(int tunnel) => string.Format("-n -f {0}:{1} --watch {2} --report{3}",
+            Natfrp.Token, 
+            tunnel,
+            PID,
+            EnableTLS ? " --natfrp-tls" : "");
 
         public void StopAll()
         {

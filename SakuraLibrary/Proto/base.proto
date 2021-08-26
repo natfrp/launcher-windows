@@ -20,6 +20,7 @@ message ServiceConfig {
   bool remote_management = 3;
   bool remote_key_set = 4;
   string remote_key_new = 5;
+  bool enable_frpc_tls = 6;
 }
 
 message UpdateStatus {

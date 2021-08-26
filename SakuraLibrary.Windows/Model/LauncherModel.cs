@@ -424,6 +424,21 @@ namespace SakuraLibrary.Model
             }
         }
 
+        [SourceBinding(nameof(Config))]
+        public bool EnableFrpcTls
+        {
+            get => Config != null && Config.EnableFrpcTls;
+            set
+            {
+                if (Config != null)
+                {
+                    Config.EnableFrpcTls = value;
+                    PushServiceConfig();
+                }
+                RaisePropertyChanged();
+            }
+        }
+
         [SourceBinding(nameof(Config), nameof(LoggedIn))]
         public bool CanEnableRemoteManagement => LoggedIn && Config != null && Config.RemoteKeySet;
 

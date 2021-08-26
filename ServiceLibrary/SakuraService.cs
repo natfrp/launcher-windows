@@ -274,6 +274,7 @@ namespace SakuraFrpService
         {
             BypassProxy = Natfrp.BypassProxy,
             UpdateInterval = UpdateManager.UpdateInterval,
+            EnableFrpcTls = TunnelManager.EnableTLS,
             RemoteManagement = RemoteManager.Enabled,
             RemoteKeySet = RemoteManager.EncryptKey != null && RemoteManager.EncryptKey.Length > 0
         };
@@ -390,6 +391,7 @@ namespace SakuraFrpService
                     }
                     Config.BypassProxy = Natfrp.BypassProxy = req.DataConfig.BypassProxy;
                     Config.UpdateInterval = UpdateManager.UpdateInterval = req.DataConfig.UpdateInterval;
+                    Config.EnableFrpcTLS = TunnelManager.EnableTLS = req.DataConfig.EnableFrpcTls;
                     Config.Save();
                     PushConfig();
                     break;

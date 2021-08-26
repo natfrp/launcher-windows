@@ -16,6 +16,8 @@ namespace SakuraFrpService.Provider
         byte[] RemoteKey { get; set; }
         bool EnableRemote { get; set; }
 
+        bool EnableFrpcTLS { get; set; }
+
         List<int> EnabledTunnels { get; set; }
 
         /// <summary>

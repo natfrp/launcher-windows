@@ -21,6 +21,8 @@ namespace SakuraFrpService.Provider
         public byte[] RemoteKey { get => Settings.RemoteKey; set => Settings.RemoteKey = value; }
         public bool EnableRemote { get => Settings.EnableRemote; set => Settings.EnableRemote = value; }
 
+        public bool EnableFrpcTLS { get => Settings.EnableFrpcTLS; set => Settings.EnableFrpcTLS = value; }
+
         public List<int> EnabledTunnels { get => Settings.EnabledTunnels; set => Settings.EnabledTunnels = value; }
 
         private Properties.Settings Settings = Properties.Settings.Default;
