@@ -1,7 +1,7 @@
 ﻿using SakuraLibrary;
 using System.Reflection;
 
-[assembly: AssemblyCopyright("Copyright © FENGberd 2020-2021")]
+[assembly: AssemblyCopyright("Copyright © iDea Leaper 2020-2022")]
 
 [assembly: AssemblyVersion(Consts.Version)]
 [assembly: AssemblyFileVersion(Consts.Version)]
