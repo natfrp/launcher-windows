@@ -164,8 +164,7 @@ namespace SakuraFrpService.Manager
                             Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "指令解密失败, 原因可能为密钥错误, 如果您无故看到此错误请检查账户是否被盗");
                             break;
                         }
-                        remote.Buffer = data;
-                        Main.Pipe_DataReceived(remote, data.Length);
+                        Main.Pipe_DataReceived(remote, SakuraLibrary.Proto.RequestBase.Parser.ParseFrom(data));
 
                         nonce = SecretBox.GenerateNonce();
                         ms.Write(nonce, 0, nonce.Length);

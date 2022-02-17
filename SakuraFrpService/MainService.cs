@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Linq;
 using System.Threading;
@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using SakuraLibrary;
 using SakuraLibrary.Pipe;
 using SakuraLibrary.Proto;
+using SakuraLibrary.Helper;
 using UserStatus = SakuraLibrary.Proto.User.Types.Status;
 
 using SakuraFrpService.Data;
@@ -60,7 +61,7 @@ namespace SakuraFrpService
             InitializeComponent();
 
             Pipe = new PipeServer(Utils.InstallationPipeName);
-            Pipe.DataReceived += Pipe_DataReceived;
+            Pipe.DataReceived = Pipe_DataReceived;
 
             LogManager = new LogManager(this, 8192);
             NodeManager = new NodeManager(this);
@@ -344,11 +345,10 @@ namespace SakuraFrpService
             Message = message ?? ""
         };
 
-        public void Pipe_DataReceived(PipeConnection connection, int count)
+        public void Pipe_DataReceived(ServiceConnection connection, RequestBase req)
         {
             try
             {
-                var req = RequestBase.Parser.ParseFrom(connection.Buffer, 0, count);
                 var resp = ResponseBase(true);
                 var isRemote = connection is RemotePipeConnection;
 

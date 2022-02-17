@@ -157,11 +157,10 @@ namespace SakuraLibrary.Model
             while (!AsyncManager.StopEvent.WaitOne(500));
         }
 
-        protected void Pipe_ServerPush(PipeConnection connection, int length)
+        protected void Pipe_ServerPush(ServiceConnection connection, PushMessageBase msg)
         {
             try
             {
-                var msg = PushMessageBase.Parser.ParseFrom(connection.Buffer, 0, length);
                 switch (msg.Type)
                 {
                 case PushMessageID.UpdateUser:

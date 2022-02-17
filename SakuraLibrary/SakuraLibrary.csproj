@@ -78,6 +78,7 @@
     <Compile Include="Pipe\PipeClient.cs" />
     <Compile Include="Pipe\PipeConnection.cs" />
     <Compile Include="Pipe\PipeServer.cs" />
+    <Compile Include="Helper\ServiceConnection.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
