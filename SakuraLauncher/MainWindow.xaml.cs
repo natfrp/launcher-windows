@@ -70,6 +70,12 @@ namespace SakuraLauncher
             NTAPI.SendMessage(new WindowInteropHelper(this).Handle, 0xA1, new IntPtr(0x2), IntPtr.Zero);
         }
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Hide();
+            e.Cancel = true;
+        }
+
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e) => Model.Save();
 
         private void ButtonHide_Click(object sender, RoutedEventArgs e) => Hide();

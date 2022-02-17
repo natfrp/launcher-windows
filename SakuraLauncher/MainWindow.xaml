@@ -10,7 +10,7 @@
         TextOptions.TextRenderingMode="ClearType"
         TextOptions.TextFormattingMode="Ideal"
         Title="SakuraLauncher" Height="500" Width="782"
-        MinHeight="380" MinWidth="725" ResizeMode="CanResize" SizeChanged="Window_SizeChanged"
+        MinHeight="380" MinWidth="725" ResizeMode="CanResize" SizeChanged="Window_SizeChanged" Closing="Window_Closing"
         AllowsTransparency="True" Background="Transparent" WindowStyle="None"
         MouseDown="Window_MouseDown" WindowStartupLocation="CenterScreen">
     <WindowChrome.WindowChrome>

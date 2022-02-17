@@ -36,6 +36,14 @@ namespace SakuraLibrary.Model
 
         public abstract void Save();
 
+        protected void launcherError(string message) => Log(new Log()
+        {
+            Category = 3,
+            Source = "Launcher",
+            Data = message,
+            Time = Utils.GetSakuraTime()
+        });
+
         #region Daemon Sync
 
         public bool SyncUser()
@@ -76,6 +84,10 @@ namespace SakuraLibrary.Model
                     }
                 });
             }
+            else
+            {
+                launcherError("SyncLog 失败: " + logs.Message);
+            }
             return logs.Success;
         }
 
@@ -86,6 +98,10 @@ namespace SakuraLibrary.Model
             {
                 Config = config.DataConfig;
             }
+            else
+            {
+                launcherError("SyncConfig 失败: " + config.Message);
+            }
             return config.Success;
         }
 
@@ -95,6 +111,10 @@ namespace SakuraLibrary.Model
             if (update.Success)
             {
                 Update = update.DataUpdate;
+            }
+            else
+            {
+                launcherError("SyncUpdate 失败: " + update.Message);
             }
             return update.Success;
         }
@@ -253,10 +273,6 @@ namespace SakuraLibrary.Model
              try
              {
                  var resp = Pipe.Request(MessageID.TunnelReload);
-                 if (resp.DataTunnels != null)
-                 {
-                     LoadTunnels(resp.DataTunnels);
-                 }
                  callback(resp.Success, resp.Message);
              }
              catch (Exception e)
@@ -383,12 +399,7 @@ namespace SakuraLibrary.Model
             });
             if (!result.Success)
             {
-                Log(new Log()
-                {
-                    Category = 3,
-                    Source = "Launcher",
-                    Data = "无法更新守护进程配置: " + result.Message
-                });
+                launcherError("无法更新守护进程配置: " + result.Message);
             }
         }
 
