@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              d:DesignHeight="600" d:DesignWidth="580">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" UseLayoutRounding="True">
         <ScrollViewer.Template>
             <ControlTemplate TargetType="{x:Type ScrollViewer}">
                 <Grid x:Name="Grid" Background="{TemplateBinding Background}">
@@ -23,8 +23,9 @@
                 </Grid>
             </ControlTemplate>
         </ScrollViewer.Template>
-        <StackPanel Margin="16,4,16,16">
-            <StackPanel Orientation="Horizontal" Margin="16,0,0,0">
+        <StackPanel Margin="16,0,16,16" UseLayoutRounding="True">
+            <TextBlock Foreground="#DDFFFFFF" FontSize="22" Margin="8,0,0,0">账户</TextBlock>
+            <StackPanel Orientation="Horizontal" Margin="12,4,16,0">
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
@@ -52,7 +53,7 @@
                         </Style>
                     </StackPanel.Style>
                     <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16" Margin="0,0,8,0">访问密钥:</TextBlock>
-                    <TextBox Text="{Binding UserToken}" MinWidth="256" FontSize="16" IsEnabled="{Binding TokenEditable}" />
+                    <TextBox Text="{Binding UserToken}" MinWidth="256" FontSize="16" IsEnabled="{Binding TokenEditable}" VerticalAlignment="Center" />
                 </StackPanel>
                 <Button Margin="16,0,0,0" Click="ButtonLogin_Click" IsEnabled="{Binding Connected}">
                     <Button.Resources>
@@ -92,9 +93,9 @@
                     </StackPanel>
                 </Button>
             </StackPanel>
-            <Separator Margin="8,16,8,12" Background="#55a0a0a0"/>
-            <TextBlock Foreground="#DDFFFFFF" FontSize="22" Margin="16,0,0,0">启动器</TextBlock>
-            <StackPanel Orientation="Horizontal" Margin="16,4,16,0" Height="32">
+            <Separator Margin="4,16,8,12" Background="#55a0a0a0"/>
+            <TextBlock Foreground="#DDFFFFFF" FontSize="22" Margin="8,0,0,0">启动器</TextBlock>
+            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" Height="32">
                 <ToggleButton IsChecked="{Binding SuppressNotification}" Checked="Save" Unchecked="Save"/>
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">关闭状态提示</TextBlock>
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="不再在右下角弹出隧道状态变更提示" ToolTipService.InitialShowDelay="0">
@@ -105,11 +106,11 @@
                 </materialDesign:PackIcon>
                 </TextBlock>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="16,4,16,0" Height="32">
+            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" Height="32">
                 <ToggleButton IsChecked="{Binding LogTextWrapping}" Checked="Save" Unchecked="Save"/>
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">日志自动换行</TextBlock>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="16,4,16,0" Height="32">
+            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" Height="32">
                 <ToggleButton IsChecked="{Binding AutoRun}"/>
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">启动器开机自启</TextBlock>
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="守护进程模式下必须启用此选项来实现隧道自启" ToolTipService.InitialShowDelay="0">
@@ -120,9 +121,9 @@
                 </materialDesign:PackIcon>
                 </TextBlock>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="16,4,16,0" Height="32">
+            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" Height="32">
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16">更换皮肤:</TextBlock>
-                <ComboBox MinWidth="150" Margin="8,0,0,0" SelectedValuePath="Tag" SelectedValue="{Binding Theme}" SelectionChanged="Save" materialDesign:ComboBoxAssist.ClassicMode="True">
+                <ComboBox MinWidth="150" Margin="8,0,0,0" SelectedValuePath="Tag" SelectedValue="{Binding Theme}" SelectionChanged="Save" VerticalAlignment="Center">
                     <ComboBoxItem Tag="0">默认皮肤</ComboBoxItem>
                     <ComboBoxItem Tag="1">黑 金 贵 族</ComboBoxItem>
                     <ComboBoxItem Tag="2">童 话 世 界</ComboBoxItem>
@@ -130,7 +131,7 @@
                     <ComboBoxItem Tag="4">丰 收 时 节</ComboBoxItem>
                     <ComboBoxItem Tag="5">前 途 光 明</ComboBoxItem>
                 </ComboBox>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="更换后需要重启启动器才能生效, 我觉得这个功能没什么卵用" ToolTipService.InitialShowDelay="0">
+                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="更换后需要重启启动器才能生效" ToolTipService.InitialShowDelay="0">
                 <materialDesign:PackIcon Kind="HelpCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
                     <materialDesign:PackIcon.RenderTransform>
                         <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
@@ -138,9 +139,9 @@
                 </materialDesign:PackIcon>
                 </TextBlock>
             </StackPanel>
-            <Separator Margin="8,12,8,12" Background="#55a0a0a0"/>
-            <TextBlock Foreground="#DDFFFFFF" FontSize="22" Margin="16,0,16,0">守护进程</TextBlock>
-            <StackPanel Orientation="Horizontal" Margin="16,4,16,0" IsEnabled="{Binding Connected}" Height="32">
+            <Separator Margin="4,12,8,12" Background="#55a0a0a0"/>
+            <TextBlock Foreground="#DDFFFFFF" FontSize="22" Margin="8,0,16,0">守护进程</TextBlock>
+            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" IsEnabled="{Binding Connected}" Height="32">
                 <ToggleButton IsChecked="{Binding BypassProxy}"/>
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">绕过系统代理</TextBlock>
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="请求 SakuraFrp API 时绕过系统代理" ToolTipService.InitialShowDelay="0">
@@ -151,7 +152,7 @@
                 </materialDesign:PackIcon>
                 </TextBlock>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="16,4,16,0" IsEnabled="{Binding UpdateEnabled}" Height="32">
+            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" IsEnabled="{Binding UpdateEnabled}" Height="32">
                 <ToggleButton IsChecked="{Binding CheckUpdate}"/>
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">自动下载更新</TextBlock>
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="启用后会在后台自动检查并下载更新, 安装更新前需手动确认" ToolTipService.InitialShowDelay="0">
@@ -191,8 +192,8 @@
                     </StackPanel>
                 </Button>
             </StackPanel>
-            <Separator Margin="8,8,8,12" Background="#55a0a0a0"/>
-            <StackPanel Orientation="Horizontal" Margin="16,0,16,0">
+            <Separator Margin="4,8,8,12" Background="#55a0a0a0"/>
+            <StackPanel Orientation="Horizontal" Margin="8,0,16,0">
                 <TextBlock Foreground="#DDFFFFFF" FontSize="22">高级设置</TextBlock>
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16" ToolTip="修改前请仔细阅读帮助文档, 如果您不清楚这些功能的作用, 请不要进行任何修改" ToolTipService.InitialShowDelay="0">
                 <materialDesign:PackIcon Kind="WarningOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
@@ -202,7 +203,7 @@
                 </materialDesign:PackIcon>
                 </TextBlock>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="16,4,16,0" Height="32">
+            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" Height="32">
                 <ToggleButton IsChecked="{Binding RemoteManagement}" IsEnabled="{Binding CanEnableRemoteManagement}"/>
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">启用远程管理</TextBlock>
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="通过 Sakura Frp 管理启动器, 该功能由端到端加密保护, 启用前需先设置密码" ToolTipService.InitialShowDelay="0">
@@ -214,7 +215,7 @@
                 </TextBlock>
                 <Button Margin="16,0,0,0" Click="ButtonRemotePassword_Click" Content="设置密码" Style="{StaticResource MaterialDesignFlatButton}"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="16,4,16,0" Height="32">
+            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" Height="32">
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16">
                 <Run>运行模式:</Run>
                 <Run Text="{Binding WorkingMode, Mode=OneTime}" />

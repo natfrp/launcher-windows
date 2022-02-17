@@ -44,5 +44,12 @@ namespace SakuraLauncher.View
                 }
             }
         }
+
+        private void ScrollViewer_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            var view = (ScrollViewer)sender;
+            view.ScrollToVerticalOffset(view.VerticalOffset - e.Delta);
+            e.Handled = true;
+        }
     }
 }

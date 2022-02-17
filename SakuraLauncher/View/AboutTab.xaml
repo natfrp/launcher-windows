@@ -15,9 +15,9 @@
                 <Run FontSize="16" Text="{Binding Version, Mode=OneTime}"/>
                 <LineBreak/>
                 <LineBreak/>
-                <Run FontSize="15" Text="版权所有 © 2020-2021 iDea Leaper"/>
+                <Run FontSize="15" Text="版权所有 © 2020-2022 iDea Leaper"/>
                 <LineBreak/>
-                <Run FontSize="15">https://github.com/fengberd/SakuraFrpLauncher</Run>
+                <Run FontSize="15">https://github.com/natfrp/SakuraFrpLauncher</Run>
             </TextBlock>
         </StackPanel>
         <Border Padding="8" BorderBrush="#FFAAAAAA" Background="#33000000" BorderThickness="2" Margin="16,16,16,16">
