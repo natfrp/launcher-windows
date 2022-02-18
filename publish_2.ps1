@@ -32,8 +32,8 @@ function PackFrpc {
     )
     New-Item -Name "frpc" -ItemType "directory" -ErrorAction SilentlyContinue
     
-    Copy-Item "sign\frpc_windows_$Architecture.exe" "frpc\frpc.exe"
-    Copy-Item "sign\frpc_windows_$Architecture.exe.sig" "frpc\frpc.exe.sig"
+    Copy-Item "sign\frpc_windows_${Architecture}_gui.exe" "frpc\frpc.exe"
+    Copy-Item "sign\frpc_windows_${Architecture}_gui.exe.sig" "frpc\frpc.exe.sig"
 
     Compress-Archive -Force -CompressionLevel Optimal -Path "frpc\*" -DestinationPath "frpc_windows_$Architecture.zip"
     Remove-Item "frpc" -Recurse
@@ -47,7 +47,7 @@ try {
             Move-Item -Path $i.FullName -Destination $i.BaseName
             Sign "$($i.BaseName)\$($i.Name)"
         }
-        if ($i -match "^frpc_.+\.exe$") { 
+        if ($i -match "^frpc_.+_gui\.exe$") { 
             Sign $i.FullName
         }
     }

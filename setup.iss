@@ -11,7 +11,7 @@ AppId=SakuraFrpLauncher
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} v{#GetFileVersion("_publish\SakuraLibrary\SakuraLibrary.dll")}
-AppCopyright=Copyright © FENGberd 2020-2021
+AppCopyright=Copyright © iDea Leaper 2020-2022
 
 AppPublisher=SakuraFrp
 AppPublisherURL=https://www.natfrp.com/
@@ -66,12 +66,12 @@ Name: "launcher_ui\legacy"; Description: "传统界面 (不推荐)"; Types: cust
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkedonce
 
 [Files]
-Source: "_publish\sign\frpc_windows_386.exe"; DestDir: "{app}"; DestName: "frpc.exe"; Flags: ignoreversion; Components: "frpc\x86"
-Source: "_publish\sign\frpc_windows_386.exe.sig"; DestDir: "{app}"; DestName: "frpc.exe.sig"; Flags: ignoreversion; Components: "frpc\x86"
-Source: "_publish\sign\frpc_windows_amd64.exe"; DestDir: "{app}"; DestName: "frpc.exe"; Flags: ignoreversion; Components: "frpc\x64"
-Source: "_publish\sign\frpc_windows_amd64.exe.sig"; DestDir: "{app}"; DestName: "frpc.exe.sig"; Flags: ignoreversion; Components: "frpc\x64"
-Source: "_publish\sign\frpc_windows_arm64.exe"; DestDir: "{app}"; DestName: "frpc.exe"; Flags: ignoreversion; Components: "frpc\arm64"
-Source: "_publish\sign\frpc_windows_arm64.exe.sig"; DestDir: "{app}"; DestName: "frpc.exe.sig"; Flags: ignoreversion; Components: "frpc\arm64"
+Source: "_publish\sign\frpc_windows_386_gui.exe"; DestDir: "{app}"; DestName: "frpc.exe"; Flags: ignoreversion; Components: "frpc\x86"
+Source: "_publish\sign\frpc_windows_386_gui.exe.sig"; DestDir: "{app}"; DestName: "frpc.exe.sig"; Flags: ignoreversion; Components: "frpc\x86"
+Source: "_publish\sign\frpc_windows_amd64_gui.exe"; DestDir: "{app}"; DestName: "frpc.exe"; Flags: ignoreversion; Components: "frpc\x64"
+Source: "_publish\sign\frpc_windows_amd64_gui.exe.sig"; DestDir: "{app}"; DestName: "frpc.exe.sig"; Flags: ignoreversion; Components: "frpc\x64"
+Source: "_publish\sign\frpc_windows_arm64_gui.exe"; DestDir: "{app}"; DestName: "frpc.exe"; Flags: ignoreversion; Components: "frpc\arm64"
+Source: "_publish\sign\frpc_windows_arm64_gui.exe.sig"; DestDir: "{app}"; DestName: "frpc.exe.sig"; Flags: ignoreversion; Components: "frpc\arm64"
 
 Source: "_publish\SakuraLibrary\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher"
 Source: "_publish\SakuraFrpService\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs; Components: "launcher"
