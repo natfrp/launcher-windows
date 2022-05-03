@@ -34,8 +34,16 @@ namespace SakuraUpdater
                         var sb = new StringBuilder((int)size - 1);
                         if (QueryFullProcessImageName(p.Handle, 0, sb, ref size) && Path.GetFullPath(sb.ToString()) == testPath)
                         {
-                            Console.WriteLine("\t结束残留进程: " + name);
-                            p.Kill();
+                            Console.Write("\t正在结束残留进程 [" + name + "] ...\t");
+                            try
+                            {
+                                p.Kill();
+                                Console.WriteLine(p.WaitForExit(10000) ? "完成" : "失败");
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("错误: " + e.Message);
+                            }
                         }
                     }
                     catch { }
