@@ -1,5 +1,6 @@
 ﻿#define AppName "SakuraFrp 启动器"
 #define AppVersion ""
+#define RealVersion GetFileVersion("_publish\SakuraLibrary\SakuraLibrary.dll")
 
 #define MainExecutable "SakuraLauncher.exe"
 
@@ -10,12 +11,14 @@
 AppId=SakuraFrpLauncher
 AppName={#AppName}
 AppVersion={#AppVersion}
-AppVerName={#AppName} v{#GetFileVersion("_publish\SakuraLibrary\SakuraLibrary.dll")}
+AppVerName={#AppName} v{#RealVersion}
 AppCopyright=Copyright © iDea Leaper 2020-2022
 
 AppPublisher=SakuraFrp
 AppPublisherURL=https://www.natfrp.com/
 AppSupportURL=https://www.natfrp.com/
+
+VersionInfoVersion={#RealVersion}
 
 ; Wizard
 WizardStyle=modern
@@ -236,4 +239,4 @@ begin
 //		DelTree(ExpandConstant('{userappdata}\LegacyaLauncher'), True, True, True);
 //		DelTree(ExpandConstant('{userappdata}\SakuraFrpService'), True, True, True);
 //	end;
-end; 
+end;
