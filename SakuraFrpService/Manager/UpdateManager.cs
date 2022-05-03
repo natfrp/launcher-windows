@@ -96,6 +96,7 @@ namespace SakuraFrpService.Manager
                     if (!p.WaitForExit(1000))
                     {
                         p.Kill();
+                        p.WaitForExit(500);
                     }
                     return TryParseFrpcVersion(p.StandardOutput.ReadLine(), out FrpcVersion, out FrpcSakura);
                 }

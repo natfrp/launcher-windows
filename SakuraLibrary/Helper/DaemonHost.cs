@@ -99,6 +99,7 @@ namespace SakuraLibrary.Helper
                 if (!BaseProcess.HasExited)
                 {
                     BaseProcess.Kill();
+                    BaseProcess.WaitForExit(5000);
                 }
                 BaseProcess.Dispose();
                 return true;

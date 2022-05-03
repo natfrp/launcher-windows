@@ -130,7 +130,7 @@ namespace SakuraFrpService.Data
             return false;
         }
 
-        public void Stop(bool kill = false)
+        public void Stop()
         {
             try
             {
@@ -138,19 +138,25 @@ namespace SakuraFrpService.Data
                 {
                     return;
                 }
-                if (kill)
+                try
                 {
-                    BaseProcess.Kill();
-                }
-                else
-                {
+                    // Ignore write errors, to kill the process properly later
                     BaseProcess.StandardInput.Write("stop\n");
-                    if (!BaseProcess.WaitForExit(3500))
+                }
+                catch { }
+                if (!BaseProcess.WaitForExit(3500))
+                {
+                    Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "frpc 未响应, 正在强制结束进程");
+                    BaseProcess.Kill();
+                    if (!BaseProcess.WaitForExit(2000))
                     {
-                        Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_WARNING, Tag, "frpc 未响应, 正在强制结束进程");
-                        BaseProcess.Kill();
+                        Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "无法结束 frpc 进程");
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "隧道关闭出错: " + e.Message);
             }
             finally
             {

@@ -35,14 +35,12 @@ namespace SakuraFrpService.Manager
 
         public string GetArguments(int tunnel) => string.Format("-n -f {0}:{1} --watch {2} --report", Natfrp.Token, tunnel, PID);
 
-        public void StopAll()
+        public void StopAllAndClear()
         {
             lock (this)
             {
-                foreach (var t in Values)
-                {
-                    t.Stop();
-                }
+                Parallel.ForEach(Values, t => t.Stop());
+                Clear();
             }
         }
 
@@ -201,7 +199,7 @@ namespace SakuraFrpService.Manager
                             else if (t.StartState != 2)
                             {
                                 // No report for 60s
-                                t.Stop(true);
+                                t.Stop();
                                 t.FailAndCleanup();
                             }
                             else
@@ -223,7 +221,7 @@ namespace SakuraFrpService.Manager
                 }
                 catch { }
             }
-            StopAll();
+            StopAllAndClear();
         }
 
         #region Dictionary Overload
@@ -267,29 +265,35 @@ namespace SakuraFrpService.Manager
 
         public void Start()
         {
+            var killed = new List<Process>();
             foreach (var p in Utils.SearchProcess("frpc", FrpcPath))
             {
                 try
                 {
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "正在结束残留 frpc 进程: #" + p.Id);
                     p.Kill();
+                    killed.Add(p);
                 }
                 catch { }
             }
+            Parallel.ForEach(killed, p =>
+            {
+                try
+                {
+                    if (!p.WaitForExit(1000))
+                    {
+                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "无法结束残留 frpc 进程: #" + p.Id);
+                    }
+                }
+                catch { }
+            });
             AsyncManager.Start();
         }
 
         public void Stop(bool kill = false)
         {
             AsyncManager.Stop(kill);
-            foreach (var t in Values)
-            {
-                try
-                {
-                    t.Stop();
-                }
-                catch { }
-            }
-            Clear();
+            StopAllAndClear();
         }
 
         #endregion
