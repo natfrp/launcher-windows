@@ -183,13 +183,13 @@ namespace SakuraFrpService.Manager
                             {
                                 if (t.StartState == 1)
                                 {
-                                    t.Fail(); // Pending start, crash confirmed
+                                    t.FailAndCleanup(); // Pending start, crash confirmed
                                 }
                                 else
                                 {
                                     if (!t.Start())
                                     {
-                                        t.Fail();
+                                        t.FailAndCleanup();
                                     }
                                     else
                                     {
@@ -201,8 +201,8 @@ namespace SakuraFrpService.Manager
                             else if (t.StartState != 2)
                             {
                                 // No report for 60s
-                                t.Fail();
                                 t.Stop(true);
+                                t.FailAndCleanup();
                             }
                             else
                             {

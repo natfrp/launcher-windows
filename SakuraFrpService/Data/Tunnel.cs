@@ -132,14 +132,9 @@ namespace SakuraFrpService.Data
 
         public void Stop(bool kill = false)
         {
-            if (!Running)
-            {
-                Cleanup();
-                return;
-            }
             try
             {
-                if (BaseProcess.HasExited)
+                if (!Running)
                 {
                     return;
                 }
@@ -163,7 +158,7 @@ namespace SakuraFrpService.Data
             }
         }
 
-        public void Fail()
+        public void FailAndCleanup()
         {
             if (++FailCount >= 4)
             {
