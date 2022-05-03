@@ -34,7 +34,7 @@ namespace SakuraLauncher
                 new TunnelTab(Model),
                 new LogTab(Model),
                 new SettingsTab(Model),
-                new AboutTab()
+                new AboutTab(Model)
             };
             Model.SwitchTab(2);
         }

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+﻿using SakuraLauncher.Model;
 using System.Windows.Controls;
 
 namespace SakuraLauncher.View
@@ -8,13 +8,10 @@ namespace SakuraLauncher.View
     /// </summary>
     public partial class AboutTab : UserControl
     {
-        public string License => Properties.Resources.LICENSE;
-        public string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
-
-        public AboutTab()
+        public AboutTab(LauncherViewModel model)
         {
             InitializeComponent();
-            DataContext = this;
+            DataContext = new AboutModel(model);
         }
     }
 }

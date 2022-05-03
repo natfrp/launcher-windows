@@ -51,7 +51,8 @@ namespace SakuraFrpService.Manager
         private int _updateInterval;
 
         private double FrpcSakura = 0;
-        private Version FrpcVersion;
+        private string FrpcVersionFull = "-";
+        private Version FrpcVersion, ServiceVersion = Assembly.GetExecutingAssembly().GetName().Version;
 
         private DateTime LastCheck = DateTime.MinValue;
 
@@ -64,6 +65,8 @@ namespace SakuraFrpService.Manager
             AsyncManager = new AsyncManager(Run);
 
             UpdateInterval = Properties.Settings.Default.UpdateInterval;
+
+            Status.CurrentVersionService = ServiceVersion.ToString();
         }
 
         public void IssueUpdateCheck()
@@ -98,7 +101,8 @@ namespace SakuraFrpService.Manager
                         p.Kill();
                         p.WaitForExit(500);
                     }
-                    return TryParseFrpcVersion(p.StandardOutput.ReadLine(), out FrpcVersion, out FrpcSakura);
+                    Status.CurrentVersionFrpc = FrpcVersionFull = p.StandardOutput.ReadLine().Trim();
+                    return TryParseFrpcVersion(FrpcVersionFull, out FrpcVersion, out FrpcSakura);
                 }
             }
             catch (Exception e)
@@ -194,7 +198,7 @@ namespace SakuraFrpService.Manager
             var result = await Natfrp.Request<Natfrp.GetVersion>("get_version");
             lock (this)
             {
-                UpdateLauncher = Version.TryParse(result.Launcher.Version, out Version launcher) && launcher > Assembly.GetExecutingAssembly().GetName().Version;
+                UpdateLauncher = Version.TryParse(result.Launcher.Version, out Version launcher) && launcher > ServiceVersion;
                 UpdateFrpc = TryParseFrpcVersion(result.Frpc.Version, out Version frpc, out double sakura) && (frpc > FrpcVersion || (frpc == FrpcVersion && FrpcSakura != 0 && sakura > FrpcSakura));
 
                 var note = new List<string>();
@@ -214,7 +218,9 @@ namespace SakuraFrpService.Manager
                     DownloadCurrent = 0,
                     DownloadTotal = 0,
                     Note = string.Join("\n\n", note),
-                    UpdateManagerRunning = true
+                    UpdateManagerRunning = true,
+                    CurrentVersionService = ServiceVersion.ToString(),
+                    CurrentVersionFrpc = FrpcVersionFull,
                 };
                 if (Status.UpdateAvailable)
                 {

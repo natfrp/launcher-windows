@@ -32,6 +32,9 @@ message UpdateStatus {
   string note = 5;
   
   bool update_manager_running = 6;
+  
+  string current_version_service = 7;
+  string current_version_frpc = 8;
 }
 
 enum MessageID {

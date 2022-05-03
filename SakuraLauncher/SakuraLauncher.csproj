@@ -93,6 +93,7 @@
     </Compile>
     <Compile Include="Helper\SelectableTextBlock.cs" />
     <Compile Include="Helper\TabIndexTester.cs" />
+    <Compile Include="Model\AboutModel.cs" />
     <Compile Include="Model\LauncherViewModel.cs" />
     <Compile Include="Model\LogModel.cs" />
     <Compile Include="PingTestWindow.xaml.cs">
