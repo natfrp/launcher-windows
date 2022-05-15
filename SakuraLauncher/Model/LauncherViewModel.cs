@@ -220,19 +220,14 @@ namespace SakuraLauncher.Model
         [SourceBinding(nameof(CurrentTab))]
         public TabIndexTester CurrentTabTester { get; set; }
 
-        public void SwitchTab(int id)
+        public void SwitchTab(int id) => Dispatcher.BeginInvoke(() =>
         {
-            if (!Dispatcher.CheckAccess())
-            {
-                Dispatcher.Invoke(() => SwitchTab(id));
-                return;
-            }
             if (CurrentTab != id)
             {
                 CurrentTab = id;
                 View.BeginTabStoryboard("TabHideAnimation");
             }
-        }
+        });
 
         #endregion
     }
