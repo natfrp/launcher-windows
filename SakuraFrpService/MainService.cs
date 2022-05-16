@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using System.Linq;
 using System.Threading;
@@ -26,6 +27,8 @@ namespace SakuraFrpService
             Status = UserStatus.NoLogin
         };
 
+        public readonly string WorkingDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), Consts.ServiceName);
+
         public readonly bool Daemonize;
         public readonly Thread TickThread = null;
 
@@ -40,6 +43,8 @@ namespace SakuraFrpService
 
         public MainService(bool daemon)
         {
+            Directory.CreateDirectory(WorkingDirectory);
+
             var settings = Properties.Settings.Default;
             if (settings.UpgradeRequired)
             {

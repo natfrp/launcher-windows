@@ -101,6 +101,7 @@ namespace SakuraFrpService.Data
             {
                 BaseProcess = Process.Start(new ProcessStartInfo(Manager.FrpcPath, Manager.GetArguments(Id))
                 {
+                    WorkingDirectory = Manager.FrpcWorkingDirectory,
                     CreateNoWindow = true,
                     UseShellExecute = false,
                     RedirectStandardInput = true,

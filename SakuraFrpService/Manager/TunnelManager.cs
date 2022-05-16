@@ -24,11 +24,15 @@ namespace SakuraFrpService.Manager
         public readonly AsyncManager AsyncManager;
 
         public readonly string FrpcPath;
+        public readonly string FrpcWorkingDirectory;
 
         public TunnelManager(MainService main)
         {
             Main = main;
             FrpcPath = Path.GetFullPath(FrpcExecutable);
+            FrpcWorkingDirectory = Path.Combine(main.WorkingDirectory, "FrpcWorkingDirectory");
+
+            Directory.CreateDirectory(FrpcWorkingDirectory);
 
             AsyncManager = new AsyncManager(Run);
         }
