@@ -204,6 +204,17 @@
                 </TextBlock>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="12,4,16,0" Height="32">
+                <ToggleButton IsChecked="{Binding EnableTLS}" IsEnabled="{Binding Connected}"/>
+                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">强制使能 frpc TLS</TextBlock>
+                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="使 frpc 全程使用 TLS 加密流量, 将有效增大 CPU 占用并显著提高延迟" ToolTipService.InitialShowDelay="0">
+                <materialDesign:PackIcon Kind="HelpCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                </TextBlock>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" Height="32">
                 <ToggleButton IsChecked="{Binding RemoteManagement}" IsEnabled="{Binding CanEnableRemoteManagement}"/>
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">启用远程管理</TextBlock>
                 <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="通过 Sakura Frp 管理启动器, 该功能由端到端加密保护, 启用前需先设置密码" ToolTipService.InitialShowDelay="0">

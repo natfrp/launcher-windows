@@ -372,7 +372,8 @@ namespace SakuraLibrary.Model
 
         #region Settings - Service
 
-        public ServiceConfig Config { get => _config; set => SafeSet(out _config, value); }
+        public ServiceConfig Config { get => _config; 
+            set => SafeSet(out _config, value); }
         private ServiceConfig _config;
 
         [SourceBinding(nameof(Config))]
@@ -427,6 +428,21 @@ namespace SakuraLibrary.Model
 
         [SourceBinding(nameof(Config), nameof(LoggedIn))]
         public bool CanEnableRemoteManagement => LoggedIn && Config != null && Config.RemoteKeySet;
+
+        [SourceBinding(nameof(Config))]
+        public bool EnableTLS
+        {
+            get => Config != null && Config.EnableTls;
+            set
+            {
+                if (Config != null)
+                {
+                    Config.EnableTls = value;
+                    PushServiceConfig();
+                }
+                RaisePropertyChanged();
+            }
+        }
 
         public UpdateStatus Update { get => _update; set => SafeSet(out _update, value); }
         private UpdateStatus _update;

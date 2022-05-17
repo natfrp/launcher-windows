@@ -70,7 +70,10 @@ namespace SakuraFrpService
 
             LogManager = new LogManager(this, 8192);
             NodeManager = new NodeManager(this);
-            TunnelManager = new TunnelManager(this);
+            TunnelManager = new TunnelManager(this)
+            {
+                EnableTLS = settings.EnableTLS,
+            };
             UpdateManager = new UpdateManager(this);
             RemoteManager = new RemoteManager(this)
             {
@@ -94,6 +97,8 @@ namespace SakuraFrpService
 
             settings.Token = Natfrp.Token;
             settings.BypassProxy = Natfrp.BypassProxy;
+
+            settings.EnableTLS = TunnelManager.EnableTLS;
 
             settings.RemoteKey = RemoteManager.EncryptKey;
             settings.EnableRemote = RemoteManager.Enabled;
@@ -333,6 +338,7 @@ namespace SakuraFrpService
         {
             BypassProxy = Natfrp.BypassProxy,
             UpdateInterval = UpdateManager.UpdateInterval,
+            EnableTls = TunnelManager.EnableTLS,
             RemoteManagement = RemoteManager.Enabled,
             RemoteKeySet = RemoteManager.EncryptKey != null && RemoteManager.EncryptKey.Length > 0
         };
@@ -448,6 +454,7 @@ namespace SakuraFrpService
                         RemoteManager.Stop();
                     }
                     Natfrp.BypassProxy = req.DataConfig.BypassProxy;
+                    TunnelManager.EnableTLS = req.DataConfig.EnableTls;
                     UpdateManager.UpdateInterval = req.DataConfig.UpdateInterval;
                     Save();
                     PushConfig();
