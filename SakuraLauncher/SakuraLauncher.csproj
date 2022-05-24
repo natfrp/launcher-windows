@@ -91,6 +91,7 @@
     <Compile Include="CreateTunnelWindow.xaml.cs">
       <DependentUpon>CreateTunnelWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helper\FadeTrimming.cs" />
     <Compile Include="Helper\SelectableTextBlock.cs" />
     <Compile Include="Helper\TabIndexTester.cs" />
     <Compile Include="Model\AboutModel.cs" />

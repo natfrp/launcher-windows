@@ -11,7 +11,8 @@ namespace SakuraLauncher.View.DesignerData
         public static Dictionary<int, string> Nodes = new Dictionary<int, string>()
         {
             { 1, "PA47 Node" },
-            { 2, "LMAO BGP" }
+            { 2, "LMAO BGP" },
+            { 4, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" },
         };
 
         public List<TunnelModel> Tunnels { get; } = new List<TunnelModel>()
@@ -44,7 +45,17 @@ namespace SakuraLauncher.View.DesignerData
                 Note = "super looooooooooooooooooooooooooooooooooooooong note",
                 Status = TunnelStatus.Running,
                 Description = "example.tld"
-            },null, Nodes)
+            },null, Nodes),
+            new TunnelModel(new Tunnel()
+            {
+                Id = 114514,
+                Node = 4,
+                Type = "HTTP",
+                Name = "LongTunnelNameThatWraps",
+                Note = "super looooooooooooooooooooooooooooooooooooooong note",
+                Status = TunnelStatus.Running,
+                Description = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+            },null, Nodes),
         };
     }
 }

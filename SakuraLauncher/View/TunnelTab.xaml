@@ -1,9 +1,10 @@
 ﻿<UserControl x:Class="SakuraLauncher.View.TunnelTab" mc:Ignorable="d"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:Helper="clr-namespace:SakuraLauncher.Helper"
              xmlns:Data="clr-namespace:SakuraLibrary.Model;assembly=SakuraLibrary"
              xmlns:DesignerData="clr-namespace:SakuraLauncher.View.DesignerData;assembly=SakuraLauncher"
              d:DataContext="{d:DesignInstance {x:Type DesignerData:TunnelTab}, IsDesignTimeCreatable=True}"
@@ -75,7 +76,7 @@
                                 </Button>
                                 <DockPanel LastChildFill="False">
                                     <DockPanel DockPanel.Dock="Top" Margin="16" LastChildFill="False">
-                                        <TextBlock Foreground="White" FontSize="22" Text="{Binding Name, Mode=OneWay}" TextWrapping="Wrap" MaxWidth="180"/>
+                                        <TextBlock Foreground="White" FontSize="22" Text="{Binding Name, Mode=OneWay}" MaxWidth="180" Helper:FadeTrimming.IsEnabled="True"/>
                                         <ToggleButton DockPanel.Dock="Right" IsChecked="{Binding Enabled}" IsEnabled="{Binding NotPending, Mode=OneWay}"/>
                                     </DockPanel>
                                     <Grid DockPanel.Dock="Bottom" Margin="16,0,16,16">
@@ -88,7 +89,7 @@
                                             <RowDefinition />
                                             <RowDefinition />
                                         </Grid.RowDefinitions>
-                                        <TextBlock Foreground="White" FontSize="14" VerticalAlignment="Center">
+                                        <TextBlock Foreground="White" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" MaxWidth="180" Helper:FadeTrimming.IsEnabled="True">
                                             #<Run Text="{Binding Node, Mode=OneWay}"></Run>
                                             <Run Text="{Binding NodeName, Mode=OneWay}"></Run>
                                         </TextBlock>
@@ -104,8 +105,8 @@
                                             </TextBlock.Style>
                                             <materialDesign:PackIcon Kind="InfoCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White" />
                                         </TextBlock>
-                                        <TextBlock Grid.Row="1" VerticalAlignment="Bottom" FontSize="13" Foreground="White" Opacity="0.8" Text="{Binding Description, Mode=OneWay}" />
-                                        <TextBlock Grid.Row="1" VerticalAlignment="Bottom" Grid.Column="2" Foreground="White" FontSize="13" Text="{Binding Type, Mode=OneWay}" Margin="0,4,0,0"/>
+                                        <TextBlock Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontSize="13" Foreground="White" Opacity="0.8" Text="{Binding Description, Mode=OneWay}" MaxWidth="180" Helper:FadeTrimming.IsEnabled="True" />
+                                        <TextBlock Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Foreground="White" FontSize="13" Text="{Binding Type, Mode=OneWay}" Margin="0,4,0,0"/>
                                     </Grid>
                                 </DockPanel>
                             </Grid>
