@@ -78,18 +78,35 @@
                                         <TextBlock Foreground="White" FontSize="22" Text="{Binding Name, Mode=OneWay}" TextWrapping="Wrap" MaxWidth="180"/>
                                         <ToggleButton DockPanel.Dock="Right" IsChecked="{Binding Enabled}" IsEnabled="{Binding NotPending, Mode=OneWay}"/>
                                     </DockPanel>
-                                    <StackPanel DockPanel.Dock="Bottom" Margin="16">
-                                        <DockPanel LastChildFill="False">
-                                            <TextBlock DockPanel.Dock="Left" Foreground="White" FontSize="14" Margin="0,0,0,4">
-                                                #<Run Text="{Binding Node, Mode=OneWay}"></Run>
-                                                <Run Text="{Binding NodeName, Mode=OneWay}"></Run>
-                                            </TextBlock>
-                                        </DockPanel>
-                                        <DockPanel LastChildFill="False">
-                                            <TextBlock DockPanel.Dock="Left" FontSize="13" Foreground="White" Opacity="0.8" Text="{Binding Description, Mode=OneWay}" />
-                                            <TextBlock DockPanel.Dock="Right" Foreground="White" FontSize="13" Text="{Binding Type, Mode=OneWay}"/>
-                                        </DockPanel>
-                                    </StackPanel>
+                                    <Grid DockPanel.Dock="Bottom" Margin="16,0,16,16">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Foreground="White" FontSize="14" VerticalAlignment="Center">
+                                            #<Run Text="{Binding Node, Mode=OneWay}"></Run>
+                                            <Run Text="{Binding NodeName, Mode=OneWay}"></Run>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="2" Foreground="#DDFFFFFF" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="16" ToolTip="{Binding Note, Mode=OneWay}" ToolTipService.InitialShowDelay="0" ToolTipService.Placement="Bottom">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding NoteEmpty, Mode=OneWay}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                            <materialDesign:PackIcon Kind="InfoCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White" />
+                                        </TextBlock>
+                                        <TextBlock Grid.Row="1" VerticalAlignment="Bottom" FontSize="13" Foreground="White" Opacity="0.8" Text="{Binding Description, Mode=OneWay}" />
+                                        <TextBlock Grid.Row="1" VerticalAlignment="Bottom" Grid.Column="2" Foreground="White" FontSize="13" Text="{Binding Type, Mode=OneWay}" Margin="0,4,0,0"/>
+                                    </Grid>
                                 </DockPanel>
                             </Grid>
                         </Border>

@@ -45,6 +45,12 @@ namespace SakuraLibrary.Model
             });
         }
 
+        [SourceBinding(nameof(Proto))]
+        public string Note => Proto.Note;
+
+        [SourceBinding(nameof(Note))]
+        public bool NoteEmpty => string.IsNullOrEmpty(Note);
+
         public string NodeName { get => _nodeName; set => Set(out _nodeName, value); }
         private string _nodeName;
 

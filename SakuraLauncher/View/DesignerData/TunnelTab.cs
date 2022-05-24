@@ -22,6 +22,7 @@ namespace SakuraLauncher.View.DesignerData
                 Node = 1,
                 Type = "TCP",
                 Name = "SampleTunnel1",
+                Note = "yay=louder",
                 Status = TunnelStatus.Disabled,
                 Description = "2333 -> 1.1.1.1:2333"
             },null, Nodes),
@@ -40,6 +41,7 @@ namespace SakuraLauncher.View.DesignerData
                 Node = 0,
                 Type = "HTTP",
                 Name = "SampleTunnel 3",
+                Note = "super looooooooooooooooooooooooooooooooooooooong note",
                 Status = TunnelStatus.Running,
                 Description = "example.tld"
             },null, Nodes)
