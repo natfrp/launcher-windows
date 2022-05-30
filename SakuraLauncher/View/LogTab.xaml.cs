@@ -1,9 +1,11 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-
+﻿using SakuraLauncher.Model;
 using SakuraLibrary.Proto;
-
-using SakuraLauncher.Model;
+using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace SakuraLauncher.View
 {
@@ -26,6 +28,28 @@ namespace SakuraLauncher.View
         {
             Model.ClearLog();
             Model.Pipe.Request(MessageID.LogClear);
+        }
+
+        private void ButtonSave_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var dlg = new Microsoft.Win32.SaveFileDialog()
+                {
+                    FileName = "SakuraLauncher_" + DateTime.Now.ToString("yyyyMMdd_HHmmss"),
+                    DefaultExt = ".log",
+                    Filter = "日志文件|*.log"
+                };
+                if (dlg.ShowDialog() != true)
+                {
+                    return;
+                }
+                File.WriteAllText(dlg.FileName, string.Join("\n", Model.Logs.Select(v => v.ToString())), Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                Model.SimpleFailureHandler(false, ex.ToString());
+            }
         }
 
         private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)

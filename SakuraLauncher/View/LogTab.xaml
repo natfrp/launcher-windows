@@ -14,6 +14,9 @@
             <Button Style="{StaticResource MaterialDesignIconButton}" Width="33" Height="33" Click="ButtonClear_Click" Margin="8,1,0,0" IsEnabled="{Binding Connected}">
                 <materialDesign:PackIcon Kind="TrashCanOutline" Foreground="White"/>
             </Button>
+            <Button Style="{StaticResource MaterialDesignIconButton}" Width="33" Height="33" Click="ButtonSave_Click" Margin="8,1,0,0">
+                <materialDesign:PackIcon Kind="ContentSaveOutline" Foreground="White"/>
+            </Button>
             <ComboBox MinWidth="150" ItemsSource="{Binding LogSourceList, Mode=OneWay}" Margin="8,0,0,0" SelectedItem="{Binding LogSourceFilter}" SelectionChanged="ComboBox_SelectionChanged" VerticalAlignment="Center">
                 <ComboBox.ItemsPanel>
                     <ItemsPanelTemplate>

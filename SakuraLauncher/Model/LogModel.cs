@@ -17,5 +17,7 @@ namespace SakuraLauncher.Model
         public string Data { get; set; }
 
         public SolidColorBrush LevelColor { get; set; } = BrushInfo;
+
+        public override string ToString() => string.Format("{0} {1} {2} {3}", Time, Level, Source, Data);
     }
 }
