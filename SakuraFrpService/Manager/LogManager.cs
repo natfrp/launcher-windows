@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Collections.Concurrent;
-
-using SakuraLibrary;
-using SakuraLibrary.Proto;
+﻿using SakuraLibrary;
 using SakuraLibrary.Helper;
+using SakuraLibrary.Proto;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
 namespace SakuraFrpService.Manager
 {
@@ -13,11 +14,14 @@ namespace SakuraFrpService.Manager
             CATEGORY_SERVICE_INFO = 1, CATEGORY_SERVICE_WARNING = 2, CATEGORY_SERVICE_ERROR = 3,
             CATEGORY_NOTICE_INFO = 4, CATEGORY_NOTICE_WARNING = 5, CATEGORY_NOTICE_ERROR = 6;
 
+        public static readonly string LogDirectory = Path.Combine(Consts.WorkingDirectory, "Logs");
+
         public readonly MainService Main;
         public readonly AsyncManager AsyncManager;
 
         public int RotateSize;
 
+        protected StreamWriter logWriter = null;
         protected List<Log> newLog = new List<Log>();
 
         public LogManager(MainService main, int bufferSize)
@@ -26,6 +30,8 @@ namespace SakuraFrpService.Manager
             RotateSize = bufferSize;
 
             AsyncManager = new AsyncManager(Run);
+
+            Directory.CreateDirectory(LogDirectory);
         }
 
         public void Clear()
@@ -80,6 +86,7 @@ namespace SakuraFrpService.Manager
                                 if (l.Category < CATEGORY_NOTICE_INFO)
                                 {
                                     Enqueue(l);
+                                    WriteFileLog(l);
                                 }
                             }
                             newLog.Clear();
@@ -95,13 +102,50 @@ namespace SakuraFrpService.Manager
             }
         }
 
+        private void WriteFileLog(Log l)
+        {
+            try
+            {
+                logWriter?.WriteLine(l.Category == 0 ?
+                    string.Format("frpc[{0}] {1}", l.Source, l.Data) :
+                    string.Format("{0} {1} {2} {3}",
+                        Utils.ParseSakuraTime(l.Time).ToString("yyyy/MM/dd HH:mm:ss"),
+                        l.Category == CATEGORY_SERVICE_ERROR ? "E" : (l.Category == CATEGORY_SERVICE_WARNING ? "W" : "I"),
+                        l.Source,
+                        l.Data
+                    )
+                );
+            }
+            catch { }
+        }
+
         #region IAsyncManager
 
         public bool Running => AsyncManager.Running;
 
-        public void Start() => AsyncManager.Start();
+        public void Start()
+        {
+            var logs = Path.Combine(LogDirectory, "SakuraFrpService.log");
+            if (File.Exists(logs))
+            {
+                var last = Path.Combine(LogDirectory, "SakuraFrpService.last.log");
+                File.Delete(last);
+                File.Move(logs, last);
+            }
+            logWriter = new StreamWriter(File.Open(logs, FileMode.Create, FileAccess.Write, FileShare.Read), Encoding.UTF8, 4096, false)
+            {
+                AutoFlush = true
+            };
 
-        public void Stop(bool kill = false) => AsyncManager.Stop(kill);
+            AsyncManager.Start();
+        }
+
+        public void Stop(bool kill = false)
+        {
+            logWriter.Close();
+
+            AsyncManager.Stop(kill);
+        }
 
         #endregion
     }
