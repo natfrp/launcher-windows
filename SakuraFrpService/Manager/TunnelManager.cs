@@ -32,7 +32,7 @@ namespace SakuraFrpService.Manager
         {
             Main = main;
             FrpcPath = Path.GetFullPath(FrpcExecutable);
-            FrpcWorkingDirectory = Path.Combine(main.WorkingDirectory, "FrpcWorkingDirectory");
+            FrpcWorkingDirectory = Path.Combine(Consts.WorkingDirectory, "FrpcWorkingDirectory");
 
             Directory.CreateDirectory(FrpcWorkingDirectory);
 

@@ -1,4 +1,7 @@
-﻿namespace SakuraLibrary
+﻿using System;
+using System.IO;
+
+namespace SakuraLibrary
 {
     public static class Consts
     {
@@ -12,5 +15,8 @@
 
         public const string SakuraLauncherPrefix = "SakuraLauncher_";
         public const string LegacyLauncherPrefix = "LegacySakuraLauncher_";
+
+
+        public static readonly string WorkingDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), ServiceName) + "\\";
     }
 }

@@ -1,7 +1,8 @@
-﻿using System.Windows;
+﻿using SakuraLauncher.Model;
+using SakuraLibrary;
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
-
-using SakuraLauncher.Model;
 
 namespace SakuraLauncher.View
 {
@@ -51,6 +52,13 @@ namespace SakuraLauncher.View
         private void ButtonSwitchMode_Click(object sender, RoutedEventArgs e) => Model.SwitchWorkingMode(Model.SimpleHandler, Model.SimpleConfirmHandler);
 
         private void ButtonRemotePassword_Click(object sender, RoutedEventArgs e) => new RemoteConfigWindow(Model).ShowDialog();
+
+        private void ButtonOpenCWD_Click(object sender, RoutedEventArgs e) => Process.Start(new ProcessStartInfo()
+        {
+            FileName = Consts.WorkingDirectory,
+            UseShellExecute = true,
+            Verb = "open"
+        });
 
         private void Save(object sender, RoutedEventArgs e) => Model.Save();
     }
