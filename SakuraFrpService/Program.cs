@@ -1,20 +1,18 @@
-﻿using System;
+﻿using SakuraFrpService.Manager;
+using SakuraLibrary;
+using System;
+using System.ComponentModel;
+using System.Configuration.Install;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Management;
-using System.Diagnostics;
-using System.Windows.Forms;
-using System.ComponentModel;
-using System.ServiceProcess;
-using System.Security.Principal;
-using System.Configuration.Install;
-using System.Security.AccessControl;
 using System.Runtime.InteropServices;
-
-using SakuraLibrary;
-
-using SakuraFrpService.Manager;
+using System.Security.AccessControl;
+using System.Security.Principal;
+using System.ServiceProcess;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace SakuraFrpService
 {
@@ -79,6 +77,39 @@ namespace SakuraFrpService
         private static void UninstallService()
         {
             ManagedInstallerClass.InstallHelper(new string[] { "/u", Utils.ExecutablePath });
+        }
+
+        private static T ResetACL<T>(T acl) where T : FileSystemSecurity
+        {
+            acl.SetAccessRuleProtection(false, false);
+            foreach (FileSystemAccessRule r in acl.GetAccessRules(true, false, typeof(NTAccount)))
+            {
+                acl.RemoveAccessRule(r);
+            }
+            return acl;
+        }
+
+        private static void ResetACLRecursive(DirectoryInfo dir, IdentityReference owner, bool root = true)
+        {
+            if (!dir.Exists)
+            {
+                return;
+            }
+            var acl = ResetACL(dir.GetAccessControl());
+            if (root)
+            {
+                acl.SetAccessRule(new FileSystemAccessRule(owner, FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.None, AccessControlType.Allow));
+            }
+            dir.SetAccessControl(acl);
+
+            foreach (var file in dir.GetFiles())
+            {
+                file.SetAccessControl(ResetACL(file.GetAccessControl()));
+            }
+            foreach (var d in dir.GetDirectories())
+            {
+                ResetACLRecursive(d, owner, false);
+            }
         }
 
         /// <summary>
@@ -146,6 +177,15 @@ namespace SakuraFrpService
                         MessageBox.Show(e.ToString(), "操作失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return 2;
                     }
+                    try
+                    {
+                        ResetACLRecursive(new DirectoryInfo(Consts.WorkingDirectory), new SecurityIdentifier(WellKnownSidType.LocalServiceSid, null));
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show("无法设置工作路径 ACL, 启动器可能无法正常运行\n请截图此错误并联系管理员:\n" + e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return 4;
+                    }
                     return 0;
                 case "--uninstall":
                     try
@@ -160,6 +200,15 @@ namespace SakuraFrpService
                     {
                         MessageBox.Show(e.ToString(), "操作失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return 2;
+                    }
+                    try
+                    {
+                        ResetACLRecursive(new DirectoryInfo(Consts.WorkingDirectory), WindowsIdentity.GetCurrent().User);
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show("无法设置工作路径 ACL, 启动器可能无法正常运行\n请截图此错误并联系管理员:\n" + e.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return 4;
                     }
                     return 0;
                 case "--daemon":

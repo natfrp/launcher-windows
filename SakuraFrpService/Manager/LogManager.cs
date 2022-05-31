@@ -142,7 +142,7 @@ namespace SakuraFrpService.Manager
 
         public void Stop(bool kill = false)
         {
-            logWriter.Close();
+            logWriter?.Close();
 
             AsyncManager.Stop(kill);
         }
