@@ -31,10 +31,11 @@ try {
         Move-Item -Path "$name\$name.exe", "$name\$name.dll" -Destination "sign" -ErrorAction SilentlyContinue
     }
 
-    Copy-Item "..\bin\frpc_windows_*" "sign"
-
     Compress-Archive -Force -CompressionLevel Optimal -Path "debug\*" -DestinationPath "DebugSymbols.zip"
     Compress-Archive -Force -CompressionLevel Optimal -Path "sign\*" -DestinationPath "sign_$version.zip"
+
+    # We don't sign frpc anymore, copy them after Compress-Archive
+    Copy-Item "..\bin\frpc_windows_*" "sign"
 }
 finally {
     Pop-Location
