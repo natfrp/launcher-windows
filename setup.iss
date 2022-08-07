@@ -196,7 +196,7 @@ begin
 			downloadPage.Show;
 			downloadPage.Clear;
 			
-			downloadPage.Add('https://download.visualstudio.microsoft.com/download/pr/014120d7-d689-4305-befd-3cb711108212/1f81f3962f75eff5d83a60abd3a3ec7b/ndp48-web.exe', 'dotnet.exe', 'b9821f28facfd6b11ffbf3703ff3f218cc3c31b85d6503d5c20570751ff08876');
+			downloadPage.Add('https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/9b7b8746971ed51a1770ae4293618187/ndp48-web.exe', 'dotnet.exe', '0bba3094588c4bfec301939985222a20b340bf03431563dec8b2b4478b06fffa');
 			
 			retry := True;
 			while retry do begin
