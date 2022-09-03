@@ -362,8 +362,13 @@ namespace SakuraLibrary.Model
 
         #region Settings - Launcher
 
-        public bool SuppressNotification { get => _suppressNotification; set => Set(out _suppressNotification, value); }
-        private bool _suppressNotification;
+        /// <summary>
+        /// 0 = Show all
+        /// 1 = Suppress all
+        /// 2 = Suppress INFO
+        /// </summary>
+        public int NotificationMode { get => _notificationMode; set => Set(out _notificationMode, value); }
+        private int _notificationMode;
 
         public bool LogTextWrapping { get => _logTextWrapping; set => Set(out _logTextWrapping, value); }
         private bool _logTextWrapping;

@@ -49,7 +49,7 @@ namespace SakuraLauncher.Model
 
             Theme = settings.Theme;
             LogTextWrapping = settings.LogTextWrapping;
-            SuppressNotification = settings.SuppressNotification;
+            NotificationMode = settings.NotificationMode;
 
             LogsViewSource.Filter += e =>
             {
@@ -73,7 +73,7 @@ namespace SakuraLauncher.Model
 
             settings.Theme = Theme;
             settings.LogTextWrapping = LogTextWrapping;
-            settings.SuppressNotification = SuppressNotification;
+            settings.NotificationMode = NotificationMode;
 
             settings.Save();
         }
@@ -184,10 +184,18 @@ namespace SakuraLauncher.Model
                 case 4: // Notice INFO
                 case 5: // Notice WARNING
                 case 6: // Notice ERROR
-                    if (!SuppressNotification)
+                    switch (NotificationMode)
                     {
-                        Dispatcher.Invoke(() => View.trayIcon.ShowBalloonTip(entry.Source, entry.Data, (Hardcodet.Wpf.TaskbarNotification.BalloonIcon)l.Category - 3));
+                    case 1:
+                        return;
+                    case 2:
+                        if (l.Category == 4)
+                        {
+                            return;
+                        }
+                        break;
                     }
+                    Dispatcher.Invoke(() => View.trayIcon.ShowBalloonTip(entry.Source, entry.Data, (Hardcodet.Wpf.TaskbarNotification.BalloonIcon)l.Category - 3));
                     return;
                 }
             }

@@ -1,90 +1,147 @@
-﻿<UserControl x:Class="SakuraLauncher.View.SettingsTab" mc:Ignorable="d"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             d:DesignHeight="600" d:DesignWidth="580">
-    <ScrollViewer VerticalScrollBarVisibility="Auto" UseLayoutRounding="True">
+﻿<UserControl
+    x:Class="SakuraLauncher.View.SettingsTab"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="600"
+    d:DesignWidth="580"
+    mc:Ignorable="d">
+    <ScrollViewer UseLayoutRounding="True" VerticalScrollBarVisibility="Auto">
         <ScrollViewer.Template>
             <ControlTemplate TargetType="{x:Type ScrollViewer}">
                 <Grid x:Name="Grid" Background="{TemplateBinding Background}">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <Rectangle x:Name="Corner" Grid.Column="1" Fill="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Grid.Row="1"/>
-                    <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="False" CanVerticallyScroll="False" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Grid.Column="0" Margin="{TemplateBinding Padding}" Grid.Row="0"/>
-                    <ScrollBar x:Name="PART_VerticalScrollBar" AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow" Grid.Column="1" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" Grid.Row="0" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportHeight}" Margin="0,20,0,0"/>
+                    <Rectangle
+                        x:Name="Corner"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Fill="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
+                    <ScrollContentPresenter
+                        x:Name="PART_ScrollContentPresenter"
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Margin="{TemplateBinding Padding}"
+                        CanContentScroll="{TemplateBinding CanContentScroll}"
+                        CanHorizontallyScroll="False"
+                        CanVerticallyScroll="False"
+                        Content="{TemplateBinding Content}"
+                        ContentTemplate="{TemplateBinding ContentTemplate}" />
+                    <ScrollBar
+                        x:Name="PART_VerticalScrollBar"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Margin="0,20,0,0"
+                        AutomationProperties.AutomationId="VerticalScrollBar"
+                        Cursor="Arrow"
+                        Maximum="{TemplateBinding ScrollableHeight}"
+                        Minimum="0"
+                        ViewportSize="{TemplateBinding ViewportHeight}"
+                        Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                        Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
                 </Grid>
             </ControlTemplate>
         </ScrollViewer.Template>
-        <StackPanel Margin="16,0,16,16" UseLayoutRounding="True">
-            <TextBlock Foreground="#DDFFFFFF" FontSize="22" Margin="8,0,0,0">账户</TextBlock>
-            <StackPanel Orientation="Horizontal" Margin="12,4,16,0">
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16">
+        <StackPanel Margin="24,0,16,16" UseLayoutRounding="True">
+            <DockPanel Margin="0,0,8,12">
+                <TextBlock
+                    Margin="0,0,16,0"
+                    DockPanel.Dock="Left"
+                    FontSize="22"
+                    Foreground="#DDFFFFFF">
+                    账户
+                </TextBlock>
+                <Separator VerticalAlignment="Center" Background="#55a0a0a0" />
+            </DockPanel>
+            <StackPanel Margin="12,4,16,0" Orientation="Horizontal">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
-                            <Setter Property="Visibility" Value="Collapsed"></Setter>
+                            <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding LoggedIn}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </TextBlock.Style>
-                <Run Text="{Binding UserName, Mode=OneWay}" />
-                <Run> - </Run>
-                <Run Text="{Binding UserMeta, Mode=OneWay}" />
+                    <Run Text="{Binding UserName, Mode=OneWay}" />
+                    <Run>-</Run>
+                    <Run Text="{Binding UserMeta, Mode=OneWay}" />
                 </TextBlock>
                 <StackPanel Orientation="Horizontal">
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
-                            <Setter Property="Visibility" Value="Visible"></Setter>
+                            <Setter Property="Visibility" Value="Visible" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding LoggedIn}" Value="True">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
-                    <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16" Margin="0,0,8,0">访问密钥:</TextBlock>
-                    <TextBox Text="{Binding UserToken}" MinWidth="256" FontSize="16" IsEnabled="{Binding TokenEditable}" VerticalAlignment="Center" />
+                    <TextBlock
+                        Margin="0,0,8,0"
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        Foreground="#DDFFFFFF">
+                        访问密钥:
+                    </TextBlock>
+                    <TextBox
+                        MinWidth="256"
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        IsEnabled="{Binding TokenEditable}"
+                        Text="{Binding UserToken}" />
                 </StackPanel>
-                <Button Margin="16,0,0,0" Click="ButtonLogin_Click" IsEnabled="{Binding Connected}">
+                <Button
+                    Margin="16,0,0,0"
+                    Click="ButtonLogin_Click"
+                    IsEnabled="{Binding Connected}">
                     <Button.Resources>
-                        <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                        <Style BasedOn="{StaticResource MaterialDesignFlatButton}" TargetType="Button">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding LoggingIn}" Value="True">
-                                    <Setter Property="Foreground" Value="White"/>
+                                    <Setter Property="Foreground" Value="White" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                        <Style TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignCircularProgressBar}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style BasedOn="{StaticResource MaterialDesignCircularProgressBar}" TargetType="ProgressBar">
+                            <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding LoggingIn}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Button.Resources>
                     <StackPanel Orientation="Horizontal">
-                        <ProgressBar Value="0" IsIndeterminate="True" Foreground="White" Margin="0,0,8,0"/>
+                        <ProgressBar
+                            Margin="0,0,8,0"
+                            Foreground="White"
+                            IsIndeterminate="True"
+                            Value="0" />
                         <TextBlock VerticalAlignment="Center">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Text" Value="登录"/>
+                                    <Setter Property="Text" Value="登录" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding LoggingIn}" Value="True">
-                                            <Setter Property="Text" Value="登录中"/>
+                                            <Setter Property="Text" Value="登录中" />
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding LoggedIn}" Value="True">
-                                            <Setter Property="Text" Value="退出"/>
+                                            <Setter Property="Text" Value="退出" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -93,37 +150,116 @@
                     </StackPanel>
                 </Button>
             </StackPanel>
-            <Separator Margin="4,16,8,12" Background="#55a0a0a0"/>
-            <TextBlock Foreground="#DDFFFFFF" FontSize="22" Margin="8,0,0,0">启动器</TextBlock>
-            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" Height="32">
-                <ToggleButton IsChecked="{Binding SuppressNotification}" Checked="Save" Unchecked="Save"/>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">关闭状态提示</TextBlock>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="不再在右下角弹出隧道状态变更提示" ToolTipService.InitialShowDelay="0">
-                <materialDesign:PackIcon Kind="HelpCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
-                    <materialDesign:PackIcon.RenderTransform>
-                        <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
-                    </materialDesign:PackIcon.RenderTransform>
-                </materialDesign:PackIcon>
+            <DockPanel Margin="4,16,8,12">
+                <TextBlock
+                    Margin="0,0,16,0"
+                    DockPanel.Dock="Left"
+                    FontSize="22"
+                    Foreground="#DDFFFFFF">
+                    启动器
+                </TextBlock>
+                <Separator Background="#55a0a0a0" />
+            </DockPanel>
+            <StackPanel
+                Height="32"
+                Margin="12,4,16,0"
+                Orientation="Horizontal">
+                <ToggleButton
+                    Checked="Save"
+                    IsChecked="{Binding LogTextWrapping}"
+                    Unchecked="Save" />
+                <TextBlock
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
+                    日志自动换行
                 </TextBlock>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" Height="32">
-                <ToggleButton IsChecked="{Binding LogTextWrapping}" Checked="Save" Unchecked="Save"/>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">日志自动换行</TextBlock>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" Height="32">
-                <ToggleButton IsChecked="{Binding AutoRun}"/>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">启动器开机自启</TextBlock>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="守护进程模式下必须启用此选项来实现隧道自启" ToolTipService.InitialShowDelay="0">
-                <materialDesign:PackIcon Kind="HelpCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
-                    <materialDesign:PackIcon.RenderTransform>
-                        <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
-                    </materialDesign:PackIcon.RenderTransform>
-                </materialDesign:PackIcon>
+            <StackPanel
+                Height="32"
+                Margin="12,4,16,0"
+                Orientation="Horizontal">
+                <ToggleButton IsChecked="{Binding AutoRun}" />
+                <TextBlock
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
+                    启动器开机自启
+                </TextBlock>
+                <TextBlock
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF"
+                    ToolTip="守护进程模式下必须启用此选项来实现隧道自启"
+                    ToolTipService.InitialShowDelay="0">
+                    <materialDesign:PackIcon
+                        Foreground="White"
+                        Kind="HelpCircleOutline"
+                        RenderTransformOrigin="0.5,0.1">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
                 </TextBlock>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" Height="32">
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16">更换皮肤:</TextBlock>
-                <ComboBox MinWidth="150" Margin="8,0,0,0" SelectedValuePath="Tag" SelectedValue="{Binding Theme}" SelectionChanged="Save" VerticalAlignment="Center">
+            <StackPanel
+                Height="32"
+                Margin="12,4,16,0"
+                Orientation="Horizontal">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
+                    状态通知:
+                </TextBlock>
+                <ComboBox
+                    MinWidth="150"
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    SelectedValue="{Binding NotificationMode}"
+                    SelectedValuePath="Tag"
+                    SelectionChanged="Save">
+                    <ComboBoxItem Tag="0">显示所有</ComboBoxItem>
+                    <ComboBoxItem Tag="1">隐藏所有</ComboBoxItem>
+                    <ComboBoxItem Tag="2">隐藏启动成功</ComboBoxItem>
+                </ComboBox>
+                <TextBlock
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF"
+                    ToolTip="在右下角弹出隧道状态变更通知"
+                    ToolTipService.InitialShowDelay="0">
+                    <materialDesign:PackIcon
+                        Foreground="White"
+                        Kind="HelpCircleOutline"
+                        RenderTransformOrigin="0.5,0.1">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                </TextBlock>
+            </StackPanel>
+            <StackPanel
+                Height="32"
+                Margin="12,4,16,0"
+                Orientation="Horizontal">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
+                    更换皮肤:
+                </TextBlock>
+                <ComboBox
+                    MinWidth="150"
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    SelectedValue="{Binding Theme}"
+                    SelectedValuePath="Tag"
+                    SelectionChanged="Save">
                     <ComboBoxItem Tag="0">默认皮肤</ComboBoxItem>
                     <ComboBoxItem Tag="1">黑 金 贵 族</ComboBoxItem>
                     <ComboBoxItem Tag="2">童 话 世 界</ComboBoxItem>
@@ -131,136 +267,262 @@
                     <ComboBoxItem Tag="4">丰 收 时 节</ComboBoxItem>
                     <ComboBoxItem Tag="5">前 途 光 明</ComboBoxItem>
                 </ComboBox>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="更换后需要重启启动器才能生效" ToolTipService.InitialShowDelay="0">
-                <materialDesign:PackIcon Kind="HelpCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
-                    <materialDesign:PackIcon.RenderTransform>
-                        <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
-                    </materialDesign:PackIcon.RenderTransform>
-                </materialDesign:PackIcon>
+                <TextBlock
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF"
+                    ToolTip="更换后需要重启启动器才能生效"
+                    ToolTipService.InitialShowDelay="0">
+                    <materialDesign:PackIcon
+                        Foreground="White"
+                        Kind="HelpCircleOutline"
+                        RenderTransformOrigin="0.5,0.1">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
                 </TextBlock>
             </StackPanel>
-            <Separator Margin="4,12,8,12" Background="#55a0a0a0"/>
-            <TextBlock Foreground="#DDFFFFFF" FontSize="22" Margin="8,0,16,0">守护进程</TextBlock>
-            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" IsEnabled="{Binding Connected}" Height="32">
-                <ToggleButton IsChecked="{Binding BypassProxy}"/>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">绕过系统代理</TextBlock>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="请求 SakuraFrp API 时绕过系统代理" ToolTipService.InitialShowDelay="0">
-                <materialDesign:PackIcon Kind="HelpCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
-                    <materialDesign:PackIcon.RenderTransform>
-                        <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
-                    </materialDesign:PackIcon.RenderTransform>
-                </materialDesign:PackIcon>
+            <DockPanel Margin="4,16,8,12">
+                <TextBlock
+                    Margin="0,0,16,0"
+                    DockPanel.Dock="Left"
+                    FontSize="22"
+                    Foreground="#DDFFFFFF">
+                    守护进程
+                </TextBlock>
+                <Separator Background="#55a0a0a0" />
+            </DockPanel>
+            <StackPanel
+                Height="32"
+                Margin="12,4,16,0"
+                IsEnabled="{Binding Connected}"
+                Orientation="Horizontal">
+                <ToggleButton IsChecked="{Binding BypassProxy}" />
+                <TextBlock
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
+                    绕过系统代理
+                </TextBlock>
+                <TextBlock
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF"
+                    ToolTip="请求 SakuraFrp API 时绕过系统代理"
+                    ToolTipService.InitialShowDelay="0">
+                    <materialDesign:PackIcon
+                        Foreground="White"
+                        Kind="HelpCircleOutline"
+                        RenderTransformOrigin="0.5,0.1">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
                 </TextBlock>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" IsEnabled="{Binding UpdateEnabled}" Height="32">
-                <ToggleButton IsChecked="{Binding CheckUpdate}"/>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">自动下载更新</TextBlock>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="启用后会在后台自动检查并下载更新, 安装更新前需手动确认" ToolTipService.InitialShowDelay="0">
-                <materialDesign:PackIcon Kind="HelpCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
-                    <materialDesign:PackIcon.RenderTransform>
-                        <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
-                    </materialDesign:PackIcon.RenderTransform>
-                </materialDesign:PackIcon>
+            <StackPanel
+                Height="32"
+                Margin="12,4,16,0"
+                IsEnabled="{Binding UpdateEnabled}"
+                Orientation="Horizontal">
+                <ToggleButton IsChecked="{Binding CheckUpdate}" />
+                <TextBlock
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
+                    自动下载更新
                 </TextBlock>
-                <Button Margin="16,0,0,0" Click="ButtonUpdate_Click" IsEnabled="{Binding CheckUpdate}">
+                <TextBlock
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF"
+                    ToolTip="启用后会在后台自动检查并下载更新, 安装更新前需手动确认"
+                    ToolTipService.InitialShowDelay="0">
+                    <materialDesign:PackIcon
+                        Foreground="White"
+                        Kind="HelpCircleOutline"
+                        RenderTransformOrigin="0.5,0.1">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                </TextBlock>
+                <Button
+                    Margin="16,0,0,0"
+                    Click="ButtonUpdate_Click"
+                    IsEnabled="{Binding CheckUpdate}">
                     <Button.Resources>
-                        <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                        <Style BasedOn="{StaticResource MaterialDesignFlatButton}" TargetType="Button">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CheckingUpdate}" Value="True">
-                                    <Setter Property="Foreground" Value="White"/>
+                                    <Setter Property="Foreground" Value="White" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                        <Style TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignCircularProgressBar}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style BasedOn="{StaticResource MaterialDesignCircularProgressBar}" TargetType="ProgressBar">
+                            <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CheckingUpdate}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Button.Resources>
                     <StackPanel Orientation="Horizontal">
-                        <ProgressBar Value="0" IsIndeterminate="True" Foreground="White" Margin="0,0,8,0"/>
+                        <ProgressBar
+                            Margin="0,0,8,0"
+                            Foreground="White"
+                            IsIndeterminate="True"
+                            Value="0" />
                         <TextBlock VerticalAlignment="Center">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Text" Value="立即检查"/>
+                                    <Setter Property="Text" Value="立即检查" />
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
                     </StackPanel>
                 </Button>
             </StackPanel>
-            <Separator Margin="4,8,8,12" Background="#55a0a0a0"/>
-            <StackPanel Orientation="Horizontal" Margin="8,0,16,0">
-                <TextBlock Foreground="#DDFFFFFF" FontSize="22">高级设置</TextBlock>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16" ToolTip="修改前请仔细阅读帮助文档, 如果您不清楚这些功能的作用, 请不要进行任何修改" ToolTipService.InitialShowDelay="0">
-                <materialDesign:PackIcon Kind="WarningOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
-                    <materialDesign:PackIcon.RenderTransform>
-                        <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
-                    </materialDesign:PackIcon.RenderTransform>
-                </materialDesign:PackIcon>
+            <DockPanel Margin="4,16,8,12">
+                <StackPanel
+                    Margin="0,0,16,0"
+                    DockPanel.Dock="Left"
+                    Orientation="Horizontal">
+                    <TextBlock FontSize="22" Foreground="#DDFFFFFF">高级设置</TextBlock>
+                    <TextBlock
+                        Margin="16,0,0,0"
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        Foreground="#DDFFFFFF"
+                        ToolTip="修改前请仔细阅读帮助文档, 如果您不清楚这些功能的作用, 请不要进行任何修改"
+                        ToolTipService.InitialShowDelay="0">
+                        <materialDesign:PackIcon
+                            Foreground="White"
+                            Kind="WarningOutline"
+                            RenderTransformOrigin="0.5,0.1">
+                            <materialDesign:PackIcon.RenderTransform>
+                                <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                            </materialDesign:PackIcon.RenderTransform>
+                        </materialDesign:PackIcon>
+                    </TextBlock>
+                </StackPanel>
+                <Separator Background="#55a0a0a0" />
+            </DockPanel>
+            <StackPanel
+                Height="32"
+                Margin="12,4,16,0"
+                Orientation="Horizontal">
+                <ToggleButton IsChecked="{Binding EnableTLS}" IsEnabled="{Binding Connected}" />
+                <TextBlock
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
+                    强制使能 frpc TLS
+                </TextBlock>
+                <TextBlock
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF"
+                    ToolTip="使 frpc 全程使用 TLS 加密流量, 将有效增大 CPU 占用并显著提高延迟"
+                    ToolTipService.InitialShowDelay="0">
+                    <materialDesign:PackIcon
+                        Foreground="White"
+                        Kind="HelpCircleOutline"
+                        RenderTransformOrigin="0.5,0.1">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
                 </TextBlock>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" Height="32">
-                <ToggleButton IsChecked="{Binding EnableTLS}" IsEnabled="{Binding Connected}"/>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">强制使能 frpc TLS</TextBlock>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="使 frpc 全程使用 TLS 加密流量, 将有效增大 CPU 占用并显著提高延迟" ToolTipService.InitialShowDelay="0">
-                <materialDesign:PackIcon Kind="HelpCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
-                    <materialDesign:PackIcon.RenderTransform>
-                        <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
-                    </materialDesign:PackIcon.RenderTransform>
-                </materialDesign:PackIcon>
+            <StackPanel
+                Height="32"
+                Margin="12,4,16,0"
+                Orientation="Horizontal">
+                <ToggleButton IsChecked="{Binding RemoteManagement}" IsEnabled="{Binding CanEnableRemoteManagement}" />
+                <TextBlock
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
+                    启用远程管理
                 </TextBlock>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" Height="32">
-                <ToggleButton IsChecked="{Binding RemoteManagement}" IsEnabled="{Binding CanEnableRemoteManagement}"/>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="16,0,0,0" FontSize="16">启用远程管理</TextBlock>
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" Margin="8,0,0,0" FontSize="16" ToolTip="通过 Sakura Frp 管理启动器, 该功能由端到端加密保护, 启用前需先设置密码" ToolTipService.InitialShowDelay="0">
-                <materialDesign:PackIcon Kind="HelpCircleOutline" RenderTransformOrigin="0.5,0.1" Foreground="White">
-                    <materialDesign:PackIcon.RenderTransform>
-                        <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
-                    </materialDesign:PackIcon.RenderTransform>
-                </materialDesign:PackIcon>
+                <TextBlock
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF"
+                    ToolTip="通过 Sakura Frp 管理启动器, 该功能由端到端加密保护, 启用前需先设置密码"
+                    ToolTipService.InitialShowDelay="0">
+                    <materialDesign:PackIcon
+                        Foreground="White"
+                        Kind="HelpCircleOutline"
+                        RenderTransformOrigin="0.5,0.1">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
                 </TextBlock>
-                <Button Margin="16,0,0,0" Click="ButtonRemotePassword_Click" Content="设置密码" Style="{StaticResource MaterialDesignFlatButton}"/>
+                <Button
+                    Margin="16,0,0,0"
+                    Click="ButtonRemotePassword_Click"
+                    Content="设置密码"
+                    Style="{StaticResource MaterialDesignFlatButton}" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="12,4,16,0" Height="32">
-                <TextBlock VerticalAlignment="Center" Foreground="#DDFFFFFF" FontSize="16">
-                <Run>运行模式:</Run>
-                <Run Text="{Binding WorkingMode, Mode=OneTime}" />
+            <StackPanel
+                Height="32"
+                Margin="12,4,16,0"
+                Orientation="Horizontal">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
+                    <Run>运行模式:</Run>
+                    <Run Text="{Binding WorkingMode, Mode=OneTime}" />
                 </TextBlock>
                 <Button Margin="16,0,0,0" Click="ButtonSwitchMode_Click">
                     <Button.Resources>
-                        <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                        <Style BasedOn="{StaticResource MaterialDesignFlatButton}" TargetType="Button">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SwitchingMode}" Value="True">
-                                    <Setter Property="Foreground" Value="White"/>
+                                    <Setter Property="Foreground" Value="White" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                        <Style TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignCircularProgressBar}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style BasedOn="{StaticResource MaterialDesignCircularProgressBar}" TargetType="ProgressBar">
+                            <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SwitchingMode}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Button.Resources>
                     <StackPanel Orientation="Horizontal">
-                        <ProgressBar Value="0" IsIndeterminate="True" Foreground="White" Margin="0,0,8,0"/>
+                        <ProgressBar
+                            Margin="0,0,8,0"
+                            Foreground="White"
+                            IsIndeterminate="True"
+                            Value="0" />
                         <TextBlock VerticalAlignment="Center">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Text" Value="卸载服务"/>
+                                    <Setter Property="Text" Value="卸载服务" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding SwitchingMode}" Value="True">
-                                            <Setter Property="Text" Value="切换中"/>
+                                            <Setter Property="Text" Value="切换中" />
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding IsDaemon, Mode=OneTime}" Value="True">
-                                            <Setter Property="Text" Value="安装服务"/>
+                                            <Setter Property="Text" Value="安装服务" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -268,7 +530,11 @@
                         </TextBlock>
                     </StackPanel>
                 </Button>
-                <Button Margin="16,0,0,0" Click="ButtonOpenCWD_Click" Content="打开工作目录" Style="{StaticResource MaterialDesignFlatButton}"/>
+                <Button
+                    Margin="16,0,0,0"
+                    Click="ButtonOpenCWD_Click"
+                    Content="打开工作目录"
+                    Style="{StaticResource MaterialDesignFlatButton}" />
             </StackPanel>
         </StackPanel>
     </ScrollViewer>
