@@ -19,6 +19,7 @@ namespace SakuraLauncher
         public static MessageBoxResult ShowMessage(string text, string title, MessageBoxImage icon, MessageBoxButton buttons = MessageBoxButton.OK) => Current.Dispatcher.Invoke(() => MessageBox.Show(text, title, buttons, icon));
 
         public Mutex AppMutex = null;
+        public EventWaitHandle ActivateEventHandle = null;
 
         private void Application_Exit(object sender, ExitEventArgs e) => AppMutex?.ReleaseMutex();
 
@@ -39,11 +40,30 @@ namespace SakuraLauncher
             }
 
             AppMutex = new Mutex(true, "SakuraLauncher_" + Utils.InstallationHash, out bool created);
+            ActivateEventHandle = new EventWaitHandle(false, EventResetMode.AutoReset, "SakuraLauncher_ActivateEvent_" + Utils.InstallationHash);
             if (!created)
             {
-                ShowMessage("请不要重复开启 SakuraFrp 客户端. 如果想运行多个实例请将软件复制到其他目录.", "Oops", MessageBoxImage.Warning);
+                if (!ActivateEventHandle.Set())
+                {
+                    ShowMessage("请不要重复开启 SakuraFrp 客户端. 如果想运行多个实例请将软件复制到其他目录.", "Oops", MessageBoxImage.Warning);
+                }
                 Environment.Exit(0);
             }
+            new Thread(() =>
+            {
+                while (ActivateEventHandle.WaitOne())
+                {
+                    Dispatcher.InvokeAsync(() =>
+                    {
+                        MainWindow.Show();
+                        MainWindow.WindowState = WindowState.Normal;
+                        MainWindow.Activate();
+                    });
+                }
+            })
+            {
+                IsBackground = true,
+            }.Start();
 
             var settings = SakuraLauncher.Properties.Settings.Default;
             if (settings.UpgradeRequired)
