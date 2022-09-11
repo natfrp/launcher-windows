@@ -1,74 +1,108 @@
-﻿<Window x:Class="SakuraLauncher.MainWindow" mc:Ignorable="d"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:tb="http://www.hardcodet.net/taskbar"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}" 
-        TextElement.FontWeight="Regular"
-        TextOptions.TextRenderingMode="ClearType"
-        TextOptions.TextFormattingMode="Ideal"
-        Title="SakuraLauncher" Height="500" Width="782"
-        MinHeight="380" MinWidth="725" ResizeMode="CanResize" SizeChanged="Window_SizeChanged" Closing="Window_Closing"
-        AllowsTransparency="True" Background="Transparent" WindowStyle="None"
-        MouseDown="Window_MouseDown" WindowStartupLocation="CenterScreen">
+﻿<Window
+    x:Class="SakuraLauncher.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:tb="http://www.hardcodet.net/taskbar"
+    Title="SakuraLauncher"
+    Width="782"
+    Height="500"
+    MinWidth="725"
+    MinHeight="380"
+    AllowsTransparency="True"
+    Background="Transparent"
+    Closing="Window_Closing"
+    MouseDown="Window_MouseDown"
+    ResizeMode="CanResize"
+    SizeChanged="Window_SizeChanged"
+    TextElement.FontWeight="Regular"
+    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+    TextOptions.TextFormattingMode="Ideal"
+    TextOptions.TextRenderingMode="ClearType"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="None"
+    mc:Ignorable="d">
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="0" ResizeBorderThickness="3" />
     </WindowChrome.WindowChrome>
     <Window.Resources>
         <LinearGradientBrush x:Key="TabGradientTransparent" StartPoint="0,0" EndPoint="0,0">
-            <GradientStop Color="{StaticResource TabGradient_Start}" Offset="0.02"/>
-            <GradientStop Color="{StaticResource TabGradient_Middle}" Offset="0.02"/>
-            <GradientStop Color="{StaticResource TabGradient_End}" Offset="0.1"/>
-            <GradientStop Color="{StaticResource TabGradient_End}" Offset="0.5"/>
-            <GradientStop Color="{StaticResource TabGradient_EndTransparent}" Offset="1"/>
-            <GradientStop Color="Transparent" Offset="1"/>
+            <GradientStop Offset="0.02" Color="{StaticResource TabGradient_Start}" />
+            <GradientStop Offset="0.02" Color="{StaticResource TabGradient_Middle}" />
+            <GradientStop Offset="0.1" Color="{StaticResource TabGradient_End}" />
+            <GradientStop Offset="0.5" Color="{StaticResource TabGradient_End}" />
+            <GradientStop Offset="1" Color="{StaticResource TabGradient_EndTransparent}" />
+            <GradientStop Offset="1" Color="Transparent" />
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="TabGradientSelected" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Color="{StaticResource TabGradient_Start}" Offset="0.1"/>
-            <GradientStop Color="{StaticResource TabGradient_Middle}" Offset="0.1"/>
-            <GradientStop Color="{StaticResource TabGradient_End}" Offset="0.4"/>
-            <GradientStop Color="{StaticResource TabGradient_EndTransparent}" Offset="1"/>
+            <GradientStop Offset="0.1" Color="{StaticResource TabGradient_Start}" />
+            <GradientStop Offset="0.1" Color="{StaticResource TabGradient_Middle}" />
+            <GradientStop Offset="0.4" Color="{StaticResource TabGradient_End}" />
+            <GradientStop Offset="1" Color="{StaticResource TabGradient_EndTransparent}" />
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="TabGradientHover" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Color="{StaticResource TabGradient_EndMiddle}" Offset="0.5" />
-            <GradientStop Color="{StaticResource TabGradient_EndTransparent}" Offset="1"/>
+            <GradientStop Offset="0.5" Color="{StaticResource TabGradient_EndMiddle}" />
+            <GradientStop Offset="1" Color="{StaticResource TabGradient_EndTransparent}" />
         </LinearGradientBrush>
         <Storyboard x:Key="TabDeactiveAnimation">
-            <PointAnimation Duration="00:00:00.1" Storyboard.TargetProperty="(Background).(LinearGradientBrush.EndPoint)" From="1,0" To="0,0" />
+            <PointAnimation
+                Storyboard.TargetProperty="(Background).(LinearGradientBrush.EndPoint)"
+                From="1,0"
+                To="0,0"
+                Duration="00:00:00.1" />
         </Storyboard>
         <Storyboard x:Key="TabActiveAnimation">
-            <DoubleAnimation Duration="00:00:00.25" Storyboard.TargetProperty="(Background).(LinearGradientBrush.GradientStops)[0].(GradientStop.Offset)" From="0" To="0.02" />
-            <DoubleAnimation Duration="00:00:00.25" Storyboard.TargetProperty="(Background).(LinearGradientBrush.GradientStops)[1].(GradientStop.Offset)" From="0" To="0.02" />
-            <DoubleAnimation Duration="00:00:00.25" Storyboard.TargetProperty="(Background).(LinearGradientBrush.GradientStops)[2].(GradientStop.Offset)" From="0.02" To="0.1" />
-            <ColorAnimation Duration="00:00:00.25" Storyboard.TargetProperty="(Background).(LinearGradientBrush.GradientStops)[3].(GradientStop.Color)" From="{StaticResource TabGradient_EndTransparent}" To="{StaticResource TabGradient_End}" />
+            <DoubleAnimation
+                Storyboard.TargetProperty="(Background).(LinearGradientBrush.GradientStops)[0].(GradientStop.Offset)"
+                From="0"
+                To="0.02"
+                Duration="00:00:00.25" />
+            <DoubleAnimation
+                Storyboard.TargetProperty="(Background).(LinearGradientBrush.GradientStops)[1].(GradientStop.Offset)"
+                From="0"
+                To="0.02"
+                Duration="00:00:00.25" />
+            <DoubleAnimation
+                Storyboard.TargetProperty="(Background).(LinearGradientBrush.GradientStops)[2].(GradientStop.Offset)"
+                From="0.02"
+                To="0.1"
+                Duration="00:00:00.25" />
+            <ColorAnimation
+                Storyboard.TargetProperty="(Background).(LinearGradientBrush.GradientStops)[3].(GradientStop.Color)"
+                From="{StaticResource TabGradient_EndTransparent}"
+                To="{StaticResource TabGradient_End}"
+                Duration="00:00:00.25" />
         </Storyboard>
         <Storyboard x:Key="TabHideAnimation" Completed="StoryboardTabHideAnimation_Completed">
-            <DoubleAnimationUsingKeyFrames Duration="00:00:00.15" Storyboard.TargetProperty="Opacity">
-                <LinearDoubleKeyFrame KeyTime="00:00:00" Value="1"></LinearDoubleKeyFrame>
-                <LinearDoubleKeyFrame KeyTime="00:00:00.15" Value="0"></LinearDoubleKeyFrame>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity" Duration="00:00:00.15">
+                <LinearDoubleKeyFrame KeyTime="00:00:00" Value="1" />
+                <LinearDoubleKeyFrame KeyTime="00:00:00.15" Value="0" />
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
         <Storyboard x:Key="TabShowAnimation">
-            <DoubleAnimationUsingKeyFrames Duration="00:00:00.1" Storyboard.TargetProperty="Opacity">
-                <LinearDoubleKeyFrame KeyTime="00:00:00" Value="0"></LinearDoubleKeyFrame>
-                <LinearDoubleKeyFrame KeyTime="00:00:00.1" Value="1"></LinearDoubleKeyFrame>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity" Duration="00:00:00.1">
+                <LinearDoubleKeyFrame KeyTime="00:00:00" Value="0" />
+                <LinearDoubleKeyFrame KeyTime="00:00:00.1" Value="1" />
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
         <Style x:Key="TabButtonBase" TargetType="Button">
-            <Setter Property="Height" Value="48"></Setter>
-            <Setter Property="Cursor" Value="Hand"></Setter>
-            <Setter Property="Opacity" Value="0.76"></Setter>
-            <Setter Property="Focusable" Value="False"/>
-            <Setter Property="Foreground" Value="White"></Setter>
-            <Setter Property="Background" Value="{StaticResource TabGradientTransparent}"></Setter>
-            <Setter Property="FontSize" Value="16"></Setter>
+            <Setter Property="Height" Value="48" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Opacity" Value="0.76" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="{StaticResource TabGradientTransparent}" />
+            <Setter Property="FontSize" Value="16" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}">
-                            <ContentPresenter Margin="24,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <ContentPresenter
+                                Margin="24,0,0,0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center" />
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
@@ -76,7 +110,7 @@
             <Style.Triggers>
                 <Trigger Property="Background" Value="{StaticResource TabGradientSelected}">
                     <Trigger.EnterActions>
-                        <BeginStoryboard Storyboard="{StaticResource TabActiveAnimation}"></BeginStoryboard>
+                        <BeginStoryboard Storyboard="{StaticResource TabActiveAnimation}" />
                     </Trigger.EnterActions>
                 </Trigger>
             </Style.Triggers>
@@ -84,28 +118,37 @@
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="180"/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="180" />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Border CornerRadius="3,0,0,3" Background="{StaticResource Background_SidePanel}">
+        <Border Background="{StaticResource Background_SidePanel}" CornerRadius="3,0,0,3">
             <StackPanel>
-                <Border x:Name="logo" Margin="0,24,0,24" Width="120" Height="120" CornerRadius="180" MouseLeftButtonDown="Logo_MouseLeftButtonDown">
+                <Border
+                    x:Name="logo"
+                    Width="120"
+                    Height="120"
+                    Margin="0,24,0,24"
+                    CornerRadius="180"
+                    MouseLeftButtonDown="Logo_MouseLeftButtonDown">
                     <Border.Background>
-                        <ImageBrush Stretch="Fill" ImageSource="Resources/logo.png"/>
+                        <ImageBrush ImageSource="Resources/logo.png" Stretch="Fill" />
                     </Border.Background>
                     <Border.Effect>
-                        <DropShadowEffect BlurRadius="16" Opacity="0.5" ShadowDepth="4"/>
+                        <DropShadowEffect
+                            BlurRadius="16"
+                            Opacity="0.5"
+                            ShadowDepth="4" />
                     </Border.Effect>
                 </Border>
-                <Button Tag="0" Click="ButtonTab_Click">
+                <Button Click="ButtonTab_Click" Tag="0">
                     <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource TabButtonBase}">
+                        <Style BasedOn="{StaticResource TabButtonBase}" TargetType="Button">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CurrentTab}" Value="0">
-                                    <Setter Property="Opacity" Value="1"></Setter>
-                                    <Setter Property="Background" Value="{StaticResource TabGradientSelected}"></Setter>
+                                    <Setter Property="Opacity" Value="1" />
+                                    <Setter Property="Background" Value="{StaticResource TabGradientSelected}" />
                                     <DataTrigger.ExitActions>
-                                        <BeginStoryboard Storyboard="{StaticResource TabDeactiveAnimation}"></BeginStoryboard>
+                                        <BeginStoryboard Storyboard="{StaticResource TabDeactiveAnimation}" />
                                     </DataTrigger.ExitActions>
                                 </DataTrigger>
                                 <MultiDataTrigger>
@@ -118,8 +161,8 @@
                                     </MultiDataTrigger.Setters>
                                 </MultiDataTrigger>
                                 <DataTrigger Binding="{Binding LoggedIn}" Value="False">
-                                    <Setter Property="Opacity" Value="0.2"></Setter>
-                                    <Setter Property="IsEnabled" Value="False"></Setter>
+                                    <Setter Property="Opacity" Value="0.2" />
+                                    <Setter Property="IsEnabled" Value="False" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -127,23 +170,23 @@
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="ServerNetwork">
                             <materialDesign:PackIcon.LayoutTransform>
-                                <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.6" ScaleY="1.6"/>
+                                <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.6" ScaleY="1.6" />
                             </materialDesign:PackIcon.LayoutTransform>
                         </materialDesign:PackIcon>
                         <Border>
-                            <TextBlock VerticalAlignment="Center" Margin="8,0,0,0">隧道</TextBlock>
+                            <TextBlock Margin="8,0,0,0" VerticalAlignment="Center">隧道</TextBlock>
                         </Border>
                     </StackPanel>
                 </Button>
-                <Button Tag="1" Click="ButtonTab_Click">
+                <Button Click="ButtonTab_Click" Tag="1">
                     <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource TabButtonBase}">
+                        <Style BasedOn="{StaticResource TabButtonBase}" TargetType="Button">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CurrentTab}" Value="1">
-                                    <Setter Property="Opacity" Value="1"></Setter>
-                                    <Setter Property="Background" Value="{StaticResource TabGradientSelected}"></Setter>
+                                    <Setter Property="Opacity" Value="1" />
+                                    <Setter Property="Background" Value="{StaticResource TabGradientSelected}" />
                                     <DataTrigger.ExitActions>
-                                        <BeginStoryboard Storyboard="{StaticResource TabDeactiveAnimation}"></BeginStoryboard>
+                                        <BeginStoryboard Storyboard="{StaticResource TabDeactiveAnimation}" />
                                     </DataTrigger.ExitActions>
                                 </DataTrigger>
                                 <MultiDataTrigger>
@@ -161,23 +204,23 @@
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="DriveDocument">
                             <materialDesign:PackIcon.LayoutTransform>
-                                <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.6" ScaleY="1.6"/>
+                                <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.6" ScaleY="1.6" />
                             </materialDesign:PackIcon.LayoutTransform>
                         </materialDesign:PackIcon>
                         <Border>
-                            <TextBlock VerticalAlignment="Center" Margin="8,0,0,0">日志</TextBlock>
+                            <TextBlock Margin="8,0,0,0" VerticalAlignment="Center">日志</TextBlock>
                         </Border>
                     </StackPanel>
                 </Button>
-                <Button Tag="2" Click="ButtonTab_Click">
+                <Button Click="ButtonTab_Click" Tag="2">
                     <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource TabButtonBase}">
+                        <Style BasedOn="{StaticResource TabButtonBase}" TargetType="Button">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CurrentTab}" Value="2">
-                                    <Setter Property="Opacity" Value="1"></Setter>
-                                    <Setter Property="Background" Value="{StaticResource TabGradientSelected}"></Setter>
+                                    <Setter Property="Opacity" Value="1" />
+                                    <Setter Property="Background" Value="{StaticResource TabGradientSelected}" />
                                     <DataTrigger.ExitActions>
-                                        <BeginStoryboard Storyboard="{StaticResource TabDeactiveAnimation}"></BeginStoryboard>
+                                        <BeginStoryboard Storyboard="{StaticResource TabDeactiveAnimation}" />
                                     </DataTrigger.ExitActions>
                                 </DataTrigger>
                                 <MultiDataTrigger>
@@ -195,23 +238,23 @@
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="Settings">
                             <materialDesign:PackIcon.LayoutTransform>
-                                <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.6" ScaleY="1.6"/>
+                                <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.6" ScaleY="1.6" />
                             </materialDesign:PackIcon.LayoutTransform>
                         </materialDesign:PackIcon>
                         <Border>
-                            <TextBlock VerticalAlignment="Center" Margin="8,0,0,0">设置</TextBlock>
+                            <TextBlock Margin="8,0,0,0" VerticalAlignment="Center">设置</TextBlock>
                         </Border>
                     </StackPanel>
                 </Button>
-                <Button Tag="3" Click="ButtonTab_Click">
+                <Button Click="ButtonTab_Click" Tag="3">
                     <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource TabButtonBase}">
+                        <Style BasedOn="{StaticResource TabButtonBase}" TargetType="Button">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CurrentTab}" Value="3">
-                                    <Setter Property="Opacity" Value="1"></Setter>
-                                    <Setter Property="Background" Value="{StaticResource TabGradientSelected}"></Setter>
+                                    <Setter Property="Opacity" Value="1" />
+                                    <Setter Property="Background" Value="{StaticResource TabGradientSelected}" />
                                     <DataTrigger.ExitActions>
-                                        <BeginStoryboard Storyboard="{StaticResource TabDeactiveAnimation}"></BeginStoryboard>
+                                        <BeginStoryboard Storyboard="{StaticResource TabDeactiveAnimation}" />
                                     </DataTrigger.ExitActions>
                                 </DataTrigger>
                                 <MultiDataTrigger>
@@ -229,20 +272,23 @@
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="AboutCircle">
                             <materialDesign:PackIcon.LayoutTransform>
-                                <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.6" ScaleY="1.6"/>
+                                <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.6" ScaleY="1.6" />
                             </materialDesign:PackIcon.LayoutTransform>
                         </materialDesign:PackIcon>
                         <Border>
-                            <TextBlock VerticalAlignment="Center" Margin="8,0,0,0">关于</TextBlock>
+                            <TextBlock Margin="8,0,0,0" VerticalAlignment="Center">关于</TextBlock>
                         </Border>
                     </StackPanel>
                 </Button>
             </StackPanel>
         </Border>
-        <Border Grid.Column="1" CornerRadius="0,3,3,0" Background="{StaticResource Background_MainPanel}">
+        <Border
+            Grid.Column="1"
+            Background="{StaticResource Background_MainPanel}"
+            CornerRadius="0,3,3,0">
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition/>
+                    <RowDefinition />
                     <RowDefinition>
                         <RowDefinition.Style>
                             <Style TargetType="{x:Type RowDefinition}">
@@ -256,51 +302,102 @@
                         </RowDefinition.Style>
                     </RowDefinition>
                 </Grid.RowDefinitions>
-                <Border Grid.Row="0" Name="tabContents" Margin="0,24,0,0" RenderTransformOrigin="0.5,0.5">
+                <Border
+                    Name="tabContents"
+                    Grid.Row="0"
+                    Margin="0,24,0,0"
+                    RenderTransformOrigin="0.5,0.5">
                     <Border.RenderTransform>
-                        <TranslateTransform Y="0"/>
+                        <TranslateTransform Y="0" />
                     </Border.RenderTransform>
                 </Border>
-                <Button Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top" Width="32" Height="32" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Margin="0,5,5,0" Click="ButtonHide_Click">
+                <Button
+                    Grid.Row="0"
+                    Width="32"
+                    Height="32"
+                    Margin="0,5,5,0"
+                    Padding="0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Background="{x:Null}"
+                    BorderBrush="{x:Null}"
+                    Click="ButtonHide_Click">
                     <Grid>
-                        <Line X2="16" Y2="16" Stroke="White" StrokeThickness="1.5" />
-                        <Line X1="16" Y2="16"  Stroke="White" StrokeThickness="1.5" />
+                        <Line
+                            Stroke="White"
+                            StrokeThickness="1.5"
+                            X2="16"
+                            Y2="16" />
+                        <Line
+                            Stroke="White"
+                            StrokeThickness="1.5"
+                            X1="16"
+                            Y2="16" />
                     </Grid>
                 </Button>
-                <Button Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top" Width="32" Height="32" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0" Margin="0,5,43,0" Click="ButtonMinimize_Click">
-                    <Line X2="16" Stroke="White" StrokeThickness="1.5" Margin="0,8,0,0" />
+                <Button
+                    Grid.Row="0"
+                    Width="32"
+                    Height="32"
+                    Margin="0,5,43,0"
+                    Padding="0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Background="{x:Null}"
+                    BorderBrush="{x:Null}"
+                    Click="ButtonMinimize_Click">
+                    <Line
+                        Margin="0,8,0,0"
+                        Stroke="White"
+                        StrokeThickness="1.5"
+                        X2="16" />
                 </Button>
-                <Border Grid.Row="1" Background="Teal" Cursor="Hand" MouseLeftButtonDown="Update_MouseLeftButtonDown">
+                <Border
+                    Grid.Row="1"
+                    Background="Teal"
+                    Cursor="Hand"
+                    MouseLeftButtonDown="Update_MouseLeftButtonDown">
                     <Border.Style>
                         <Style TargetType="Border">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding HaveUpdate}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
-                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="Visibility" Value="Collapsed" />
                         </Style>
                     </Border.Style>
-                    <TextBlock TextAlignment="Center" VerticalAlignment="Center" FontSize="18" Text="{Binding UpdateText}"/>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="18"
+                        Text="{Binding UpdateText}"
+                        TextAlignment="Center" />
                 </Border>
                 <Border Grid.Row="1" Background="OrangeRed">
                     <Border.Style>
                         <Style TargetType="Border">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Connected}" Value="False">
-                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
-                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="Visibility" Value="Collapsed" />
                         </Style>
                     </Border.Style>
-                    <TextBlock TextAlignment="Center" VerticalAlignment="Center" FontSize="18">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="18"
+                        TextAlignment="Center">
                         未连接到守护进程, 大部分功能将不可用, 请尝试重启启动器
                     </TextBlock>
                 </Border>
             </Grid>
         </Border>
-        <tb:TaskbarIcon x:Name="trayIcon" TrayLeftMouseUp="TrayIcon_TrayLeftMouseUp" IconSource="Resources/icon.ico" ContextMenu="{StaticResource TrayMenu}">
+        <tb:TaskbarIcon
+            x:Name="trayIcon"
+            ContextMenu="{StaticResource TrayMenu}"
+            IconSource="Resources/icon.ico"
+            TrayLeftMouseUp="TrayIcon_TrayLeftMouseUp">
             <tb:TaskbarIcon.TrayToolTip>
                 <ToolTip Placement="Mouse">
                     <TextBlock>SakuraFrp Launcher 运行中, 点击显示主窗口</TextBlock>

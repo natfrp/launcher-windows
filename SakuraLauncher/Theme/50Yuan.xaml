@@ -1,17 +1,16 @@
-﻿<!-- 前 途 光 明 -->
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<!--  前 途 光 明  -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <LinearGradientBrush x:Key="Background_SidePanel" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#529a82" Offset="0"/>
-        <GradientStop Color="#507564" Offset="1"/>
+        <GradientStop Offset="0" Color="#529a82" />
+        <GradientStop Offset="1" Color="#507564" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="Background_MainPanel" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#507564" Offset="0"/>
-        <GradientStop Color="#3d6658" Offset="1"/>
+        <GradientStop Offset="0" Color="#507564" />
+        <GradientStop Offset="1" Color="#3d6658" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="Background_Tunnel" StartPoint="0,0" EndPoint="0.5,1">
-        <GradientStop Color="#529a82" Offset="0"/>
-        <GradientStop Color="#507564" Offset="1"/>
+        <GradientStop Offset="0" Color="#529a82" />
+        <GradientStop Offset="1" Color="#507564" />
     </LinearGradientBrush>
 
     <Color x:Key="TabGradient_Start">#bcdceb</Color>

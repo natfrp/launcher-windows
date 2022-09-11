@@ -1,42 +1,56 @@
-﻿<Window x:Class="SakuraLauncher.CreateTunnelWindow" mc:Ignorable="d"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        TextElement.FontSize="15"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}" 
-        TextElement.FontWeight="Regular"
-        TextOptions.TextRenderingMode="Auto"
-        TextOptions.TextFormattingMode="Ideal" 
-        Background="{StaticResource MaterialDesignPaper}"
-        Title="新建穿透隧道" Height="500" Width="880" 
-        WindowStartupLocation="CenterOwner">
+﻿<Window
+    x:Class="SakuraLauncher.CreateTunnelWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="新建穿透隧道"
+    Width="880"
+    Height="500"
+    Background="{StaticResource MaterialDesignPaper}"
+    TextElement.FontSize="15"
+    TextElement.FontWeight="Regular"
+    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+    TextOptions.TextFormattingMode="Ideal"
+    TextOptions.TextRenderingMode="Auto"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="280"/>
+            <ColumnDefinition />
+            <ColumnDefinition Width="280" />
         </Grid.ColumnDefinitions>
         <DockPanel Margin="16,16,0,16">
-            <Button DockPanel.Dock="Bottom" Margin="0,8,0,0" Style="{StaticResource MaterialDesignFlatButton}" Click="ButtonReload_Click" Width="96" HorizontalAlignment="Right">
+            <Button
+                Width="96"
+                Margin="0,8,0,0"
+                HorizontalAlignment="Right"
+                Click="ButtonReload_Click"
+                DockPanel.Dock="Bottom"
+                Style="{StaticResource MaterialDesignFlatButton}">
                 <Button.Resources>
-                    <Style TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignCircularProgressBar}">
-                        <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style BasedOn="{StaticResource MaterialDesignCircularProgressBar}" TargetType="ProgressBar">
+                        <Setter Property="Visibility" Value="Collapsed" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Loading}" Value="True">
-                                <Setter Property="Visibility" Value="Visible"/>
+                                <Setter Property="Visibility" Value="Visible" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Button.Resources>
                 <StackPanel Orientation="Horizontal">
-                    <ProgressBar Value="0" IsIndeterminate="True" Foreground="White" Margin="0,0,8,0"/>
+                    <ProgressBar
+                        Margin="0,0,8,0"
+                        Foreground="White"
+                        IsIndeterminate="True"
+                        Value="0" />
                     <TextBlock VerticalAlignment="Center">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Loading}" Value="False">
-                                        <Setter Property="Text" Value="刷新"/>
+                                        <Setter Property="Text" Value="刷新" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -47,14 +61,18 @@
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <materialDesign:Card Margin="0,0,8,0">
                     <StackPanel>
-                        <ListView ItemsSource="{Binding Listening, Mode=OneWay}" SelectionMode="Single" Name="listening" SelectionChanged="Listening_SelectionChanged">
+                        <ListView
+                            Name="listening"
+                            ItemsSource="{Binding Listening, Mode=OneWay}"
+                            SelectionChanged="Listening_SelectionChanged"
+                            SelectionMode="Single">
                             <ListView.View>
                                 <GridView>
-                                    <GridViewColumn Header="协议" DisplayMemberBinding="{Binding Protocol, Mode=OneTime}" />
-                                    <GridViewColumn Header="监听地址" DisplayMemberBinding="{Binding Address, Mode=OneTime}" />
-                                    <GridViewColumn Header="监听端口" DisplayMemberBinding="{Binding Port, Mode=OneTime}" />
-                                    <GridViewColumn Header="PID" DisplayMemberBinding="{Binding PID, Mode=OneTime}" />
-                                    <GridViewColumn Header="进程名" DisplayMemberBinding="{Binding ProcessName, Mode=OneTime}" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Protocol, Mode=OneTime}" Header="协议" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Address, Mode=OneTime}" Header="监听地址" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Port, Mode=OneTime}" Header="监听端口" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding PID, Mode=OneTime}" Header="PID" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding ProcessName, Mode=OneTime}" Header="进程名" />
                                 </GridView>
                             </ListView.View>
                         </ListView>
@@ -67,72 +85,120 @@
                 <StackPanel>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="160"/>
-                            <ColumnDefinition/>
+                            <ColumnDefinition Width="160" />
+                            <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <TextBox materialDesign:HintAssist.Hint="本地IP" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding LocalAddress}"/>
-                        <TextBox Grid.Column="1" materialDesign:HintAssist.Hint="端口" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding LocalPort}"/>
+                        <TextBox
+                            Margin="8"
+                            materialDesign:HintAssist.Hint="本地IP"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                            Text="{Binding LocalAddress}" />
+                        <TextBox
+                            Grid.Column="1"
+                            Margin="8"
+                            materialDesign:HintAssist.Hint="端口"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                            Text="{Binding LocalPort}" />
                     </Grid>
-                    <TextBox materialDesign:HintAssist.Hint="隧道名称(留空随机)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding TunnelName}"/>
-                    <TextBox materialDesign:HintAssist.Hint="备注(可空)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding Note}" TextWrapping="Wrap" AcceptsReturn="True"/>
+                    <TextBox
+                        Margin="8"
+                        materialDesign:HintAssist.Hint="隧道名称(留空随机)"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="{Binding TunnelName}" />
+                    <TextBox
+                        Margin="8"
+                        materialDesign:HintAssist.Hint="备注(可空)"
+                        AcceptsReturn="True"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="{Binding Note}"
+                        TextWrapping="Wrap" />
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition/>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <ComboBox Margin="8" materialDesign:HintAssist.Hint="隧道类型" Style="{StaticResource MaterialDesignFloatingHintComboBox}" Text="{Binding Type}" IsEditable="True">
+                        <ComboBox
+                            Margin="8"
+                            materialDesign:HintAssist.Hint="隧道类型"
+                            IsEditable="True"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                            Text="{Binding Type}">
                             <ComboBoxItem>TCP</ComboBoxItem>
                             <ComboBoxItem>UDP</ComboBoxItem>
                         </ComboBox>
-                        <TextBox Grid.Column="1" materialDesign:HintAssist.Hint="远程端口(0随机)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="8" Text="{Binding RemotePort}"/>
+                        <TextBox
+                            Grid.Column="1"
+                            Margin="8"
+                            materialDesign:HintAssist.Hint="远程端口(0随机)"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                            Text="{Binding RemotePort}" />
                     </Grid>
-                    <ComboBox Name="node" Width="224" Margin="8" materialDesign:HintAssist.Hint="穿透节点" Style="{StaticResource MaterialDesignFloatingHintComboBox}" ItemsSource="{Binding Nodes}">
+                    <ComboBox
+                        Name="node"
+                        Width="224"
+                        Margin="8"
+                        materialDesign:HintAssist.Hint="穿透节点"
+                        ItemsSource="{Binding Nodes}"
+                        Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.ItemContainerStyle>
-                            <Style TargetType="ComboBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                            <Style BasedOn="{StaticResource MaterialDesignListBoxItem}" TargetType="ComboBoxItem">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Enabled}" Value="True">
                                         <Setter Property="Padding" Value="32,8,16,8" />
                                     </DataTrigger>
                                 </Style.Triggers>
-                                <Setter Property="Padding" Value="16 8" />
+                                <Setter Property="Padding" Value="16,8" />
                                 <Setter Property="IsEnabled" Value="{Binding Enabled}" />
                             </Style>
                         </ComboBox.ItemContainerStyle>
                     </ComboBox>
                     <Grid Margin="6">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                     </Grid>
                 </StackPanel>
             </materialDesign:Card>
             <Grid Margin="8,0,16,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Click="ButtonPingTest_Click" Style="{StaticResource MaterialDesignFlatButton}">延迟测试</Button>
-                <Button Grid.Column="1" Margin="8,0,0,0" Style="{StaticResource MaterialDesignRaisedDarkButton}" Click="ButtonCreate_Click">
+                <Button
+                    Grid.Column="0"
+                    Click="ButtonPingTest_Click"
+                    Style="{StaticResource MaterialDesignFlatButton}">
+                    延迟测试
+                </Button>
+                <Button
+                    Grid.Column="1"
+                    Margin="8,0,0,0"
+                    Click="ButtonCreate_Click"
+                    Style="{StaticResource MaterialDesignRaisedDarkButton}">
                     <Button.Resources>
-                        <Style TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignCircularProgressBar}">
-                            <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style BasedOn="{StaticResource MaterialDesignCircularProgressBar}" TargetType="ProgressBar">
+                            <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Creating}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Button.Resources>
                     <StackPanel Orientation="Horizontal">
-                        <ProgressBar Value="0" IsIndeterminate="True" Foreground="White" Margin="0,0,8,0"/>
+                        <ProgressBar
+                            Margin="0,0,8,0"
+                            Foreground="White"
+                            IsIndeterminate="True"
+                            Value="0" />
                         <TextBlock VerticalAlignment="Center">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Text" Value="创建"/>
+                                    <Setter Property="Text" Value="创建" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Creating}" Value="True">
-                                            <Setter Property="Text" Value="创建中"/>
+                                            <Setter Property="Text" Value="创建中" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>

@@ -1,16 +1,15 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <LinearGradientBrush x:Key="Background_SidePanel" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#1F5966" Offset="0"/>
-        <GradientStop Color="#0F2C33" Offset="1"/>
+        <GradientStop Offset="0" Color="#1F5966" />
+        <GradientStop Offset="1" Color="#0F2C33" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="Background_MainPanel" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#0F2C33" Offset="0"/>
-        <GradientStop Color="#00151A" Offset="1"/>
+        <GradientStop Offset="0" Color="#0F2C33" />
+        <GradientStop Offset="1" Color="#00151A" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="Background_Tunnel" StartPoint="0,0" EndPoint="0.5,1">
-        <GradientStop Color="#0092B3" Offset="0"/>
-        <GradientStop Color="#005366" Offset="1"/>
+        <GradientStop Offset="0" Color="#0092B3" />
+        <GradientStop Offset="1" Color="#005366" />
     </LinearGradientBrush>
 
     <Color x:Key="TabGradient_Start">#34e89e</Color>

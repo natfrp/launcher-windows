@@ -1,22 +1,37 @@
-﻿<Application x:Class="SakuraLauncher.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             Exit="Application_Exit" Startup="Application_Startup">
+﻿<Application
+    x:Class="SakuraLauncher.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Exit="Application_Exit"
+    Startup="Application_Startup">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <materialDesign:BundledTheme BaseTheme="Dark" PrimaryColor="Teal" SecondaryColor="Teal" ColorAdjustment="{materialDesign:ColorAdjustment}" />
-                <ResourceDictionary Source="/Theme/Teal.xaml"/>
-                
+                <materialDesign:BundledTheme
+                    BaseTheme="Dark"
+                    ColorAdjustment="{materialDesign:ColorAdjustment}"
+                    PrimaryColor="Teal"
+                    SecondaryColor="Teal" />
+                <ResourceDictionary Source="/Theme/Teal.xaml" />
+
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <ContextMenu x:Key="TrayMenu" Placement="MousePoint">
-                <MenuItem Header="显示主窗口" Style="{StaticResource MaterialDesignMenuItem}" Click="TrayMenu_Show"/>
+                <MenuItem
+                    Click="TrayMenu_Show"
+                    Header="显示主窗口"
+                    Style="{StaticResource MaterialDesignMenuItem}" />
                 <Separator />
-                <MenuItem Header="退出启动器" Style="{StaticResource MaterialDesignMenuItem}" Click="TrayMenu_Exit"/>
-                <MenuItem Header="彻底退出" Style="{StaticResource MaterialDesignMenuItem}" Click="TrayMenu_ExitAll"/>
+                <MenuItem
+                    Click="TrayMenu_Exit"
+                    Header="退出启动器"
+                    Style="{StaticResource MaterialDesignMenuItem}" />
+                <MenuItem
+                    Click="TrayMenu_ExitAll"
+                    Header="彻底退出"
+                    Style="{StaticResource MaterialDesignMenuItem}" />
             </ContextMenu>
         </ResourceDictionary>
     </Application.Resources>

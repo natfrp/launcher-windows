@@ -1,17 +1,16 @@
-﻿<!-- 海 阔 天 空 -->
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<!--  海 阔 天 空  -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <LinearGradientBrush x:Key="Background_SidePanel" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#5292c0" Offset="0"/>
-        <GradientStop Color="#3f689e" Offset="1"/>
+        <GradientStop Offset="0" Color="#5292c0" />
+        <GradientStop Offset="1" Color="#3f689e" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="Background_MainPanel" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#3f689e" Offset="0"/>
-        <GradientStop Color="#355389" Offset="1"/>
+        <GradientStop Offset="0" Color="#3f689e" />
+        <GradientStop Offset="1" Color="#355389" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="Background_Tunnel" StartPoint="0,0" EndPoint="0.5,1">
-        <GradientStop Color="#5292c0" Offset="0"/>
-        <GradientStop Color="#3f689e" Offset="1"/>
+        <GradientStop Offset="0" Color="#5292c0" />
+        <GradientStop Offset="1" Color="#3f689e" />
     </LinearGradientBrush>
 
     <Color x:Key="TabGradient_Start">#bedeed</Color>
