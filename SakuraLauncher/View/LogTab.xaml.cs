@@ -67,6 +67,6 @@ namespace SakuraLauncher.View
             }
         }
 
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => Model.LogsViewSource.Refresh();
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => Model.LogsView.Refresh();
     }
 }

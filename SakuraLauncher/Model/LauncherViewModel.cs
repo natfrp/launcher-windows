@@ -51,11 +51,12 @@ namespace SakuraLauncher.Model
             LogTextWrapping = settings.LogTextWrapping;
             NotificationMode = settings.NotificationMode;
 
-            LogsViewSource.Filter += e =>
+            LogsView.Filter += e =>
             {
                 var item = e as LogModel;
                 return LogSourceFilter == "" || item.Source == LogSourceFilter;
             };
+            TunnelsView.SortDescriptions.Add(new SortDescription(nameof(TunnelModel.Name), ListSortDirection.Ascending));
         }
 
         public override void Save()
@@ -122,6 +123,8 @@ namespace SakuraLauncher.Model
         public int Theme { get => _theme; set => Set(out _theme, value); }
         private int _theme;
 
+        public ICollectionView TunnelsView => CollectionViewSource.GetDefaultView(Tunnels);
+
         #endregion
 
         #region Logging
@@ -134,7 +137,7 @@ namespace SakuraLauncher.Model
             { "" }
         };
 
-        public ICollectionView LogsViewSource => CollectionViewSource.GetDefaultView(Logs);
+        public ICollectionView LogsView => CollectionViewSource.GetDefaultView(Logs);
         public ObservableCollection<LogModel> Logs { get; } = new ObservableCollection<LogModel>();
 
         public override void Log(Log l, bool init)
