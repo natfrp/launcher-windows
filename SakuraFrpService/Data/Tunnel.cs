@@ -190,6 +190,11 @@ namespace SakuraFrpService.Data
             {
                 if (BaseProcess != null)
                 {
+                    if (BaseProcess.ExitCode == 0 && Enabled)
+                    {
+                        Manager.Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "frpc 无故退出，已关闭该隧道");
+                        Enabled = false;
+                    }
                     BaseProcess.Exited -= OnProcessExit;
                 }
             }
