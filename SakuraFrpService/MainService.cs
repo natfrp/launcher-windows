@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Linq;
 using System.Threading;
@@ -50,8 +51,12 @@ namespace SakuraFrpService
                 settings.UpgradeRequired = false;
                 settings.Save();
             }
+
+            // Logging is available right after settings were loaded
+            LogManager = new LogManager(this, 8192);
+
             Natfrp.Token = settings.Token; // Prevent possible token lost
-            Natfrp.BypassProxy = settings.BypassProxy;
+            ApplyBypassProxy(settings.BypassProxy);
 
             AutoLogin = Natfrp.Token != null && Natfrp.Token.Length > 0;
 
@@ -63,10 +68,11 @@ namespace SakuraFrpService
 
             InitializeComponent();
 
-            Pipe = new PipeServer(Utils.InstallationPipeName);
-            Pipe.DataReceived = Pipe_DataReceived;
+            Pipe = new PipeServer(Utils.InstallationPipeName)
+            {
+                DataReceived = Pipe_DataReceived
+            };
 
-            LogManager = new LogManager(this, 8192);
             NodeManager = new NodeManager(this);
             TunnelManager = new TunnelManager(this)
             {
@@ -451,7 +457,10 @@ namespace SakuraFrpService
                     {
                         RemoteManager.Stop();
                     }
-                    Natfrp.BypassProxy = req.DataConfig.BypassProxy;
+                    if (req.DataConfig.BypassProxy != Natfrp.BypassProxy)
+                    {
+                        ApplyBypassProxy(req.DataConfig.BypassProxy);
+                    }
                     TunnelManager.EnableTLS = req.DataConfig.EnableTls;
                     UpdateManager.UpdateInterval = req.DataConfig.UpdateInterval;
                     Save();
@@ -549,5 +558,28 @@ namespace SakuraFrpService
         }
 
         #endregion
+
+        public void ApplyBypassProxy(bool bypass)
+        {
+            Natfrp.BypassProxy = bypass;
+
+            if (bypass)
+            {
+                LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "已绕过系统代理");
+                WebRequest.DefaultWebProxy = null;
+                return;
+            }
+            try
+            {
+                WebRequest.DefaultWebProxy = WebRequest.GetSystemWebProxy();
+            }
+            catch (Exception ex)
+            {
+                Natfrp.BypassProxy = true;
+                WebRequest.DefaultWebProxy = null;
+
+                LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "代理配置异常，启动器将绕过系统代理。\n如果您曾使用加速器类软件，尝试执行 netsh winsock reset 命令或加速器软件中的「修复 LSP」功能进行修复。\n" + ex);
+            }
+        }
     }
 }

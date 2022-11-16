@@ -28,11 +28,6 @@ namespace SakuraFrpService
             request.UserAgent = UserAgent;
             request.AllowAutoRedirect = true;
 
-            if (BypassProxy)
-            {
-                request.Proxy = null;
-            }
-
             return request;
         }
 
