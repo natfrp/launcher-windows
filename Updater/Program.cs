@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.IO.Compression;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace SakuraUpdater
@@ -21,8 +22,9 @@ namespace SakuraUpdater
 
         public static string GetTempPath(string file) => Path.Combine(TempDir, file);
 
-        public static void KillProcess(string name)
+        public static IEnumerable<Process> FindBundleProcess(string name)
         {
+            var result = new List<Process>();
             try
             {
                 var testPath = Path.GetFullPath(name + ".exe");
@@ -34,23 +36,17 @@ namespace SakuraUpdater
                         var sb = new StringBuilder((int)size - 1);
                         if (QueryFullProcessImageName(p.Handle, 0, sb, ref size) && Path.GetFullPath(sb.ToString()) == testPath)
                         {
-                            Console.Write("\t正在结束残留进程 [" + name + "] ...\t");
-                            try
-                            {
-                                p.Kill();
-                                Console.WriteLine(p.WaitForExit(10000) ? "完成" : "失败");
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine("错误: " + e.Message);
-                            }
+                            result.Add(p);
                         }
                     }
                     catch { }
                 }
             }
             catch { }
+            return result;
         }
+
+        public static IEnumerable<Process> FindBundleProcess(params string[] names) => names.SelectMany(n => FindBundleProcess(n));
 
         /// <summary>
         /// 应用程序的主入口点。
@@ -79,17 +75,40 @@ namespace SakuraUpdater
                     throw new Exception("临时目录格式不匹配, 无法执行更新任务");
                 }
 
-                Console.WriteLine("等待启动器彻底退出...");
+                Console.Write("等待启动器彻底退出 ...");
                 Thread.Sleep(1000);
+                Console.WriteLine("完成");
 
-                Console.WriteLine("搜索残留进程...");
-                KillProcess("frpc");
-                KillProcess("SakuraLauncher");
-                KillProcess("LegacyLauncher");
-                KillProcess("SakuraFrpService");
+                for (int i = 0; i < 3; i++)
+                {
+                    Console.Write("搜索残留进程 [" + i + " / 3] ..\t");
 
-                Console.WriteLine("等待资源释放...");
+                    var processes = FindBundleProcess("SakuraLauncher", "LegacyLauncher", "SakuraFrpService", "frpc").ToArray();
+                    if (processes.Length == 0)
+                    {
+                        Console.WriteLine("未发现");
+                        break;
+                    }
+                    Console.WriteLine(processes.Length + " 个进程");
+
+                    foreach (var p in processes)
+                    {
+                        try
+                        {
+                            Console.Write("\t - 正在结束残留进程 " + p.Id + " ...\t");
+                            p.Kill();
+                            Console.WriteLine(p.WaitForExit(10000) ? "完成" : "失败");
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("错误: " + e.Message);
+                        }
+                    }
+                }
+
+                Console.Write("等待资源释放 ...\t");
                 Thread.Sleep(1000);
+                Console.WriteLine("完成");
 
                 var tasks = XDocument.Parse(File.ReadAllText(GetTempPath("tasks.xml"))).Element("tasks").Elements();
                 Console.WriteLine("读取到 " + tasks.Count() + " 个更新任务");
@@ -120,7 +139,7 @@ namespace SakuraUpdater
                                 {
                                     continue;
                                 }
-                                Console.WriteLine("\t解压文件 " + entry.FullName + " ...");
+                                Console.WriteLine("\t - 解压文件 " + entry.FullName + " ...");
                                 Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(target, entry.FullName)));
                                 using (var es = entry.Open())
                                 using (var fs = File.Open(Path.Combine(target, entry.FullName), FileMode.Create))
@@ -142,15 +161,16 @@ namespace SakuraUpdater
                     }
                 }
 
-                Console.WriteLine("清理临时文件 ...");
+                Console.Write("清理临时文件 ...\t");
                 Directory.Delete(TempDir, true);
+                Console.WriteLine("完成");
 
                 Console.WriteLine("更新完成");
             }
             catch (Exception e)
             {
                 Console.WriteLine("更新失败: " + e.ToString());
-                MessageBox.Show(e.ToString(), "更新失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("请重试，若持续看到此提示请下载最新版安装包手动进行更新。\n\n" + e.ToString(), "更新失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
