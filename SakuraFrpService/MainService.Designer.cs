@@ -29,9 +29,10 @@
         private void InitializeComponent()
         {
             // 
-            // Service1
+            // MainService
             // 
-            this.ServiceName = SakuraLibrary.Consts.ServiceName;
+            this.CanShutdown = true;
+            this.ServiceName = "SakuraFrpService";
 
         }
 

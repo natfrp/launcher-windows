@@ -226,7 +226,6 @@ namespace SakuraFrpService
                     }
                     File.WriteAllBytes(Consts.UpdaterExecutable, Properties.Resources.Updater);
                     Process.Start(Consts.UpdaterExecutable, '"' + argv[1] + '"' + (argv.Length >= 3 ? ' ' + argv[2] : ""));
-                    Environment.Exit(0);
                     return 0;
                 }
             }
@@ -246,12 +245,10 @@ namespace SakuraFrpService
                 return -1;
             }
 
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[]
+            ServiceBase.Run(new ServiceBase[]
             {
                 new MainService(false)
-            };
-            ServiceBase.Run(ServicesToRun);
+            });
             return 0;
         }
     }

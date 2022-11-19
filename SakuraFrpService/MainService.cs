@@ -4,6 +4,7 @@ using System.Net;
 using System.Text;
 using System.Linq;
 using System.Threading;
+using System.Windows.Forms;
 using System.ServiceProcess;
 using System.Threading.Tasks;
 
@@ -37,6 +38,8 @@ namespace SakuraFrpService
         public readonly TunnelManager TunnelManager;
         public readonly UpdateManager UpdateManager;
         public readonly RemoteManager RemoteManager;
+
+        public MessagePumpForm MessagePump = null;
 
         protected bool AutoLogin = false;
 
@@ -147,6 +150,8 @@ namespace SakuraFrpService
             {
                 throw new InvalidOperationException();
             }
+            MessagePump = new MessagePumpForm(this);
+
             OnStart(args);
             TickRun();
         }
@@ -299,6 +304,14 @@ namespace SakuraFrpService
                     TickThread.Start();
                 }
                 UpdateManager.Start();
+
+                if (MessagePump != null)
+                {
+                    new Thread(new ThreadStart(() =>Application.Run(MessagePump)))
+                    {
+                        IsBackground = true
+                    }.Start();
+                }
             }
             catch
             {
@@ -314,6 +327,11 @@ namespace SakuraFrpService
             {
                 RequestAdditionalTime(60000);
             }
+            OnShutdown();
+        }
+
+        protected override void OnShutdown()
+        {
             try
             {
                 Pipe.Stop();
@@ -325,8 +343,12 @@ namespace SakuraFrpService
                     TickThread.Abort();
                 }
                 UpdateManager.Stop(true);
+                MessagePump?.Close();
             }
-            catch { }
+            catch (Exception e)
+            {
+                EventLog?.WriteEntry(e.ToString(), System.Diagnostics.EventLogEntryType.Error);
+            }
             LogManager.Stop();
             if (Daemonize)
             {

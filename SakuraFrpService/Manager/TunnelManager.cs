@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -41,11 +43,19 @@ namespace SakuraFrpService.Manager
 
         public string GetArguments(int tunnel) => string.Format("-n -f {0}:{1} --watch {2} --report{3}", Natfrp.Token, tunnel, PID, EnableTLS ? " --natfrp_tls" : "");
 
-        public void StopAllAndClear()
+        public void StopAllAndClear(bool timeout = false)
         {
             lock (this)
             {
-                Parallel.ForEach(Values, t => t.Stop());
+                try
+                {
+                    Parallel.ForEach(Values, new ParallelOptions()
+                    {
+                        MaxDegreeOfParallelism = -1,
+                        CancellationToken = timeout ? new CancellationTokenSource(6000).Token : CancellationToken.None,
+                    }, t => t.Stop());
+                }
+                catch (OperationCanceledException) { }
                 Clear();
             }
         }
@@ -299,7 +309,10 @@ namespace SakuraFrpService.Manager
         public void Stop(bool kill = false)
         {
             AsyncManager.Stop(kill);
-            StopAllAndClear();
+            if (kill)
+            {
+                StopAllAndClear(true);
+            }
         }
 
         #endregion
