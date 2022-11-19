@@ -25,7 +25,11 @@
     WindowStyle="None"
     mc:Ignorable="d">
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="0" ResizeBorderThickness="3" />
+        <WindowChrome
+            CaptionHeight="0"
+            CornerRadius="3"
+            GlassFrameThickness="0"
+            ResizeBorderThickness="3" />
     </WindowChrome.WindowChrome>
     <Window.Resources>
         <LinearGradientBrush x:Key="TabGradientTransparent" StartPoint="0,0" EndPoint="0,0">
