@@ -75,13 +75,13 @@ namespace SakuraUpdater
                     throw new Exception("临时目录格式不匹配, 无法执行更新任务");
                 }
 
-                Console.Write("等待启动器彻底退出 ...");
+                Console.Write("等待启动器彻底退出 ...\t");
                 Thread.Sleep(1000);
                 Console.WriteLine("完成");
 
                 for (int i = 0; i < 3; i++)
                 {
-                    Console.Write("搜索残留进程 [" + i + " / 3] ..\t");
+                    Console.Write("搜索残留进程 [" + (i + 1) + " / 3] ..\t");
 
                     var processes = FindBundleProcess("SakuraLauncher", "LegacyLauncher", "SakuraFrpService", "frpc").ToArray();
                     if (processes.Length == 0)
