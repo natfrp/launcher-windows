@@ -29,7 +29,7 @@ namespace SakuraLauncher.Model
 
         public readonly MainWindow View;
 
-        public LauncherViewModel(MainWindow view)
+        public LauncherViewModel(MainWindow view) : base(false)
         {
             View = view;
             Dispatcher = new DispatcherWrapper(View.Dispatcher.Invoke, a => View.Dispatcher.BeginInvoke(a), View.Dispatcher.CheckAccess);

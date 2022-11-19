@@ -116,7 +116,7 @@ namespace SakuraLibrary.Pipe
                 var pipe = ar.AsyncState as PipeStream;
                 var count = pipe.EndRead(ar);
 
-                if (!pipe.IsConnected || PushPipe == null)
+                if (count == 0 || !pipe.IsConnected || PushPipe == null)
                 {
                     Dispose();
                     return;

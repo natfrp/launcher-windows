@@ -164,7 +164,7 @@ namespace SakuraLibrary.Pipe
                 return;
             }
 
-            if (!Running)
+            if (!Running || count == 0 || !conn.Pipe.IsConnected)
             {
                 return;
             }
