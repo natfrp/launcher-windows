@@ -150,7 +150,6 @@ namespace SakuraFrpService
             {
                 throw new InvalidOperationException();
             }
-            MessagePump = new MessagePumpForm(this);
 
             OnStart(args);
             TickRun();
@@ -305,9 +304,14 @@ namespace SakuraFrpService
                 }
                 UpdateManager.Start();
 
-                if (MessagePump != null)
+                if (Daemonize)
                 {
-                    new Thread(new ThreadStart(() =>Application.Run(MessagePump)))
+                    new Thread(new ThreadStart(() =>
+                    {
+                        MessagePump?.Close();
+                        MessagePump = new MessagePumpForm(this);
+                        Application.Run(MessagePump);
+                    }))
                     {
                         IsBackground = true
                     }.Start();
