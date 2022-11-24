@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Text;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-
-using Newtonsoft.Json;
 
 namespace SakuraFrpService
 {
@@ -16,7 +15,12 @@ namespace SakuraFrpService
 
         public static string Token = "";
         public static string Endpoint = "https://api.natfrp.com/launcher/";
+
+#if DEBUG
+        public static string UserAgent = "SakuraFrpService/" + Assembly.GetExecutingAssembly().GetName().Version + "-DEBUG";
+#else
         public static string UserAgent = "SakuraFrpService/" + Assembly.GetExecutingAssembly().GetName().Version;
+#endif
 
         public static HttpWebRequest CreateRequest(string url)
         {
