@@ -1,8 +1,10 @@
-﻿using SakuraLauncher.Model;
+﻿using SakuraLauncher.Helper;
+using SakuraLauncher.Model;
 using SakuraLibrary;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace SakuraLauncher.View
 {
@@ -12,11 +14,15 @@ namespace SakuraLauncher.View
     public partial class SettingsTab : UserControl
     {
         private readonly LauncherViewModel Model;
+        private readonly TouchScrollHelper scrollHelper;
 
         public SettingsTab(LauncherViewModel main)
         {
             InitializeComponent();
+            scrollHelper = new TouchScrollHelper(scrollViewer);
+
             DataContext = Model = main;
+
             Model.PropertyChanged += (s, e) =>
             {
                 if (Model.CheckingUpdate && e.PropertyName == nameof(Model.Update))
@@ -59,6 +65,14 @@ namespace SakuraLauncher.View
             UseShellExecute = true,
             Verb = "open"
         });
+
+        private void Hint_TouchUp(object sender, TouchEventArgs e)
+        {
+            if ((sender as FrameworkElement)?.ToolTip is string tooltip)
+            {
+                Model.SnackMessageQueue.Enqueue(tooltip);
+            }
+        }
 
         private void Save(object sender, RoutedEventArgs e) => Model.Save();
     }

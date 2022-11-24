@@ -14,6 +14,7 @@
     d:DesignWidth="900"
     mc:Ignorable="d">
     <ScrollViewer
+        x:Name="scrollViewer"
         HorizontalScrollBarVisibility="Disabled"
         IsEnabled="{Binding LoggedIn}"
         PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"

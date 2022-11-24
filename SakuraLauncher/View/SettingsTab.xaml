@@ -8,7 +8,10 @@
     d:DesignHeight="600"
     d:DesignWidth="580"
     mc:Ignorable="d">
-    <ScrollViewer UseLayoutRounding="True" VerticalScrollBarVisibility="Auto">
+    <ScrollViewer
+        x:Name="scrollViewer"
+        UseLayoutRounding="True"
+        VerticalScrollBarVisibility="Auto">
         <ScrollViewer.Template>
             <ControlTemplate TargetType="{x:Type ScrollViewer}">
                 <Grid x:Name="Grid" Background="{TemplateBinding Background}">
@@ -194,7 +197,8 @@
                     FontSize="16"
                     Foreground="#DDFFFFFF"
                     ToolTip="守护进程模式下必须启用此选项来实现隧道自启"
-                    ToolTipService.InitialShowDelay="0">
+                    ToolTipService.InitialShowDelay="0"
+                    TouchUp="Hint_TouchUp">
                     <materialDesign:PackIcon
                         Foreground="White"
                         Kind="HelpCircleOutline"
@@ -232,7 +236,8 @@
                     FontSize="16"
                     Foreground="#DDFFFFFF"
                     ToolTip="在右下角弹出隧道状态变更通知"
-                    ToolTipService.InitialShowDelay="0">
+                    ToolTipService.InitialShowDelay="0"
+                    TouchUp="Hint_TouchUp">
                     <materialDesign:PackIcon
                         Foreground="White"
                         Kind="HelpCircleOutline"
@@ -273,7 +278,8 @@
                     FontSize="16"
                     Foreground="#DDFFFFFF"
                     ToolTip="更换后需要重启启动器才能生效"
-                    ToolTipService.InitialShowDelay="0">
+                    ToolTipService.InitialShowDelay="0"
+                    TouchUp="Hint_TouchUp">
                     <materialDesign:PackIcon
                         Foreground="White"
                         Kind="HelpCircleOutline"
@@ -313,7 +319,8 @@
                     FontSize="16"
                     Foreground="#DDFFFFFF"
                     ToolTip="请求 SakuraFrp API 时绕过系统代理"
-                    ToolTipService.InitialShowDelay="0">
+                    ToolTipService.InitialShowDelay="0"
+                    TouchUp="Hint_TouchUp">
                     <materialDesign:PackIcon
                         Foreground="White"
                         Kind="HelpCircleOutline"
@@ -343,7 +350,8 @@
                     FontSize="16"
                     Foreground="#DDFFFFFF"
                     ToolTip="启用后会在后台自动检查并下载更新, 安装更新前需手动确认"
-                    ToolTipService.InitialShowDelay="0">
+                    ToolTipService.InitialShowDelay="0"
+                    TouchUp="Hint_TouchUp">
                     <materialDesign:PackIcon
                         Foreground="White"
                         Kind="HelpCircleOutline"
@@ -402,7 +410,8 @@
                         FontSize="16"
                         Foreground="#DDFFFFFF"
                         ToolTip="修改前请仔细阅读帮助文档, 如果您不清楚这些功能的作用, 请不要进行任何修改"
-                        ToolTipService.InitialShowDelay="0">
+                        ToolTipService.InitialShowDelay="0"
+                        TouchUp="Hint_TouchUp">
                         <materialDesign:PackIcon
                             Foreground="White"
                             Kind="WarningOutline"
@@ -433,7 +442,8 @@
                     FontSize="16"
                     Foreground="#DDFFFFFF"
                     ToolTip="使 frpc 全程使用 TLS 加密流量, 将有效增大 CPU 占用并显著提高延迟"
-                    ToolTipService.InitialShowDelay="0">
+                    ToolTipService.InitialShowDelay="0"
+                    TouchUp="Hint_TouchUp">
                     <materialDesign:PackIcon
                         Foreground="White"
                         Kind="HelpCircleOutline"
@@ -462,7 +472,8 @@
                     FontSize="16"
                     Foreground="#DDFFFFFF"
                     ToolTip="通过 Sakura Frp 管理启动器, 该功能由端到端加密保护, 启用前需先设置密码"
-                    ToolTipService.InitialShowDelay="0">
+                    ToolTipService.InitialShowDelay="0"
+                    TouchUp="Hint_TouchUp">
                     <materialDesign:PackIcon
                         Foreground="White"
                         Kind="HelpCircleOutline"

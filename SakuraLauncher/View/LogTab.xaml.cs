@@ -1,4 +1,5 @@
-﻿using SakuraLauncher.Model;
+﻿using SakuraLauncher.Helper;
+using SakuraLauncher.Model;
 using SakuraLibrary.Proto;
 using System;
 using System.IO;
@@ -15,6 +16,7 @@ namespace SakuraLauncher.View
     public partial class LogTab : UserControl
     {
         private readonly LauncherViewModel Model;
+        private readonly TouchScrollHelper scrollHelper = new TouchScrollHelper();
 
         private bool AutoScroll = true;
 
@@ -68,5 +70,7 @@ namespace SakuraLauncher.View
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => Model.LogsView.Refresh();
+
+        private void ScrollViewer_Loaded(object sender, RoutedEventArgs e) => scrollHelper.AttachTo(sender as ScrollViewer);
     }
 }

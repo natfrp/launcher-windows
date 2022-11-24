@@ -33,7 +33,7 @@
             Background="#33000000"
             BorderBrush="#FFAAAAAA"
             BorderThickness="2">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ScrollViewer x:Name="scrollViewer" VerticalScrollBarVisibility="Auto">
                 <Helper:SelectableTextBlock
                     FontFamily="Consolas"
                     Text="{Binding License, Mode=OneTime}"

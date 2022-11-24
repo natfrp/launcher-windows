@@ -1,4 +1,5 @@
-﻿using SakuraLauncher.Model;
+﻿using SakuraLauncher.Helper;
+using SakuraLauncher.Model;
 using System.Windows.Controls;
 
 namespace SakuraLauncher.View
@@ -8,9 +9,13 @@ namespace SakuraLauncher.View
     /// </summary>
     public partial class AboutTab : UserControl
     {
+        private readonly TouchScrollHelper scrollHelper;
+
         public AboutTab(LauncherViewModel model)
         {
             InitializeComponent();
+            scrollHelper = new TouchScrollHelper(scrollViewer);
+
             DataContext = new AboutModel(model);
         }
     }

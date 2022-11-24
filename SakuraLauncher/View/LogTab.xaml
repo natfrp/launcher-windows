@@ -88,7 +88,10 @@
                 </ItemsControl.Resources>
                 <ItemsControl.Template>
                     <ControlTemplate>
-                        <ScrollViewer CanContentScroll="True" ScrollChanged="ScrollViewer_ScrollChanged">
+                        <ScrollViewer
+                            CanContentScroll="True"
+                            Loaded="ScrollViewer_Loaded"
+                            ScrollChanged="ScrollViewer_ScrollChanged">
                             <ScrollViewer.Resources>
                                 <Style TargetType="Rectangle">
                                     <Setter Property="Opacity" Value="0.2" />

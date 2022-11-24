@@ -395,6 +395,7 @@
                         未连接到守护进程, 大部分功能将不可用, 请尝试重启启动器
                     </TextBlock>
                 </Border>
+                <materialDesign:Snackbar MessageQueue="{Binding SnackMessageQueue}" />
             </Grid>
         </Border>
         <tb:TaskbarIcon

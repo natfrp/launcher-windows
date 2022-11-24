@@ -4,16 +4,20 @@ using System.Windows.Controls;
 using SakuraLibrary.Model;
 
 using SakuraLauncher.Model;
+using SakuraLauncher.Helper;
 
 namespace SakuraLauncher.View
 {
     public partial class TunnelTab : UserControl
     {
         private readonly LauncherViewModel Model;
+        private readonly TouchScrollHelper scrollHelper;
 
         public TunnelTab(LauncherViewModel main)
         {
             InitializeComponent();
+            scrollHelper = new TouchScrollHelper(scrollViewer);
+
             DataContext = Model = main;
         }
 

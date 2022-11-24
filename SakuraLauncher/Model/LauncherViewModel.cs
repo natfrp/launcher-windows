@@ -9,6 +9,7 @@ using SakuraLibrary;
 using SakuraLibrary.Model;
 using SakuraLibrary.Proto;
 using SakuraLibrary.Helper;
+using MaterialDesignThemes.Wpf;
 
 using SakuraLauncher.Helper;
 
@@ -90,6 +91,8 @@ namespace SakuraLauncher.Model
         }
 
         #region Generic Properties
+
+        public SnackbarMessageQueue SnackMessageQueue { get; } = new SnackbarMessageQueue();
 
         public bool AutoRun
         {
