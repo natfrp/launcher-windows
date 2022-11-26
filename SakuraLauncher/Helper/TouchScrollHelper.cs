@@ -11,17 +11,25 @@ namespace SakuraLauncher.Helper
 
         public TouchScrollHelper() { }
 
-        public TouchScrollHelper(ScrollViewer view) => AttachTo(view);
+        public TouchScrollHelper(ScrollViewer view) => AttachTo(view, false);
 
-        public void AttachTo(ScrollViewer view)
+        public void AttachTo(ScrollViewer view, bool autoDetach = true)
         {
             Detach();
 
+            if (view == null)
+            {
+                return;
+            }
             this.view = view;
 
             view.PreviewTouchDown += OnPreviewTouchDown;
             view.PreviewTouchMove += OnPreviewTouchMove;
-            view.Unloaded += View_Unloaded;
+
+            if (autoDetach)
+            {
+                view.Unloaded += View_Unloaded;
+            }
         }
 
         public void Detach()
@@ -36,9 +44,9 @@ namespace SakuraLauncher.Helper
             }
         }
 
-        private void View_Unloaded(object sender, RoutedEventArgs e) => Detach();
+        public void View_Unloaded(object sender, RoutedEventArgs e) => Detach();
 
-        void OnPreviewTouchDown(object sender, TouchEventArgs e)
+        public void OnPreviewTouchDown(object sender, TouchEventArgs e)
         {
             if (sender is IInputElement s)
             {
@@ -46,7 +54,7 @@ namespace SakuraLauncher.Helper
             }
         }
 
-        void OnPreviewTouchMove(object sender, TouchEventArgs e)
+        public void OnPreviewTouchMove(object sender, TouchEventArgs e)
         {
             if (sender is ScrollViewer s)
             {
