@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Text;
-using System.Security.AccessControl;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
+using System.Text;
 
 namespace SakuraLibrary
 {
@@ -33,9 +33,52 @@ namespace SakuraLibrary
         public IntPtr dacl;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RECT
+    {
+        public int Left, Top, Right, Bottom;
+
+        public RECT(int left, int top, int right, int bottom)
+        {
+            Left = left;
+            Top = top;
+            Right = right;
+            Bottom = bottom;
+        }
+
+        public int X
+        {
+            get { return Left; }
+            set { Right -= (Left - value); Left = value; }
+        }
+
+        public int Y
+        {
+            get { return Top; }
+            set { Bottom -= (Top - value); Top = value; }
+        }
+
+        public int Height
+        {
+            get { return Bottom - Top; }
+            set { Bottom = value + Top; }
+        }
+
+        public int Width
+        {
+            get { return Right - Left; }
+            set { Right = value + Left; }
+        }
+    }
+
+    public enum WindowsMessages : int
+    {
+        WM_SIZING = 0x214,
+    }
+
     public enum SystemMetric : int
     {
-        SM_REMOTESESSION = 0x1000
+        SM_REMOTESESSION = 0x1000,
     }
 
     public static class NTAPI

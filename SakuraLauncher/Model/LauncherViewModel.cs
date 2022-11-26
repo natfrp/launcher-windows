@@ -51,6 +51,7 @@ namespace SakuraLauncher.Model
             Theme = settings.Theme;
             LogTextWrapping = settings.LogTextWrapping;
             NotificationMode = settings.NotificationMode;
+            AlignWidth = settings.AlignWidth;
 
             LogsView.Filter += e =>
             {
@@ -76,6 +77,7 @@ namespace SakuraLauncher.Model
             settings.Theme = Theme;
             settings.LogTextWrapping = LogTextWrapping;
             settings.NotificationMode = NotificationMode;
+            settings.AlignWidth = AlignWidth;
 
             settings.Save();
         }
@@ -125,6 +127,9 @@ namespace SakuraLauncher.Model
 
         public int Theme { get => _theme; set => Set(out _theme, value); }
         private int _theme;
+
+        public bool AlignWidth { get => _alignWidth; set => Set(out _alignWidth, value); }
+        private bool _alignWidth;
 
         public ICollectionView TunnelsView => CollectionViewSource.GetDefaultView(Tunnels);
 

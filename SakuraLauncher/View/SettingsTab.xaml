@@ -213,6 +213,22 @@
                 Height="32"
                 Margin="12,4,16,0"
                 Orientation="Horizontal">
+                <ToggleButton
+                    Checked="Save"
+                    IsChecked="{Binding AlignWidth}"
+                    Unchecked="Save" />
+                <TextBlock
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
+                    窗口宽度对齐隧道卡片
+                </TextBlock>
+            </StackPanel>
+            <StackPanel
+                Height="32"
+                Margin="12,4,16,0"
+                Orientation="Horizontal">
                 <TextBlock
                     VerticalAlignment="Center"
                     FontSize="16"

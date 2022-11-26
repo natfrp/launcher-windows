@@ -6,6 +6,7 @@ using System.Windows.Interop;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Animation;
+using System.Runtime.InteropServices;
 
 using SakuraLibrary;
 
@@ -20,6 +21,8 @@ namespace SakuraLauncher
     public partial class MainWindow : Window
     {
         public readonly LauncherViewModel Model;
+
+        private int SideWidth = 180 + (int)SystemParameters.VerticalScrollBarWidth + 8 * 2, CardWidth = 256 + 16 * 2;
 
         public UserControl[] Tabs = null;
 
@@ -55,6 +58,8 @@ namespace SakuraLauncher
             }
         }
 
+        private int GetAlignedWidth(double width) => (int)Math.Max(Math.Round((width - SideWidth) / CardWidth), 2) * CardWidth + SideWidth;
+
         private void TrayIcon_TrayLeftMouseUp(object sender, RoutedEventArgs e)
         {
             Show();
@@ -63,6 +68,32 @@ namespace SakuraLauncher
         }
 
         #region Window Events
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            var source = HwndSource.FromHwnd(new WindowInteropHelper(this).Handle);
+            var scaleFactor = source.CompositionTarget.TransformToDevice.M11;
+
+            if (Model.AlignWidth)
+            {
+                Width = GetAlignedWidth(Width); // DPI-irrelevant
+            }
+            SideWidth = (int)Math.Ceiling((180 + SystemParameters.VerticalScrollBarWidth + 8 * 2) * scaleFactor);
+            CardWidth = (int)Math.Ceiling((256 + 16 * 2) * scaleFactor);
+
+            source.AddHook((IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
+            {
+                if (Model.AlignWidth && msg == (int)WindowsMessages.WM_SIZING)
+                {
+                    var rect = Marshal.PtrToStructure<RECT>(lParam);
+                    rect.Width = GetAlignedWidth(rect.Width);
+                    Marshal.StructureToPtr(rect, lParam, false);
+
+                    handled = true;
+                }
+                return IntPtr.Zero;
+            });
+        }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {

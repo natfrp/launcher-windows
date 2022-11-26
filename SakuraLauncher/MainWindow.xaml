@@ -14,6 +14,7 @@
     AllowsTransparency="True"
     Background="Transparent"
     Closing="Window_Closing"
+    Loaded="Window_Loaded"
     MouseDown="Window_MouseDown"
     ResizeMode="CanResize"
     SizeChanged="Window_SizeChanged"
