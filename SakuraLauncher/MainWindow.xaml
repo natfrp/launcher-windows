@@ -14,6 +14,7 @@
     AllowsTransparency="True"
     Background="Transparent"
     Closing="Window_Closing"
+    DpiChanged="Window_DpiChanged"
     Loaded="Window_Loaded"
     MouseDown="Window_MouseDown"
     ResizeMode="CanResize"
@@ -30,7 +31,7 @@
             CaptionHeight="0"
             CornerRadius="3"
             GlassFrameThickness="0"
-            ResizeBorderThickness="3" />
+            ResizeBorderThickness="5,5,3,3" />
     </WindowChrome.WindowChrome>
     <Window.Resources>
         <LinearGradientBrush x:Key="TabGradientTransparent" StartPoint="0,0" EndPoint="0,0">
@@ -396,9 +397,9 @@
                         未连接到守护进程, 大部分功能将不可用, 请尝试重启启动器
                     </TextBlock>
                 </Border>
-                <materialDesign:Snackbar MessageQueue="{Binding SnackMessageQueue}" />
             </Grid>
         </Border>
+        <materialDesign:Snackbar Grid.ColumnSpan="2" MessageQueue="{Binding SnackMessageQueue}" />
         <tb:TaskbarIcon
             x:Name="trayIcon"
             ContextMenu="{StaticResource TrayMenu}"

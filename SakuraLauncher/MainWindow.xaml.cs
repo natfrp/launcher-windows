@@ -21,8 +21,9 @@ namespace SakuraLauncher
     public partial class MainWindow : Window
     {
         public readonly LauncherViewModel Model;
-
-        private int SideWidth = 180 + (int)SystemParameters.VerticalScrollBarWidth + 8 * 2, CardWidth = 256 + 16 * 2;
+        
+        public double ScaleFactor = 1;
+        public readonly int SideWidth = 180 + (int)Math.Ceiling(SystemParameters.VerticalScrollBarWidth) + 8 * 2, CardWidth = 256 + 16 * 2;
 
         public UserControl[] Tabs = null;
 
@@ -58,7 +59,11 @@ namespace SakuraLauncher
             }
         }
 
-        private int GetAlignedWidth(double width) => (int)Math.Max(Math.Round((width - SideWidth) / CardWidth), 2) * CardWidth + SideWidth;
+        private int GetAlignedWidth(double width)
+        {
+            double side = SideWidth * ScaleFactor, card = CardWidth * ScaleFactor;
+            return (int)(Math.Max(Math.Round((width - side) / card), 2) * card + side);
+        }
 
         private void TrayIcon_TrayLeftMouseUp(object sender, RoutedEventArgs e)
         {
@@ -72,14 +77,13 @@ namespace SakuraLauncher
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             var source = HwndSource.FromHwnd(new WindowInteropHelper(this).Handle);
-            var scaleFactor = source.CompositionTarget.TransformToDevice.M11;
 
             if (Model.AlignWidth)
             {
+                ScaleFactor = 1;
                 Width = GetAlignedWidth(Width); // DPI-irrelevant
             }
-            SideWidth = (int)Math.Ceiling((180 + SystemParameters.VerticalScrollBarWidth + 8 * 2) * scaleFactor);
-            CardWidth = (int)Math.Ceiling((256 + 16 * 2) * scaleFactor);
+            ScaleFactor = source.CompositionTarget.TransformToDevice.M11;
 
             source.AddHook((IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
             {
@@ -94,6 +98,8 @@ namespace SakuraLauncher
                 return IntPtr.Zero;
             });
         }
+
+        private void Window_DpiChanged(object sender, DpiChangedEventArgs e) => ScaleFactor = e.NewDpi.DpiScaleX;
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
