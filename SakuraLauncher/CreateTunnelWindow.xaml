@@ -63,6 +63,7 @@
                     <StackPanel>
                         <ListView
                             Name="listening"
+                            materialDesign:DataGridAssist.ColumnHeaderPadding="8,6"
                             ItemsSource="{Binding Listening, Mode=OneWay}"
                             SelectionChanged="Listening_SelectionChanged"
                             SelectionMode="Single">
