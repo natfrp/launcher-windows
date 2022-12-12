@@ -1,19 +1,19 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Xml.Linq;
-using System.Threading;
-using System.Reflection;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Runtime.InteropServices;
-
-using SakuraLibrary;
-using SakuraLibrary.Proto;
+﻿using SakuraLibrary;
 using SakuraLibrary.Helper;
+using SakuraLibrary.Proto;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SakuraFrpService.Manager
 {
@@ -169,18 +169,13 @@ namespace SakuraFrpService.Manager
             }
         }
 
-        public void EmptyTempPath()
+        public void Cleanup()
         {
             try
             {
-                var dir = new DirectoryInfo(TempDir);
-                foreach (var f in dir.GetFiles())
+                if (Directory.Exists(TempDir))
                 {
-                    f.Delete();
-                }
-                foreach (var d in dir.GetDirectories())
-                {
-                    d.Delete(true);
+                    Directory.Delete(TempDir, true);
                 }
             }
             catch { }
@@ -192,9 +187,8 @@ namespace SakuraFrpService.Manager
             DataUpdate = Status
         });
 
-        private async Task<UpdateStatus> CheckUpdate()
+        private async Task CheckUpdate()
         {
-            AbortDownload();
             var result = await Natfrp.Request<Natfrp.GetVersion>("get_version");
             lock (this)
             {
@@ -222,6 +216,7 @@ namespace SakuraFrpService.Manager
                     CurrentVersionService = ServiceVersion.ToString(),
                     CurrentVersionFrpc = FrpcVersionFull,
                 };
+
                 if (Status.UpdateAvailable)
                 {
                     try
@@ -238,10 +233,7 @@ namespace SakuraFrpService.Manager
                     }
                 }
 
-                LastCheck = DateTime.Now;
                 PushStatus();
-
-                return Status;
             }
         }
 
@@ -249,13 +241,7 @@ namespace SakuraFrpService.Manager
         {
             try
             {
-                Directory.CreateDirectory(TempDir);
-                EmptyTempPath();
-
-                var query = new List<string>()
-                {
-                    "xml"
-                };
+                var query = new List<string>() { "xml" };
                 lock (this)
                 {
                     if (UpdateLauncher)
@@ -279,12 +265,20 @@ namespace SakuraFrpService.Manager
                     }
                 }
 
+                Directory.CreateDirectory(TempDir);
+
                 XDocument xml;
                 using (var ms = Natfrp.Request("get_version", string.Join("&", query)).WaitResult())
                 {
                     var tmp = ms.ToArray();
                     File.WriteAllBytes(GetTempPath("tasks.xml"), tmp);
                     xml = XDocument.Parse(Encoding.UTF8.GetString(tmp));
+                }
+
+                var tasks = xml.Element("tasks").Elements();
+                if (tasks.Count() == 0)
+                {
+                    throw new Exception("没有可下载的更新文件");
                 }
 
                 lock (this)
@@ -296,8 +290,7 @@ namespace SakuraFrpService.Manager
                     }
                 }
 
-                Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "开始下载更新, 临时目录: " + TempDir);
-                foreach (var task in xml.Element("tasks").Elements())
+                foreach (var task in tasks)
                 {
                     int tries = 3;
                     uint previous_progress = Status.DownloadCurrent;
@@ -330,7 +323,7 @@ namespace SakuraFrpService.Manager
                             File.Delete(target);
                         }
 
-                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "开始下载: " + url);
+                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_INFO, Tag, "开始下载更新: " + url);
 
                         var request = Natfrp.CreateRequest(task.Attribute("url").Value);
                         using (var fs = File.OpenWrite(target))
@@ -384,7 +377,7 @@ namespace SakuraFrpService.Manager
             }
             catch (Exception e)
             {
-                EmptyTempPath();
+                Cleanup();
                 lock (this)
                 {
                     Status.UpdateReadyDir = "";
@@ -394,7 +387,7 @@ namespace SakuraFrpService.Manager
                     }
                     else
                     {
-                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "下载失败: " + e.ToString());
+                        Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "下载失败: " + e);
                         Status.UpdateAvailable = false;
                     }
                     PushStatus();
@@ -420,15 +413,21 @@ namespace SakuraFrpService.Manager
                             continue;
                         }
                     }
-                    CheckUpdate().WaitResult();
+
+                    AbortDownload();
+                    LastCheck = DateTime.Now;
+
+                    CheckUpdate().Wait();
                 }
                 catch (AggregateException e) when (e.InnerExceptions.Count == 1)
                 {
-                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "更新检查失败, " + e.InnerExceptions[0].ToString());
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "更新检查失败: " + e.InnerExceptions[0]);
+                    PushStatus();
                 }
                 catch (Exception e)
                 {
-                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, e.ToString());
+                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "更新检查失败: " + e);
+                    PushStatus();
                 }
             }
             while (!AsyncManager.StopEvent.WaitOne(1000));

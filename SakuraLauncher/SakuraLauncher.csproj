@@ -116,9 +116,6 @@
     <Compile Include="View\AboutTab.xaml.cs">
       <DependentUpon>AboutTab.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\CreateTunnelTab.xaml.cs">
-      <DependentUpon>CreateTunnelTab.xaml</DependentUpon>
-    </Compile>
     <Compile Include="View\TunnelTab.xaml.cs">
       <DependentUpon>TunnelTab.xaml</DependentUpon>
     </Compile>
@@ -178,10 +175,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\AboutTab.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="View\CreateTunnelTab.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
