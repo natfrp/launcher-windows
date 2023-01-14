@@ -12,4 +12,4 @@ SakuraFrp 的 Windows 启动器, 提供了便捷的隧道操作功能和自启�
 
 ### 使用指南
 
-请参阅 [启动器使用教程](https://doc.natfrp.com/#/launcher/usage)
+请参阅 [启动器使用教程](https://doc.natfrp.com/launcher/usage.html)
