@@ -163,6 +163,7 @@ namespace SakuraFrpService.Manager
                 try
                 {
                     DownloadThread?.Abort();
+                    DownloadThread?.Join(200);
                 }
                 catch { }
                 DownloadThread = null;
@@ -205,7 +206,7 @@ namespace SakuraFrpService.Manager
                     note.Add(string.Format("frpc v{0}:\n{1}", result.Frpc.Version, result.Frpc.Note));
                 }
 
-                Status = new UpdateStatus
+                var status = new UpdateStatus
                 {
                     UpdateAvailable = UpdateFrpc || UpdateLauncher,
                     UpdateReadyDir = "",
@@ -217,8 +218,10 @@ namespace SakuraFrpService.Manager
                     CurrentVersionFrpc = FrpcVersionFull,
                 };
 
-                if (Status.UpdateAvailable)
+                if (status.UpdateAvailable)
                 {
+                    AbortDownload();
+                    Status = status;
                     try
                     {
                         DownloadThread = new Thread(new ThreadStart(DownloadUpdate))
@@ -231,6 +234,10 @@ namespace SakuraFrpService.Manager
                     {
                         Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, "UpdateManager", e.ToString());
                     }
+                }
+                else
+                {
+                    Status = status;
                 }
 
                 PushStatus();
@@ -332,6 +339,7 @@ namespace SakuraFrpService.Manager
                             if (response.StatusCode != HttpStatusCode.OK)
                             {
                                 Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "下载失败: HTTP 状态异常, " + response.StatusCode);
+                                Thread.Sleep(10000);
                                 continue;
                             }
                             using (var ws = response.GetResponseStream())
@@ -358,7 +366,7 @@ namespace SakuraFrpService.Manager
                                 var test = BitConverter.ToString(hasher.Hash).Replace("-", "").ToLower();
                                 if (test != hash)
                                 {
-                                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "下载失败: Hash 不匹配 [" + test + "!=" + hash + "]");
+                                    Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "下载失败: Hash 不匹配 [R:" + test + " != E:" + hash + "]");
                                     continue;
                                 }
 
@@ -377,7 +385,6 @@ namespace SakuraFrpService.Manager
             }
             catch (Exception e)
             {
-                Cleanup();
                 lock (this)
                 {
                     Status.UpdateReadyDir = "";
@@ -387,6 +394,7 @@ namespace SakuraFrpService.Manager
                     }
                     else
                     {
+                        Cleanup();
                         Main.LogManager.Log(LogManager.CATEGORY_SERVICE_ERROR, Tag, "下载失败: " + e);
                         Status.UpdateAvailable = false;
                     }
@@ -413,10 +421,8 @@ namespace SakuraFrpService.Manager
                             continue;
                         }
                     }
-
-                    AbortDownload();
+                    
                     LastCheck = DateTime.Now;
-
                     CheckUpdate().Wait();
                 }
                 catch (AggregateException e) when (e.InnerExceptions.Count == 1)
