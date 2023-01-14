@@ -2,6 +2,7 @@
 using SakuraLauncher.Model;
 using SakuraLibrary;
 using System.Diagnostics;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -53,6 +54,17 @@ namespace SakuraLauncher.View
                 return;
             }
             Model.RequestLogin(Model.SimpleFailureHandler);
+        }
+
+        private void ButtonRefreshNodes_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            btn.IsEnabled = false;
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                Model.SnackMessageQueue.Enqueue($"节点列表刷新{(Model.SyncNodes(true) ? "成功" : "失败")}");
+                Dispatcher.Invoke(() => btn.IsEnabled = true);
+            });
         }
 
         private void ButtonSwitchMode_Click(object sender, RoutedEventArgs e) => Model.SwitchWorkingMode(Model.SimpleHandler, Model.SimpleConfirmHandler);

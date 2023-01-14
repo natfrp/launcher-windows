@@ -119,8 +119,15 @@ namespace SakuraLibrary.Model
             return update.Success;
         }
 
-        public bool SyncNodes()
+        public bool SyncNodes(bool reload = false)
         {
+            if (reload)
+            {
+                if (!Pipe.Request(MessageID.NodeReload).Success)
+                {
+                    return false;
+                }
+            }
             var nodes = Pipe.Request(MessageID.NodeList);
             if (nodes.Success)
             {
@@ -377,7 +384,7 @@ namespace SakuraLibrary.Model
 
         #region Settings - Service
 
-        public ServiceConfig Config { get => _config; 
+        public ServiceConfig Config { get => _config;
             set => SafeSet(out _config, value); }
         private ServiceConfig _config;
 

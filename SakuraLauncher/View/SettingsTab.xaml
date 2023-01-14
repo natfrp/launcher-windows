@@ -110,6 +110,22 @@
                 </StackPanel>
                 <Button
                     Margin="16,0,0,0"
+                    Click="ButtonRefreshNodes_Click"
+                    IsEnabled="{Binding Connected}">
+                    <Button.Resources>
+                        <Style BasedOn="{StaticResource MaterialDesignFlatButton}" TargetType="Button">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding LoggedIn}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Resources>
+                    刷新节点列表
+                </Button>
+                <Button
+                    Margin="16,0,0,0"
                     Click="ButtonLogin_Click"
                     IsEnabled="{Binding Connected}">
                     <Button.Resources>
