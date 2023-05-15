@@ -14,7 +14,7 @@ namespace SakuraFrpService
         public static bool BypassProxy = false;
 
         public static string Token = "";
-        public static string Endpoint = "https://api.natfrp.com/launcher/";
+        public static string Endpoint = "https://natfrp-api.globalslb.net/launcher/";
 
 #if DEBUG
         public static string UserAgent = "SakuraFrpService/" + Assembly.GetExecutingAssembly().GetName().Version + "-DEBUG";
