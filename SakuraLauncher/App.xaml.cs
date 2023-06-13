@@ -30,6 +30,11 @@ namespace SakuraLauncher
             Utils.VerifySignature(Utils.LibraryPath, Utils.ExecutablePath, Path.GetFullPath(Consts.ServiceExecutable));
             Utils.ValidateSettings();
 
+            var tmp = Path.Combine(Consts.WorkingDirectory, "Temp");
+            Environment.SetEnvironmentVariable("TEMP", tmp);
+            Environment.SetEnvironmentVariable("TMP", tmp);
+            Directory.CreateDirectory(tmp);
+
             var minimize = false;
             foreach (var a in e.Args)
             {
