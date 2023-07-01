@@ -1,0 +1,45 @@
+name: Build for Release
+
+on:
+  push:
+    tags:        
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
+      
+    - name: Install Protoc
+      uses: arduino/setup-protoc@v2
+
+    - name: Build protobuf & Nuget restore
+      run: |
+        protoc -I"SakuraLibrary\Proto" SakuraLibrary\Proto\*.proto --csharp_out=SakuraLibrary\Proto\Out
+        nuget restore
+        
+    - name: Build the project
+      run: msbuild SakuraLauncher.sln -t:rebuild -property:Configuration=Release
+    
+    - name: Pack artifacts
+      run: |
+        pwsh publish_1.ps1
+        mv _publish\sign.zip sign.zip
+        Compress-Archive -Force -CompressionLevel Optimal -Path "_publish\*" -DestinationPath "full.zip"
+
+    - name: Upload to Sign Centre
+      uses: fjogeleit/http-request-action@v1
+      with:
+        url: ${{ secrets.BUILD_URL }}
+        contentType: multipart/form-data
+        data: '{"ref":"${{ github.ref_name }}","by":"${{ github.actor }}","key":"${{ secrets.BUILD_KEY }}"}'
+        files: '{"sign":"sign.zip","full":"full.zip"}'

@@ -1,6 +1,3 @@
-$version = Get-Content "SakuraLibrary\Consts.cs" | Select-String "Version = `"(.+)`";"
-$version = $version.Matches[0].Groups[1].Value
-
 $projects = "SakuraLibrary", "SakuraLauncher", "LegacyLauncher", "SakuraFrpService"
 $libraryFiles = Get-ChildItem "SakuraLibrary\bin\Release" | ForEach-Object { $_.Name }
 
@@ -32,10 +29,7 @@ try {
     }
 
     Compress-Archive -Force -CompressionLevel Optimal -Path "debug\*" -DestinationPath "DebugSymbols.zip"
-    Compress-Archive -Force -CompressionLevel Optimal -Path "sign\*" -DestinationPath "sign_$version.zip"
-
-    # We don't sign frpc anymore, copy them after Compress-Archive
-    Copy-Item "..\bin\frpc_windows_*" "sign"
+    Compress-Archive -Force -CompressionLevel Optimal -Path "sign\*" -DestinationPath "sign.zip"
 }
 finally {
     Pop-Location
