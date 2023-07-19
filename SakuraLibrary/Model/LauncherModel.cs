@@ -115,6 +115,7 @@ namespace SakuraLibrary.Model
                     Connected = false;
                     Console.WriteLine(ex);
                 }
+                await Task.Delay(1000);
             }
         }
 
@@ -356,6 +357,7 @@ namespace SakuraLibrary.Model
 
         public bool IsDaemon => Daemon.Daemon;
 
+        [SourceBinding(nameof(IsDaemon))]
         public string WorkingMode => Daemon.Daemon ? "守护进程" : "系统服务";
 
         public bool SwitchingMode { get => _switchingMode; set => SafeSet(out _switchingMode, value); }
@@ -382,15 +384,13 @@ namespace SakuraLibrary.Model
                 try
                 {
                     Daemon.Stop();
-                    if (!Daemon.InstallService(!Daemon.Daemon))
-                    {
-                        callback(false, "运行模式切换失败, 请检查您是否有足够的权限 安装/卸载 服务.\n由于发生严重错误, 启动器即将退出.");
-                    }
-                    else
-                    {
-                        callback(true, "运行模式已切换, 启动器即将退出");
-                    }
-                    Environment.Exit(0);
+
+                    var result = Daemon.SwitchMode();
+
+                    Dispatcher.Invoke(() => RaisePropertyChanged(nameof(IsDaemon)));
+                    Daemon.Start();
+
+                    callback(result, result ? "运行模式已切换, 即将重新初始化 DaemonHost" : "运行模式切换失败, 请检查您是否有足够的权限 安装/卸载 服务");
                 }
                 finally
                 {

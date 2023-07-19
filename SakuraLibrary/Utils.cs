@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Diagnostics;
 using System.Configuration;
-using System.Security.Principal;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -14,15 +13,11 @@ namespace SakuraLibrary
     public static class Utils
     {
         public static readonly DateTime UtcTimeBase = new(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-        public static readonly DateTime SakuraTimeBase = new(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         public static readonly string LibraryPath = Assembly.GetExecutingAssembly().Location;
         public static readonly string ExecutablePath = Process.GetCurrentProcess().MainModule.FileName;
 
-        public static readonly bool IsAdministrator = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
-
         public static readonly string InstallationHash = Md5(Assembly.GetExecutingAssembly().Location);
-        public static readonly string InstallationPipeName = InstallationHash + "_" + Consts.PipeName;
 
         public static string Md5(byte[] data)
         {
@@ -84,10 +79,6 @@ namespace SakuraLibrary
             catch { }
             return false;
         }).ToArray();
-
-        public static uint GetSakuraTime() => (uint)DateTime.UtcNow.Subtract(SakuraTimeBase).TotalSeconds;
-
-        public static DateTime ParseSakuraTime(uint seconds) => SakuraTimeBase.AddSeconds(seconds).ToLocalTime();
 
         public static DateTime ParseTimestamp(long seconds) => UtcTimeBase.AddSeconds(seconds).ToLocalTime();
 

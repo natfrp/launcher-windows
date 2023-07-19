@@ -555,7 +555,7 @@
                     FontSize="16"
                     Foreground="#DDFFFFFF">
                     <Run>运行模式:</Run>
-                    <Run Text="{Binding WorkingMode, Mode=OneTime}" />
+                    <Run Text="{Binding WorkingMode, Mode=OneWay}" />
                 </TextBlock>
                 <Button Margin="16,0,0,0" Click="ButtonSwitchMode_Click">
                     <Button.Resources>
@@ -589,7 +589,7 @@
                                         <DataTrigger Binding="{Binding SwitchingMode}" Value="True">
                                             <Setter Property="Text" Value="切换中" />
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsDaemon, Mode=OneTime}" Value="True">
+                                        <DataTrigger Binding="{Binding IsDaemon, Mode=OneWay}" Value="True">
                                             <Setter Property="Text" Value="安装服务" />
                                         </DataTrigger>
                                     </Style.Triggers>

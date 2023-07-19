@@ -13,10 +13,12 @@ namespace SakuraLibrary.Helper
 {
     public class DaemonHost
     {
-        public readonly bool Daemon;
+        public readonly string ServicePath = Path.GetFullPath(Consts.ServiceExecutable);
+
+        public readonly bool ForceDaemon;
         public readonly LauncherModel Launcher;
 
-        public readonly string ServicePath;
+        public bool Daemon;
 
         public Process BaseProcess = null;
         public ServiceController Controller = null;
@@ -26,11 +28,16 @@ namespace SakuraLibrary.Helper
 
         public DaemonHost(LauncherModel launcher, bool forceDaemon)
         {
-            Controller = forceDaemon ? null : ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == Consts.ServiceName);
-            Daemon = Controller == null;
+            ForceDaemon = forceDaemon;
             Launcher = launcher;
 
-            ServicePath = Path.GetFullPath(Consts.ServiceExecutable);
+            DetectMode();
+        }
+
+        public void DetectMode()
+        {
+            Controller = ForceDaemon ? null : ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == Consts.ServiceName);
+            Daemon = Controller == null;
 
             if (!Daemon)
             {
@@ -57,98 +64,6 @@ namespace SakuraLibrary.Helper
             }
         }
 
-        public bool StartDaemon()
-        {
-            return false;
-            //if (IsRunning())
-            //{
-            //    return true;
-            //}
-            //if (!Daemon)
-            //{
-            //    try
-            //    {
-            //        Controller.Start();
-            //        return true;
-            //    }
-            //    catch { }
-            //    return false;
-            //}
-            //BaseProcess = Process.Start(ServicePath, "--daemon");
-            //return !BaseProcess.HasExited;
-        }
-
-        public bool Stop()
-        {
-            StopEvent.Set();
-            return false;
-            //if (!IsRunning())
-            //{
-            //    return true;
-            //}
-            //try
-            //{
-            //    if (!Daemon)
-            //    {
-            //        Controller.Stop();
-            //        return true;
-            //    }
-            //    if (Launcher.Connected)
-            //    {
-            //        ThreadPool.QueueUserWorkItem(s => Launcher.RPC.Request(MessageID.ControlExit));
-            //        BaseProcess.WaitForExit(10000);
-            //    }
-            //    if (!BaseProcess.HasExited)
-            //    {
-            //        BaseProcess.Kill();
-            //        BaseProcess.WaitForExit(5000);
-            //    }
-            //    BaseProcess.Dispose();
-            //    return true;
-            //}
-            //catch { }
-            //return false;
-        }
-
-        public bool IsRunning()
-        {
-            return false;
-            if (!Daemon)
-            {
-                Controller.Refresh();
-                return Controller.Status == ServiceControllerStatus.Running;
-            }
-            if (BaseProcess != null && !BaseProcess.HasExited)
-            {
-                return true;
-            }
-            var processes = Utils.SearchProcess("SakuraFrpService", ServicePath);
-            if (processes.Length == 0)
-            {
-                return false;
-            }
-            if (BaseProcess == null)
-            {
-                BaseProcess = processes[0];
-            }
-            return true;
-        }
-
-        public bool InstallService(bool uninstall = false)
-        {
-            try
-            {
-                var p = Process.Start(new ProcessStartInfo(ServicePath, uninstall ? "--uninstall" : "--install")
-                {
-                    Verb = "runAs"
-                });
-                p.WaitForExit();
-                return p.ExitCode == 0;
-            }
-            catch { }
-            return false;
-        }
-
         public void Start()
         {
             StopEvent.Reset();
@@ -157,14 +72,112 @@ namespace SakuraLibrary.Helper
             {
                 while (!StopEvent.WaitOne(500))
                 {
-                    if (!IsRunning())
+                    if (IsRunning())
                     {
-                        StartDaemon();
+                        continue;
                     }
+                    try
+                    {
+                        if (!Daemon)
+                        {
+                            Controller.Start();
+                        }
+                        BaseProcess = Process.Start(new ProcessStartInfo(ServicePath, "--daemon")
+                        {
+                            UseShellExecute = false,
+                            CreateNoWindow = true,
+                        });
+                    }
+                    catch { }
                 }
             })
             { IsBackground = true };
             WorkerThread.Start();
+        }
+
+        public bool Stop()
+        {
+            StopEvent.Set();
+            WorkerThread.Join();
+
+            if (!IsRunning())
+            {
+                return true;
+            }
+            try
+            {
+                if (!Daemon)
+                {
+                    Controller.Stop();
+                    return true;
+                }
+                if (Launcher.Connected)
+                {
+                    ThreadPool.QueueUserWorkItem(s =>
+                    {
+                        try
+                        {
+                            Launcher.RPC.Shutdown(new Empty());
+                        }
+                        catch { }
+                    });
+                    BaseProcess.WaitForExit(10000);
+                }
+                if (!BaseProcess.HasExited)
+                {
+                    BaseProcess.Kill();
+                    BaseProcess.WaitForExit(5000);
+                }
+                BaseProcess.Dispose();
+                BaseProcess = null;
+                return true;
+            }
+            catch { }
+            return false;
+        }
+
+        public bool IsRunning()
+        {
+            if (!Daemon)
+            {
+                Controller.Refresh();
+                return Controller.Status == ServiceControllerStatus.Running || Controller.Status == ServiceControllerStatus.StartPending;
+            }
+            if (BaseProcess != null && !BaseProcess.HasExited)
+            {
+                return true;
+            }
+            var processes = Utils.SearchProcess(Consts.ServiceName, ServicePath);
+            if (processes.Length == 0)
+            {
+                return false;
+            }
+            BaseProcess ??= processes[0];
+            return true;
+        }
+
+        public bool SwitchMode()
+        {
+            if (ForceDaemon) return false;
+            try
+            {
+                var p = Process.Start(new ProcessStartInfo(ServicePath, Daemon ? "--install" : "--uninstall")
+                {
+                    Verb = "runAs",
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                });
+                p.WaitForExit();
+                return p.ExitCode == 0;
+            }
+            catch (Exception e)
+            {
+                NTAPI.MessageBox(0, e.ToString(), "运行模式切换失败", 0x10);
+            }
+            finally
+            {
+                DetectMode();
+            }
+            return false;
         }
     }
 }
