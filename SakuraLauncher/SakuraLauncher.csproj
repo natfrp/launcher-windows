@@ -6,7 +6,7 @@
 		<Product>SakuraFrp Windows 启动器界面</Product>
 		<AssemblyTitle>SakuraFrp Launcher</AssemblyTitle>
 		<ApplicationIcon>Resources\icon.ico</ApplicationIcon>
-		<ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+		<ApplicationManifest>Properties\App.manifest</ApplicationManifest>
 		<UseWPF>true</UseWPF>
 		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
 	</PropertyGroup>

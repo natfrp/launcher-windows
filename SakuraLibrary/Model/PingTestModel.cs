@@ -14,14 +14,14 @@ namespace SakuraLibrary.Model
         private bool _testing = false;
 
         public ObservableCollection<NodePingModel> Nodes { get => _nodes; set => Set(out _nodes, value); }
-        private ObservableCollection<NodePingModel> _nodes = new ObservableCollection<NodePingModel>();
+        private ObservableCollection<NodePingModel> _nodes = new();
 
-        private ManualResetEvent stopTest = new ManualResetEvent(false);
+        private readonly ManualResetEvent stopTest = new(false);
 
         public PingTestModel(LauncherModel launcher) : base(launcher.Dispatcher)
         {
             Launcher = launcher;
-            foreach (var n in launcher.Nodes.Where(n => n.Host != "").OrderBy(n => n.Id))
+            foreach (var n in launcher.Nodes.Values.Where(n => n.Host != "").OrderBy(n => n.Id))
             {
                 Nodes.Add(new NodePingModel(n, Dispatcher));
             }

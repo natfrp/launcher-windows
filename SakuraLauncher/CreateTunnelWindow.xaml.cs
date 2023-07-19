@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 
 using SakuraLibrary.Model;
+using SakuraLibrary.Proto;
 
 namespace SakuraLauncher
 {
@@ -26,7 +27,7 @@ namespace SakuraLauncher
             {
                 return;
             }
-            if (!(this.node.SelectedItem is NodeModel node))
+            if (!(this.node.SelectedItem is Node node))
             {
                 App.ShowMessage("请选择穿透服务器", "Oops", MessageBoxImage.Error);
                 return;

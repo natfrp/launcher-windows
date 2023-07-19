@@ -10,7 +10,7 @@ namespace LegacyLauncher
     static class Program
     {
         public static Mutex AppMutex = null;
-        public static Form TopMostForm => new Form() { TopMost = true };
+        public static Form TopMostForm => new() { TopMost = true };
 
         /// <summary>
         /// 应用程序的主入口点。

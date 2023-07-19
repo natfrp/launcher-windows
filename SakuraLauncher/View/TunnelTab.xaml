@@ -161,10 +161,7 @@
                                             FontSize="22"
                                             Foreground="White"
                                             Text="{Binding Name, Mode=OneWay}" />
-                                        <ToggleButton
-                                            DockPanel.Dock="Right"
-                                            IsChecked="{Binding Enabled}"
-                                            IsEnabled="{Binding NotPending, Mode=OneWay}" />
+                                        <ToggleButton DockPanel.Dock="Right" IsChecked="{Binding Enabled}" />
                                     </DockPanel>
                                     <Grid Margin="16,0,16,16" DockPanel.Dock="Bottom">
                                         <Grid.ColumnDefinitions>

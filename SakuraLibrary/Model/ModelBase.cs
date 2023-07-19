@@ -14,7 +14,7 @@ namespace SakuraLibrary.Model
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected Dictionary<string, HashSet<string>> SourceBinding = new Dictionary<string, HashSet<string>>();
+        protected Dictionary<string, HashSet<string>> SourceBinding = new();
 
         public ModelBase(DispatcherWrapper dispatcher = null)
         {

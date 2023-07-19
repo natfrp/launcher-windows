@@ -13,8 +13,8 @@ namespace SakuraLibrary
 {
     public static class Utils
     {
-        public static readonly DateTime UtcTimeBase = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-        public static readonly DateTime SakuraTimeBase = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        public static readonly DateTime UtcTimeBase = new(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+        public static readonly DateTime SakuraTimeBase = new(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         public static readonly string LibraryPath = Assembly.GetExecutingAssembly().Location;
         public static readonly string ExecutablePath = Process.GetCurrentProcess().MainModule.FileName;

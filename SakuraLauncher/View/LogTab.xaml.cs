@@ -16,7 +16,7 @@ namespace SakuraLauncher.View
     public partial class LogTab : UserControl
     {
         private readonly LauncherViewModel Model;
-        private readonly TouchScrollHelper scrollHelper = new TouchScrollHelper();
+        private readonly TouchScrollHelper scrollHelper = new();
 
         private bool AutoScroll = true;
 

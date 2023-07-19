@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-
+﻿using System.Linq;
 using SakuraLibrary.Proto;
 using TunnelState = SakuraLibrary.Proto.Tunnel.Types.State;
 
@@ -25,7 +24,13 @@ namespace SakuraLibrary.Model
         public string Type => Proto.Type.ToUpper();
 
         [SourceBinding(nameof(Proto))]
-        public string Description => Proto.Description;
+        public string Description => Proto.Type switch
+        {
+            "tcp" or "udp" => $"{Proto.Remote} → {Proto.LocalIp}:{Proto.LocalPort}",
+            "http" or "https" => $"{Proto.Type.ToUpper()} → {Proto.LocalIp}:{Proto.LocalPort}",
+            "etcp" or "eudp" => $"{Proto.LocalIp}:{Proto.LocalPort}",
+            _ => "-",
+        };
 
         [SourceBinding(nameof(Proto))]
         public TunnelState State => Proto.State;
@@ -52,15 +57,17 @@ namespace SakuraLibrary.Model
         public bool NoteEmpty => string.IsNullOrEmpty(Note);
 
         public string NodeName { get => _nodeName; set => Set(out _nodeName, value); }
-        private string _nodeName;
+        private string _nodeName = "未知节点";
 
-        public TunnelModel(Tunnel proto, LauncherModel launcher, Dictionary<int, string> nodes = null)
+        public TunnelModel(Tunnel proto, LauncherModel launcher = null)
         {
             Proto = proto;
             Launcher = launcher;
-            SetNodeName(nodes);
-        }
 
-        public void SetNodeName(Dictionary<int, string> nodes) => NodeName = nodes != null && nodes.ContainsKey(Node) ? nodes[Node] : "未知节点";
+            if (Launcher?.Nodes.TryGetValue(Node, out var node) == true)
+            {
+                NodeName = node.Name;
+            }
+        }
     }
 }

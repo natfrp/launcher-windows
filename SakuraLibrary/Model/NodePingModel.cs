@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
 
 using SakuraLibrary.Helper;
+using SakuraLibrary.Proto;
 
 namespace SakuraLibrary.Model
 {
     public class NodePingModel : ModelBase
     {
-        public readonly NodeModel Node;
+        public readonly Node Node;
 
-        public string Name => Node.ToString();
-        public string AcceptNew => Node.AcceptNew ? "√" : "";
+        public string Name => "#" + Node.Id + " " + Node.Name;
+        public string AcceptNew => NodeFlags.AcceptNewTunnel(Node) ? "√" : "";
 
         public string Ping { get => _ping; set => SafeSet(out _ping, value); }
         private string _ping = "-";
@@ -26,9 +27,9 @@ namespace SakuraLibrary.Model
         public bool complete = false;
         public int lossPackets = 0;
 
-        public List<long> pingTime = new List<long>();
+        public List<long> pingTime = new();
 
-        public NodePingModel(NodeModel node, DispatcherWrapper dispatcher) : base(dispatcher)
+        public NodePingModel(Node node, DispatcherWrapper dispatcher) : base(dispatcher)
         {
             Node = node;
         }

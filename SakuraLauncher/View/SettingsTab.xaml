@@ -5,6 +5,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="clr-namespace:SakuraLauncher.Model"
+    d:DataContext="{d:DesignInstance Type=model:LauncherViewModel}"
     d:DesignHeight="600"
     d:DesignWidth="580"
     mc:Ignorable="d">
@@ -64,13 +66,10 @@
                 </TextBlock>
                 <Separator VerticalAlignment="Center" Background="#55a0a0a0" />
             </DockPanel>
-            <StackPanel Margin="12,4,16,0" Orientation="Horizontal">
-                <TextBlock
-                    VerticalAlignment="Center"
-                    FontSize="16"
-                    Foreground="#DDFFFFFF">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding LoggedIn}" Value="True">
@@ -78,12 +77,38 @@
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </TextBlock.Style>
-                    <Run Text="{Binding UserName, Mode=OneWay}" />
-                    <Run>-</Run>
-                    <Run Text="{Binding UserMeta, Mode=OneWay}" />
-                </TextBlock>
-                <StackPanel Orientation="Horizontal">
+                    </StackPanel.Style>
+                    <Border
+                        x:Name="logo"
+                        Width="48"
+                        Height="48"
+                        Margin="8,0,4,0"
+                        CornerRadius="180">
+                        <Border.Background>
+                            <ImageBrush ImageSource="https://gravatar.globalslb.net/avatar/2734e78078ce5ae5a2cc2f7cc819f7c8?d=mp" Stretch="Fill" />
+                        </Border.Background>
+                    </Border>
+                    <StackPanel Margin="12,0,0,0">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="18"
+                            Foreground="#DDFFFFFF">
+                            <Run>#</Run><Run Text="{Binding UserInfo.Id, Mode=OneWay}" />
+                            <Run Text="{Binding UserInfo.Name, Mode=OneWay}" />
+                        </TextBlock>
+                        <TextBlock
+                            Margin="0,8,0,0"
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            Foreground="#DDFFFFFF">
+                            <Run Text="{Binding UserInfo.Group.Name, Mode=OneWay}" />
+                            <Run>&#160;/&#160;</Run>
+                            <Run Text="{Binding UserInfo.Speed, Mode=OneWay}" />
+                        </TextBlock>
+                    </StackPanel>
+
+                </StackPanel>
+                <StackPanel Margin="12,0,0,0" Orientation="Horizontal">
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
                             <Setter Property="Visibility" Value="Visible" />

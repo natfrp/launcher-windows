@@ -8,7 +8,7 @@ namespace SakuraLauncher.View.DesignerData
 {
     public class TunnelTab
     {
-        public static Dictionary<int, string> Nodes = new Dictionary<int, string>()
+        public static Dictionary<int, string> Nodes = new()
         {
             { 1, "PA47 Node" },
             { 2, "LMAO BGP" },
@@ -26,8 +26,10 @@ namespace SakuraLauncher.View.DesignerData
                 Note = "yay=louder",
                 Enabled = false,
                 State = State.Idle,
-                Description = "2333 -> 1.1.1.1:2333"
-            },null, Nodes),
+                Remote = "2333",
+                LocalIp = "1.1.1.1",
+                LocalPort = 2333,
+            }),
             new TunnelModel(new Tunnel()
             {
                 Id = 1,
@@ -35,8 +37,10 @@ namespace SakuraLauncher.View.DesignerData
                 Type = "UDP",
                 Name = "SampleTunnel 2",
                 State = State.Started,
-                Description = "2333 -> 1.1.1.1:2333"
-            }, null,Nodes),
+                Remote = "2333",
+                LocalIp = "1.1.1.1",
+                LocalPort = 2333,
+            }),
             new TunnelModel(new Tunnel()
             {
                 Id = 1,
@@ -45,8 +49,8 @@ namespace SakuraLauncher.View.DesignerData
                 Name = "SampleTunnel 3",
                 Note = "super looooooooooooooooooooooooooooooooooooooong note",
                 State = State.Running,
-                Description = "example.tld"
-            },null, Nodes),
+                Remote = "example.tld",
+            }),
             new TunnelModel(new Tunnel()
             {
                 Id = 114514,
@@ -55,8 +59,8 @@ namespace SakuraLauncher.View.DesignerData
                 Name = "LongTunnelNameThatWraps",
                 Note = "super looooooooooooooooooooooooooooooooooooooong note",
                 State = State.Running,
-                Description = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-            },null, Nodes),
+                Remote = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            }),
         };
     }
 }

@@ -11,16 +11,18 @@ using SakuraLibrary.Proto;
 
 namespace SakuraLibrary.Helper
 {
-    public class DaemonHost : IAsyncManager
+    public class DaemonHost
     {
         public readonly bool Daemon;
-        public readonly AsyncManager AsyncManager;
         public readonly LauncherModel Launcher;
 
         public readonly string ServicePath;
 
         public Process BaseProcess = null;
         public ServiceController Controller = null;
+
+        public Thread WorkerThread = null;
+        public ManualResetEvent StopEvent = new(false);
 
         public DaemonHost(LauncherModel launcher, bool forceDaemon)
         {
@@ -30,24 +32,21 @@ namespace SakuraLibrary.Helper
 
             ServicePath = Path.GetFullPath(Consts.ServiceExecutable);
 
-            AsyncManager = new AsyncManager(Run);
-
             if (!Daemon)
             {
                 try
                 {
-                    using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Service WHERE Name = '" + Consts.ServiceName + "'"))
-                    using (var collection = searcher.Get())
+                    using var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Service WHERE Name = '" + Consts.ServiceName + "'");
+                    using var collection = searcher.Get();
+
+                    var service = collection.OfType<ManagementObject>().FirstOrDefault();
+                    if (service != null)
                     {
-                        var service = collection.OfType<ManagementObject>().FirstOrDefault();
-                        if (service != null)
+                        var oldPath = Path.GetFullPath((service.GetPropertyValue("PathName") as string).Trim('"'));
+                        var newPath = Path.GetFullPath(Consts.ServiceExecutable);
+                        if (oldPath != newPath)
                         {
-                            var oldPath = Path.GetFullPath((service.GetPropertyValue("PathName") as string).Trim('"'));
-                            var newPath = Path.GetFullPath(Consts.ServiceExecutable);
-                            if (oldPath != newPath)
-                            {
-                                NTAPI.MessageBox(0, "系统服务状态异常, 启动器可能无法正常运行\n请不要在安装系统服务后挪动启动器文件或在其他路径运行启动器\n\n如果无法正常连接到守护进程请点击 \"卸载服务\"\n如果无法正常连接到守护进程请点击 \"卸载服务\"\n如果无法正常连接到守护进程请点击 \"卸载服务\"\n\n服务路径:\n" + oldPath + "\n当前路径:\n" + newPath, "错误", 0x10);
-                            }
+                            NTAPI.MessageBox(0, "系统服务状态异常, 启动器可能无法正常运行\n请不要在安装系统服务后挪动启动器文件或在其他路径运行启动器\n\n如果无法正常连接到守护进程请点击 \"卸载服务\"\n如果无法正常连接到守护进程请点击 \"卸载服务\"\n如果无法正常连接到守护进程请点击 \"卸载服务\"\n\n服务路径:\n" + oldPath + "\n当前路径:\n" + newPath, "错误", 0x10);
                         }
                     }
                 }
@@ -79,8 +78,9 @@ namespace SakuraLibrary.Helper
             //return !BaseProcess.HasExited;
         }
 
-        public bool StopDaemon()
+        public bool Stop()
         {
+            StopEvent.Set();
             return false;
             //if (!IsRunning())
             //{
@@ -149,29 +149,22 @@ namespace SakuraLibrary.Helper
             return false;
         }
 
-        protected void Run()
+        public void Start()
         {
-            while (!AsyncManager.StopEvent.WaitOne(500))
+            StopEvent.Reset();
+
+            WorkerThread = new Thread(() =>
             {
-                if (!IsRunning())
+                while (!StopEvent.WaitOne(500))
                 {
-                    StartDaemon();
+                    if (!IsRunning())
+                    {
+                        StartDaemon();
+                    }
                 }
-            }
+            })
+            { IsBackground = true };
+            WorkerThread.Start();
         }
-
-        #region IAsyncManager
-
-        public bool Running => AsyncManager.Running;
-
-        public void Start() => AsyncManager.Start(true);
-
-        public void Stop(bool kill = false)
-        {
-            AsyncManager.Stop(kill);
-            StopDaemon();
-        }
-
-        #endregion
     }
 }

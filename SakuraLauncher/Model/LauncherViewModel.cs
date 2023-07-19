@@ -60,6 +60,16 @@ namespace SakuraLauncher.Model
                 return LogSourceFilter == "" || item.Source == LogSourceFilter;
             };
             TunnelsView.SortDescriptions.Add(new SortDescription(nameof(TunnelModel.Name), ListSortDirection.Ascending));
+
+            PropertyChanged += (sender, e) =>
+            {
+                if (e.PropertyName == nameof(LoggedIn))
+                {
+                    SwitchTab(LoggedIn ? 0 : 2);
+                }
+            };
+
+            Run();
         }
 
         public override void Save()

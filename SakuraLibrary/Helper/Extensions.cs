@@ -37,5 +37,24 @@ namespace System.Threading.Tasks
         }
 
         public static void Then(this Task<Exception> task, Action<Exception> callback) => task.ContinueWith(t => callback(t.Result));
+
+        public static async Task<Task> InitStream<T>(this AsyncServerStreamingCall<T> request, Action<T> callback, CancellationToken token) where T : class
+        {
+            var stream = request.ResponseStream;
+
+            if (!await stream.MoveNext(token).ConfigureAwait(false))
+            {
+                throw new Exception("Stream ended unexpectedly");
+            }
+            callback(stream.Current);
+
+            return Task.Run(async () =>
+            {
+                while (await stream.MoveNext(token).ConfigureAwait(false))
+                {
+                    callback(stream.Current);
+                }
+            });
+        }
     }
 }

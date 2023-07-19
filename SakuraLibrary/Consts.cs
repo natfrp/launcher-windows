@@ -5,9 +5,9 @@ namespace SakuraLibrary
 {
     public static class Consts
     {
-        public const string Version = "2.0.6.2";
+        public const string Version = "3.0.0.0";
 
-        public const string PipeName = "SakuraFrp_ServicePipe";
+        public const string PipeName = "SakuraFrpService3";
         public const string ServiceName = "SakuraFrpService";
 
         public const string UpdaterExecutable = "Updater.exe";

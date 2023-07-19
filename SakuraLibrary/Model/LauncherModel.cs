@@ -1,8 +1,8 @@
-﻿using Grpc.Core.Utils;
-using Grpc.Net.Client;
+﻿using Grpc.Net.Client;
 using SakuraLibrary.Helper;
 using SakuraLibrary.Proto;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO.Pipes;
@@ -10,12 +10,12 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using static SakuraLibrary.Proto.NatfrpService;
+using NatfrpServiceClient = SakuraLibrary.Proto.NatfrpService.NatfrpServiceClient;
 using UserStatus = SakuraLibrary.Proto.User.Types.Status;
 
 namespace SakuraLibrary.Model
 {
-    public abstract class LauncherModel : ModelBase, IAsyncManager
+    public abstract class LauncherModel : ModelBase
     {
         static LauncherModel()
         {
@@ -23,15 +23,15 @@ namespace SakuraLibrary.Model
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
         }
 
-        public static Empty RpcEmpty = new Empty();
+        public static Empty RpcEmpty = new();
 
-        public readonly NatfrpServiceClient RPC = new NatfrpServiceClient(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
+        public readonly NatfrpServiceClient RPC = new(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
         {
             HttpHandler = new StandardSocketsHttpHandler()
             {
                 ConnectCallback = async (context, cancellationToken) =>
                 {
-                    var pipe = new NamedPipeClientStream(".", "SakuraFrpService", PipeDirection.InOut, PipeOptions.Asynchronous);
+                    var pipe = new NamedPipeClientStream(".", Consts.PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
                     try
                     {
                         await pipe.ConnectAsync(cancellationToken);
@@ -45,15 +45,12 @@ namespace SakuraLibrary.Model
             }
         }));
         public readonly DaemonHost Daemon;
-        public readonly AsyncManager AsyncManager;
+
+        public readonly CancellationTokenSource CTS = new();
 
         public LauncherModel(bool forceDaemon = false)
         {
             Daemon = new DaemonHost(this, forceDaemon);
-            AsyncManager = new AsyncManager(Run);
-
-            Daemon.Start();
-            Start();
         }
 
         public abstract void Log(Log l, bool init = false);
@@ -61,40 +58,57 @@ namespace SakuraLibrary.Model
 
         public abstract void Save();
 
-        protected void launcherError(string message)
+        protected async void Run()
         {
-            //Log(new Log()
-            //{
-            //    Category = 3,
-            //    Source = "Launcher",
-            //    Data = message,
-            //    Time = Utils.GetSakuraTime()
-            //});
-        }
+            Daemon.Start();
 
-        #region IPC Handling
-
-        protected void Run()
-        {
-            //var userCb = (User u) => UserInfo = u;
-            do
+            while (!CTS.IsCancellationRequested)
             {
                 try
                 {
-                    Task.WaitAll(new Task[]
+                    // In case of disconnect, reset UI state
+                    UserInfo = new User { Status = UserStatus.NoLogin };
+                    Dispatcher.Invoke(() =>
                     {
-                        RPC.StreamUser(RpcEmpty).ResponseStream.ForEachAsync((User u) => UserInfo = u),
-                        RPC.StreamLog(RpcEmpty).ResponseStream.ForEachAsync(l => Dispatcher.Invoke(() => Log(l))),
-                        RPC.StreamNodes(RpcEmpty).ResponseStream.ForEachAsync(n => Dispatcher.Invoke(() =>
-                        {
-                            Nodes.Clear();
-                            foreach (var node in n.Nodes.Values)
-                            {
-                                Nodes.Add(new NodeModel(node));
-                            }
-                            Connected = true;
-                        })),
+                        Nodes.Clear();
+                        Tunnels.Clear();
+                        ClearLog();
                     });
+
+                    Config = await RPC.GetConfigAsync(RpcEmpty);
+                    Connected = true; // Hide the connecting bar ASAP
+
+                    var tasks = new Task[]
+                    {
+                        await RPC.StreamUser(RpcEmpty).InitStream(u => UserInfo = u, CTS.Token),
+                        await RPC.StreamLog(RpcEmpty).InitStream(l => Dispatcher.Invoke(() => Log(l)), CTS.Token),
+                        await RPC.StreamNodes(RpcEmpty).InitStream(n => Nodes = n.Nodes, CTS.Token),
+                        await RPC.StreamTunnels(RpcEmpty).InitStream(t => Dispatcher.Invoke(() =>
+                        {
+                            switch(t.Action)
+                            {
+                            case TunnelUpdate.Types.Action.Add:
+                                Tunnels.Add(new TunnelModel(t.Tunnel, this));
+                                break;
+                            case TunnelUpdate.Types.Action.Update:
+                                var find = Tunnels.FirstOrDefault(x => x.Id == t.Tunnel.Id);
+                                if (find != null)
+                                {
+                                    find.Proto = t.Tunnel;
+                                }
+                                break;
+                            case TunnelUpdate.Types.Action.Delete:
+                                Tunnels.Remove(Tunnels.FirstOrDefault(x => x.Id == t.Tunnel.Id));
+                                break;
+                            case TunnelUpdate.Types.Action.Clear:
+                                Tunnels.Clear();
+                                break;
+                            }
+                        }), CTS.Token),
+                        //await RPC.StreamUpdateStatus(RpcEmpty).InitStream(u => {}),
+                    };
+
+                    await Task.WhenAll(tasks);
                 }
                 catch (Exception ex)
                 {
@@ -102,84 +116,18 @@ namespace SakuraLibrary.Model
                     Console.WriteLine(ex);
                 }
             }
-            while (!AsyncManager.StopEvent.WaitOne(500));
         }
-
-        //protected void Pipe_ServerPush(ServiceConnection connection, PushMessageBase msg)
-        //{
-        //    try
-        //    {
-        //        switch (msg.Type)
-        //        {
-        //        case PushMessageID.UpdateTunnel:
-        //            Dispatcher.Invoke(() =>
-        //            {
-        //                foreach (var t in Tunnels)
-        //                {
-        //                    if (t.Id == msg.DataTunnel.Id)
-        //                    {
-        //                        t.Proto = msg.DataTunnel;
-        //                        t.SetNodeName(Nodes.ToDictionary(k => k.Id, v => v.Name));
-        //                        break;
-        //                    }
-        //                }
-        //            });
-        //            break;
-        //        case PushMessageID.UpdateTunnels:
-        //            LoadTunnels(msg.DataTunnels);
-        //            break;
-        //        case PushMessageID.UpdateNodes:
-        //            Dispatcher.Invoke(() =>
-        //            {
-        //                Nodes.Clear();
-        //                var map = new Dictionary<int, string>();
-        //                foreach (var n in msg.DataNodes.Nodes)
-        //                {
-        //                    Nodes.Add(new NodeModel(n));
-        //                    map.Add(n.Id, n.Name);
-        //                }
-        //                foreach (var t in Tunnels)
-        //                {
-        //                    t.SetNodeName(map);
-        //                }
-        //            });
-        //            break;
-        //        case PushMessageID.AppendLog:
-        //            Dispatcher.Invoke(() =>
-        //            {
-        //                foreach (var l in msg.DataLog.Data)
-        //                {
-        //                    Log(l);
-        //                }
-        //            });
-        //            break;
-        //        }
-        //    }
-        //    catch { }
-        //}
-
-        #endregion
 
         #region Main Window
 
         public bool Connected { get => _connected; set => Set(out _connected, value); }
         private bool _connected = false;
 
-        public User UserInfo
-        {
-            get => _userInfo;
-            set
-            {
-                if (value == null)
-                {
-                    value = new User();
-                }
-                SafeSet(out _userInfo, value);
-            }
-        }
-        private User _userInfo = new User();
+        public User UserInfo { get => _userInfo; set => SafeSet(out _userInfo, value ?? new User()); }
+        private User _userInfo = new();
 
-        public ObservableCollection<NodeModel> Nodes { get; set; } = new ObservableCollection<NodeModel>();
+        public IDictionary<int, Node> Nodes { get => _nodes; set => SafeSet(out _nodes, value); }
+        private IDictionary<int, Node> _nodes = new Dictionary<int, Node>();
 
         #endregion
 
@@ -276,15 +224,15 @@ namespace SakuraLibrary.Model
 
         public void PushServiceConfig()
         {
-            //var result = RPC.Request(new RequestBase()
-            //{
-            //    Type = MessageID.ControlConfigSet,
-            //    DataConfig = Config
-            //});
-            //if (!result.Success)
-            //{
-            //    launcherError("无法更新守护进程配置: " + result.Message);
-            //}
+            try
+            {
+                Config = RPC.UpdateConfig(Config);
+            }
+            catch (Exception ex)
+            {
+                // TODO?
+                Console.WriteLine(ex);
+            }
         }
 
         #endregion
@@ -371,7 +319,7 @@ namespace SakuraLibrary.Model
 
         public void RequestUpdateCheck()
         {
-
+            // TODO
         }
 
         public void ConfirmUpdate(bool legacy, Action<bool, string> callback, Func<string, bool> confirm, Func<string, bool> warn)
@@ -450,16 +398,6 @@ namespace SakuraLibrary.Model
                 }
             });
         }
-
-        #endregion
-
-        #region IAsyncManager
-
-        public bool Running => AsyncManager.Running;
-
-        public void Start() => AsyncManager.Start(true);
-
-        public void Stop(bool kill = false) => AsyncManager.Stop(kill);
 
         #endregion
     }

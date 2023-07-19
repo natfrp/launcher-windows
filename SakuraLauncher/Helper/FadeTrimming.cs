@@ -221,7 +221,7 @@ namespace SakuraLauncher.Helper
                 }
             }
 
-            private LinearGradientBrush GetHorizontalClipBrush(double visibleWidth) => new LinearGradientBrush
+            private LinearGradientBrush GetHorizontalClipBrush(double visibleWidth) => new()
             {
                 // set MappingMode to absolute so that
                 // we can specify the EndPoint of the brush in
@@ -247,7 +247,7 @@ namespace SakuraLauncher.Helper
                 }
             };
 
-            private LinearGradientBrush GetVerticalClipBrush(double visibleHeight) => new LinearGradientBrush
+            private LinearGradientBrush GetVerticalClipBrush(double visibleHeight) => new()
             {
                 // set MappingMode to absolute so that
                 // we can specify the EndPoint of the brush in

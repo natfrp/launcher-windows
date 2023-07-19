@@ -37,21 +37,14 @@ namespace SakuraLibrary.Model
         public bool Creating { get => _creating; set => SafeSet(out _creating, value); }
         private bool _creating = false;
 
-        public IEnumerable<NodeModel> Nodes { get => _nodes; set => Set(out _nodes, value); }
-        private IEnumerable<NodeModel> _nodes;
+        public IEnumerable<Node> Nodes { get; set; }
 
         public ObservableCollection<LocalProcessModel> Listening { get; set; } = new ObservableCollection<LocalProcessModel>();
 
         public CreateTunnelModel(LauncherModel launcher) : base(launcher.Dispatcher)
         {
             Launcher = launcher;
-            launcher.Nodes.CollectionChanged += LauncherNodes_CollectionChanged;
-            LauncherNodes_CollectionChanged();
-        }
-
-        ~CreateTunnelModel()
-        {
-            Launcher.Nodes.CollectionChanged -= LauncherNodes_CollectionChanged;
+            Nodes = launcher.Nodes.Values.Where(NodeFlags.AcceptNewTunnel);
         }
 
         public void RequestCreate(int node, Action<bool, string> callback)
@@ -172,7 +165,5 @@ namespace SakuraLibrary.Model
                 Launcher.Dispatcher.BeginInvoke(() => Loading = false);
             });
         }
-
-        private void LauncherNodes_CollectionChanged(object sender = null, NotifyCollectionChangedEventArgs e = null) => Nodes = Launcher.Nodes.Where(t => t.AcceptNew);
     }
 }
