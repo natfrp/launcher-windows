@@ -1,0 +1,10 @@
+<Project>
+	<PropertyGroup>
+		<LangVersion>latest</LangVersion>
+		<TargetFramework>net48</TargetFramework>
+		<TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<OutputPath>..\bin\Debug\</OutputPath>
+	</PropertyGroup>
+</Project>
