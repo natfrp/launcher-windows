@@ -11,9 +11,9 @@ namespace SakuraLauncher.Model
 
         public string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-        public string ServiceVersion => Model.Update?.CurrentVersionService ?? "-";
+        public string ServiceVersion => ""; // Model.Update?.CurrentVersionService ?? "-";
 
-        public string FrpcVersion => Model.Update?.CurrentVersionFrpc == null || Model.Update.CurrentVersionFrpc == "" ? "-" : Model.Update.CurrentVersionFrpc;
+        public string FrpcVersion => ""; // Model.Update?.CurrentVersionFrpc == null || Model.Update.CurrentVersionFrpc == "" ? "-" : Model.Update.CurrentVersionFrpc;
 
         public AboutModel(LauncherViewModel model)
         {

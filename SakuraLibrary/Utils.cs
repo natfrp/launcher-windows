@@ -13,6 +13,7 @@ namespace SakuraLibrary
 {
     public static class Utils
     {
+        public static readonly DateTime UtcTimeBase = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
         public static readonly DateTime SakuraTimeBase = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         public static readonly string LibraryPath = Assembly.GetExecutingAssembly().Location;
@@ -87,6 +88,8 @@ namespace SakuraLibrary
         public static uint GetSakuraTime() => (uint)DateTime.UtcNow.Subtract(SakuraTimeBase).TotalSeconds;
 
         public static DateTime ParseSakuraTime(uint seconds) => SakuraTimeBase.AddSeconds(seconds).ToLocalTime();
+
+        public static DateTime ParseTimestamp(long seconds) => UtcTimeBase.AddSeconds(seconds).ToLocalTime();
 
         public static void VerifySignature(params string[] files)
         {

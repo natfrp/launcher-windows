@@ -60,56 +60,59 @@ namespace SakuraLibrary.Helper
 
         public bool StartDaemon()
         {
-            if (IsRunning())
-            {
-                return true;
-            }
-            if (!Daemon)
-            {
-                try
-                {
-                    Controller.Start();
-                    return true;
-                }
-                catch { }
-                return false;
-            }
-            BaseProcess = Process.Start(ServicePath, "--daemon");
-            return !BaseProcess.HasExited;
+            return false;
+            //if (IsRunning())
+            //{
+            //    return true;
+            //}
+            //if (!Daemon)
+            //{
+            //    try
+            //    {
+            //        Controller.Start();
+            //        return true;
+            //    }
+            //    catch { }
+            //    return false;
+            //}
+            //BaseProcess = Process.Start(ServicePath, "--daemon");
+            //return !BaseProcess.HasExited;
         }
 
         public bool StopDaemon()
         {
-            if (!IsRunning())
-            {
-                return true;
-            }
-            try
-            {
-                if (!Daemon)
-                {
-                    Controller.Stop();
-                    return true;
-                }
-                if (Launcher.Connected)
-                {
-                    ThreadPool.QueueUserWorkItem(s => Launcher.Pipe.Request(MessageID.ControlExit));
-                    BaseProcess.WaitForExit(10000);
-                }
-                if (!BaseProcess.HasExited)
-                {
-                    BaseProcess.Kill();
-                    BaseProcess.WaitForExit(5000);
-                }
-                BaseProcess.Dispose();
-                return true;
-            }
-            catch { }
             return false;
+            //if (!IsRunning())
+            //{
+            //    return true;
+            //}
+            //try
+            //{
+            //    if (!Daemon)
+            //    {
+            //        Controller.Stop();
+            //        return true;
+            //    }
+            //    if (Launcher.Connected)
+            //    {
+            //        ThreadPool.QueueUserWorkItem(s => Launcher.RPC.Request(MessageID.ControlExit));
+            //        BaseProcess.WaitForExit(10000);
+            //    }
+            //    if (!BaseProcess.HasExited)
+            //    {
+            //        BaseProcess.Kill();
+            //        BaseProcess.WaitForExit(5000);
+            //    }
+            //    BaseProcess.Dispose();
+            //    return true;
+            //}
+            //catch { }
+            //return false;
         }
 
         public bool IsRunning()
         {
+            return false;
             if (!Daemon)
             {
                 Controller.Refresh();

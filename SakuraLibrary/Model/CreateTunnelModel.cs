@@ -61,33 +61,33 @@ namespace SakuraLibrary.Model
             {
                 try
                 {
-                    var resp = Launcher.Pipe.Request(new RequestBase()
-                    {
-                        Type = MessageID.TunnelCreate,
-                        DataCreateTunnel = new CreateTunnel()
-                        {
-                            Name = TunnelName,
-                            Note = Note,
-                            Node = node,
-                            Type = Type.ToLower(),
-                            RemotePort = RemotePort,
-                            LocalPort = LocalPort,
-                            LocalAddress = LocalAddress
-                        }
-                    });
-                    if (!resp.Success)
-                    {
-                        callback(false, resp.Message);
-                        return;
-                    }
-                    Dispatcher.Invoke(() =>
-                    {
-                        LocalPort = 0;
-                        LocalAddress = "";
-                        RemotePort = 0;
-                        TunnelName = "";
-                    });
-                    callback(true, "成功创建隧道 " + resp.Message);
+                    //var resp = Launcher.RPC.Request(new RequestBase()
+                    //{
+                    //    Type = MessageID.TunnelCreate,
+                    //    DataCreateTunnel = new CreateTunnel()
+                    //    {
+                    //        Name = TunnelName,
+                    //        Note = Note,
+                    //        Node = node,
+                    //        Type = Type.ToLower(),
+                    //        RemotePort = RemotePort,
+                    //        LocalPort = LocalPort,
+                    //        LocalAddress = LocalAddress
+                    //    }
+                    //});
+                    //if (!resp.Success)
+                    //{
+                    //    callback(false, resp.Message);
+                    //    return;
+                    //}
+                    //Dispatcher.Invoke(() =>
+                    //{
+                    //    LocalPort = 0;
+                    //    LocalAddress = "";
+                    //    RemotePort = 0;
+                    //    TunnelName = "";
+                    //});
+                    //callback(true, "成功创建隧道 " + resp.Message);
                 }
                 finally
                 {

@@ -220,7 +220,7 @@ namespace LegacyLauncher
         private void button_clear_Click(object sender, EventArgs e)
         {
             textBox_log.Text = "";
-            Model.Pipe.Request(MessageID.LogClear);
+            Model.RPC.Request(MessageID.LogClear);
         }
 
         #endregion

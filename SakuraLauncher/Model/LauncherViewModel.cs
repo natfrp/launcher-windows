@@ -12,6 +12,7 @@ using SakuraLibrary.Helper;
 using MaterialDesignThemes.Wpf;
 
 using SakuraLauncher.Helper;
+using static SakuraLibrary.Proto.Log.Types;
 
 namespace SakuraLauncher.Model
 {
@@ -82,16 +83,6 @@ namespace SakuraLauncher.Model
             settings.Save();
         }
 
-        public override bool SyncAll()
-        {
-            if (base.SyncAll())
-            {
-                SwitchTab(LoggedIn ? 0 : 2);
-                return true;
-            }
-            return false;
-        }
-
         #region Generic Properties
 
         public SnackbarMessageQueue SnackMessageQueue { get; } = new SnackbarMessageQueue();
@@ -123,7 +114,7 @@ namespace SakuraLauncher.Model
         public string UserName => UserInfo.Name;
 
         [SourceBinding(nameof(UserInfo))]
-        public string UserMeta => UserInfo.Meta;
+        public string UserMeta => "";
 
         public int Theme { get => _theme; set => Set(out _theme, value); }
         private int _theme;
@@ -155,8 +146,12 @@ namespace SakuraLauncher.Model
                 Source = l.Source,
                 Data = l.Data
             };
-            if (l.Category == 0) // CATEGORY_FRPC
+            switch (l.Category)
             {
+            case Category.Alert:
+                Dispatcher.Invoke(() => View.trayIcon.ShowBalloonTip(entry.Source, entry.Data, (Hardcodet.Wpf.TaskbarNotification.BalloonIcon)Math.Max(Math.Min((int)l.Level, 2), 1)));
+                return;
+            case Category.Frpc:
                 entry.Source = "Tunnel/" + entry.Source;
                 var match = LogModel.Pattern.Match(l.Data);
                 if (match.Success)
@@ -174,41 +169,34 @@ namespace SakuraLauncher.Model
                         break;
                     }
                 }
-            }
-            else
-            {
-                entry.Time = Utils.ParseSakuraTime(l.Time).ToString("yyyy/MM/dd HH:mm:ss");
-                switch (l.Category)
+                break;
+            case Category.Service:
+                entry.Time = Utils.ParseTimestamp(l.Time).ToString("yyyy/MM/dd HH:mm:ss");
+                switch (l.Level)
                 {
-                case 1:
+                case Level.Debug:
+                    entry.Level = "D";
+                    break;
+                case Level.Info:
                 default:
                     entry.Level = "I";
                     break;
-                case 2:
+                case Level.Warn:
                     entry.Level = "W";
                     entry.LevelColor = LogModel.BrushWarning;
                     break;
-                case 3:
+                case Level.Error:
                     entry.Level = "E";
                     entry.LevelColor = LogModel.BrushError;
                     break;
-                case 4: // Notice INFO
-                case 5: // Notice WARNING
-                case 6: // Notice ERROR
-                    switch (NotificationMode)
-                    {
-                    case 1:
-                        return;
-                    case 2:
-                        if (l.Category == 4)
-                        {
-                            return;
-                        }
-                        break;
-                    }
-                    Dispatcher.Invoke(() => View.trayIcon.ShowBalloonTip(entry.Source, entry.Data, (Hardcodet.Wpf.TaskbarNotification.BalloonIcon)l.Category - 3));
-                    return;
+                case Level.Fatal:
+                    entry.Level = "F";
+                    entry.LevelColor = LogModel.BrushError;
+                    break;
                 }
+                break;
+            default:
+                return;
             }
             Dispatcher.Invoke(() =>
             {

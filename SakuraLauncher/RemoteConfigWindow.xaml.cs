@@ -29,7 +29,7 @@ namespace SakuraLauncher
                 App.ShowMessage("密码不能为空", "错误", MessageBoxImage.Error);
                 return;
             }
-            Model.Config.RemoteKeyNew = password.Text;
+            Model.Config.RemoteManagementKey = password.Text;
             Model.PushServiceConfig();
             Close();
         }

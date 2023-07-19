@@ -2,7 +2,7 @@
 
 using SakuraLibrary.Model;
 using SakuraLibrary.Proto;
-using TunnelStatus = SakuraLibrary.Proto.Tunnel.Types.Status;
+using static SakuraLibrary.Proto.Tunnel.Types;
 
 namespace SakuraLauncher.View.DesignerData
 {
@@ -24,7 +24,8 @@ namespace SakuraLauncher.View.DesignerData
                 Type = "TCP",
                 Name = "SampleTunnel1",
                 Note = "yay=louder",
-                Status = TunnelStatus.Disabled,
+                Enabled = false,
+                State = State.Idle,
                 Description = "2333 -> 1.1.1.1:2333"
             },null, Nodes),
             new TunnelModel(new Tunnel()
@@ -33,7 +34,7 @@ namespace SakuraLauncher.View.DesignerData
                 Node = 2,
                 Type = "UDP",
                 Name = "SampleTunnel 2",
-                Status = TunnelStatus.Pending,
+                State = State.Started,
                 Description = "2333 -> 1.1.1.1:2333"
             }, null,Nodes),
             new TunnelModel(new Tunnel()
@@ -43,7 +44,7 @@ namespace SakuraLauncher.View.DesignerData
                 Type = "HTTP",
                 Name = "SampleTunnel 3",
                 Note = "super looooooooooooooooooooooooooooooooooooooong note",
-                Status = TunnelStatus.Running,
+                State = State.Running,
                 Description = "example.tld"
             },null, Nodes),
             new TunnelModel(new Tunnel()
@@ -53,7 +54,7 @@ namespace SakuraLauncher.View.DesignerData
                 Type = "HTTP",
                 Name = "LongTunnelNameThatWraps",
                 Note = "super looooooooooooooooooooooooooooooooooooooong note",
-                Status = TunnelStatus.Running,
+                State = State.Running,
                 Description = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
             },null, Nodes),
         };

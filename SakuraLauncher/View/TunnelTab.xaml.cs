@@ -26,10 +26,13 @@ namespace SakuraLauncher.View
         private void ButtonReload_Click(object sender, RoutedEventArgs e)
         {
             IsEnabled = false;
-            Model.RequestReloadTunnels((a, b) =>
+            Model.RequestReloadTunnelsAsync().ContinueWith(r =>
             {
-                Dispatcher.Invoke(() => IsEnabled = true);
-                Model.SimpleFailureHandler(a, b);
+                if (r.Result != null)
+                {
+                    Model.SimpleFailureHandler(false, r.Result.Message);
+                }
+                IsEnabled = true;
             });
         }
 
@@ -40,11 +43,11 @@ namespace SakuraLauncher.View
                 if (App.ShowMessage(string.Format("确定要删除隧道 #{0} {1} 吗?", tunnel.Id, tunnel.Name), "操作确认", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                 {
                     IsEnabled = false;
-                    Model.RequestDeleteTunnel(tunnel.Id, (a, b) =>
-                    {
-                        Dispatcher.Invoke(() => IsEnabled = true);
-                        Model.SimpleFailureHandler(a, b);
-                    });
+                    //Model.RequestDeleteTunnel(tunnel.Id, (a, b) =>
+                    //{
+                    //    Dispatcher.Invoke(() => IsEnabled = true);
+                    //    Model.SimpleFailureHandler(a, b);
+                    //});
                 }
             }
         }

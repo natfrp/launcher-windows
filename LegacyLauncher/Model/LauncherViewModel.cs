@@ -5,6 +5,7 @@ using SakuraLibrary;
 using SakuraLibrary.Model;
 using SakuraLibrary.Proto;
 using SakuraLibrary.Helper;
+using static SakuraLibrary.Proto.Log.Types;
 
 namespace LegacyLauncher.Model
 {
@@ -49,22 +50,33 @@ namespace LegacyLauncher.Model
 
         public override void Log(Log l, bool init)
         {
-            string category = "";
-            switch (l.Category)
+            if (l.Category == Category.Alert)
             {
-            case 1:
+                return;
+            }
+            string category = "";
+            switch (l.Level)
+            {
+            case Level.Debug:
+                category = "D ";
+                break;
+            default:
+            case Level.Info:
                 category = "I ";
                 break;
-            case 2:
+            case Level.Warn:
                 category = "W ";
                 break;
-            case 3:
+            case Level.Error:
                 category = "E ";
                 break;
+            case Level.Fatal:
+                category = "F ";
+                break;
             }
-            if (l.Category != 0)
+            if (l.Level != 0)
             {
-                l.Data = Utils.ParseSakuraTime(l.Time).ToString("yyyy/MM/dd HH:mm:ss") + " " + l.Data;
+                l.Data = Utils.ParseTimestamp(l.Time).ToString("yyyy/MM/dd HH:mm:ss") + " " + l.Data;
             }
             Dispatcher.Invoke(() => View.textBox_log.AppendText(l.Source + " " + category + l.Data + Environment.NewLine));
         }

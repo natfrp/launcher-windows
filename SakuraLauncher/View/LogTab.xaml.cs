@@ -29,7 +29,7 @@ namespace SakuraLauncher.View
         private void ButtonClear_Click(object sender, RoutedEventArgs e)
         {
             Model.ClearLog();
-            Model.Pipe.Request(MessageID.LogClear);
+            //Model.RPC.Request(MessageID.LogClear);
         }
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)

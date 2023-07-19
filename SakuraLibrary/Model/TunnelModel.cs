@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 using SakuraLibrary.Proto;
-using TunnelStatus = SakuraLibrary.Proto.Tunnel.Types.Status;
+using TunnelState = SakuraLibrary.Proto.Tunnel.Types.State;
 
 namespace SakuraLibrary.Model
 {
@@ -28,20 +28,20 @@ namespace SakuraLibrary.Model
         public string Description => Proto.Description;
 
         [SourceBinding(nameof(Proto))]
-        public bool NotPending => Proto.Status != TunnelStatus.Pending;
+        public TunnelState State => Proto.State;
 
         [SourceBinding(nameof(Proto))]
         public bool Enabled
         {
-            get => Proto.Status != TunnelStatus.Disabled;
-            set => Launcher.Pipe.Request(new RequestBase()
+            get => Proto.Enabled;
+            set => Launcher.RPC.UpdateTunnel(new TunnelUpdate()
             {
-                Type = MessageID.TunnelUpdate,
-                DataUpdateTunnel = new UpdateTunnelStatus()
+                Action = TunnelUpdate.Types.Action.Update,
+                Tunnel = new Tunnel()
                 {
                     Id = Id,
-                    Status = value ? 1 : 0
-                }
+                    Enabled = value,
+                },
             });
         }
 

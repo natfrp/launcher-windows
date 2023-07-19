@@ -53,7 +53,7 @@ namespace SakuraLauncher.View
             {
                 return;
             }
-            Model.RequestLogin(Model.SimpleFailureHandler);
+            Model.LoginOrLogout();
         }
 
         private void ButtonRefreshNodes_Click(object sender, RoutedEventArgs e)
@@ -62,7 +62,7 @@ namespace SakuraLauncher.View
             btn.IsEnabled = false;
             ThreadPool.QueueUserWorkItem(_ =>
             {
-                Model.SnackMessageQueue.Enqueue($"节点列表刷新{(Model.SyncNodes(true) ? "成功" : "失败")}");
+                //Model.SnackMessageQueue.Enqueue($"节点列表刷新{(Model.SyncNodes(true) ? "成功" : "失败")}");
                 Dispatcher.Invoke(() => btn.IsEnabled = true);
             });
         }
