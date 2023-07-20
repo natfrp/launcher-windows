@@ -22,11 +22,11 @@
                 <TextBox
                     x:Name="password"
                     Margin="8"
-                    materialDesign:HintAssist.Hint="管理密码"
+                    materialDesign:HintAssist.Hint="管理密码 (8 位以上)"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
                 <TextBlock Padding="8" TextWrapping="WrapWithOverflow">
-                    该功能为高级功能，我们不推荐普通用户启用该功能，并且不为启用此功能造成的任何后果承担任何责任<LineBreak />
-                    远程管理采用端到端加密进行通信，请设置一个安全的密码来确保其他人无法控制您的启动器</TextBlock>
+                    远程管理采用端到端加密进行通信，请设置一个安全的密码来确保其他人无法控制您的启动器<LineBreak />
+                    该功能为高级功能，您需要为自己的设备安全负责，SakuraFrp 不为误用此功能造成的损失承担任何责任</TextBlock>
                 <CheckBox x:Name="agreement" Margin="8">
                     <TextBlock TextWrapping="WrapWithOverflow">
                         我已仔细阅读上述内容，并且同意承担该功能可能带来的安全风险

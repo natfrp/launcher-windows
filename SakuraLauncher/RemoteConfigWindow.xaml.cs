@@ -1,5 +1,7 @@
-﻿using System.Windows;
-
+﻿using System;
+using System.Threading;
+using System.Windows;
+using System.Windows.Controls;
 using SakuraLauncher.Model;
 
 namespace SakuraLauncher
@@ -19,18 +21,19 @@ namespace SakuraLauncher
 
         private void ButtonUpdate_Click(object sender, RoutedEventArgs e)
         {
-            if (!agreement.IsChecked.HasValue || !agreement.IsChecked.Value)
+            try
             {
-                App.ShowMessage("您需要仔细阅读说明内容并同意承担该功能可能带来的安全风险才能启用远程控制", "错误", MessageBoxImage.Error);
-                return;
+                if (!agreement.IsChecked.HasValue || !agreement.IsChecked.Value) throw new Exception("您需要仔细阅读说明内容并同意承担该功能可能带来的安全风险才能启用远程控制");
+                if (password.Text == "") throw new Exception("密码不能为空");
+                if (password.Text.Length < 8) throw new Exception("密码至少需要 8 位");
+
+                Model.Config.RemoteManagementKey = password.Text;
+                Model.PushServiceConfig(true);
             }
-            if (password.Text == "")
+            catch (Exception ex)
             {
-                App.ShowMessage("密码不能为空", "错误", MessageBoxImage.Error);
-                return;
+                App.ShowMessage(ex.Message, "错误", MessageBoxImage.Error);
             }
-            Model.Config.RemoteManagementKey = password.Text;
-            Model.PushServiceConfig();
             Close();
         }
     }

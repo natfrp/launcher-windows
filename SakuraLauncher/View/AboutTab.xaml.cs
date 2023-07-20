@@ -16,7 +16,7 @@ namespace SakuraLauncher.View
             InitializeComponent();
             scrollHelper = new TouchScrollHelper(scrollViewer);
 
-            DataContext = new AboutModel(model);
+            DataContext = model;
         }
     }
 }

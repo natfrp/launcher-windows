@@ -3,13 +3,12 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Data="clr-namespace:SakuraLibrary.Model;assembly=SakuraLibrary"
-    xmlns:DesignerData="clr-namespace:SakuraLauncher.View.DesignerData;assembly=SakuraLauncher"
     xmlns:Helper="clr-namespace:SakuraLauncher.Helper"
+    xmlns:Model="clr-namespace:SakuraLauncher.Model"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DataContext="{d:DesignInstance {x:Type DesignerData:TunnelTab},
-                                     IsDesignTimeCreatable=True}"
+    d:DataContext="{d:DesignInstance Type=Model:LauncherViewModel}"
     d:DesignHeight="600"
     d:DesignWidth="900"
     mc:Ignorable="d">

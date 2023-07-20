@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO.Pipes;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using NatfrpServiceClient = SakuraLibrary.Proto.NatfrpService.NatfrpServiceClient;
@@ -75,11 +76,9 @@ namespace SakuraLibrary.Model
                         ClearLog();
                     });
 
-                    Config = await RPC.GetConfigAsync(RpcEmpty);
-                    Connected = true; // Hide the connecting bar ASAP
-
                     var tasks = new Task[]
                     {
+                        await RPC.StreamConfig(RpcEmpty).InitStream(c => Config = c, CTS.Token),
                         await RPC.StreamUser(RpcEmpty).InitStream(u => UserInfo = u, CTS.Token),
                         await RPC.StreamLog(RpcEmpty).InitStream(l => Dispatcher.Invoke(() => Log(l)), CTS.Token),
                         await RPC.StreamNodes(RpcEmpty).InitStream(n => Nodes = n.Nodes, CTS.Token),
@@ -107,6 +106,8 @@ namespace SakuraLibrary.Model
                         }), CTS.Token),
                         //await RPC.StreamUpdateStatus(RpcEmpty).InitStream(u => {}),
                     };
+
+                    Connected = true;
 
                     await Task.WhenAll(tasks);
                 }
@@ -219,20 +220,45 @@ namespace SakuraLibrary.Model
                     Config.BypassProxy = value;
                     PushServiceConfig();
                 }
-                RaisePropertyChanged();
             }
         }
 
-        public void PushServiceConfig()
+        [SourceBinding(nameof(Config))]
+        public bool RemoteManagement
         {
-            try
+            get => Config?.RemoteManagement ?? false;
+            set
             {
-                Config = RPC.UpdateConfig(Config);
+                if (Config == null) return;
+                Config.RemoteManagement = value && !string.IsNullOrEmpty(Config.RemoteManagementKey);
+                PushServiceConfig();
             }
-            catch (Exception ex)
+        }
+
+        [SourceBinding(nameof(Config), nameof(LoggedIn))]
+        public bool CanEnableRemoteManagement => LoggedIn && !string.IsNullOrEmpty(Config?.RemoteManagementKey);
+
+        [SourceBinding(nameof(Config))]
+        public bool EnableTLS
+        {
+            get => Config?.FrpcForceTls ?? false;
+            set
             {
-                // TODO?
-                Console.WriteLine(ex);
+                if (Config == null) return;
+                Config.FrpcForceTls = value;
+                PushServiceConfig();
+            }
+        }
+
+        public void PushServiceConfig(bool blocking = false)
+        {
+            if (blocking)
+            {
+                RPC.UpdateConfig(Config);
+            }
+            else
+            {
+                _ = RPC.UpdateConfigAsync(Config);
             }
         }
 
@@ -240,79 +266,48 @@ namespace SakuraLibrary.Model
 
         #region Settings - Auto Update
 
-        [SourceBinding(nameof(Config))]
-        public bool RemoteManagement
-        {
-            get => Config != null && Config.RemoteManagement;
-            set
-            {
-                if (Config != null)
-                {
-                    if (!value || !string.IsNullOrEmpty(Config.RemoteManagementKey))
-                    {
-                        Config.RemoteManagement = value;
-                    }
-                    PushServiceConfig();
-                }
-                RaisePropertyChanged();
-            }
-        }
+        public string License => Properties.Resources.LICENSE;
 
-        [SourceBinding(nameof(Config), nameof(LoggedIn))]
-        public bool CanEnableRemoteManagement => LoggedIn && Config != null && !string.IsNullOrEmpty(Config.RemoteManagementKey);
+        public string LauncherVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         [SourceBinding(nameof(Config))]
-        public bool EnableTLS
-        {
-            get => Config != null && Config.FrpcForceTls;
-            set
-            {
-                if (Config != null)
-                {
-                    Config.FrpcForceTls = value;
-                    PushServiceConfig();
-                }
-                RaisePropertyChanged();
-            }
-        }
+        public string ServiceVersion => Config?.Update?.ServiceVersion ?? "-";
 
-        public UpdateStatus Update { get => _update; set => SafeSet(out _update, value); }
-        private UpdateStatus _update;
+        [SourceBinding(nameof(Config))]
+        public string FrpcVersion => Config?.Update?.FrpcVersion ?? "-";
 
-        [SourceBinding(nameof(Update))]
-        public bool HaveUpdate => Update != null && Update.UpdateManagerRunning && Update.UpdateAvailable;
+        [SourceBinding(nameof(Config))]
+        public bool HaveUpdate => false; // TODO Config.Update != null && Update.UpdateEnabled && Update.UpdateAvailable;
 
-        [SourceBinding(nameof(Update))]
+        [SourceBinding(nameof(Config))]
         public string UpdateText
         {
             get
             {
-                if (Update == null || !Update.UpdateAvailable)
-                {
-                    return "";
-                }
-                if (Update.UpdateReadyDir != "")
-                {
-                    return "更新准备完成, 点此进行更新";
-                }
-                return "下载更新中... " + Math.Round(Update.DownloadCurrent / 1048576f, 2) + " MiB/" + Math.Round(Update.DownloadTotal / 1048576f, 2) + " MiB";
+                // TODO
+                return "";
+                //if (Update == null || !Update.UpdateAvailable)
+                //{
+                //    return "";
+                //}
+                //if (Update.UpdateReadyDir != "")
+                //{
+                //    return "更新准备完成, 点此进行更新";
+                //}
+                //return "下载更新中... " + Math.Round(Update.DownloadCurrent / 1048576f, 2) + " MiB/" + Math.Round(Update.DownloadTotal / 1048576f, 2) + " MiB";
             }
         }
 
-        [SourceBinding(nameof(Config), nameof(Update))]
+        [SourceBinding(nameof(Config))]
         public bool CheckUpdate
         {
-            get => Config != null && Config.UpdateInterval != -1 && Update != null && Update.UpdateManagerRunning;
+            get => Config != null && Config.UpdateInterval != -1;
             set
             {
                 if (Config != null)
                 {
                     Config.UpdateInterval = value ? 86400 : -1;
                     PushServiceConfig();
-                }
-                if (!value)
-                {
-                    Update = null;
                 }
                 RaisePropertyChanged();
             }
@@ -325,30 +320,31 @@ namespace SakuraLibrary.Model
 
         public void ConfirmUpdate(bool legacy, Action<bool, string> callback, Func<string, bool> confirm, Func<string, bool> warn)
         {
-            if (Update.UpdateReadyDir == "")
-            {
-                return;
-            }
-            if (!confirm(Update.Note))
-            {
-                return;
-            }
-            if (NTAPI.GetSystemMetrics(SystemMetric.SM_REMOTESESSION) != 0 && !warn("检测到当前正在使用远程桌面连接，若您正在通过 SakuraFrp 连接计算机，请勿进行更新\n进行更新时启动器和所有 frpc 将彻底退出并且需要手动确认操作，这会造成远程桌面断开并且无法恢复\n是否继续?"))
-            {
-                return;
-            }
-            Daemon.Stop();
-            try
-            {
-                Process.Start(new ProcessStartInfo(Consts.ServiceExecutable, "--update \"" + Update.UpdateReadyDir.TrimEnd('\\') + "\" " + (legacy ? "legacy" : "wpf"))
-                {
-                    Verb = "runas"
-                });
-            }
-            finally
-            {
-                Environment.Exit(0);
-            }
+            // TODO
+            //if (Update.UpdateReadyDir == "")
+            //{
+            //    return;
+            //}
+            //if (!confirm(Update.Note))
+            //{
+            //    return;
+            //}
+            //if (NTAPI.GetSystemMetrics(SystemMetric.SM_REMOTESESSION) != 0 && !warn("检测到当前正在使用远程桌面连接，若您正在通过 SakuraFrp 连接计算机，请勿进行更新\n进行更新时启动器和所有 frpc 将彻底退出并且需要手动确认操作，这会造成远程桌面断开并且无法恢复\n是否继续?"))
+            //{
+            //    return;
+            //}
+            //Daemon.Stop();
+            //try
+            //{
+            //    Process.Start(new ProcessStartInfo(Consts.ServiceExecutable, "--update \"" + Update.UpdateReadyDir.TrimEnd('\\') + "\" " + (legacy ? "legacy" : "wpf"))
+            //    {
+            //        Verb = "runas"
+            //    });
+            //}
+            //finally
+            //{
+            //    Environment.Exit(0);
+            //}
         }
 
         #endregion
@@ -369,12 +365,7 @@ namespace SakuraLibrary.Model
             {
                 return;
             }
-            if (LoggingIn || LoggedIn)
-            {
-                callback(false, "请先登出当前账户");
-                return;
-            }
-            if (!confirm("确定要切换运行模式吗?\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n\n注意事项:\n1. 切换运行模式后不要移动启动器到其他目录, 否则会造成严重错误\n2. 如需移动或卸载启动器, 请先切到 \"守护进程\" 模式来避免文件残留\n3. 切换过程可能需要十余秒, 请耐心等待, 不要做其他操作\n4. 切换操作即为 安装/卸载 系统服务, 需要管理员权限\n5. 切换完成后需要重启启动器"))
+            if (!confirm("确定要切换运行模式吗?\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n\n注意事项:\n1. 切换运行模式后不要移动启动器到其他目录, 否则会造成严重错误\n2. 如需移动或卸载启动器, 请先切到 \"守护进程\" 模式来避免文件残留\n3. 切换过程可能需要十余秒, 请耐心等待, 不要做其他操作\n4. 切换操作即为 安装/卸载 系统服务, 需要管理员权限"))
             {
                 return;
             }
@@ -390,7 +381,7 @@ namespace SakuraLibrary.Model
                     Dispatcher.Invoke(() => RaisePropertyChanged(nameof(IsDaemon)));
                     Daemon.Start();
 
-                    callback(result, result ? "运行模式已切换, 即将重新初始化 DaemonHost" : "运行模式切换失败, 请检查您是否有足够的权限 安装/卸载 服务");
+                    callback(result, result ? "运行模式已切换, 正在重新初始化 Daemon" : "运行模式切换失败, 请检查您是否有足够的权限 安装/卸载 服务");
                 }
                 finally
                 {

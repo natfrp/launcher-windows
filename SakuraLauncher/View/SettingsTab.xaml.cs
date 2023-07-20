@@ -26,14 +26,15 @@ namespace SakuraLauncher.View
 
             Model.PropertyChanged += (s, e) =>
             {
-                if (Model.CheckingUpdate && e.PropertyName == nameof(Model.Update))
-                {
-                    Model.CheckingUpdate = false;
-                    if (!Model.Update.UpdateAvailable)
-                    {
-                        App.ShowMessage("您当前使用的启动器与 frpc 均为最新版本", "提示", MessageBoxImage.Information);
-                    }
-                }
+                // TODO
+                //if (Model.CheckingUpdate && e.PropertyName == nameof(Model.Update))
+                //{
+                //    Model.CheckingUpdate = false;
+                //    if (!Model.Update.UpdateAvailable)
+                //    {
+                //        App.ShowMessage("您当前使用的启动器与 frpc 均为最新版本", "提示", MessageBoxImage.Information);
+                //    }
+                //}
             };
         }
 
@@ -53,7 +54,7 @@ namespace SakuraLauncher.View
             {
                 return;
             }
-            Model.LoginOrLogout();
+            _ = Model.LoginOrLogout();
         }
 
         private void ButtonRefreshNodes_Click(object sender, RoutedEventArgs e)

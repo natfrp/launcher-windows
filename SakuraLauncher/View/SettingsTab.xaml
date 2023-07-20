@@ -2,11 +2,11 @@
     x:Class="SakuraLauncher.View.SettingsTab"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Model="clr-namespace:SakuraLauncher.Model"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:model="clr-namespace:SakuraLauncher.Model"
-    d:DataContext="{d:DesignInstance Type=model:LauncherViewModel}"
+    d:DataContext="{d:DesignInstance Type=Model:LauncherViewModel}"
     d:DesignHeight="600"
     d:DesignWidth="580"
     mc:Ignorable="d">
@@ -391,7 +391,6 @@
             <StackPanel
                 Height="32"
                 Margin="12,4,16,0"
-                IsEnabled="{Binding UpdateEnabled}"
                 Orientation="Horizontal">
                 <ToggleButton IsChecked="{Binding CheckUpdate}" />
                 <TextBlock
