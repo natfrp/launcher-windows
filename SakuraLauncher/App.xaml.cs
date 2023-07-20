@@ -16,8 +16,6 @@ namespace SakuraLauncher
     {
         public static new App Current => (App)Application.Current;
 
-        public static MessageBoxResult ShowMessage(string text, string title, MessageBoxImage icon, MessageBoxButton buttons = MessageBoxButton.OK) => Current.Dispatcher.Invoke(() => MessageBox.Show(text, title, buttons, icon));
-
         public Mutex AppMutex = null;
         public EventWaitHandle ActivateEventHandle = null;
 
@@ -50,7 +48,7 @@ namespace SakuraLauncher
             {
                 if (!ActivateEventHandle.Set())
                 {
-                    ShowMessage("请不要重复开启 SakuraFrp 客户端. 如果想运行多个实例请将软件复制到其他目录.", "Oops", MessageBoxImage.Warning);
+                    Current.Dispatcher.Invoke(() => MessageBox.Show("请不要重复开启 SakuraFrp 客户端", "Oops", MessageBoxButton.OK, MessageBoxImage.Warning));
                 }
                 Environment.Exit(0);
             }

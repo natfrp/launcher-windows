@@ -30,8 +30,6 @@ namespace SakuraLibrary.Helper
         {
             ForceDaemon = forceDaemon;
             Launcher = launcher;
-
-            DetectMode();
         }
 
         public void DetectMode()
@@ -53,19 +51,22 @@ namespace SakuraLibrary.Helper
                         var newPath = Path.GetFullPath(Consts.ServiceExecutable);
                         if (oldPath != newPath)
                         {
-                            NTAPI.MessageBox(0, "系统服务状态异常, 启动器可能无法正常运行\n请不要在安装系统服务后挪动启动器文件或在其他路径运行启动器\n\n如果无法正常连接到守护进程请点击 \"卸载服务\"\n如果无法正常连接到守护进程请点击 \"卸载服务\"\n如果无法正常连接到守护进程请点击 \"卸载服务\"\n\n服务路径:\n" + oldPath + "\n当前路径:\n" + newPath, "错误", 0x10);
+                            Launcher.ShowMessage("系统服务状态异常, 启动器可能无法正常运行\n请不要在安装系统服务后挪动启动器文件或在其他路径运行启动器\n\n【如果无法正常连接到守护进程请点击 \"卸载服务\"】\n【如果无法正常连接到守护进程请点击 \"卸载服务\"】\n\n服务路径:\n" + oldPath + "\n预期路径:\n" + newPath, "警告", LauncherModel.MessageMode.Warning);
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    NTAPI.MessageBox(0, "出现了一个神秘的错误, 建议截图此错误并联系管理员:\n" + e, "错误", 0x10);
+                    Launcher.ShowMessage("无法检查系统服务安装是否正确, 启动器可能无法正常工作\n\n【如果无法正常连接到守护进程请点击 \"卸载服务\"】\n【如果无法正常连接到守护进程请点击 \"卸载服务\"】\n\n错误信息：\n" + e.ToString(), "警告", LauncherModel.MessageMode.Error);
                 }
             }
         }
 
         public void Start()
         {
+            // Don't put this in constructer, the dispatcher is not initialized yet
+            DetectMode();
+
             StopEvent.Reset();
 
             WorkerThread = new Thread(() =>
@@ -171,7 +172,7 @@ namespace SakuraLibrary.Helper
             }
             catch (Exception e)
             {
-                NTAPI.MessageBox(0, e.ToString(), "运行模式切换失败", 0x10);
+                Launcher.ShowMessage(e.ToString(), "运行模式切换失败", LauncherModel.MessageMode.Error);
             }
             finally
             {

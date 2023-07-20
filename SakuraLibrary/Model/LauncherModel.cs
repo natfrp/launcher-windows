@@ -54,11 +54,6 @@ namespace SakuraLibrary.Model
             Daemon = new DaemonHost(this, forceDaemon);
         }
 
-        public abstract void Log(Log l, bool init = false);
-        public abstract void ClearLog();
-
-        public abstract void Save();
-
         protected async void Run()
         {
             Daemon.Start();
@@ -120,6 +115,23 @@ namespace SakuraLibrary.Model
             }
         }
 
+        #region ViewModel Abstraction
+
+        public enum MessageMode
+        {
+            Info,
+            Warning,
+            Error,
+            Confirm,
+        }
+
+        public abstract void Log(Log l, bool init = false);
+        public abstract void ClearLog();
+        public abstract bool ShowMessage(string message, string title, MessageMode mode);
+        public abstract void Save();
+
+        #endregion
+
         #region Main Window
 
         public bool Connected { get => _connected; set => Set(out _connected, value); }
@@ -131,19 +143,35 @@ namespace SakuraLibrary.Model
         public IDictionary<int, Node> Nodes { get => _nodes; set => SafeSet(out _nodes, value); }
         private IDictionary<int, Node> _nodes = new Dictionary<int, Node>();
 
-        #endregion
-
-        #region Tunnel
-
         public ObservableCollection<TunnelModel> Tunnels { get; set; } = new ObservableCollection<TunnelModel>();
 
-        public Task<Exception> RequestReloadTunnelsAsync() => RPC.ReloadTunnelsAsync(RpcEmpty).WaitException();
+        #endregion
 
-        public Task<Exception> RequestDeleteTunnelAsync(int id) => RPC.UpdateTunnelAsync(new TunnelUpdate()
+        #region RPC Wrappers
+
+        public async Task RequestReloadTunnelsAsync() => await RPC.ReloadTunnelsAsync(RpcEmpty);
+
+        public async Task RequestDeleteTunnelAsync(int id)
         {
-            Action = TunnelUpdate.Types.Action.Delete,
-            Tunnel = new Tunnel() { Id = id }
-        }).WaitException();
+            try
+            {
+                await RPC.UpdateTunnelAsync(new TunnelUpdate()
+                {
+                    Action = TunnelUpdate.Types.Action.Delete,
+                    Tunnel = new Tunnel() { Id = id }
+                });
+            }
+            catch (Exception ex)
+            {
+                ShowMessage(ex.Message, "删除失败", MessageMode.Error);
+            }
+        }
+
+        public void RequestClearLog()
+        {
+            RPC.ClearLog(RpcEmpty);
+            Dispatcher.Invoke(ClearLog);
+        }
 
         #endregion
 
@@ -176,6 +204,10 @@ namespace SakuraLibrary.Model
                 {
                     await RPC.LoginAsync(new LoginRequest() { Token = UserToken }).ConfigureAwait(false);
                 }
+            }
+            catch (Exception ex)
+            {
+                ShowMessage(ex.Message, "登录失败", MessageMode.Error);
             }
             finally
             {
@@ -318,7 +350,7 @@ namespace SakuraLibrary.Model
             // TODO
         }
 
-        public void ConfirmUpdate(bool legacy, Action<bool, string> callback, Func<string, bool> confirm, Func<string, bool> warn)
+        public void ConfirmUpdate(bool legacy)
         {
             // TODO
             //if (Update.UpdateReadyDir == "")
@@ -359,13 +391,13 @@ namespace SakuraLibrary.Model
         public bool SwitchingMode { get => _switchingMode; set => SafeSet(out _switchingMode, value); }
         private bool _switchingMode;
 
-        public void SwitchWorkingMode(Action<bool, string> callback, Func<string, bool> confirm)
+        public void SwitchWorkingMode()
         {
             if (SwitchingMode)
             {
                 return;
             }
-            if (!confirm("确定要切换运行模式吗?\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n\n注意事项:\n1. 切换运行模式后不要移动启动器到其他目录, 否则会造成严重错误\n2. 如需移动或卸载启动器, 请先切到 \"守护进程\" 模式来避免文件残留\n3. 切换过程可能需要十余秒, 请耐心等待, 不要做其他操作\n4. 切换操作即为 安装/卸载 系统服务, 需要管理员权限"))
+            if (!ShowMessage("确定要切换运行模式吗?\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n\n注意事项:\n1. 切换运行模式后不要移动启动器到其他目录, 否则会造成严重错误\n2. 如需移动或卸载启动器, 请先切到 \"守护进程\" 模式来避免文件残留\n3. 切换过程可能需要十余秒, 请耐心等待, 不要做其他操作\n4. 切换操作即为 安装/卸载 系统服务, 需要管理员权限", "提示", MessageMode.Confirm))
             {
                 return;
             }
@@ -381,7 +413,14 @@ namespace SakuraLibrary.Model
                     Dispatcher.Invoke(() => RaisePropertyChanged(nameof(IsDaemon)));
                     Daemon.Start();
 
-                    callback(result, result ? "运行模式已切换, 正在重新初始化 Daemon" : "运行模式切换失败, 请检查您是否有足够的权限 安装/卸载 服务");
+                    if (result)
+                    {
+                        ShowMessage("运行模式已切换, 正在重新初始化 Daemon", "提示", MessageMode.Info);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ShowMessage(ex.ToString(), "错误", MessageMode.Error);
                 }
                 finally
                 {

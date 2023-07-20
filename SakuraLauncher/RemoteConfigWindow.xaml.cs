@@ -32,7 +32,7 @@ namespace SakuraLauncher
             }
             catch (Exception ex)
             {
-                App.ShowMessage(ex.Message, "错误", MessageBoxImage.Error);
+                Model.ShowMessage(ex.Message, "错误", SakuraLibrary.Model.LauncherModel.MessageMode.Error);
             }
             Close();
         }

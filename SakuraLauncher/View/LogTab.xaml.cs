@@ -1,6 +1,5 @@
 ﻿using SakuraLauncher.Helper;
 using SakuraLauncher.Model;
-using SakuraLibrary.Proto;
 using System;
 using System.IO;
 using System.Linq;
@@ -26,11 +25,7 @@ namespace SakuraLauncher.View
             DataContext = Model = main;
         }
 
-        private void ButtonClear_Click(object sender, RoutedEventArgs e)
-        {
-            Model.ClearLog();
-            //Model.RPC.Request(MessageID.LogClear);
-        }
+        private void ButtonClear_Click(object sender, RoutedEventArgs e) => Model.RequestClearLog();
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
@@ -50,7 +45,7 @@ namespace SakuraLauncher.View
             }
             catch (Exception ex)
             {
-                Model.SimpleFailureHandler(false, ex.ToString());
+                Model.ShowMessage(ex.ToString(), "错误", SakuraLibrary.Model.LauncherModel.MessageMode.Error);
             }
         }
 

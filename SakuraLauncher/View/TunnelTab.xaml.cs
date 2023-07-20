@@ -11,7 +11,9 @@ namespace SakuraLauncher.View
     public partial class TunnelTab : UserControl
     {
         private readonly LauncherViewModel Model;
+#pragma warning disable IDE0052
         private readonly TouchScrollHelper scrollHelper;
+#pragma warning restore IDE0052
 
         public TunnelTab(LauncherViewModel main)
         {
@@ -26,28 +28,17 @@ namespace SakuraLauncher.View
         private void ButtonReload_Click(object sender, RoutedEventArgs e)
         {
             IsEnabled = false;
-            Model.RequestReloadTunnelsAsync().ContinueWith(r =>
-            {
-                if (r.Result != null)
-                {
-                    Model.SimpleFailureHandler(false, r.Result.Message);
-                }
-                IsEnabled = true;
-            });
+            Model.RequestReloadTunnelsAsync().ContinueWith(r => IsEnabled = true);
         }
 
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
         {
             if ((sender as Button).DataContext is TunnelModel tunnel)
             {
-                if (App.ShowMessage(string.Format("确定要删除隧道 #{0} {1} 吗?", tunnel.Id, tunnel.Name), "操作确认", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                if (Model.ShowMessage(string.Format("确定要删除隧道 #{0} {1} 吗?", tunnel.Id, tunnel.Name), "操作确认", LauncherModel.MessageMode.Confirm))
                 {
                     IsEnabled = false;
-                    //Model.RequestDeleteTunnel(tunnel.Id, (a, b) =>
-                    //{
-                    //    Dispatcher.Invoke(() => IsEnabled = true);
-                    //    Model.SimpleFailureHandler(a, b);
-                    //});
+                    Model.RequestDeleteTunnelAsync(tunnel.Id).ContinueWith(_ => Dispatcher.Invoke(() => IsEnabled = true));
                 }
             }
         }

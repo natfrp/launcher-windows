@@ -56,7 +56,7 @@
             </ControlTemplate>
         </ScrollViewer.Template>
         <StackPanel Margin="24,0,16,16" UseLayoutRounding="True">
-            <DockPanel Margin="0,0,8,12">
+            <DockPanel Margin="4,0,8,12">
                 <TextBlock
                     Margin="0,0,16,0"
                     DockPanel.Dock="Left"

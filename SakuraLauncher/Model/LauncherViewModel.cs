@@ -18,17 +18,6 @@ namespace SakuraLauncher.Model
 {
     public class LauncherViewModel : LauncherModel
     {
-        public readonly Func<string, bool> SimpleConfirmHandler = message => App.ShowMessage(message, "操作确认", MessageBoxImage.Asterisk, MessageBoxButton.OKCancel) == MessageBoxResult.OK;
-        public readonly Func<string, bool> SimpleWarningHandler = message => App.ShowMessage(message, "警告", MessageBoxImage.Warning, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
-        public readonly Action<bool, string> SimpleHandler = (success, message) => App.ShowMessage(message, success ? "操作成功" : "操作失败", success ? MessageBoxImage.Information : MessageBoxImage.Error);
-        public readonly Action<bool, string> SimpleFailureHandler = (success, message) =>
-        {
-            if (!success)
-            {
-                App.ShowMessage(message, "操作失败", MessageBoxImage.Error);
-            }
-        };
-
         public readonly MainWindow View;
 
         public LauncherViewModel(MainWindow view) : base(false)
@@ -72,6 +61,21 @@ namespace SakuraLauncher.Model
             Run();
         }
 
+        #region ViewModel Abstraction
+
+        public override bool ShowMessage(string message, string title, MessageMode mode) => View.Dispatcher.Invoke(() => MessageBox.Show(
+            View, message, title,
+            mode == MessageMode.Confirm ? MessageBoxButton.OKCancel : MessageBoxButton.OK,
+            mode switch
+            {
+                MessageMode.Confirm => MessageBoxImage.Question,
+                MessageMode.Info => MessageBoxImage.Information,
+                MessageMode.Warning => MessageBoxImage.Warning,
+                MessageMode.Error => MessageBoxImage.Error,
+                _ => MessageBoxImage.None
+            }
+        )) == MessageBoxResult.OK;
+
         public override void Save()
         {
             if (!Dispatcher.CheckAccess())
@@ -93,6 +97,8 @@ namespace SakuraLauncher.Model
             settings.Save();
         }
 
+        #endregion
+
         #region Generic Properties
 
         public SnackbarMessageQueue SnackMessageQueue { get; } = new SnackbarMessageQueue();
@@ -105,7 +111,7 @@ namespace SakuraLauncher.Model
                 var result = Utils.SetAutoRun(!AutoRun, Consts.SakuraLauncherPrefix);
                 if (result != null)
                 {
-                    App.ShowMessage(result, "设置失败", MessageBoxImage.Error);
+                    ShowMessage(result, "设置失败", MessageMode.Error);
                 }
                 RaisePropertyChanged();
             }

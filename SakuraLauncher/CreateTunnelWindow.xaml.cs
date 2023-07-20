@@ -3,6 +3,7 @@ using System.Windows.Controls;
 
 using SakuraLibrary.Model;
 using SakuraLibrary.Proto;
+using MessageMode = SakuraLibrary.Model.LauncherModel.MessageMode;
 
 namespace SakuraLauncher
 {
@@ -27,19 +28,19 @@ namespace SakuraLauncher
             {
                 return;
             }
-            if (!(this.node.SelectedItem is Node node))
+            if (this.node.SelectedItem is not Node node)
             {
-                App.ShowMessage("请选择穿透服务器", "Oops", MessageBoxImage.Error);
+                Model.Launcher.ShowMessage("请选择穿透服务器", "操作失败", MessageMode.Error);
                 return;
             }
             Model.RequestCreate(node.Id, (success, message) =>
             {
                 if (!success)
                 {
-                    App.ShowMessage(message, "操作失败", MessageBoxImage.Error);
+                    Model.Launcher.ShowMessage(message, "操作失败", MessageMode.Error);
                     return;
                 }
-                if (App.ShowMessage(message + "\n是否继续创建?", "创建成功", MessageBoxImage.Question, MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                if (Model.Launcher.ShowMessage(message + "\n是否关闭当前窗口?", "创建成功", MessageMode.Confirm))
                 {
                     Dispatcher.Invoke(() => Close());
                     return;

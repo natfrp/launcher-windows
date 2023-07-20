@@ -24,7 +24,7 @@
                 <Run Text="{Binding FrpcVersion, Mode=OneWay}" />
                 <LineBreak />
                 <LineBreak />
-                <Run FontSize="15" Text="版权所有 © 2020-2022 iDea Leaper" />
+                <Run FontSize="15" Text="版权所有 © 2020-2023 iDea Leaper" />
                 <LineBreak />
                 <Run FontSize="15">https://github.com/natfrp/SakuraFrpLauncher</Run>
             </TextBlock>
