@@ -2,12 +2,14 @@
     x:Class="SakuraLauncher.CreateTunnelWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Model="clr-namespace:SakuraLibrary.Model;assembly=SakuraLibrary"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="新建穿透隧道"
     Width="880"
     Height="500"
+    d:DataContext="{d:DesignInstance Type=Model:CreateTunnelModel}"
     Background="{StaticResource MaterialDesignPaper}"
     TextElement.FontSize="15"
     TextElement.FontWeight="Regular"
@@ -139,10 +141,11 @@
                         Width="224"
                         Margin="8"
                         materialDesign:HintAssist.Hint="穿透节点"
+                        DisplayMemberPath="DisplayName"
                         ItemsSource="{Binding Nodes}"
                         Style="{StaticResource MaterialDesignFloatingHintComboBox}">
                         <ComboBox.ItemContainerStyle>
-                            <Style BasedOn="{StaticResource MaterialDesignListBoxItem}" TargetType="ComboBoxItem">
+                            <Style BasedOn="{StaticResource MaterialDesignComboBoxItemStyle}" TargetType="ComboBoxItem">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Enabled}" Value="True">
                                         <Setter Property="Padding" Value="32,8,16,8" />

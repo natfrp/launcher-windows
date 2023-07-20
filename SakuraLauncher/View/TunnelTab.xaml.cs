@@ -28,7 +28,7 @@ namespace SakuraLauncher.View
         private void ButtonReload_Click(object sender, RoutedEventArgs e)
         {
             IsEnabled = false;
-            Model.RequestReloadTunnelsAsync().ContinueWith(r => IsEnabled = true);
+            Model.RequestReloadTunnelsAsync().ContinueWith(_ => Dispatcher.Invoke(() => IsEnabled = true));
         }
 
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)

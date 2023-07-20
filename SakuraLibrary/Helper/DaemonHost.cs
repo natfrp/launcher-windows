@@ -103,6 +103,15 @@ namespace SakuraLibrary.Helper
 
             if (!IsRunning())
             {
+                // The daemon is not managed by this host, but it do exists, request exit anyway
+                if (Launcher.Connected)
+                {
+                    try
+                    {
+                        Launcher.RPC.Shutdown(new Empty());
+                    }
+                    catch { }
+                }
                 return true;
             }
             try

@@ -70,23 +70,15 @@ namespace LegacyLauncher
             }
             button_create.Enabled = false;
             button_create.Text = "创建中";
-            Model.RequestCreate(n.Id, (success, message) =>
+            Model.RequestCreate(n.Id, (close) =>
             {
-                if (!success)
+                if (close)
                 {
-                    MessageBox.Show(message, "操作失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
                     return;
                 }
-                if (MessageBox.Show(message + "\n是否继续创建?", "创建成功", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-                {
-                    Model.Dispatcher.Invoke(() => Close());
-                    return;
-                }
-                Model.Dispatcher.Invoke(() =>
-                {
-                    button_create.Enabled = true;
-                    button_create.Text = "创建";
-                });
+                button_create.Enabled = true;
+                button_create.Text = "创建";
             });
         }
 

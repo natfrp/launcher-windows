@@ -2,7 +2,7 @@
 
 namespace System.Threading.Tasks
 {
-    public static class TaskExtensions
+    public static class Extensions
     {
         public static T WaitResult<T>(this Task<T> task)
         {
@@ -56,5 +56,15 @@ namespace System.Threading.Tasks
                 }
             });
         }
+    }
+}
+
+namespace SakuraLibrary.Proto
+{
+    public sealed partial class Node
+    {
+        public bool Enabled { get; set; } = true;
+
+        public string DisplayName => Enabled ? "#" + Id + " " + Name : Name;
     }
 }

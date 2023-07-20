@@ -62,15 +62,6 @@ namespace SakuraLibrary.Model
             {
                 try
                 {
-                    // In case of disconnect, reset UI state
-                    UserInfo = new User { Status = UserStatus.NoLogin };
-                    Dispatcher.Invoke(() =>
-                    {
-                        Nodes.Clear();
-                        Tunnels.Clear();
-                        ClearLog();
-                    });
-
                     var tasks = new Task[]
                     {
                         await RPC.StreamConfig(RpcEmpty).InitStream(c => Config = c, CTS.Token),
@@ -99,7 +90,6 @@ namespace SakuraLibrary.Model
                                 break;
                             }
                         }), CTS.Token),
-                        //await RPC.StreamUpdateStatus(RpcEmpty).InitStream(u => {}),
                     };
 
                     Connected = true;
@@ -111,6 +101,15 @@ namespace SakuraLibrary.Model
                     Connected = false;
                     Console.WriteLine(ex);
                 }
+
+                // In case of disconnect, reset UI state
+                UserInfo = new User { Status = UserStatus.Pending };
+                Dispatcher.Invoke(() =>
+                {
+                    Nodes.Clear();
+                    Tunnels.Clear();
+                    ClearLog();
+                });
                 await Task.Delay(1000);
             }
         }
@@ -138,7 +137,7 @@ namespace SakuraLibrary.Model
         private bool _connected = false;
 
         public User UserInfo { get => _userInfo; set => SafeSet(out _userInfo, value ?? new User()); }
-        private User _userInfo = new();
+        private User _userInfo = new() { Status = UserStatus.Pending };
 
         public IDictionary<int, Node> Nodes { get => _nodes; set => SafeSet(out _nodes, value); }
         private IDictionary<int, Node> _nodes = new Dictionary<int, Node>();
@@ -149,7 +148,24 @@ namespace SakuraLibrary.Model
 
         #region RPC Wrappers
 
+        public async Task RequestReloadNodesAsync() => await RPC.ReloadNodesAsync(RpcEmpty);
+
         public async Task RequestReloadTunnelsAsync() => await RPC.ReloadTunnelsAsync(RpcEmpty);
+
+        public async Task<TunnelUpdate> RequestCreateTunnelAsync(string localIp, int localPort, string name, string note, string type, int remote, int node) => await RPC.UpdateTunnelAsync(new TunnelUpdate()
+        {
+            Action = TunnelUpdate.Types.Action.Add,
+            Tunnel = new Tunnel()
+            {
+                Name = name,
+                Note = note,
+                Node = node,
+                Type = type,
+                Remote = remote.ToString(),
+                LocalIp = localIp,
+                LocalPort = localPort,
+            },
+        });
 
         public async Task RequestDeleteTunnelAsync(int id)
         {

@@ -37,56 +37,75 @@ namespace SakuraLibrary.Model
         public bool Creating { get => _creating; set => SafeSet(out _creating, value); }
         private bool _creating = false;
 
-        public IEnumerable<Node> Nodes { get; set; }
+        public List<Node> Nodes { get; set; } = new List<Node>();
 
         public ObservableCollection<LocalProcessModel> Listening { get; set; } = new ObservableCollection<LocalProcessModel>();
 
         public CreateTunnelModel(LauncherModel launcher) : base(launcher.Dispatcher)
         {
             Launcher = launcher;
-            Nodes = launcher.Nodes.Values.Where(NodeFlags.AcceptNewTunnel);
+
+            var groups = new Dictionary<string, List<Node>>()
+            {
+                { "private", new List<Node>() },
+                { "vip3", new List<Node>() },
+                { "vip4", new List<Node>() },
+                { "china", new List<Node>() },
+                { "normal", new List<Node>() },
+            };
+            foreach (var n in launcher.Nodes.Values)
+            {
+                if (!NodeFlags.AcceptNewTunnel(n))
+                {
+                    continue;
+                }
+                var key = NodeFlags.IsPrivate(n) ? "private" : n.Vip > 0 ? $"vip{n.Vip}" : NodeFlags.IsChinese(n) ? "china" : "normal";
+                if (!groups.ContainsKey(key))
+                {
+                    groups.Add(key, new List<Node>() { n });
+                }
+                else
+                {
+                    groups[key].Add(n);
+                }
+            }
+            foreach (var g in groups)
+            {
+                if (g.Value.Count == 0)
+                {
+                    continue;
+                }
+                Nodes.Add(new Node()
+                {
+                    Enabled = false,
+                    Name = g.Key switch
+                    {
+                        "private" => "私有节点",
+                        "vip3" => "青铜节点",
+                        "vip4" => "白银节点",
+                        "china" => "普通节点 (内地)",
+                        "normal" => "普通节点 (其他)",
+                        _ => g.Key,
+                    },
+                });
+                Nodes.AddRange(g.Value);
+            }
         }
 
-        public void RequestCreate(int node, Action<bool, string> callback)
+        public void RequestCreate(int node, Action<bool> callback)
         {
             Creating = true;
-            ThreadPool.QueueUserWorkItem(s =>
+            Launcher.RequestCreateTunnelAsync(LocalAddress, LocalPort, TunnelName, Note, Type.ToLower(), RemotePort, node).ContinueWith(r => Dispatcher.Invoke(() =>
             {
-                try
+                Creating = false;
+                if (r.Exception != null)
                 {
-                    //var resp = Launcher.RPC.Request(new RequestBase()
-                    //{
-                    //    Type = MessageID.TunnelCreate,
-                    //    DataCreateTunnel = new CreateTunnel()
-                    //    {
-                    //        Name = TunnelName,
-                    //        Note = Note,
-                    //        Node = node,
-                    //        Type = Type.ToLower(),
-                    //        RemotePort = RemotePort,
-                    //        LocalPort = LocalPort,
-                    //        LocalAddress = LocalAddress
-                    //    }
-                    //});
-                    //if (!resp.Success)
-                    //{
-                    //    callback(false, resp.Message);
-                    //    return;
-                    //}
-                    //Dispatcher.Invoke(() =>
-                    //{
-                    //    LocalPort = 0;
-                    //    LocalAddress = "";
-                    //    RemotePort = 0;
-                    //    TunnelName = "";
-                    //});
-                    //callback(true, "成功创建隧道 " + resp.Message);
+                    Launcher.ShowMessage(r.Exception.ToString(), "创建失败", LauncherModel.MessageMode.Error);
+                    callback(false);
+                    return;
                 }
-                finally
-                {
-                    Creating = false;
-                }
-            });
+                callback(Launcher.ShowMessage($"成功创建隧道 #{r.Result.Tunnel.Id} {r.Result.Tunnel.Name}\n\n按 \"取消\" 继续创建, \"确定\" 关闭创建隧道窗口", "创建成功", LauncherModel.MessageMode.Confirm));
+            }));
         }
 
         public void ReloadListening()

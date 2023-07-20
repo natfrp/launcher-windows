@@ -33,17 +33,11 @@ namespace SakuraLauncher
                 Model.Launcher.ShowMessage("请选择穿透服务器", "操作失败", MessageMode.Error);
                 return;
             }
-            Model.RequestCreate(node.Id, (success, message) =>
+            Model.RequestCreate(node.Id, (close) =>
             {
-                if (!success)
+                if (close)
                 {
-                    Model.Launcher.ShowMessage(message, "操作失败", MessageMode.Error);
-                    return;
-                }
-                if (Model.Launcher.ShowMessage(message + "\n是否关闭当前窗口?", "创建成功", MessageMode.Confirm))
-                {
-                    Dispatcher.Invoke(() => Close());
-                    return;
+                    Close();
                 }
             });
         }

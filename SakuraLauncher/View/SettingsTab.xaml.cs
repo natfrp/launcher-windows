@@ -61,11 +61,18 @@ namespace SakuraLauncher.View
         {
             var btn = sender as Button;
             btn.IsEnabled = false;
-            ThreadPool.QueueUserWorkItem(_ =>
+            Model.RequestReloadNodesAsync().ContinueWith(r => Dispatcher.Invoke(() =>
             {
-                //Model.SnackMessageQueue.Enqueue($"节点列表刷新{(Model.SyncNodes(true) ? "成功" : "失败")}");
-                Dispatcher.Invoke(() => btn.IsEnabled = true);
-            });
+                if (r.Exception != null)
+                {
+                    Model.ShowMessage(r.Exception.ToString(), "节点列表刷新失败", SakuraLibrary.Model.LauncherModel.MessageMode.Error);
+                }
+                else
+                {
+                    Model.SnackMessageQueue.Enqueue("节点列表刷新成功");
+                }
+                btn.IsEnabled = true;
+            }));
         }
 
         private void ButtonSwitchMode_Click(object sender, RoutedEventArgs e) => Model.SwitchWorkingMode();
