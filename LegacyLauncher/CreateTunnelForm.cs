@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 
 using SakuraLibrary.Model;
+using SakuraLibrary.Proto;
 
 namespace LegacyLauncher
 {
@@ -16,7 +17,7 @@ namespace LegacyLauncher
 
             foreach (var node in Model.Nodes)
             {
-                if (node.AcceptNew)
+                if (NodeFlags.AcceptNewTunnel(node))
                 {
                     comboBox_node.Items.Add(node);
                 }
@@ -62,9 +63,9 @@ namespace LegacyLauncher
 
         private void button_create_Click(object sender, EventArgs e)
         {
-            if (!(comboBox_node.SelectedItem is NodeModel n))
+            if (comboBox_node.SelectedItem is not Node n)
             {
-                MessageBox.Show("请选择穿透服务器", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("请选择穿透节点", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             button_create.Enabled = false;

@@ -11,26 +11,10 @@ namespace LegacyLauncher.Model
 {
     public class LauncherViewModel : LauncherModel
     {
-        public readonly Func<string, bool> SimpleConfirmHandler;
-        public readonly Func<string, bool> SimpleWarningHandler;
-        public readonly Action<bool, string> SimpleHandler;
-        public readonly Action<bool, string> SimpleFailureHandler;
-
         public readonly MainForm View;
 
         public LauncherViewModel(MainForm view) : base(true)
         {
-            SimpleConfirmHandler = message => MessageBox.Show(View, message, "操作确认", MessageBoxButtons.OKCancel, MessageBoxIcon.Asterisk) == DialogResult.OK;
-            SimpleWarningHandler = message => MessageBox.Show(View, message, "警告", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
-            SimpleHandler = (success, message) => MessageBox.Show(View, message, success ? "操作成功" : "操作失败", MessageBoxButtons.OK, success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
-            SimpleFailureHandler = (success, message) =>
-            {
-                if (!success)
-                {
-                    MessageBox.Show(View, message, "操作失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            };
-
             View = view;
             Dispatcher = new DispatcherWrapper(a => View.Invoke(a), a => View.BeginInvoke(a), () => !View.InvokeRequired);
 
@@ -82,6 +66,19 @@ namespace LegacyLauncher.Model
             }
             Dispatcher.Invoke(() => View.textBox_log.AppendText(l.Source + " " + category + l.Data + Environment.NewLine));
         }
+
+        public override bool ShowMessage(string message, string title, MessageMode mode) => MessageBox.Show(
+            message, title,
+            mode == MessageMode.Confirm ? MessageBoxButtons.OKCancel : MessageBoxButtons.OK,
+            mode switch
+            {
+                MessageMode.Confirm => MessageBoxIcon.Question,
+                MessageMode.Info => MessageBoxIcon.Information,
+                MessageMode.Warning => MessageBoxIcon.Warning,
+                MessageMode.Error => MessageBoxIcon.Error,
+                _ => MessageBoxIcon.None,
+            }
+        ) == DialogResult.OK;
 
         public override void Save()
         {

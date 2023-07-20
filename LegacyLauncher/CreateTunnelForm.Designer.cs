@@ -163,11 +163,12 @@
             // 
             // comboBox_node
             // 
+            this.comboBox_node.DisplayMember = "DisplayName";
             this.comboBox_node.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_node.FormattingEnabled = true;
-            this.comboBox_node.Location = new System.Drawing.Point(59, 105);
+            this.comboBox_node.Location = new System.Drawing.Point(47, 105);
             this.comboBox_node.Name = "comboBox_node";
-            this.comboBox_node.Size = new System.Drawing.Size(231, 20);
+            this.comboBox_node.Size = new System.Drawing.Size(243, 20);
             this.comboBox_node.TabIndex = 12;
             // 
             // label6
@@ -175,9 +176,9 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(6, 108);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(47, 12);
+            this.label6.Size = new System.Drawing.Size(35, 12);
             this.label6.TabIndex = 11;
-            this.label6.Text = "服务器:";
+            this.label6.Text = "节点:";
             // 
             // textBox_remote
             // 

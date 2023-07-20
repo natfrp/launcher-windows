@@ -6,7 +6,6 @@ using System.Collections.Specialized;
 
 using SakuraLibrary;
 using SakuraLibrary.Model;
-using SakuraLibrary.Proto;
 
 using LegacyLauncher.Model;
 
@@ -29,6 +28,8 @@ namespace LegacyLauncher
             notifyIcon_tray.Icon = Icon;
 
             checkBox_autorun.Checked = File.Exists(Utils.GetAutoRunFile(Consts.LegacyLauncherPrefix));
+
+            label_unconnected.Visible = Model.Connected;
         }
 
         public void RefresnTunnels(object s = null, NotifyCollectionChangedEventArgs e = null)
@@ -97,6 +98,9 @@ namespace LegacyLauncher
             case nameof(Model.LogTextWrapping):
                 textBox_log.ScrollBars = Model.LogTextWrapping ? ScrollBars.Vertical : ScrollBars.Both;
                 break;
+            case nameof(Model.Connected):
+                label_unconnected.Visible = !Model.Connected;
+                break;
             case nameof(Model.HaveUpdate):
                 if (Model.HaveUpdate)
                 {
@@ -145,7 +149,7 @@ namespace LegacyLauncher
             }
         }
 
-        private void label_update_Click(object sender, EventArgs e) => Model.ConfirmUpdate(true, Model.SimpleFailureHandler, Model.SimpleConfirmHandler, Model.SimpleWarningHandler);
+        private void label_update_Click(object sender, EventArgs e) => Model.ConfirmUpdate(true);
 
         private void checkBox_update_CheckedChanged(object sender, EventArgs e)
         {
@@ -181,6 +185,12 @@ namespace LegacyLauncher
             }
         }
 
+        private void toolStripMenuItem_reload_Click(object sender, EventArgs e)
+        {
+            listView_tunnels.Enabled = false;
+            Model.RequestReloadTunnelsAsync().ContinueWith(_ => Invoke(() => listView_tunnels.Enabled = true));
+        }
+
         private void toolStripMenuItem_delete_Click(object sender, EventArgs e)
         {
             if (listView_tunnels.SelectedItems.Count == 1)
@@ -193,11 +203,7 @@ namespace LegacyLauncher
                         return;
                     }
                     listView_tunnels.Enabled = false;
-                    Model.RequestDeleteTunnel(tunnel.Id, (a, b) =>
-                    {
-                        Model.Dispatcher.Invoke(() => listView_tunnels.Enabled = true);
-                        Model.SimpleFailureHandler(a, b);
-                    });
+                    Model.RequestDeleteTunnelAsync(tunnel.Id).ContinueWith(_ => Invoke(() => listView_tunnels.Enabled = true));
                 }
             }
         }
@@ -212,16 +218,12 @@ namespace LegacyLauncher
             {
                 return;
             }
-            Model.RequestLogin(Model.SimpleFailureHandler);
+            _ = Model.LoginOrLogout();
         }
 
         private void button_create_Click(object sender, EventArgs e) => new CreateTunnelForm(Model).ShowDialog();
 
-        private void button_clear_Click(object sender, EventArgs e)
-        {
-            textBox_log.Text = "";
-            Model.RPC.Request(MessageID.LogClear);
-        }
+        private void button_clear_Click(object sender, EventArgs e) => Model.RequestClearLog();
 
         #endregion
 

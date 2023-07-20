@@ -54,6 +54,8 @@
             this.checkBox_textwrap = new System.Windows.Forms.CheckBox();
             this.checkBox_update = new System.Windows.Forms.CheckBox();
             this.label_update = new System.Windows.Forms.Label();
+            this.label_unconnected = new System.Windows.Forms.Label();
+            this.toolStripMenuItem_reload = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.launcherModelBindingSource)).BeginInit();
             this.contextMenuStrip_tray.SuspendLayout();
             this.contextMenuStrip_tunnel.SuspendLayout();
@@ -187,31 +189,31 @@
             this.toolStripMenuItem_exit,
             this.ToolStripMenuItem_exitAll});
             this.contextMenuStrip_tray.Name = "contextMenuStrip1";
-            this.contextMenuStrip_tray.Size = new System.Drawing.Size(125, 76);
+            this.contextMenuStrip_tray.Size = new System.Drawing.Size(137, 76);
             // 
             // toolStripMenuItem_show
             // 
             this.toolStripMenuItem_show.Name = "toolStripMenuItem_show";
-            this.toolStripMenuItem_show.Size = new System.Drawing.Size(124, 22);
+            this.toolStripMenuItem_show.Size = new System.Drawing.Size(136, 22);
             this.toolStripMenuItem_show.Text = "显示";
             this.toolStripMenuItem_show.Click += new System.EventHandler(this.toolStripMenuItem_show_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(121, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(133, 6);
             // 
             // toolStripMenuItem_exit
             // 
             this.toolStripMenuItem_exit.Name = "toolStripMenuItem_exit";
-            this.toolStripMenuItem_exit.Size = new System.Drawing.Size(124, 22);
+            this.toolStripMenuItem_exit.Size = new System.Drawing.Size(136, 22);
             this.toolStripMenuItem_exit.Text = "退出启动器";
             this.toolStripMenuItem_exit.Click += new System.EventHandler(this.toolStripMenuItem_exit_Click);
             // 
             // ToolStripMenuItem_exitAll
             // 
             this.ToolStripMenuItem_exitAll.Name = "ToolStripMenuItem_exitAll";
-            this.ToolStripMenuItem_exitAll.Size = new System.Drawing.Size(124, 22);
+            this.ToolStripMenuItem_exitAll.Size = new System.Drawing.Size(136, 22);
             this.ToolStripMenuItem_exitAll.Text = "彻底退出";
             this.ToolStripMenuItem_exitAll.Click += new System.EventHandler(this.ToolStripMenuItem_exitAll_Click);
             // 
@@ -228,14 +230,15 @@
             // contextMenuStrip_tunnel
             // 
             this.contextMenuStrip_tunnel.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem_reload,
             this.toolStripMenuItem_delete});
             this.contextMenuStrip_tunnel.Name = "contextMenuStrip_tunnel";
-            this.contextMenuStrip_tunnel.Size = new System.Drawing.Size(101, 26);
+            this.contextMenuStrip_tunnel.Size = new System.Drawing.Size(181, 70);
             // 
             // toolStripMenuItem_delete
             // 
             this.toolStripMenuItem_delete.Name = "toolStripMenuItem_delete";
-            this.toolStripMenuItem_delete.Size = new System.Drawing.Size(100, 22);
+            this.toolStripMenuItem_delete.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem_delete.Text = "删除";
             this.toolStripMenuItem_delete.Click += new System.EventHandler(this.toolStripMenuItem_delete_Click);
             // 
@@ -282,11 +285,32 @@
             this.label_update.Visible = false;
             this.label_update.Click += new System.EventHandler(this.label_update_Click);
             // 
+            // label_unconnected
+            // 
+            this.label_unconnected.BackColor = System.Drawing.Color.OrangeRed;
+            this.label_unconnected.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label_unconnected.ForeColor = System.Drawing.Color.White;
+            this.label_unconnected.Location = new System.Drawing.Point(0, 492);
+            this.label_unconnected.Name = "label_unconnected";
+            this.label_unconnected.Size = new System.Drawing.Size(665, 31);
+            this.label_unconnected.TabIndex = 13;
+            this.label_unconnected.Text = "未连接到守护进程, 大部分功能将不可用, 请尝试重启启动器";
+            this.label_unconnected.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label_unconnected.Click += new System.EventHandler(this.label_update_Click);
+            // 
+            // toolStripMenuItem_reload
+            // 
+            this.toolStripMenuItem_reload.Name = "toolStripMenuItem_reload";
+            this.toolStripMenuItem_reload.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem_reload.Text = "刷新";
+            this.toolStripMenuItem_reload.Click += new System.EventHandler(this.toolStripMenuItem_reload_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(665, 523);
+            this.Controls.Add(this.label_unconnected);
             this.Controls.Add(this.label_update);
             this.Controls.Add(this.checkBox_update);
             this.Controls.Add(this.checkBox_textwrap);
@@ -338,6 +362,8 @@
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_exitAll;
         private System.Windows.Forms.Label label_update;
+        private System.Windows.Forms.Label label_unconnected;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_reload;
     }
 }
 
