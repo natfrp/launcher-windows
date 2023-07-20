@@ -85,7 +85,7 @@
                         Margin="8,0,4,0"
                         CornerRadius="180">
                         <Border.Background>
-                            <ImageBrush ImageSource="https://gravatar.globalslb.net/avatar/2734e78078ce5ae5a2cc2f7cc819f7c8?d=mp" Stretch="Fill" />
+                            <ImageBrush ImageSource="{Binding UserInfo.Avatar}" Stretch="Fill" />
                         </Border.Background>
                     </Border>
                     <StackPanel Margin="12,0,0,0">
