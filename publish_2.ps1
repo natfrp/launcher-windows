@@ -1,7 +1,7 @@
 $version = Get-Content "SakuraLibrary\Consts.cs" | Select-String "Version = `"(.+)`";"
 $version = $version.Matches[0].Groups[1].Value
 
-$projects = "SakuraLibrary", "SakuraLauncher", "LegacyLauncher", "SakuraFrpService"
+$projects = "SakuraLibrary", "SakuraLauncher", "LegacyLauncher"
 
 function Sign {
     param (
@@ -16,11 +16,10 @@ function PackLauncher {
         [String[]]$Files
     )
     New-Item -Name "launcher" -ItemType "directory" -ErrorAction SilentlyContinue
-    
+
     Copy-Item -Recurse "SakuraLibrary\*" "launcher"
-    Copy-Item -Recurse "SakuraFrpService\*" "launcher"
     Copy-Item -Recurse "$Variation\*" "launcher"
-    
+
     $target = $Variation -replace "Launcher", "Update"
     Compress-Archive -Force -CompressionLevel Optimal -Path "launcher\*" -DestinationPath "$target.zip"
     Remove-Item "launcher" -Recurse
@@ -31,7 +30,7 @@ function PackFrpc {
         $Architecture
     )
     New-Item -Name "frpc" -ItemType "directory" -ErrorAction SilentlyContinue
-    
+
     Copy-Item "sign\frpc_windows_${Architecture}_gui.exe" "frpc\frpc.exe"
     Copy-Item "sign\frpc_windows_${Architecture}_gui.exe.sig" "frpc\frpc.exe.sig"
 
@@ -41,13 +40,13 @@ function PackFrpc {
 
 try {
     Push-Location -Path "_publish"
-    
+
     foreach ($i in Get-ChildItem -Path "sign") {
         if ($projects -contains $i.BaseName) {
             Move-Item -Path $i.FullName -Destination $i.BaseName
             Sign "$($i.BaseName)\$($i.Name)"
         }
-        if ($i -match "^frpc_.+_gui\.exe$") { 
+        if ($i -match "^frpc_.+_gui\.exe$" -or $i -match "^SakuraFrpService_.+\.exe$") {
             Sign $i.FullName
         }
     }

@@ -1,6 +1,6 @@
 ﻿#define AppName "SakuraFrp 启动器"
 #define AppVersion ""
-#define RealVersion GetFileVersion("_publish\SakuraLibrary\SakuraLibrary.dll")
+#define RealVersion GetVersionNumbersString("_publish\SakuraLibrary\SakuraLibrary.dll")
 
 #define MainExecutable "SakuraLauncher.exe"
 
@@ -12,7 +12,7 @@ AppId=SakuraFrpLauncher
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} v{#RealVersion}
-AppCopyright=Copyright © iDea Leaper 2020-2022
+AppCopyright=Copyright © iDea Leaper 2020-2023
 
 AppPublisher=SakuraFrp
 AppPublisherURL=https://www.natfrp.com/
@@ -40,9 +40,9 @@ OutputDir=bin
 OutputBaseFilename=SakuraLauncher
 
 ; Compression
-Compression=lzma2
+Compression=lzma2/ultra64
 SolidCompression=yes
-LZMANumBlockThreads=18
+LZMANumBlockThreads=32
 LZMAUseSeparateProcess=yes
 
 [Languages]
@@ -58,7 +58,7 @@ Name: "frpc\x86"; Description: "frpc (32 位)"; Check: IsX86; Types: default cus
 Name: "frpc\x64"; Description: "frpc (64 位)"; Check: IsX64; Types: default custom; Flags: exclusive fixed
 Name: "frpc\arm64"; Description: "frpc (ARM64, 实验性)"; Check: IsARM64; Types: default custom; Flags: exclusive fixed
 
-Name: "launcher"; Description: "守护进程"; Types: default custom; Flags: fixed
+Name: "launcher"; Description: "核心服务"; Types: default custom; Flags: fixed
 Name: "launcher\service"; Description: "安装为系统服务";
 
 Name: "launcher_ui"; Description: "用户界面"; Types: default custom; Flags: fixed
@@ -76,14 +76,16 @@ Source: "_publish\sign\frpc_windows_amd64_gui.exe.sig"; DestDir: "{app}"; DestNa
 Source: "_publish\sign\frpc_windows_arm64_gui.exe"; DestDir: "{app}"; DestName: "frpc.exe"; Flags: ignoreversion; Components: "frpc\arm64"
 Source: "_publish\sign\frpc_windows_arm64_gui.exe.sig"; DestDir: "{app}"; DestName: "frpc.exe.sig"; Flags: ignoreversion; Components: "frpc\arm64"
 
-Source: "_publish\SakuraLibrary\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher"
-Source: "_publish\SakuraFrpService\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs; Components: "launcher"
+Source: "_publish\sign\SakuraFrpService_386.exe"; DestDir: "{app}"; DestName: "SakuraFrpService.exe"; Flags: ignoreversion; Components: "launcher"; Check: IsX86
+Source: "_publish\sign\SakuraFrpService_386.exe.sig"; DestDir: "{app}"; DestName: "SakuraFrpService.exe.sig"; Flags: ignoreversion; Components: "launcher"; Check: IsX86
+Source: "_publish\sign\SakuraFrpService_amd64.exe"; DestDir: "{app}"; DestName: "SakuraFrpService.exe"; Flags: ignoreversion; Components: "launcher"; Check: IsX64
+Source: "_publish\sign\SakuraFrpService_amd64.exe.sig"; DestDir: "{app}"; DestName: "SakuraFrpService.exe.sig"; Flags: ignoreversion; Components: "launcher"; Check: IsX64
+Source: "_publish\sign\SakuraFrpService_arm64.exe"; DestDir: "{app}"; DestName: "SakuraFrpService.exe"; Flags: ignoreversion; Components: "launcher"; Check: IsARM64
+Source: "_publish\sign\SakuraFrpService_arm64.exe.sig"; DestDir: "{app}"; DestName: "SakuraFrpService.exe.sig"; Flags: ignoreversion; Components: "launcher"; Check: IsARM64
 
+Source: "_publish\SakuraLibrary\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui"
 Source: "_publish\SakuraLauncher\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui\wpf"
 Source: "_publish\LegacyLauncher\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui\legacy"
-
-; The service will always overwrite Updater.exe before executing it
-Source: "SakuraFrpService\Resources\Updater.exe"; DestDir: "{app}"; Flags: ignoreversion onlyifdoesntexist; Components: "launcher"
 
 [Icons]
 ; Start Menu
@@ -131,7 +133,7 @@ begin
 	outputPage.ProgressBar.Style := npbstMarquee;
 	outputPage.ProgressBar.Visible := True;
 	outputPage.Show;
-	
+
 	if not Exec(ExpandConstant('{tmp}\' + File), Args, '', SW_SHOW, ewWaitUntilTerminated, resultCode) then
 	begin
 		Result := Name + ' 安装失败: ' + SysErrorMessage(resultCode);
@@ -144,7 +146,7 @@ begin
 			end;
 		end;
 	end;
-	
+
 	outputPage.Hide;
 end;
 
@@ -155,18 +157,18 @@ var
 	version: Cardinal;
 begin
 	downloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
-	
+
 	installNet := (not RegQueryDWordValue(HKLM, 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full', 'Release', version)) or (version < 528040);
 end;
 
 function UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
 begin
 	Result := '';
-	
+
 	if installNet then begin
 		Result := Result + '运行环境 (需要联网下载):' + Newline + Space + '{#LibraryNameNet}' + Newline + NewLine;
 	end;
-	
+
 	if MemoUserInfoInfo <> '' then
 		Result := Result + MemoUserInfoInfo + Newline + NewLine;
 
@@ -195,9 +197,9 @@ begin
 		try
 			downloadPage.Show;
 			downloadPage.Clear;
-			
-			downloadPage.Add('https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/9b7b8746971ed51a1770ae4293618187/ndp48-web.exe', 'dotnet.exe', '0bba3094588c4bfec301939985222a20b340bf03431563dec8b2b4478b06fffa');
-			
+
+			downloadPage.Add('https://download.microsoft.com/download/6/e/4/6e483240-dd87-40cd-adf4-0c47f5695b49/NDP481-Web.exe', 'dotnet.exe', 'a9e29f446af0db54a4f20de0749db25907fde06999c2e25e9eca52528dce3142');
+
 			retry := True;
 			while retry do begin
 				retry := False;
@@ -233,10 +235,15 @@ end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
-	// Not sure if this is really appropriate, especially for LegacyLauncher dir
-//	if CurUninstallStep = usPostUninstall and MsgBox('删除启动器配置文件?', mbConfirmation, MB_YESNO) = IDYES then
-//		DelTree(ExpandConstant('{userappdata}\SakuraLauncher'), True, True, True);
-//		DelTree(ExpandConstant('{userappdata}\LegacyaLauncher'), True, True, True);
-//		DelTree(ExpandConstant('{userappdata}\SakuraFrpService'), True, True, True);
-//	end;
+	if (CurUninstallStep = usPostUninstall) and (MsgBox('是否删除启动器配置文件? 下列文件夹将会被删除: '
+		+#13#10+'    %AppData%\SakuraLauncher'
+		+#13#10+'    %AppData%\LegacyLauncher'
+		+#13#10+'    %AppData%\SakuraFrpService'
+		+#13#10+'    %ProgramData%\SakuraFrpService', mbConfirmation, MB_YESNO) = IDYES) then
+	begin
+		DelTree(ExpandConstant('{userappdata}\SakuraLauncher'), True, True, True);
+		DelTree(ExpandConstant('{userappdata}\LegacyLauncher'), True, True, True);
+		DelTree(ExpandConstant('{userappdata}\SakuraFrpService'), True, True, True);
+		DelTree(ExpandConstant('{commonappdata}\SakuraFrpService'), True, True, True);
+	end;
 end;

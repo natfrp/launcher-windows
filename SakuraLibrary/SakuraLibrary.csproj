@@ -43,13 +43,12 @@
 		</EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>
-		<Protobuf Include="..\..\natfrp-service\pkg\pb\grpc_service.proto" GrpcServices="Client">
+		<Protobuf Include="..\..\launcher\pkg\pb\grpc_service.proto" GrpcServices="Client">
 			<Link>Proto\grpc_service.proto</Link>
 		</Protobuf>
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Google.Protobuf" Version="3.23.4" />
-		<PackageReference Include="Grpc.Core" Version="2.46.6" />
 		<PackageReference Include="Grpc.Core.Api" Version="2.55.0" />
 		<PackageReference Include="Grpc.Net.Client" Version="2.55.0" />
 		<PackageReference Include="Grpc.Net.Common" Version="2.55.0" />
