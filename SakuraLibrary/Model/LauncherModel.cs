@@ -64,13 +64,29 @@ namespace SakuraLibrary.Model
                     var tasks = new Task[]
                     {
                         await RPC.StreamConfig(RpcEmpty).InitStream(c => Config = c, CTS.Token),
-                        await RPC.StreamUser(RpcEmpty).InitStream(u => UserInfo = u, CTS.Token),
-                        await RPC.StreamLog(RpcEmpty).InitStream(l => Dispatcher.Invoke(() => Log(l)), CTS.Token),
+                        await RPC.StreamUser(RpcEmpty).InitStream(u => {
+                            var us = UserInfo.Status != u.Status;
+                            UserInfo = u;
+                            // Make sure the SwitchTab don't get triggered by mistake
+                            if (us)
+                            {
+                                Dispatcher.Invoke(() => RaisePropertyChanged("_Login_State"));
+                            }
+                        }, CTS.Token),
+                        await RPC.StreamLog(RpcEmpty).InitStream(l =>
+                        {
+                            if (l.Category != Proto.Log.Types.Category.Unknown)
+                            {
+                                 Log(l);
+                            }
+                        }, CTS.Token),
                         await RPC.StreamNodes(RpcEmpty).InitStream(n => Nodes = n.Nodes, CTS.Token),
                         await RPC.StreamTunnels(RpcEmpty).InitStream(t => Dispatcher.Invoke(() =>
                         {
                             switch(t.Action)
                             {
+                            case TunnelUpdate.Types.Action.Unknown: // dummy update
+                                break;
                             case TunnelUpdate.Types.Action.Add:
                                 Tunnels.Add(new TunnelModel(t.Tunnel, this));
                                 break;

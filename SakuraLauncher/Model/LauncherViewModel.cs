@@ -2,6 +2,8 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
@@ -52,9 +54,24 @@ namespace SakuraLauncher.Model
 
             PropertyChanged += (sender, e) =>
             {
-                if (e.PropertyName == nameof(LoggedIn))
+                if (e.PropertyName == "_Login_State")
                 {
                     SwitchTab(LoggedIn ? 0 : 2);
+                }
+                else if (e.PropertyName == "UserInfo")
+                {
+                    if (string.IsNullOrEmpty(UserInfo.Avatar))
+                    {
+                        Avatar = null;
+                    }
+                    else
+                    {
+                        var uri = new Uri(UserInfo.Avatar);
+                        if (Avatar?.UriSource != uri)
+                        {
+                            Avatar = new BitmapImage(uri);
+                        }
+                    }
                 }
             };
 
@@ -120,14 +137,11 @@ namespace SakuraLauncher.Model
         [SourceBinding(nameof(Connected), nameof(HaveUpdate))]
         public bool ShowNotification => HaveUpdate || !Connected;
 
+        public BitmapImage Avatar { get => _avatar; set => Set(out _avatar, value); }
+        private BitmapImage _avatar;
+
         public bool CheckingUpdate { get => _checkingUpdate; set => SafeSet(out _checkingUpdate, value); }
         private bool _checkingUpdate;
-
-        [SourceBinding(nameof(UserInfo))]
-        public string UserName => UserInfo.Name;
-
-        [SourceBinding(nameof(UserInfo))]
-        public string UserMeta => "";
 
         public int Theme { get => _theme; set => Set(out _theme, value); }
         private int _theme;

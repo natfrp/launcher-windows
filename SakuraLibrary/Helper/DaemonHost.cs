@@ -73,7 +73,7 @@ namespace SakuraLibrary.Helper
             {
                 while (!StopEvent.WaitOne(500))
                 {
-                    if (IsRunning())
+                    if (Launcher.Connected || IsRunning())
                     {
                         continue;
                     }
