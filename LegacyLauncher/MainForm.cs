@@ -28,8 +28,6 @@ namespace LegacyLauncher
             notifyIcon_tray.Icon = Icon;
 
             checkBox_autorun.Checked = File.Exists(Utils.GetAutoRunFile(Consts.LegacyLauncherPrefix));
-
-            label_unconnected.Visible = Model.Connected;
         }
 
         public void RefresnTunnels(object s = null, NotifyCollectionChangedEventArgs e = null)
@@ -106,12 +104,12 @@ namespace LegacyLauncher
                 {
                     label_update.Text = Model.UpdateText;
                     label_update.Visible = true;
-                    textBox_log.Height = 231;
+                    textBox_log.Height = ClientSize.Height - textBox_log.Top - label_update.Height - 6;
                 }
                 else
                 {
                     label_update.Visible = false;
-                    textBox_log.Height = 253;
+                    textBox_log.Height = ClientSize.Height - textBox_log.Top - 12;
                 }
                 break;
             }

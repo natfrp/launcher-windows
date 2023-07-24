@@ -63,6 +63,8 @@
             // 
             // listView_tunnels
             // 
+            this.listView_tunnels.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.listView_tunnels.CheckBoxes = true;
             this.listView_tunnels.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
@@ -104,10 +106,6 @@
             // 
             this.columnHeader4.Text = "详情";
             this.columnHeader4.Width = 220;
-            // 
-            // launcherModelBindingSource
-            // 
-            this.launcherModelBindingSource.DataSource = typeof(SakuraLibrary.Model.LauncherModel);
             // 
             // textBox_token
             // 
@@ -162,16 +160,20 @@
             // 
             // textBox_log
             // 
+            this.textBox_log.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox_log.BackColor = System.Drawing.Color.Black;
             this.textBox_log.DataBindings.Add(new System.Windows.Forms.Binding("WordWrap", this.launcherModelBindingSource, "LogTextWrapping", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.textBox_log.Font = new System.Drawing.Font("Consolas", 10F);
             this.textBox_log.ForeColor = System.Drawing.Color.Silver;
             this.textBox_log.Location = new System.Drawing.Point(12, 258);
+            this.textBox_log.Margin = new System.Windows.Forms.Padding(3, 3, 3, 6);
             this.textBox_log.Multiline = true;
             this.textBox_log.Name = "textBox_log";
             this.textBox_log.ReadOnly = true;
             this.textBox_log.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox_log.Size = new System.Drawing.Size(641, 253);
+            this.textBox_log.Size = new System.Drawing.Size(641, 250);
             this.textBox_log.TabIndex = 9;
             // 
             // notifyIcon_tray
@@ -282,6 +284,7 @@
             this.label_update.BackColor = System.Drawing.Color.Teal;
             this.label_update.Cursor = System.Windows.Forms.Cursors.Hand;
             this.label_update.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.launcherModelBindingSource, "UpdateText", true));
+            this.label_update.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.label_update.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label_update.ForeColor = System.Drawing.Color.White;
             this.label_update.Location = new System.Drawing.Point(0, 492);
@@ -295,9 +298,10 @@
             // label_unconnected
             // 
             this.label_unconnected.BackColor = System.Drawing.Color.OrangeRed;
+            this.label_unconnected.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.label_unconnected.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label_unconnected.ForeColor = System.Drawing.Color.White;
-            this.label_unconnected.Location = new System.Drawing.Point(0, 492);
+            this.label_unconnected.Location = new System.Drawing.Point(0, 461);
             this.label_unconnected.Name = "label_unconnected";
             this.label_unconnected.Size = new System.Drawing.Size(665, 31);
             this.label_unconnected.TabIndex = 13;
@@ -322,11 +326,11 @@
             this.Controls.Add(this.checkBox_autorun);
             this.Controls.Add(this.textBox_token);
             this.Controls.Add(this.listView_tunnels);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(681, 562);
             this.Name = "MainForm";
-            this.Text = "SakuraFrp Launcher";
+            this.Text = "SakuraFrp Launcher - Legacy";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.launcherModelBindingSource)).EndInit();
             this.contextMenuStrip_tray.ResumeLayout(false);
