@@ -85,12 +85,7 @@ namespace SakuraLauncher.View
 
         private void ButtonRemotePassword_Click(object sender, RoutedEventArgs e) => new RemoteConfigWindow(Model).ShowDialog();
 
-        private void ButtonOpenCWD_Click(object sender, RoutedEventArgs e) => Process.Start(new ProcessStartInfo()
-        {
-            FileName = Consts.WorkingDirectory,
-            UseShellExecute = true,
-            Verb = "open"
-        });
+        private void ButtonOpenCWD_Click(object sender, RoutedEventArgs e) => Model.RequestOpenCWD();
 
         private void Hint_TouchUp(object sender, TouchEventArgs e)
         {

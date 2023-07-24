@@ -124,7 +124,7 @@ namespace SakuraLibrary.Model
                 }
 
                 // In case of disconnect, reset UI state
-                UserInfo = new User { Status = UserStatus.Pending };
+                UserInfo = new User();
                 Config = new ServiceConfig();
                 Update = new SoftwareUpdate();
                 Dispatcher.Invoke(() =>
@@ -163,7 +163,7 @@ namespace SakuraLibrary.Model
         private bool _connected = false;
 
         public User UserInfo { get => _userInfo; set => SafeSet(out _userInfo, value ?? new User()); }
-        private User _userInfo = new() { Status = UserStatus.Pending };
+        private User _userInfo = new();
 
         public IDictionary<int, Node> Nodes { get => _nodes; set => SafeSet(out _nodes, value); }
         private IDictionary<int, Node> _nodes = new Dictionary<int, Node>();
@@ -215,6 +215,18 @@ namespace SakuraLibrary.Model
             Dispatcher.Invoke(ClearLog);
         }
 
+        public void RequestOpenCWD()
+        {
+            try
+            {
+                RPC.OpenCWD(RpcEmpty);
+            }
+            catch (Exception e)
+            {
+                ShowMessage(e.Message, "操作失败", MessageMode.Error);
+            }
+        }
+
         #endregion
 
         #region Settings - User Status
@@ -227,7 +239,7 @@ namespace SakuraLibrary.Model
         public bool LoggedIn => UserInfo.Status == UserStatus.LoggedIn;
 
         [SourceBinding(nameof(LoggingIn), nameof(LoggedIn))]
-        public bool TokenEditable => !LoggingIn && !LoggedIn;
+        public bool TokenEditable => Connected && !LoggingIn && !LoggedIn;
 
         [SourceBinding(nameof(UserInfo))]
         public bool LoggingIn { get => _loggingIn || UserInfo.Status == UserStatus.Pending; set => SafeSet(out _loggingIn, value); }
@@ -368,6 +380,9 @@ namespace SakuraLibrary.Model
 
         [SourceBinding(nameof(Update))]
         public bool HaveUpdate => Update.Status == SoftwareUpdate.Types.Status.Downloading || Update.Status == SoftwareUpdate.Types.Status.Ready;
+
+        [SourceBinding(nameof(CheckUpdate), nameof(Connected))]
+        public bool CanCheckUpdate => Connected && CheckUpdate;
 
         [SourceBinding(nameof(Update))]
         public string UpdateText =>
