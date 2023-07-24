@@ -93,14 +93,12 @@ namespace SakuraLauncher.Model
             }
         )) == MessageBoxResult.OK;
 
-        public override void Save()
-        {
-            if (!Dispatcher.CheckAccess())
-            {
-                Dispatcher.Invoke(() => Save());
-                return;
-            }
+        #endregion
 
+        #region Generic Properties
+        
+        public void Save()
+        {
             var settings = Properties.Settings.Default;
 
             settings.Width = (int)View.Width;
@@ -113,10 +111,6 @@ namespace SakuraLauncher.Model
 
             settings.Save();
         }
-
-        #endregion
-
-        #region Generic Properties
 
         public SnackbarMessageQueue SnackMessageQueue { get; } = new SnackbarMessageQueue();
 
@@ -176,7 +170,7 @@ namespace SakuraLauncher.Model
             switch (l.Category)
             {
             case Category.Alert:
-                Dispatcher.Invoke(() => View.trayIcon.ShowBalloonTip(entry.Source, entry.Data, (Hardcodet.Wpf.TaskbarNotification.BalloonIcon)Math.Max(Math.Min((int)l.Level, 2), 1)));
+                View.trayIcon.ShowBalloonTip(entry.Source, entry.Data, (Hardcodet.Wpf.TaskbarNotification.BalloonIcon)Math.Max(Math.Min((int)l.Level, 2), 1));
                 return;
             case Category.Frpc:
                 entry.Source = "Tunnel/" + entry.Source;
@@ -225,15 +219,12 @@ namespace SakuraLauncher.Model
             default:
                 return;
             }
-            Dispatcher.Invoke(() =>
+            if (!LogSourceList.Contains(entry.Source))
             {
-                if (!LogSourceList.Contains(entry.Source))
-                {
-                    LogSourceList.Add(entry.Source);
-                }
-                Logs.Add(entry);
-                while (Logs.Count > 4096) Logs.RemoveAt(0);
-            });
+                LogSourceList.Add(entry.Source);
+            }
+            Logs.Add(entry);
+            while (Logs.Count > 4096) Logs.RemoveAt(0);
         }
 
         public override void ClearLog() => Dispatcher.Invoke(() =>

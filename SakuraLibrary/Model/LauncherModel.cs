@@ -83,7 +83,7 @@ namespace SakuraLibrary.Model
                         {
                             if (l.Category != Proto.Log.Types.Category.Unknown)
                             {
-                                 Log(l);
+                                 Dispatcher.Invoke(() => Log(l));
                             }
                         }, CTS.Token),
                         await RPC.StreamTunnels(RpcEmpty).InitStream(t => Dispatcher.Invoke(() =>
@@ -124,6 +124,8 @@ namespace SakuraLibrary.Model
 
                 // In case of disconnect, reset UI state
                 UserInfo = new User { Status = UserStatus.Pending };
+                Config = new ServiceConfig();
+                Update = new SoftwareUpdate();
                 Dispatcher.Invoke(() =>
                 {
                     Nodes.Clear();
@@ -144,10 +146,13 @@ namespace SakuraLibrary.Model
             Confirm,
         }
 
+        /// <summary>Must be called with <see cref="DispatcherWrapper"/></summary>
         public abstract void Log(Log l, bool init = false);
+
+        /// <summary>Must be called with <see cref="DispatcherWrapper"/></summary>
         public abstract void ClearLog();
+
         public abstract bool ShowMessage(string message, string title, MessageMode mode);
-        public abstract void Save();
 
         #endregion
 
@@ -255,6 +260,8 @@ namespace SakuraLibrary.Model
 
         #region Settings - Launcher
 
+        // TODO: This should be moved to VM implementation
+
         /// <summary>
         /// 0 = Show all
         /// 1 = Suppress all
@@ -314,6 +321,21 @@ namespace SakuraLibrary.Model
             }
         }
 
+        [SourceBinding(nameof(Config))]
+        public bool CheckUpdate
+        {
+            get => Config != null && Config.UpdateInterval != -1;
+            set
+            {
+                if (Config != null)
+                {
+                    Config.UpdateInterval = value ? 86400 : -1;
+                    PushServiceConfig();
+                }
+                RaisePropertyChanged();
+            }
+        }
+
         public void PushServiceConfig(bool blocking = false)
         {
             if (blocking)
@@ -337,35 +359,20 @@ namespace SakuraLibrary.Model
         public SoftwareUpdate Update { get => _update; set => SafeSet(out _update, value); }
         private SoftwareUpdate _update = new();
 
-        [SourceBinding(nameof(Config))]
+        [SourceBinding(nameof(Update))]
         public string ServiceVersion => Update.ServiceVersion ?? "-";
 
-        [SourceBinding(nameof(Config))]
+        [SourceBinding(nameof(Update))]
         public string FrpcVersion => Update.FrpcVersion ?? "-";
 
-        [SourceBinding(nameof(Config))]
+        [SourceBinding(nameof(Update))]
         public bool HaveUpdate => Update.Status == SoftwareUpdate.Types.Status.Downloading || Update.Status == SoftwareUpdate.Types.Status.Ready;
 
-        [SourceBinding(nameof(Config))]
+        [SourceBinding(nameof(Update))]
         public string UpdateText =>
             Update.Status == SoftwareUpdate.Types.Status.Downloading ? ("下载更新中... " + Math.Round(Update.DownloadCompleted / 1048576f, 2) + " MiB/" + Math.Round(Update.DownloadTotal / 1048576f, 2) + " MiB") :
             Update.Status == SoftwareUpdate.Types.Status.Ready ? "更新准备完成, 点此进行更新" :
             "";
-
-        [SourceBinding(nameof(Config))]
-        public bool CheckUpdate
-        {
-            get => Config != null && Config.UpdateInterval != -1;
-            set
-            {
-                if (Config != null)
-                {
-                    Config.UpdateInterval = value ? 86400 : -1;
-                    PushServiceConfig();
-                }
-                RaisePropertyChanged();
-            }
-        }
 
         public async Task<SoftwareUpdate> RequestCheckUpdateAsync() => await RPC.CheckUpdateAsync(RpcEmpty).ConfigureAwait(false);
 

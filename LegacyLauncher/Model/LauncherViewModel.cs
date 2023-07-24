@@ -32,6 +32,8 @@ namespace LegacyLauncher.Model
             Run();
         }
 
+        #region ViewModel Abstraction
+
         public override void ClearLog() => Dispatcher.Invoke(() => View.textBox_log.Clear());
 
         public override void Log(Log l, bool init)
@@ -64,7 +66,7 @@ namespace LegacyLauncher.Model
             {
                 l.Data = Utils.ParseTimestamp(l.Time).ToString("yyyy/MM/dd HH:mm:ss") + " " + l.Data;
             }
-            Dispatcher.Invoke(() => View.textBox_log.AppendText(l.Source + " " + category + l.Data + Environment.NewLine));
+            View.textBox_log.AppendText(l.Source + " " + category + l.Data + Environment.NewLine);
         }
 
         public override bool ShowMessage(string message, string title, MessageMode mode) => MessageBox.Show(
@@ -80,13 +82,10 @@ namespace LegacyLauncher.Model
             }
         ) == DialogResult.OK;
 
-        public override void Save()
+        #endregion
+
+        public void Save()
         {
-            if (!Dispatcher.CheckAccess())
-            {
-                Dispatcher.Invoke(() => Save());
-                return;
-            }
             var settings = Properties.Settings.Default;
 
             settings.SuppressInfo = NotificationMode != 0;
