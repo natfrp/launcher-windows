@@ -62,7 +62,7 @@ namespace SakuraLibrary
         public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern int MessageBox(int hWnd, string text, string caption, uint type);
+        public static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
 
         [DllImport("user32.dll")]
         public static extern int GetSystemMetrics(SystemMetric smIndex);

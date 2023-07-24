@@ -104,7 +104,7 @@ namespace SakuraLibrary.Model
                     callback(false);
                     return;
                 }
-                callback(Launcher.ShowMessage($"成功创建隧道 #{r.Result.Tunnel.Id} {r.Result.Tunnel.Name}\n\n按 \"取消\" 继续创建, \"确定\" 关闭创建隧道窗口", "创建成功", LauncherModel.MessageMode.Confirm));
+                callback(Launcher.ShowMessage($"成功创建隧道 #{r.Result.Tunnel.Id} {r.Result.Tunnel.Name}\n\n按 \"取消\" 继续创建, \"确定\" 关闭创建隧道窗口", "创建成功", LauncherModel.MessageMode.OkCancel | LauncherModel.MessageMode.Confirm) == LauncherModel.MessageResult.Ok);
             }));
         }
 

@@ -93,7 +93,7 @@ namespace SakuraLibrary
                 var failure = files.Where(f => !File.Exists(f)).ToList();
                 if (failure.Count != 0)
                 {
-                    NTAPI.MessageBox(0, "@@@@@@@@@@@@@@@@@@\n" +
+                    NTAPI.MessageBox(IntPtr.Zero, "@@@@@@@@@@@@@@@@@@\n" +
                         "         !!!  错误: 启动器文件损坏  !!!\n" +
                         "@@@@@@@@@@@@@@@@@@\n\n" +
                         "下列文件不存在:\n" + string.Join("\n", failure) + "\n\n" +
@@ -109,7 +109,7 @@ namespace SakuraLibrary
                     {
                         return;
                     }
-                    NTAPI.MessageBox(0, "@@@@@@@@@@@@@@@@@@\n" +
+                    NTAPI.MessageBox(IntPtr.Zero, "@@@@@@@@@@@@@@@@@@\n" +
                         "         !!!  警告: 文件签名验证失败  !!!\n" +
                         "@@@@@@@@@@@@@@@@@@\n\n" +
                         "下列文件未通过数字签名校验:\n" + string.Join("\n", failure) + "\n\n" +
@@ -119,7 +119,7 @@ namespace SakuraLibrary
             }
             catch (Exception e)
             {
-                NTAPI.MessageBox(0, "@@@@@@@@@@@@@@@@@@\n" +
+                NTAPI.MessageBox(IntPtr.Zero, "@@@@@@@@@@@@@@@@@@\n" +
                     "         !!!  警告: 文件签名验证失败  !!!\n" +
                     "@@@@@@@@@@@@@@@@@@\n" +
                     "出现内部错误, 请截图此报错并联系管理员\n\n" + e, "错误", 0x10);

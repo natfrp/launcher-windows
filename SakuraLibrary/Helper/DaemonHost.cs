@@ -1,13 +1,13 @@
-﻿using System;
+﻿using SakuraLibrary.Model;
+using SakuraLibrary.Proto;
+using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Management;
-using System.Diagnostics;
 using System.ServiceProcess;
-
-using SakuraLibrary.Model;
-using SakuraLibrary.Proto;
+using System.Text;
+using System.Threading;
 
 namespace SakuraLibrary.Helper
 {
@@ -71,7 +71,9 @@ namespace SakuraLibrary.Helper
 
             WorkerThread = new Thread(() =>
             {
-                while (!StopEvent.WaitOne(500))
+                var counter = 0;
+                var suppress = false;
+                do
                 {
                     if (Launcher.Connected || IsRunning())
                     {
@@ -82,15 +84,56 @@ namespace SakuraLibrary.Helper
                         if (!Daemon)
                         {
                             Controller.Start();
+                            continue;
                         }
-                        BaseProcess = Process.Start(new ProcessStartInfo(ServicePath, "--daemon")
+                        var p = Process.Start(new ProcessStartInfo(ServicePath, "--daemon")
                         {
                             UseShellExecute = false,
                             CreateNoWindow = true,
+                            RedirectStandardError = true,
+                            StandardErrorEncoding = Encoding.UTF8,
                         });
+                        p.Exited += (s, e) =>
+                        {
+                            if (p.ExitCode == 0 || suppress)
+                            {
+                                return;
+                            }
+                            var msg = p.StandardError.ReadToEnd().Trim();
+                            if (msg == string.Empty)
+                            {
+                                return;
+                            }
+                            switch (Launcher.ShowMessage("按 \"忽略\" 屏蔽此提示, \"终止\" 退出启动器\n\n错误信息:\n" + msg.ToString(), "守护进程异常退出", LauncherModel.MessageMode.AbortRetryIgnore | LauncherModel.MessageMode.Error))
+                            {
+                            case LauncherModel.MessageResult.Abort:
+                                Environment.Exit(1);
+                                break;
+                            case LauncherModel.MessageResult.Ignore:
+                                suppress = true;
+                                break;
+                            }
+                        };
+                        BaseProcess = p;
                     }
-                    catch { }
+                    catch (Exception e)
+                    {
+                        if (suppress || counter++ <= 3)
+                        {
+                            continue;
+                        }
+                        switch (Launcher.ShowMessage("按 \"忽略\" 屏蔽此提示, \"终止\" 退出启动器\n\n屏蔽此提示后, 可以在 WPF 启动器中切换运行模式来尝试修复此问题\n若切换运行模式无法解决, 请尝试添加启动器目录到杀软白名单并重装启动器\n\n错误信息:\n" + e.ToString(), "守护进程启动失败", LauncherModel.MessageMode.AbortRetryIgnore | LauncherModel.MessageMode.Error))
+                        {
+                        case LauncherModel.MessageResult.Abort:
+                            Environment.Exit(1);
+                            break;
+                        case LauncherModel.MessageResult.Ignore:
+                            suppress = true;
+                            break;
+                        }
+                    }
                 }
+                while (!StopEvent.WaitOne(1000));
             })
             { IsBackground = true };
             WorkerThread.Start();

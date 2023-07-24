@@ -139,12 +139,26 @@ namespace SakuraLibrary.Model
 
         #region ViewModel Abstraction
 
-        public enum MessageMode
+        // Same as MessageBox Win32 API
+        public enum MessageMode : uint
         {
-            Info,
-            Warning,
-            Error,
-            Confirm,
+            Ok = 0,
+            OkCancel = 1,
+            AbortRetryIgnore = 2,
+
+            Error = 0x10,
+            Confirm = 0x20,
+            Warning = 0x30,
+            Info = 0x40,
+        }
+
+        public enum MessageResult : int
+        {
+            Ok = 1,
+            Cancel = 2,
+            Abort = 3,
+            Retry = 4,
+            Ignore = 5,
         }
 
         /// <summary>Must be called with <see cref="DispatcherWrapper"/></summary>
@@ -153,11 +167,13 @@ namespace SakuraLibrary.Model
         /// <summary>Must be called with <see cref="DispatcherWrapper"/></summary>
         public abstract void ClearLog();
 
-        public abstract bool ShowMessage(string message, string title, MessageMode mode);
+        public abstract IntPtr GetHwnd();
 
         #endregion
 
         #region Main Window
+
+        public MessageResult ShowMessage(string message, string title, MessageMode mode) => (MessageResult)NTAPI.MessageBox(GetHwnd(), message, title, (uint)mode);
 
         public bool Connected { get => _connected; set => Set(out _connected, value); }
         private bool _connected = false;
@@ -395,7 +411,7 @@ namespace SakuraLibrary.Model
 
         public void ConfirmUpdate()
         {
-            if (Update.Status != SoftwareUpdate.Types.Status.Ready || !ShowMessage(Update.ReleaseNote, "更新日志", MessageMode.Confirm))
+            if (Update.Status != SoftwareUpdate.Types.Status.Ready || ShowMessage(Update.ReleaseNote, "更新日志", MessageMode.OkCancel | MessageMode.Confirm) != MessageResult.Ok)
             {
                 return;
             }
@@ -404,7 +420,7 @@ namespace SakuraLibrary.Model
                 Process.Start(Update.UpdateUrl);
                 return;
             }
-            if (NTAPI.GetSystemMetrics(SystemMetric.SM_REMOTESESSION) != 0 && !ShowMessage("检测到当前正在使用远程桌面连接，若您正在通过 SakuraFrp 连接计算机，请勿进行更新\n进行更新时启动器和所有 frpc 将彻底退出并且需要手动确认操作，这会造成远程桌面断开并且无法恢复\n是否继续?", "警告", MessageMode.Confirm))
+            if (NTAPI.GetSystemMetrics(SystemMetric.SM_REMOTESESSION) != 0 && ShowMessage("检测到当前正在使用远程桌面连接，若您正在通过 SakuraFrp 连接计算机，请勿进行更新\n进行更新时启动器和所有 frpc 将彻底退出并且需要手动确认操作，这会造成远程桌面断开并且无法恢复\n是否继续?", "警告", MessageMode.OkCancel | MessageMode.Warning) != MessageResult.Ok)
             {
                 return;
             }
@@ -437,7 +453,7 @@ namespace SakuraLibrary.Model
             {
                 return;
             }
-            if (!ShowMessage("确定要切换运行模式吗?\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n\n注意事项:\n1. 切换运行模式后不要移动启动器到其他目录, 否则会造成严重错误\n2. 如需移动或卸载启动器, 请先切到 \"守护进程\" 模式来避免文件残留\n3. 切换过程可能需要十余秒, 请耐心等待, 不要做其他操作\n4. 切换操作即为 安装/卸载 系统服务, 需要管理员权限", "提示", MessageMode.Confirm))
+            if (ShowMessage("确定要切换运行模式吗?\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n\n注意事项:\n1. 切换运行模式后不要移动启动器到其他目录, 否则会造成严重错误\n2. 如需移动或卸载启动器, 请先切到 \"守护进程\" 模式来避免文件残留\n3. 切换过程可能需要十余秒, 请耐心等待, 不要做其他操作\n4. 切换操作即为 安装/卸载 系统服务, 需要管理员权限", "提示", MessageMode.OkCancel | MessageMode.Warning) != MessageResult.Ok)
             {
                 return;
             }

@@ -80,18 +80,7 @@ namespace SakuraLauncher.Model
 
         #region ViewModel Abstraction
 
-        public override bool ShowMessage(string message, string title, MessageMode mode) => View.Dispatcher.Invoke(() => MessageBox.Show(
-            View, message, title,
-            mode == MessageMode.Confirm ? MessageBoxButton.OKCancel : MessageBoxButton.OK,
-            mode switch
-            {
-                MessageMode.Confirm => MessageBoxImage.Question,
-                MessageMode.Info => MessageBoxImage.Information,
-                MessageMode.Warning => MessageBoxImage.Warning,
-                MessageMode.Error => MessageBoxImage.Error,
-                _ => MessageBoxImage.None
-            }
-        )) == MessageBoxResult.OK;
+        public override IntPtr GetHwnd() => View.Dispatcher.Invoke(() => new System.Windows.Interop.WindowInteropHelper(View).Handle);
 
         #endregion
 

@@ -35,7 +35,7 @@ namespace SakuraLauncher.View
         {
             if ((sender as Button).DataContext is TunnelModel tunnel)
             {
-                if (Model.ShowMessage(string.Format("确定要删除隧道 #{0} {1} 吗?", tunnel.Id, tunnel.Name), "操作确认", LauncherModel.MessageMode.Confirm))
+                if (Model.ShowMessage(string.Format("确定要删除隧道 #{0} {1} 吗?", tunnel.Id, tunnel.Name), "操作确认", LauncherModel.MessageMode.OkCancel | LauncherModel.MessageMode.Confirm) == LauncherModel.MessageResult.Ok)
                 {
                     IsEnabled = false;
                     Model.RequestDeleteTunnelAsync(tunnel.Id).ContinueWith(_ => Dispatcher.Invoke(() => IsEnabled = true));

@@ -67,18 +67,7 @@ namespace LegacyLauncher.Model
             } + l.Data + Environment.NewLine);
         }
 
-        public override bool ShowMessage(string message, string title, MessageMode mode) => MessageBox.Show(
-            message, title,
-            mode == MessageMode.Confirm ? MessageBoxButtons.OKCancel : MessageBoxButtons.OK,
-            mode switch
-            {
-                MessageMode.Confirm => MessageBoxIcon.Question,
-                MessageMode.Info => MessageBoxIcon.Information,
-                MessageMode.Warning => MessageBoxIcon.Warning,
-                MessageMode.Error => MessageBoxIcon.Error,
-                _ => MessageBoxIcon.None,
-            }
-        ) == DialogResult.OK;
+        public override IntPtr GetHwnd() => (IntPtr)View.Invoke(() => View.Handle);
 
         #endregion
 
