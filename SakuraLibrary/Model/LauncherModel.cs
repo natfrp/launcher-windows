@@ -63,15 +63,21 @@ namespace SakuraLibrary.Model
                 {
                     var tasks = new Task[]
                     {
-                        await RPC.StreamConfig(RpcEmpty).InitStream(c => Config = c, CTS.Token),
-                        await RPC.StreamUser(RpcEmpty).InitStream(u => {
-                            var us = UserInfo.Status != u.Status;
-                            UserInfo = u;
-                            // Make sure the SwitchTab don't get triggered by mistake
-                            if (us)
+                        await RPC.StreamUpdate(RpcEmpty).InitStream(u =>
+                        {
+                            if (u.User != null)
                             {
-                                Dispatcher.Invoke(() => RaisePropertyChanged("_Login_State"));
+                                var us = UserInfo.Status != u.User.Status;
+                                UserInfo = u.User;
+                                // Make sure the SwitchTab don't get triggered by mistake
+                                if (us)
+                                {
+                                    Dispatcher.Invoke(() => RaisePropertyChanged("_Login_State"));
+                                }
                             }
+                            if (u.Nodes != null) Nodes = u.Nodes.Nodes;
+                            if (u.Config != null) Config = u.Config;
+                            if (u.Update != null) Update = u.Update;
                         }, CTS.Token),
                         await RPC.StreamLog(RpcEmpty).InitStream(l =>
                         {
@@ -80,7 +86,6 @@ namespace SakuraLibrary.Model
                                  Log(l);
                             }
                         }, CTS.Token),
-                        await RPC.StreamNodes(RpcEmpty).InitStream(n => Nodes = n.Nodes, CTS.Token),
                         await RPC.StreamTunnels(RpcEmpty).InitStream(t => Dispatcher.Invoke(() =>
                         {
                             switch(t.Action)
@@ -161,7 +166,7 @@ namespace SakuraLibrary.Model
 
         #endregion
 
-        #region RPC Wrappers
+        #region Generic RPC
 
         public async Task RequestReloadNodesAsync() => await RPC.ReloadNodesAsync(RpcEmpty);
 
@@ -265,12 +270,8 @@ namespace SakuraLibrary.Model
 
         #region Settings - Service
 
-        public ServiceConfig Config
-        {
-            get => _config;
-            set => SafeSet(out _config, value);
-        }
-        private ServiceConfig _config;
+        public ServiceConfig Config { get => _config; set => SafeSet(out _config, value); }
+        private ServiceConfig _config = new();
 
         [SourceBinding(nameof(Config))]
         public bool BypassProxy
@@ -333,33 +334,23 @@ namespace SakuraLibrary.Model
 
         public string LauncherVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-        [SourceBinding(nameof(Config))]
-        public string ServiceVersion => Config?.Update?.ServiceVersion ?? "-";
+        public SoftwareUpdate Update { get => _update; set => SafeSet(out _update, value); }
+        private SoftwareUpdate _update = new();
 
         [SourceBinding(nameof(Config))]
-        public string FrpcVersion => Config?.Update?.FrpcVersion ?? "-";
+        public string ServiceVersion => Update.ServiceVersion ?? "-";
 
         [SourceBinding(nameof(Config))]
-        public bool HaveUpdate => false; // TODO Config.Update != null && Update.UpdateEnabled && Update.UpdateAvailable;
+        public string FrpcVersion => Update.FrpcVersion ?? "-";
 
         [SourceBinding(nameof(Config))]
-        public string UpdateText
-        {
-            get
-            {
-                // TODO
-                return "";
-                //if (Update == null || !Update.UpdateAvailable)
-                //{
-                //    return "";
-                //}
-                //if (Update.UpdateReadyDir != "")
-                //{
-                //    return "更新准备完成, 点此进行更新";
-                //}
-                //return "下载更新中... " + Math.Round(Update.DownloadCurrent / 1048576f, 2) + " MiB/" + Math.Round(Update.DownloadTotal / 1048576f, 2) + " MiB";
-            }
-        }
+        public bool HaveUpdate => Update.Status == SoftwareUpdate.Types.Status.Downloading || Update.Status == SoftwareUpdate.Types.Status.Ready;
+
+        [SourceBinding(nameof(Config))]
+        public string UpdateText =>
+            Update.Status == SoftwareUpdate.Types.Status.Downloading ? ("下载更新中... " + Math.Round(Update.DownloadCompleted / 1048576f, 2) + " MiB/" + Math.Round(Update.DownloadTotal / 1048576f, 2) + " MiB") :
+            Update.Status == SoftwareUpdate.Types.Status.Ready ? "更新准备完成, 点此进行更新" :
+            "";
 
         [SourceBinding(nameof(Config))]
         public bool CheckUpdate
@@ -376,38 +367,27 @@ namespace SakuraLibrary.Model
             }
         }
 
-        public void RequestUpdateCheck()
-        {
-            // TODO
-        }
+        public async Task<SoftwareUpdate> RequestCheckUpdateAsync() => await RPC.CheckUpdateAsync(RpcEmpty).ConfigureAwait(false);
 
-        public void ConfirmUpdate(bool legacy)
+        public void ConfirmUpdate()
         {
-            // TODO
-            //if (Update.UpdateReadyDir == "")
-            //{
-            //    return;
-            //}
-            //if (!confirm(Update.Note))
-            //{
-            //    return;
-            //}
-            //if (NTAPI.GetSystemMetrics(SystemMetric.SM_REMOTESESSION) != 0 && !warn("检测到当前正在使用远程桌面连接，若您正在通过 SakuraFrp 连接计算机，请勿进行更新\n进行更新时启动器和所有 frpc 将彻底退出并且需要手动确认操作，这会造成远程桌面断开并且无法恢复\n是否继续?"))
-            //{
-            //    return;
-            //}
-            //Daemon.Stop();
-            //try
-            //{
-            //    Process.Start(new ProcessStartInfo(Consts.ServiceExecutable, "--update \"" + Update.UpdateReadyDir.TrimEnd('\\') + "\" " + (legacy ? "legacy" : "wpf"))
-            //    {
-            //        Verb = "runas"
-            //    });
-            //}
-            //finally
-            //{
-            //    Environment.Exit(0);
-            //}
+            if (Update.Status != SoftwareUpdate.Types.Status.Ready || !ShowMessage(Update.ReleaseNote, "确认更新", MessageMode.Confirm))
+            {
+                return;
+            }
+            if (NTAPI.GetSystemMetrics(SystemMetric.SM_REMOTESESSION) != 0 && !ShowMessage("检测到当前正在使用远程桌面连接，若您正在通过 SakuraFrp 连接计算机，请勿进行更新\n进行更新时启动器和所有 frpc 将彻底退出并且需要手动确认操作，这会造成远程桌面断开并且无法恢复\n是否继续?", "警告", MessageMode.Confirm))
+            {
+                return;
+            }
+            try
+            {
+                RPC.ConfirmUpdate(RpcEmpty);
+                Environment.Exit(0);
+            }
+            catch(Exception e)
+            {
+                ShowMessage(e.Message, "更新失败", MessageMode.Error);
+            }
         }
 
         #endregion

@@ -2,10 +2,11 @@
 using SakuraLauncher.Model;
 using SakuraLibrary;
 using System.Diagnostics;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using MessageMode = SakuraLibrary.Model.LauncherModel.MessageMode;
+using UpdateStatus = SakuraLibrary.Proto.SoftwareUpdate.Types.Status;
 
 namespace SakuraLauncher.View
 {
@@ -23,19 +24,6 @@ namespace SakuraLauncher.View
             scrollHelper = new TouchScrollHelper(scrollViewer);
 
             DataContext = Model = main;
-
-            Model.PropertyChanged += (s, e) =>
-            {
-                // TODO
-                //if (Model.CheckingUpdate && e.PropertyName == nameof(Model.Update))
-                //{
-                //    Model.CheckingUpdate = false;
-                //    if (!Model.Update.UpdateAvailable)
-                //    {
-                //        App.ShowMessage("您当前使用的启动器与 frpc 均为最新版本", "提示", MessageBoxImage.Information);
-                //    }
-                //}
-            };
         }
 
         private void ButtonUpdate_Click(object sender, RoutedEventArgs e)
@@ -45,7 +33,25 @@ namespace SakuraLauncher.View
                 return;
             }
             Model.CheckingUpdate = true;
-            Model.RequestUpdateCheck();
+            Model.RequestCheckUpdateAsync().ContinueWith(r => Dispatcher.Invoke(() =>
+            {
+                Model.CheckingUpdate = false;
+                if (r.Exception != null)
+                {
+                    Model.ShowMessage(r.Exception.ToString(), "更新检查失败", MessageMode.Error);
+                }
+                else if (r.Result != null)
+                {
+                    if (r.Result.Status == UpdateStatus.NoUpdate)
+                    {
+                        Model.ShowMessage("当前没有可用更新", "提示", MessageMode.Info);
+                    }
+                    else if (r.Result.Status == UpdateStatus.Failed)
+                    {
+                        Model.ShowMessage("更新检查失败, 请查看日志输出", "错误", MessageMode.Error);
+                    }
+                }
+            }));
         }
 
         private void ButtonLogin_Click(object sender, RoutedEventArgs e)
@@ -65,7 +71,7 @@ namespace SakuraLauncher.View
             {
                 if (r.Exception != null)
                 {
-                    Model.ShowMessage(r.Exception.ToString(), "节点列表刷新失败", SakuraLibrary.Model.LauncherModel.MessageMode.Error);
+                    Model.ShowMessage(r.Exception.ToString(), "节点列表刷新失败", MessageMode.Error);
                 }
                 else
                 {
