@@ -96,7 +96,7 @@ namespace SakuraLauncher.Model
         #endregion
 
         #region Generic Properties
-        
+
         public void Save()
         {
             var settings = Properties.Settings.Default;
@@ -170,7 +170,10 @@ namespace SakuraLauncher.Model
             switch (l.Category)
             {
             case Category.Alert:
-                View.trayIcon.ShowBalloonTip(entry.Source, entry.Data, (Hardcodet.Wpf.TaskbarNotification.BalloonIcon)Math.Max(Math.Min((int)l.Level, 2), 1));
+                if (NotificationMode == 0 || (NotificationMode == 2 && l.Level > Level.Info))
+                {
+                    View.trayIcon.ShowBalloonTip(entry.Source, entry.Data, (Hardcodet.Wpf.TaskbarNotification.BalloonIcon)Math.Max(Math.Min((int)l.Level, 2), 0));
+                }
                 return;
             case Category.Frpc:
                 entry.Source = "Tunnel/" + entry.Source;

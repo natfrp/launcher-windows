@@ -50,12 +50,12 @@
             this.ToolStripMenuItem_exitAll = new System.Windows.Forms.ToolStripMenuItem();
             this.button_clear = new System.Windows.Forms.Button();
             this.contextMenuStrip_tunnel = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuItem_reload = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem_delete = new System.Windows.Forms.ToolStripMenuItem();
             this.checkBox_textwrap = new System.Windows.Forms.CheckBox();
             this.checkBox_update = new System.Windows.Forms.CheckBox();
             this.label_update = new System.Windows.Forms.Label();
             this.label_unconnected = new System.Windows.Forms.Label();
-            this.toolStripMenuItem_reload = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.launcherModelBindingSource)).BeginInit();
             this.contextMenuStrip_tray.SuspendLayout();
             this.contextMenuStrip_tunnel.SuspendLayout();
@@ -233,12 +233,19 @@
             this.toolStripMenuItem_reload,
             this.toolStripMenuItem_delete});
             this.contextMenuStrip_tunnel.Name = "contextMenuStrip_tunnel";
-            this.contextMenuStrip_tunnel.Size = new System.Drawing.Size(181, 70);
+            this.contextMenuStrip_tunnel.Size = new System.Drawing.Size(101, 48);
+            // 
+            // toolStripMenuItem_reload
+            // 
+            this.toolStripMenuItem_reload.Name = "toolStripMenuItem_reload";
+            this.toolStripMenuItem_reload.Size = new System.Drawing.Size(100, 22);
+            this.toolStripMenuItem_reload.Text = "刷新";
+            this.toolStripMenuItem_reload.Click += new System.EventHandler(this.toolStripMenuItem_reload_Click);
             // 
             // toolStripMenuItem_delete
             // 
             this.toolStripMenuItem_delete.Name = "toolStripMenuItem_delete";
-            this.toolStripMenuItem_delete.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem_delete.Size = new System.Drawing.Size(100, 22);
             this.toolStripMenuItem_delete.Text = "删除";
             this.toolStripMenuItem_delete.Click += new System.EventHandler(this.toolStripMenuItem_delete_Click);
             // 
@@ -298,13 +305,6 @@
             this.label_unconnected.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label_unconnected.Click += new System.EventHandler(this.label_update_Click);
             // 
-            // toolStripMenuItem_reload
-            // 
-            this.toolStripMenuItem_reload.Name = "toolStripMenuItem_reload";
-            this.toolStripMenuItem_reload.Size = new System.Drawing.Size(180, 22);
-            this.toolStripMenuItem_reload.Text = "刷新";
-            this.toolStripMenuItem_reload.Click += new System.EventHandler(this.toolStripMenuItem_reload_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -348,7 +348,6 @@
         private System.Windows.Forms.Button button_login;
         private System.Windows.Forms.ColumnHeader columnHeader4;
         private System.Windows.Forms.Button button_create;
-        private System.Windows.Forms.NotifyIcon notifyIcon_tray;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip_tray;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_show;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_exit;
@@ -364,6 +363,7 @@
         private System.Windows.Forms.Label label_update;
         private System.Windows.Forms.Label label_unconnected;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_reload;
+        internal System.Windows.Forms.NotifyIcon notifyIcon_tray;
     }
 }
 

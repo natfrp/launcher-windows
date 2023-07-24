@@ -104,6 +104,7 @@ namespace LegacyLauncher
             case nameof(Model.HaveUpdate):
                 if (Model.HaveUpdate)
                 {
+                    label_update.Text = Model.UpdateText;
                     label_update.Visible = true;
                     textBox_log.Height = 231;
                 }
@@ -158,7 +159,6 @@ namespace LegacyLauncher
                 return;
             }
             Model.CheckUpdate = checkBox_update.Checked;
-            Model.Save();
         }
 
         private void checkBox_textwrap_CheckedChanged(object sender, EventArgs e)

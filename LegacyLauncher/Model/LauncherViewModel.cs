@@ -40,33 +40,31 @@ namespace LegacyLauncher.Model
         {
             if (l.Category == Category.Alert)
             {
+                if (NotificationMode == 0 || (NotificationMode == 2 && l.Level > Level.Info))
+                {
+                    View.notifyIcon_tray.ShowBalloonTip(5000, l.Source, l.Data, l.Level switch
+                    {
+                        Level.Info => ToolTipIcon.Info,
+                        Level.Warn => ToolTipIcon.Warning,
+                        Level.Error => ToolTipIcon.Error,
+                        Level.Fatal => ToolTipIcon.Error,
+                        _ => ToolTipIcon.None,
+                    });
+                }
                 return;
             }
-            string category = "";
-            switch (l.Level)
+            if (l.Category != Category.Frpc)
             {
-            case Level.Debug:
-                category = "D ";
-                break;
-            default:
-            case Level.Info:
-                category = "I ";
-                break;
-            case Level.Warn:
-                category = "W ";
-                break;
-            case Level.Error:
-                category = "E ";
-                break;
-            case Level.Fatal:
-                category = "F ";
-                break;
+                l.Source = Utils.ParseTimestamp(l.Time).ToString("yyyy/MM/dd HH:mm:ss") + " " + l.Source;
             }
-            if (l.Level != 0)
+            View.textBox_log.AppendText(l.Source + " " + l.Level switch
             {
-                l.Data = Utils.ParseTimestamp(l.Time).ToString("yyyy/MM/dd HH:mm:ss") + " " + l.Data;
-            }
-            View.textBox_log.AppendText(l.Source + " " + category + l.Data + Environment.NewLine);
+                Level.Debug => "D ",
+                Level.Warn => "W ",
+                Level.Error => "E ",
+                Level.Fatal => "F ",
+                _ => "I ",
+            } + l.Data + Environment.NewLine);
         }
 
         public override bool ShowMessage(string message, string title, MessageMode mode) => MessageBox.Show(
