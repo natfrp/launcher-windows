@@ -4,6 +4,7 @@ using SakuraLibrary.Proto;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO.Pipes;
 using System.Linq;
 using System.Net.Http;
@@ -371,15 +372,21 @@ namespace SakuraLibrary.Model
         [SourceBinding(nameof(Update))]
         public string UpdateText =>
             Update.Status == SoftwareUpdate.Types.Status.Downloading ? ("下载更新中... " + Math.Round(Update.DownloadCompleted / 1048576f, 2) + " MiB/" + Math.Round(Update.DownloadTotal / 1048576f, 2) + " MiB") :
-            Update.Status == SoftwareUpdate.Types.Status.Ready ? "更新准备完成, 点此进行更新" :
-            "";
+            Update.Status != SoftwareUpdate.Types.Status.Ready ? "" :
+            Update.UpdateUrl != "" ? "有更新可用, 点击此处打开下载页面" :
+            "更新准备完成, 点此进行更新";
 
         public async Task<SoftwareUpdate> RequestCheckUpdateAsync() => await RPC.CheckUpdateAsync(RpcEmpty).ConfigureAwait(false);
 
         public void ConfirmUpdate()
         {
-            if (Update.Status != SoftwareUpdate.Types.Status.Ready || !ShowMessage(Update.ReleaseNote, "确认更新", MessageMode.Confirm))
+            if (Update.Status != SoftwareUpdate.Types.Status.Ready || !ShowMessage(Update.ReleaseNote, "更新日志", MessageMode.Confirm))
             {
+                return;
+            }
+            if (Update.UpdateUrl != "")
+            {
+                Process.Start(Update.UpdateUrl);
                 return;
             }
             if (NTAPI.GetSystemMetrics(SystemMetric.SM_REMOTESESSION) != 0 && !ShowMessage("检测到当前正在使用远程桌面连接，若您正在通过 SakuraFrp 连接计算机，请勿进行更新\n进行更新时启动器和所有 frpc 将彻底退出并且需要手动确认操作，这会造成远程桌面断开并且无法恢复\n是否继续?", "警告", MessageMode.Confirm))
@@ -391,7 +398,7 @@ namespace SakuraLibrary.Model
                 RPC.ConfirmUpdate(RpcEmpty);
                 Environment.Exit(0);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 ShowMessage(e.Message, "更新失败", MessageMode.Error);
             }
