@@ -15,7 +15,7 @@ try {
     New-Item -Name "sign" -ItemType "directory"
     New-Item -Name "debug" -ItemType "directory"
 
-    Copy-Item ..\..\launcher\release\SakuraFrpService_* -Destination "sign"
+    Copy-Item ..\..\launcher\release\SakuraFrpService_*.exe -Destination "sign"
 
     foreach ($name in $projects) {
         Remove-Item -Path $name -Recurse -ErrorAction SilentlyContinue

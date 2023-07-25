@@ -254,7 +254,7 @@ namespace SakuraLibrary.Model
         [SourceBinding(nameof(UserInfo))]
         public bool LoggedIn => UserInfo.Status == UserStatus.LoggedIn;
 
-        [SourceBinding(nameof(LoggingIn), nameof(LoggedIn))]
+        [SourceBinding(nameof(LoggingIn), nameof(LoggedIn), nameof(Connected))]
         public bool TokenEditable => Connected && !LoggingIn && !LoggedIn;
 
         [SourceBinding(nameof(UserInfo))]
