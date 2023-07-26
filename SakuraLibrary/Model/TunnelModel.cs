@@ -18,6 +18,9 @@ namespace SakuraLibrary.Model
         public int Node => Proto.Node;
 
         [SourceBinding(nameof(Proto))]
+        public string NodeName => Launcher?.Nodes.TryGetValue(Proto.Node, out var node) == true ? node.Name : "未知节点";
+
+        [SourceBinding(nameof(Proto))]
         public string Name => Proto.Name;
 
         [SourceBinding(nameof(Proto))]
@@ -56,18 +59,10 @@ namespace SakuraLibrary.Model
         [SourceBinding(nameof(Note))]
         public bool NoteEmpty => string.IsNullOrEmpty(Note);
 
-        public string NodeName { get => _nodeName; set => Set(out _nodeName, value); }
-        private string _nodeName = "未知节点";
-
         public TunnelModel(Tunnel proto, LauncherModel launcher = null)
         {
             Proto = proto;
             Launcher = launcher;
-
-            if (Launcher?.Nodes.TryGetValue(Node, out var node) == true)
-            {
-                NodeName = node.Name;
-            }
         }
     }
 }
