@@ -21,7 +21,7 @@ namespace SakuraLauncher
     public partial class MainWindow : Window
     {
         public readonly LauncherViewModel Model;
-        
+
         public double ScaleFactor = 1;
         public readonly int SideWidth = 180 + (int)Math.Ceiling(SystemParameters.VerticalScrollBarWidth) + 8 * 2, CardWidth = 256 + 16 * 2;
 

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using SakuraLibrary.Proto;
+﻿using SakuraLibrary.Proto;
 using TunnelState = SakuraLibrary.Proto.Tunnel.Types.State;
 
 namespace SakuraLibrary.Model

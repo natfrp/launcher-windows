@@ -6,6 +6,7 @@
 		<ApplicationIcon>..\SakuraLauncher\Resources\icon.ico</ApplicationIcon>
 		<UseWindowsForms>true</UseWindowsForms>
 		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+		<ApplicationManifest>Properties\App.manifest</ApplicationManifest>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Include="..\SakuraLibrary\Properties\AssemblyBase.cs">
