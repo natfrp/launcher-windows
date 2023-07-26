@@ -56,6 +56,7 @@
             this.checkBox_update = new System.Windows.Forms.CheckBox();
             this.label_update = new System.Windows.Forms.Label();
             this.label_unconnected = new System.Windows.Forms.Label();
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             ((System.ComponentModel.ISupportInitialize)(this.launcherModelBindingSource)).BeginInit();
             this.contextMenuStrip_tray.SuspendLayout();
             this.contextMenuStrip_tunnel.SuspendLayout();
@@ -70,7 +71,8 @@
             this.columnHeader1,
             this.columnHeader2,
             this.columnHeader3,
-            this.columnHeader4});
+            this.columnHeader4,
+            this.columnHeader5});
             this.listView_tunnels.DataBindings.Add(new System.Windows.Forms.Binding("Enabled", this.launcherModelBindingSource, "LoggedIn", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.listView_tunnels.Enabled = false;
             this.listView_tunnels.FullRowSelect = true;
@@ -80,7 +82,7 @@
             this.listView_tunnels.Location = new System.Drawing.Point(12, 39);
             this.listView_tunnels.MultiSelect = false;
             this.listView_tunnels.Name = "listView_tunnels";
-            this.listView_tunnels.Size = new System.Drawing.Size(641, 213);
+            this.listView_tunnels.Size = new System.Drawing.Size(684, 213);
             this.listView_tunnels.TabIndex = 0;
             this.listView_tunnels.UseCompatibleStateImageBehavior = false;
             this.listView_tunnels.View = System.Windows.Forms.View.Details;
@@ -99,13 +101,15 @@
             // 
             // columnHeader3
             // 
+            this.columnHeader3.DisplayIndex = 3;
             this.columnHeader3.Text = "节点";
-            this.columnHeader3.Width = 190;
+            this.columnHeader3.Width = 150;
             // 
             // columnHeader4
             // 
+            this.columnHeader4.DisplayIndex = 4;
             this.columnHeader4.Text = "详情";
-            this.columnHeader4.Width = 220;
+            this.columnHeader4.Width = 190;
             // 
             // textBox_token
             // 
@@ -150,9 +154,9 @@
             // 
             this.button_create.DataBindings.Add(new System.Windows.Forms.Binding("Enabled", this.launcherModelBindingSource, "LoggedIn", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.button_create.Enabled = false;
-            this.button_create.Location = new System.Drawing.Point(588, 10);
+            this.button_create.Location = new System.Drawing.Point(610, 10);
             this.button_create.Name = "button_create";
-            this.button_create.Size = new System.Drawing.Size(65, 23);
+            this.button_create.Size = new System.Drawing.Size(87, 23);
             this.button_create.TabIndex = 8;
             this.button_create.Text = "新建隧道";
             this.button_create.UseVisualStyleBackColor = true;
@@ -173,7 +177,7 @@
             this.textBox_log.Name = "textBox_log";
             this.textBox_log.ReadOnly = true;
             this.textBox_log.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox_log.Size = new System.Drawing.Size(641, 250);
+            this.textBox_log.Size = new System.Drawing.Size(684, 250);
             this.textBox_log.TabIndex = 9;
             // 
             // notifyIcon_tray
@@ -223,7 +227,7 @@
             // 
             this.button_clear.Location = new System.Drawing.Point(517, 10);
             this.button_clear.Name = "button_clear";
-            this.button_clear.Size = new System.Drawing.Size(65, 23);
+            this.button_clear.Size = new System.Drawing.Size(87, 23);
             this.button_clear.TabIndex = 10;
             this.button_clear.Text = "清空日志";
             this.button_clear.UseVisualStyleBackColor = true;
@@ -289,7 +293,7 @@
             this.label_update.ForeColor = System.Drawing.Color.White;
             this.label_update.Location = new System.Drawing.Point(0, 492);
             this.label_update.Name = "label_update";
-            this.label_update.Size = new System.Drawing.Size(665, 31);
+            this.label_update.Size = new System.Drawing.Size(708, 31);
             this.label_update.TabIndex = 13;
             this.label_update.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label_update.Visible = false;
@@ -303,17 +307,23 @@
             this.label_unconnected.ForeColor = System.Drawing.Color.White;
             this.label_unconnected.Location = new System.Drawing.Point(0, 461);
             this.label_unconnected.Name = "label_unconnected";
-            this.label_unconnected.Size = new System.Drawing.Size(665, 31);
+            this.label_unconnected.Size = new System.Drawing.Size(708, 31);
             this.label_unconnected.TabIndex = 13;
             this.label_unconnected.Text = "未连接到守护进程, 大部分功能将不可用, 请尝试重启启动器";
             this.label_unconnected.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label_unconnected.Click += new System.EventHandler(this.label_update_Click);
             // 
+            // columnHeader5
+            // 
+            this.columnHeader5.DisplayIndex = 2;
+            this.columnHeader5.Text = "备注";
+            this.columnHeader5.Width = 110;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(665, 523);
+            this.ClientSize = new System.Drawing.Size(708, 523);
             this.Controls.Add(this.label_unconnected);
             this.Controls.Add(this.label_update);
             this.Controls.Add(this.checkBox_update);
@@ -328,7 +338,7 @@
             this.Controls.Add(this.listView_tunnels);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(681, 562);
+            this.MinimumSize = new System.Drawing.Size(724, 562);
             this.Name = "MainForm";
             this.Text = "SakuraFrp Launcher - Legacy";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
@@ -368,6 +378,7 @@
         private System.Windows.Forms.Label label_unconnected;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_reload;
         internal System.Windows.Forms.NotifyIcon notifyIcon_tray;
+        private System.Windows.Forms.ColumnHeader columnHeader5;
     }
 }
 

@@ -6,6 +6,8 @@ using System.Collections.Specialized;
 
 using SakuraLibrary;
 using SakuraLibrary.Model;
+using MessageMode = SakuraLibrary.Model.LauncherModel.MessageMode;
+using UpdateStatus = SakuraLibrary.Proto.SoftwareUpdate.Types.Status;
 
 using LegacyLauncher.Model;
 
@@ -38,7 +40,7 @@ namespace LegacyLauncher
             {
                 var item = new ListViewItem(new string[]
                 {
-                    t.Id.ToString(), t.Name, "#" + t.Node + " " + t.NodeName, t.Description
+                    t.Id.ToString(), t.Name, "#" + t.Node + " " + t.NodeName, t.Description, t.Note
                 })
                 {
                     Checked = t.Enabled
@@ -79,6 +81,9 @@ namespace LegacyLauncher
                         break;
                     case nameof(TunnelModel.Description):
                         item.SubItems[3].Text = t.Description;
+                        break;
+                    case nameof(TunnelModel.Note):
+                        item.SubItems[4].Text = t.Note;
                         break;
                     }
                     return;
@@ -157,6 +162,27 @@ namespace LegacyLauncher
                 return;
             }
             Model.CheckUpdate = checkBox_update.Checked;
+            if (Model.CheckUpdate)
+            {
+                Model.RequestCheckUpdateAsync().ContinueWith(r => Invoke(() =>
+                {
+                    if (r.Exception != null)
+                    {
+                        Model.ShowMessage(r.Exception.ToString(), "更新检查失败", MessageMode.Error);
+                    }
+                    else if (r.Result != null)
+                    {
+                        if (r.Result.Status == UpdateStatus.NoUpdate)
+                        {
+                            Model.ShowMessage("当前没有可用更新", "提示", MessageMode.Info);
+                        }
+                        else if (r.Result.Status == UpdateStatus.Failed)
+                        {
+                            Model.ShowMessage("更新检查失败, 请查看日志输出", "错误", MessageMode.Error);
+                        }
+                    }
+                }));
+            }
         }
 
         private void checkBox_textwrap_CheckedChanged(object sender, EventArgs e)
