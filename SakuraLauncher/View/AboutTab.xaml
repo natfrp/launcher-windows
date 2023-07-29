@@ -26,8 +26,6 @@
                 <LineBreak />
                 <Run FontSize="15" Text="版权所有 © 2020-2023 iDea Leaper" />
                 <LineBreak />
-                <Run FontSize="15">https://github.com/natfrp/launcher</Run>
-                <LineBreak />
                 <Run FontSize="15">https://github.com/natfrp/launcher-windows</Run>
             </TextBlock>
         </StackPanel>

@@ -1,4 +1,4 @@
-﻿#define AppName "SakuraFrp 启动器"
+#define AppName "SakuraFrp 启动器"
 #define AppVersion ""
 #define RealVersion GetVersionNumbersString("_publish\SakuraLibrary\SakuraLibrary.dll")
 
@@ -40,7 +40,7 @@ OutputDir=bin
 OutputBaseFilename=SakuraLauncher
 
 ; Compression
-Compression=lzma2/ultra64
+Compression=lzma2
 SolidCompression=yes
 LZMANumBlockThreads=32
 LZMAUseSeparateProcess=yes
@@ -62,14 +62,15 @@ Name: "launcher"; Description: "核心服务"; Types: default custom; Flags: fix
 Name: "launcher\x86"; Description: "核心服务 (32 位)"; Check: IsX86; Types: default custom; Flags: exclusive fixed
 Name: "launcher\x64"; Description: "核心服务 (64 位)"; Check: IsX64; Types: default custom; Flags: exclusive fixed
 Name: "launcher\arm64"; Description: "核心服务 (ARM64, 实验性)"; Check: IsARM64; Types: default custom; Flags: exclusive fixed
-Name: "launcher\service"; Description: "安装为系统服务";
+Name: "launcher\service"; Description: "安装为系统服务"; Flags: dontinheritcheck
+Name: "launcher\service\webui"; Description: "初始化 Web UI (仅限高级用户)"; Flags: dontinheritcheck
 
-Name: "launcher_ui"; Description: "用户界面"; Types: default custom; Flags: fixed
+Name: "launcher_ui"; Description: "用户界面"; Types: default custom
 Name: "launcher_ui\wpf"; Description: "WPF 界面"; Types: default; Flags: exclusive
 Name: "launcher_ui\legacy"; Description: "传统界面 (不推荐)"; Types: custom; Flags: exclusive
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkedonce
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Components: "launcher_ui"; Flags: checkedonce
 
 [Files]
 Source: "_publish\sign\frpc_windows_386_gui.exe"; DestDir: "{app}"; DestName: "frpc.exe"; Flags: ignoreversion; Components: "frpc\x86"
@@ -111,8 +112,13 @@ Filename: "{app}\SakuraFrpService.exe"; Parameters: "--install"; StatusMsg: "正
 Filename: "{app}\SakuraLauncher.exe"; Description: "{cm:LaunchProgram,{#AppName}}"; Components: "launcher_ui\wpf"; Flags: nowait postinstall skipifsilent
 Filename: "{app}\LegacyLauncher.exe"; Description: "{cm:LaunchProgram,{#AppName}}"; Components: "launcher_ui\legacy"; Flags: nowait postinstall skipifsilent
 
+; WebUI
+Filename: "{app}\SakuraFrpService.exe"; Description: "初始化 Web UI"; Components: "launcher\service\webui"; Flags: postinstall; Parameters: "--init-webui"
+Filename: "{sys}\sc.exe"; Description: "启动系统服务"; Components: "launcher\service"; Flags: postinstall runhidden; Parameters: "start SakuraFrpService"
+
 [UninstallRun]
-Filename: "{app}\SakuraFrpService.exe"; Parameters: "--uninstall"; RunOnceId: "RemoveService"; Components: "launcher\service"
+Filename: "{sys}\sc.exe"; Parameters: "stop SakuraFrpService"; RunOnceId: "RemoveService-Stop"; Flags: runhidden
+Filename: "{app}\SakuraFrpService.exe"; Parameters: "--uninstall"; RunOnceId: "RemoveService-Uninstall"
 
 [UninstallDelete]
 Type: files; Name: "{app}\InstallUtil.InstallLog"
@@ -196,7 +202,16 @@ var
 	retry: Boolean;
 begin
 	Result := True;
-	if (CurPageID = wpReady) and installNet then begin
+	if (CurPageID = wpSelectComponents) then begin
+		if not WizardIsComponentSelected('launcher_ui') then begin
+			if WizardIsComponentSelected('launcher\service\webui') then
+				Result := SuppressibleMsgBox('您选择了不使用原生界面、只启用 Web UI, Web UI 仅推荐高级用户使用'+#13#10+'请确认您理解此选择的含义和 Web UI 的配置方法, 否则请勾选一个 "用户界面"', mbError, MB_OKCANCEL, IDCANCEL) = IDOK
+			else begin
+				SuppressibleMsgBox('请至少选择一个用户界面', mbError, MB_OK, IDOK);
+				Result := False;
+			end;
+		end;
+	end else if (CurPageID = wpReady) and installNet then begin
 		try
 			downloadPage.Show;
 			downloadPage.Clear;
@@ -242,7 +257,7 @@ begin
 		+#13#10+'    %AppData%\SakuraLauncher'
 		+#13#10+'    %AppData%\LegacyLauncher'
 		+#13#10+'    %AppData%\SakuraFrpService'
-		+#13#10+'    %ProgramData%\SakuraFrpService', mbConfirmation, MB_YESNO) = IDYES) then
+		+#13#10+'    %ProgramData%\SakuraFrpService', mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES) then
 	begin
 		DelTree(ExpandConstant('{userappdata}\SakuraLauncher'), True, True, True);
 		DelTree(ExpandConstant('{userappdata}\LegacyLauncher'), True, True, True);
