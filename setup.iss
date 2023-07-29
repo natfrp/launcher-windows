@@ -1,4 +1,4 @@
-#define AppName "SakuraFrp 启动器"
+﻿#define AppName "SakuraFrp 启动器"
 #define AppVersion ""
 #define RealVersion GetVersionNumbersString("_publish\SakuraLibrary\SakuraLibrary.dll")
 
@@ -40,7 +40,7 @@ OutputDir=bin
 OutputBaseFilename=SakuraLauncher
 
 ; Compression
-Compression=lzma2
+Compression=lzma2/ultra64
 SolidCompression=yes
 LZMANumBlockThreads=32
 LZMAUseSeparateProcess=yes
@@ -174,9 +174,8 @@ function UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, Me
 begin
 	Result := '';
 
-	if installNet then begin
+	if installNet and WizardIsComponentSelected('launcher_ui') then
 		Result := Result + '运行环境 (需要联网下载):' + Newline + Space + '{#LibraryNameNet}' + Newline + NewLine;
-	end;
 
 	if MemoUserInfoInfo <> '' then
 		Result := Result + MemoUserInfoInfo + Newline + NewLine;
@@ -211,7 +210,7 @@ begin
 				Result := False;
 			end;
 		end;
-	end else if (CurPageID = wpReady) and installNet then begin
+	end else if (CurPageID = wpReady) and installNet and WizardIsComponentSelected('launcher_ui') then begin
 		try
 			downloadPage.Show;
 			downloadPage.Clear;
