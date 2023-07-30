@@ -105,7 +105,7 @@
                     </Grid>
                     <TextBox
                         Margin="8"
-                        materialDesign:HintAssist.Hint="隧道名称(留空随机)"
+                        materialDesign:HintAssist.Hint="隧道名称"
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="{Binding TunnelName}" />
                     <TextBox

@@ -224,10 +224,10 @@
             // textBox_name
             // 
             this.textBox_name.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.createTunnelModelBindingSource, "TunnelName", true));
-            this.textBox_name.Location = new System.Drawing.Point(131, 47);
+            this.textBox_name.Location = new System.Drawing.Point(71, 47);
             this.textBox_name.MaxLength = 15;
             this.textBox_name.Name = "textBox_name";
-            this.textBox_name.Size = new System.Drawing.Size(159, 21);
+            this.textBox_name.Size = new System.Drawing.Size(219, 21);
             this.textBox_name.TabIndex = 6;
             // 
             // label3
@@ -235,9 +235,9 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(6, 50);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(119, 12);
+            this.label3.Size = new System.Drawing.Size(59, 12);
             this.label3.TabIndex = 5;
-            this.label3.Text = "隧道名称(留空随机):";
+            this.label3.Text = "隧道名称:";
             // 
             // label2
             // 

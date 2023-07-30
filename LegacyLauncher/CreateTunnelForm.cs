@@ -17,8 +17,13 @@ namespace LegacyLauncher
 
             foreach (var node in Model.Nodes)
             {
-                if (NodeFlags.AcceptNewTunnel(node))
+                if (node.Enabled)
                 {
+                    comboBox_node.Items.Add(node);
+                }
+                else
+                {
+                    node.Name = "--- " + node.Name + " ---";
                     comboBox_node.Items.Add(node);
                 }
             }
@@ -63,7 +68,7 @@ namespace LegacyLauncher
 
         private void button_create_Click(object sender, EventArgs e)
         {
-            if (comboBox_node.SelectedItem is not Node n)
+            if (comboBox_node.SelectedItem is not Node n || !n.Enabled)
             {
                 MessageBox.Show("请选择穿透节点", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
