@@ -1,8 +1,7 @@
-﻿using System;
-using System.Threading;
+﻿using SakuraLauncher.Model;
+using System;
 using System.Windows;
-using System.Windows.Controls;
-using SakuraLauncher.Model;
+using static SakuraLibrary.Model.LauncherModel;
 
 namespace SakuraLauncher
 {
@@ -23,16 +22,22 @@ namespace SakuraLauncher
         {
             try
             {
-                if (!agreement.IsChecked.HasValue || !agreement.IsChecked.Value) throw new Exception("您需要仔细阅读说明内容并同意承担该功能可能带来的安全风险才能启用远程控制");
-                if (password.Text == "") throw new Exception("密码不能为空");
-                if (password.Text.Length < 8) throw new Exception("密码至少需要 8 位");
-
+                if (!agreement.IsChecked.HasValue || !agreement.IsChecked.Value)
+                {
+                    Model.ShowMessage("您需要仔细阅读说明内容并同意承担该功能可能带来的安全风险才能启用远程管理", "操作失败", MessageMode.Error);
+                    return;
+                }
+                if (password.Text.Length < 8)
+                {
+                    Model.ShowMessage("密码至少需要 8 位", "操作失败", MessageMode.Error);
+                    return;
+                }
                 Model.Config.RemoteManagementKey = password.Text;
                 Model.PushServiceConfig(true);
             }
             catch (Exception ex)
             {
-                Model.ShowMessage(ex.Message, "错误", SakuraLibrary.Model.LauncherModel.MessageMode.Error);
+                Model.ShowError(ex);
             }
             Close();
         }

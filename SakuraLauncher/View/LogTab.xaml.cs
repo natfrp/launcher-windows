@@ -45,7 +45,7 @@ namespace SakuraLauncher.View
             }
             catch (Exception ex)
             {
-                Model.ShowMessage(ex.ToString(), "错误", SakuraLibrary.Model.LauncherModel.MessageMode.Error);
+                Model.ShowError(ex);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using Grpc.Net.Client;
+﻿using Grpc.Core;
+using Grpc.Net.Client;
 using SakuraLibrary.Helper;
 using SakuraLibrary.Proto;
 using System;
@@ -186,6 +187,35 @@ namespace SakuraLibrary.Model
 
         public ObservableCollection<TunnelModel> Tunnels { get; set; } = new ObservableCollection<TunnelModel>();
 
+        public void ShowError(Exception e, string title = "操作失败")
+        {
+            string msg = "";
+            if (e is AggregateException ae)
+            {
+                foreach (var ie in ae.InnerExceptions)
+                {
+                    if (ie is RpcException)
+                    {
+                        e = ie;
+                        break;
+                    }
+                }
+            }
+            if (e is RpcException re)
+            {
+                if (re.Status.StatusCode != StatusCode.Unknown)
+                {
+                    msg += $"[{re.Status.StatusCode}] ";
+                }
+                msg += re.Status.Detail;
+            }
+            else
+            {
+                msg = e.ToString();
+            }
+            ShowMessage(msg, title, MessageMode.Error);
+        }
+
         #endregion
 
         #region Generic RPC
@@ -221,7 +251,7 @@ namespace SakuraLibrary.Model
             }
             catch (Exception ex)
             {
-                ShowMessage(ex.Message, "删除失败", MessageMode.Error);
+                ShowError(ex, "删除失败");
             }
         }
 
@@ -239,7 +269,7 @@ namespace SakuraLibrary.Model
             }
             catch (Exception e)
             {
-                ShowMessage(e.Message, "操作失败", MessageMode.Error);
+                ShowError(e);
             }
         }
 
@@ -277,7 +307,7 @@ namespace SakuraLibrary.Model
             }
             catch (Exception ex)
             {
-                ShowMessage(ex.Message, "登录失败", MessageMode.Error);
+                ShowError(ex, "登录失败");
             }
             finally
             {
@@ -476,7 +506,7 @@ namespace SakuraLibrary.Model
                 }
                 catch (Exception ex)
                 {
-                    ShowMessage(ex.ToString(), "错误", MessageMode.Error);
+                    ShowError(ex, "错误");
                 }
                 finally
                 {

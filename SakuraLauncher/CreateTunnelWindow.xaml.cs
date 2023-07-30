@@ -30,7 +30,7 @@ namespace SakuraLauncher
             }
             if (this.node.SelectedItem is not Node node)
             {
-                Model.Launcher.ShowMessage("请选择穿透服务器", "操作失败", MessageMode.Error);
+                Model.Launcher.ShowMessage("请选择穿透节点", "操作失败", MessageMode.Error);
                 return;
             }
             Model.RequestCreate(node.Id, (close) =>

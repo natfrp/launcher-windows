@@ -38,7 +38,7 @@ namespace SakuraLauncher.View
                 Model.CheckingUpdate = false;
                 if (r.Exception != null)
                 {
-                    Model.ShowMessage(r.Exception.ToString(), "更新检查失败", MessageMode.Error);
+                    Model.ShowError(r.Exception);
                 }
                 else if (r.Result != null)
                 {
@@ -71,7 +71,7 @@ namespace SakuraLauncher.View
             {
                 if (r.Exception != null)
                 {
-                    Model.ShowMessage(r.Exception.ToString(), "节点列表刷新失败", MessageMode.Error);
+                    Model.ShowError(r.Exception);
                 }
                 else
                 {

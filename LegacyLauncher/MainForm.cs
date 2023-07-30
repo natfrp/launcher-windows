@@ -168,7 +168,7 @@ namespace LegacyLauncher
                 {
                     if (r.Exception != null)
                     {
-                        Model.ShowMessage(r.Exception.ToString(), "更新检查失败", MessageMode.Error);
+                        Model.ShowError(r.Exception);
                     }
                     else if (r.Result != null)
                     {

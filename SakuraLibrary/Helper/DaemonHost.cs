@@ -224,7 +224,7 @@ namespace SakuraLibrary.Helper
             }
             catch (Exception e)
             {
-                Launcher.ShowMessage(e.ToString(), "运行模式切换失败", LauncherModel.MessageMode.Error);
+                Launcher.ShowError(e, "运行模式切换失败");
             }
             finally
             {

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Diagnostics;
+using SakuraLibrary.Proto;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-
-using SakuraLibrary.Proto;
+using System.Diagnostics;
+using System.Threading;
 
 namespace SakuraLibrary.Model
 {
@@ -100,7 +97,7 @@ namespace SakuraLibrary.Model
                 Creating = false;
                 if (r.Exception != null)
                 {
-                    Launcher.ShowMessage(r.Exception.ToString(), "创建失败", LauncherModel.MessageMode.Error);
+                    Launcher.ShowError(r.Exception, "创建失败");
                     callback(false);
                     return;
                 }
