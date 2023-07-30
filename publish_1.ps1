@@ -40,7 +40,7 @@ try {
     Remove-Item "sign", "debug" -Recurse
     New-Item -Name "sign" -ItemType "directory"
 
-    Copy-Item ..\bin\frpc_*.exe -Destination "sign"
+    Copy-Item ..\..\frp\release\frpc_windows_*_gui.exe -Destination "sign"
 } finally {
     Pop-Location
 }
