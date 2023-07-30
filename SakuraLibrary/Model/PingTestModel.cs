@@ -21,9 +21,12 @@ namespace SakuraLibrary.Model
         public PingTestModel(LauncherModel launcher) : base(launcher.Dispatcher)
         {
             Launcher = launcher;
-            foreach (var n in launcher.Nodes.Values.Where(n => n.Host != "").OrderBy(n => n.Id))
+            foreach (var n in launcher.Nodes.Values)
             {
-                Nodes.Add(new NodePingModel(n, Dispatcher));
+                if (n.Host != "" && NodeFlags.AcceptNewTunnel(n) && (launcher.UserInfo.Group?.Level ?? 0) >= n.Vip)
+                {
+                    Nodes.Add(new NodePingModel(n, Dispatcher));
+                }
             }
         }
 

@@ -1,4 +1,4 @@
-using SakuraLibrary.Proto;
+﻿using SakuraLibrary.Proto;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -52,7 +52,7 @@ namespace SakuraLibrary.Model
             };
             foreach (var n in launcher.Nodes.Values)
             {
-                if (!NodeFlags.AcceptNewTunnel(n))
+                if (!NodeFlags.AcceptNewTunnel(n) || (launcher.UserInfo.Group?.Level ?? 0) < n.Vip)
                 {
                     continue;
                 }
