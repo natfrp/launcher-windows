@@ -121,8 +121,12 @@ Filename: "{sys}\sc.exe"; Parameters: "stop SakuraFrpService"; RunOnceId: "Remov
 Filename: "{app}\SakuraFrpService.exe"; Parameters: "--uninstall"; RunOnceId: "RemoveService-Uninstall"
 
 [UninstallDelete]
+; 2.0 service installation logs
 Type: files; Name: "{app}\InstallUtil.InstallLog"
 Type: files; Name: "{app}\SakuraFrpService.InstallLog"
+
+; Possible update leftovers
+Type: files; Name: "{app}\*.del"
 
 Type: dirifempty; Name: "{app}"
 
