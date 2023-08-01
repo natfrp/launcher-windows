@@ -104,7 +104,7 @@ namespace SakuraLibrary.Helper
                             {
                                 return;
                             }
-                            switch (Launcher.ShowMessage("按 \"忽略\" 屏蔽此提示, \"终止\" 退出启动器\n\n错误信息:\n" + msg.ToString(), "守护进程异常退出", LauncherModel.MessageMode.AbortRetryIgnore | LauncherModel.MessageMode.Error))
+                            switch (Launcher.ShowMessage("按 \"忽略\" 屏蔽此提示, \"中止\" 退出启动器\n\n错误信息:\n" + msg.ToString(), "守护进程异常退出", LauncherModel.MessageMode.AbortRetryIgnore | LauncherModel.MessageMode.Error))
                             {
                             case LauncherModel.MessageResult.Abort:
                                 Environment.Exit(1);
@@ -122,7 +122,7 @@ namespace SakuraLibrary.Helper
                         {
                             continue;
                         }
-                        switch (Launcher.ShowMessage("按 \"忽略\" 屏蔽此提示, \"终止\" 退出启动器\n\n屏蔽此提示后, 可以在 WPF 启动器中切换运行模式来尝试修复此问题\n若切换运行模式无法解决, 请尝试添加启动器目录到杀软白名单并重装启动器\n\n错误信息:\n" + e.ToString(), "守护进程启动失败", LauncherModel.MessageMode.AbortRetryIgnore | LauncherModel.MessageMode.Error))
+                        switch (Launcher.ShowMessage("按 \"忽略\" 屏蔽此提示, \"中止\" 退出启动器\n\n屏蔽此提示后, 可以在 WPF 启动器中切换运行模式来尝试修复此问题\n若切换运行模式无法解决, 请尝试添加启动器目录到杀软白名单并重装启动器\n\n错误信息:\n" + e.ToString(), "守护进程启动失败", LauncherModel.MessageMode.AbortRetryIgnore | LauncherModel.MessageMode.Error))
                         {
                         case LauncherModel.MessageResult.Abort:
                             Environment.Exit(1);
