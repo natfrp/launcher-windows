@@ -113,7 +113,7 @@ Filename: "{app}\SakuraLauncher.exe"; Description: "{cm:LaunchProgram,{#AppName}
 Filename: "{app}\LegacyLauncher.exe"; Description: "{cm:LaunchProgram,{#AppName}}"; Components: "launcher_ui\legacy"; Flags: nowait postinstall skipifsilent
 
 ; WebUI
-Filename: "{app}\SakuraFrpService.exe"; Description: "初始化 Web UI"; Components: "launcher\service\webui"; Flags: postinstall; Parameters: "--init-webui"
+Filename: "{app}\SakuraFrpService.exe"; Description: "初始化 Web UI"; Components: "launcher\service\webui"; Flags: postinstall; Parameters: "webui --init"
 Filename: "{sys}\sc.exe"; Description: "启动系统服务"; Components: "launcher\service"; Flags: postinstall runhidden; Parameters: "start SakuraFrpService"
 
 [UninstallRun]
