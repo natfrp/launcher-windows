@@ -243,7 +243,7 @@ end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 begin
-	if installNet then
+	if installNet and WizardIsComponentSelected('launcher_ui') then
 		Result := TryInstall('{#LibraryNameNet}', 'dotnet.exe', '/passive /norestart /showrmui /showfinalerror');
 end;
 
