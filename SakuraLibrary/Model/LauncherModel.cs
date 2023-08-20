@@ -31,6 +31,7 @@ namespace SakuraLibrary.Model
         {
             HttpHandler = new StandardSocketsHttpHandler()
             {
+                UseProxy = false,
                 ConnectCallback = async (context, cancellationToken) =>
                 {
                     var pipe = new NamedPipeClientStream(".", Consts.PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);

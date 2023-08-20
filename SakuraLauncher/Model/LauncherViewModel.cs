@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using System.ComponentModel;
@@ -50,6 +51,7 @@ namespace SakuraLauncher.Model
             };
             TunnelsView.SortDescriptions.Add(new SortDescription(nameof(TunnelModel.Name), ListSortDirection.Ascending));
 
+            var prevAvatar = "";
             PropertyChanged += (sender, e) =>
             {
                 if (e.PropertyName == "_Login_State")
@@ -61,14 +63,28 @@ namespace SakuraLauncher.Model
                     if (string.IsNullOrEmpty(UserInfo.Avatar))
                     {
                         Avatar = null;
+                        prevAvatar = "";
+                        return;
                     }
-                    else
+                    if (UserInfo.Avatar == prevAvatar)
                     {
-                        var uri = new Uri(UserInfo.Avatar);
-                        if (Avatar?.UriSource != uri)
+                        return;
+                    }
+
+                    var uri = new Uri(UserInfo.Avatar);
+                    var cache = Path.Combine(Consts.WorkingDirectory, "Temp", "avatar.jpg");
+                    try
+                    {
+                        using (var client = new WebClient())
                         {
-                            Avatar = new BitmapImage(uri);
+                            client.DownloadFile(uri, cache);
                         }
+                        Avatar = new BitmapImage(new Uri(cache));
+                        prevAvatar = UserInfo.Avatar;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
                     }
                 }
             };
