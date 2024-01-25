@@ -5,6 +5,13 @@
 #define MainExecutable "SakuraLauncher.exe"
 
 #define LibraryNameNet ".NET Framework 4.8"
+#define LibraryNameWebView2 "Microsoft Edge WebView2 Runtime"
+
+#define Sha256Net "0bba3094588c4bfec301939985222a20b340bf03431563dec8b2b4478b06fffa"
+#define DownloadUrlNet "https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/9b7b8746971ed51a1770ae4293618187/ndp48-web.exe"
+
+#define Sha256WebView2 "5b01d964ced28c1ff850b4de05a71f386addd815a30c4a9ee210ef90619df58e"
+#define DownloadUrlWebView2 "https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/27b4fd83-937a-4e70-8ee5-c881502ea90e/MicrosoftEdgeWebview2Setup.exe"
 
 [Setup]
 ; Basics
@@ -56,12 +63,12 @@ Name: "custom"; Description: "自定义"; Flags: iscustom;
 Name: "frpc"; Description: "frpc"; Types: default custom; Flags: fixed
 Name: "frpc\x86"; Description: "frpc (32 位)"; Check: IsX86; Types: default custom; Flags: exclusive fixed
 Name: "frpc\x64"; Description: "frpc (64 位)"; Check: IsX64; Types: default custom; Flags: exclusive fixed
-Name: "frpc\arm64"; Description: "frpc (ARM64, 实验性)"; Check: IsARM64; Types: default custom; Flags: exclusive fixed
+Name: "frpc\arm64"; Description: "frpc (ARM64)"; Check: IsARM64; Types: default custom; Flags: exclusive fixed
 
 Name: "launcher"; Description: "核心服务"; Types: default custom; Flags: fixed
 Name: "launcher\x86"; Description: "核心服务 (32 位)"; Check: IsX86; Types: default custom; Flags: exclusive fixed
 Name: "launcher\x64"; Description: "核心服务 (64 位)"; Check: IsX64; Types: default custom; Flags: exclusive fixed
-Name: "launcher\arm64"; Description: "核心服务 (ARM64, 实验性)"; Check: IsARM64; Types: default custom; Flags: exclusive fixed
+Name: "launcher\arm64"; Description: "核心服务 (ARM64)"; Check: IsARM64; Types: default custom; Flags: exclusive fixed
 Name: "launcher\service"; Description: "安装为系统服务"; Flags: dontinheritcheck
 Name: "launcher\service\webui"; Description: "初始化 Web UI (仅限高级用户)"; Flags: dontinheritcheck
 
@@ -88,7 +95,7 @@ Source: "_publish\sign\SakuraFrpService_arm64.exe"; DestDir: "{app}"; DestName: 
 Source: "_publish\sign\SakuraFrpService_arm64.exe.sig"; DestDir: "{app}"; DestName: "SakuraFrpService.exe.sig"; Flags: ignoreversion; Components: "launcher\arm64"
 
 Source: "_publish\SakuraLibrary\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui"
-Source: "_publish\SakuraLauncher\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui\wpf"
+Source: "_publish\SakuraLauncher\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs; Components: "launcher_ui\wpf"
 Source: "_publish\LegacyLauncher\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui\legacy"
 
 [Icons]
@@ -136,8 +143,9 @@ var
 	downloadPage: TDownloadWizardPage;
 
 	installNet: Boolean;
+	installWebView2: Boolean;
 
-function TryInstall(const Name, File, Args: String): String;
+function TryInstall(const Name, File, Args: String; const CheckResult: Boolean): String;
 var
 	resultCode: Integer;
 	outputPage: TOutputProgressWizardPage;
@@ -148,17 +156,13 @@ begin
 	outputPage.Show;
 
 	if not Exec(ExpandConstant('{tmp}\' + File), Args, '', SW_SHOW, ewWaitUntilTerminated, resultCode) then
-	begin
-		Result := Name + ' 安装失败: ' + SysErrorMessage(resultCode);
-	end else begin
+		Result := Name + ' 安装失败: ' + SysErrorMessage(resultCode)
+	else if CheckResult then
 		case resultCode of
 			0: ;
 			1641, 3010: requiresRestart := True;
-			else begin
-				Result := Name + ' 安装失败: 错误代码 ' + IntToStr(resultCode);
-			end;
+			else Result := Name + ' 安装失败: 错误代码 ' + IntToStr(resultCode);
 		end;
-	end;
 
 	outputPage.Hide;
 end;
@@ -168,18 +172,44 @@ end;
 procedure InitializeWizard;
 var
 	version: Cardinal;
+	versionStr: String;
+	verifyWebView2: Boolean;
 begin
 	downloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
 
 	installNet := (not RegQueryDWordValue(HKLM, 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full', 'Release', version)) or (version < 528040);
+
+    { WebView2: https://stackoverflow.com/questions/72331206/detecting-if-webview2-runtime-is-installed-with-inno-setup }
+    verifyWebView2 := false;
+    if (IsWin64) then
+	begin
+        if (RegQueryStringValue(HKEY_LOCAL_MACHINE, 'SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv', versionStr)) then
+            verifyWebView2 := true;
+	end	else if (RegQueryStringValue(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv', versionStr)) then
+		verifyWebView2 := true;
+
+	if (not verifyWebView2) and (RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv', versionStr)) then
+		verifyWebView2 := true;
+
+	installWebView2 := (not verifyWebView2) or (versionStr = '') or (versionStr = '0.0.0.0');
 end;
 
 function UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
 begin
 	Result := '';
 
-	if installNet and WizardIsComponentSelected('launcher_ui') then
-		Result := Result + '运行环境 (需要联网下载):' + Newline + Space + '{#LibraryNameNet}' + Newline + NewLine;
+	if WizardIsComponentSelected('launcher_ui') and (installNet or installWebView2) then
+	begin
+		Result := Result + '运行环境 (需要联网下载):' + Newline;
+
+		if installNet then
+			Result := Result + Space + '{#LibraryNameNet}' + Newline;
+
+		if installWebView2 then
+			Result := Result + Space + '{#LibraryNameWebView2}' + Newline;
+
+		Result := Result + NewLine;
+	end;
 
 	if MemoUserInfoInfo <> '' then
 		Result := Result + MemoUserInfoInfo + Newline + NewLine;
@@ -214,13 +244,17 @@ begin
 				Result := False;
 			end;
 		end;
-	end else if (CurPageID = wpReady) and installNet and WizardIsComponentSelected('launcher_ui') then begin
+	end else if (CurPageID = wpReady) and WizardIsComponentSelected('launcher_ui') and (installNet or installWebView2) then begin
+		downloadPage.Show;
+		downloadPage.Clear;
+
+		if installNet then
+			downloadPage.Add('{#DownloadUrlNet}', 'dotnet.exe', '{#Sha256Net}');
+
+		if installWebView2 then
+			downloadPage.Add('{#DownloadUrlWebView2}', 'MicrosoftEdgeWebview2Setup.exe', '{#Sha256WebView2}');
+
 		try
-			downloadPage.Show;
-			downloadPage.Clear;
-
-			downloadPage.Add('https://download.microsoft.com/download/6/e/4/6e483240-dd87-40cd-adf4-0c47f5695b49/NDP481-Web.exe', 'dotnet.exe', 'a9e29f446af0db54a4f20de0749db25907fde06999c2e25e9eca52528dce3142');
-
 			retry := True;
 			while retry do begin
 				retry := False;
@@ -243,8 +277,14 @@ end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 begin
-	if installNet and WizardIsComponentSelected('launcher_ui') then
-		Result := TryInstall('{#LibraryNameNet}', 'dotnet.exe', '/passive /norestart /showrmui /showfinalerror');
+	if WizardIsComponentSelected('launcher_ui') then
+	begin
+		if installNet then
+			Result := Result + TryInstall('{#LibraryNameNet}', 'dotnet.exe', '/passive /norestart /showrmui /showfinalerror', true);
+
+		if installWebView2 then
+			Result := Result + TryInstall('{#LibraryNameWebView2}', 'MicrosoftEdgeWebview2Setup.exe', '/install', false);
+	end;
 end;
 
 function NeedRestart(): Boolean;
