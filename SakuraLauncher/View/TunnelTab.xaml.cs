@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 
 using SakuraLibrary.Model;
@@ -55,6 +55,11 @@ namespace SakuraLauncher.View
 
         private void ButtonEdit_Click(object sender, RoutedEventArgs e)
         {
+            if (Model.WebView2Environment == null)
+            {
+                Model.ShowMessage("WebView2 初始化失败，该功能不可用。如果已安装 WebView2 请重启启动器。", "错误", LauncherModel.MessageMode.Ok | LauncherModel.MessageMode.Error);
+                return;
+            }
             if ((sender as Button).DataContext is TunnelModel tunnel)
             {
                 new CreateTunnelWindow2(Model, tunnel.Proto).ShowDialog();

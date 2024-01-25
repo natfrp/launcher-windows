@@ -7,6 +7,10 @@ namespace System.Threading.Tasks
         public static T WaitResult<T>(this Task<T> task)
         {
             task.Wait();
+            if (task.Exception != null)
+            {
+                throw task.Exception;
+            }
             return task.Result;
         }
 

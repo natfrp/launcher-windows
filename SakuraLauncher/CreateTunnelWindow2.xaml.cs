@@ -1,10 +1,9 @@
-﻿using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Core;
 using SakuraLauncher.Helper;
 using SakuraLauncher.Model;
 using SakuraLibrary.Model;
 using SakuraLibrary.Proto;
 using System;
-using System.Diagnostics;
 using System.Windows;
 
 namespace SakuraLauncher
@@ -31,14 +30,11 @@ namespace SakuraLauncher
 
             Model.ReloadListening();
 
-            webView.EnsureCoreWebView2Async().ContinueWith((r) =>
+            webView.EnsureCoreWebView2Async(Launcher.WebView2Environment).ContinueWith((r) =>
             {
                 if (r.IsFaulted)
                 {
-                    if (MessageBox.Show("加载 WebView2 失败，请检查是否已安装 WebView2 运行时。\n按 \"确定\" 打开下载 WebView2 安装程序的下载页面。\n\n" + r.Exception.ToString(), "错误", MessageBoxButton.OKCancel, MessageBoxImage.Error) == MessageBoxResult.OK)
-                    {
-                        Process.Start("https://go.microsoft.com/fwlink/p/?LinkId=2124703");
-                    }
+                    Launcher.ShowMessage("WebView2 初始化失败，请检查是否已安装 WebView2 运行时。" + r.Exception.ToString(), "错误", LauncherModel.MessageMode.Error);
                     Close();
                 }
             });

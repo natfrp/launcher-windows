@@ -1,17 +1,20 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Interop;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.Animation;
-using System.Runtime.InteropServices;
-
-using SakuraLibrary;
-
-using SakuraLauncher.View;
+﻿using Microsoft.Web.WebView2.Core;
 using SakuraLauncher.Model;
+using SakuraLauncher.View;
+using SakuraLibrary;
+using SakuraLibrary.Model;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 
 namespace SakuraLauncher
 {
@@ -97,6 +100,27 @@ namespace SakuraLauncher
                 }
                 return IntPtr.Zero;
             });
+
+            try
+            {
+                Model.WebView2Environment = CoreWebView2Environment.CreateAsync(null, Path.Combine(Consts.WorkingDirectory, "Temp"), new()
+                {
+                    EnableTrackingPrevention = false,
+                    AreBrowserExtensionsEnabled = false,
+                    AllowSingleSignOnUsingOSPrimaryAccount = false,
+                }).WaitResult();
+                if (Model.WebView2Environment == null)
+                {
+                    throw new Exception("WebView2Environment is null");
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!Model.LegacyCreateTunnel && Model.ShowMessage("无法初始化 WebView2 运行环境，创建、编辑隧道功能将无法正常工作。\n请检查是否已安装 WebView2 运行时。\n\n按 \"确定\" 打开下载 WebView2 安装程序的下载页面。\n\n" + ex.ToString(), "错误", LauncherModel.MessageMode.OkCancel | LauncherModel.MessageMode.Error) == LauncherModel.MessageResult.Ok)
+                {
+                    Process.Start("https://go.microsoft.com/fwlink/p/?LinkId=2124703");
+                }
+            }
         }
 
         private void Window_DpiChanged(object sender, DpiChangedEventArgs e) => ScaleFactor = e.NewDpi.DpiScaleX;

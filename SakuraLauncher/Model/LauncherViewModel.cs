@@ -1,18 +1,18 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Windows.Data;
-using System.Windows.Media.Imaging;
-using System.ComponentModel;
-using System.Collections.ObjectModel;
-
+using MaterialDesignThemes.Wpf;
+using Microsoft.Web.WebView2.Core;
+using SakuraLauncher.Helper;
 using SakuraLibrary;
+using SakuraLibrary.Helper;
 using SakuraLibrary.Model;
 using SakuraLibrary.Proto;
-using SakuraLibrary.Helper;
-using MaterialDesignThemes.Wpf;
-
-using SakuraLauncher.Helper;
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Net;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Media.Imaging;
 using static SakuraLibrary.Proto.Log.Types;
 
 namespace SakuraLauncher.Model
@@ -21,6 +21,8 @@ namespace SakuraLauncher.Model
     {
         public readonly MainWindow View;
         public readonly SakuraLauncherBridge Bridge;
+
+        public CoreWebView2Environment WebView2Environment;
 
         public LauncherViewModel(MainWindow view) : base(false)
         {
