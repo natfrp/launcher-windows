@@ -23,7 +23,17 @@ namespace SakuraLauncher.View
             DataContext = Model = main;
         }
 
-        private void ButtonCreate_Click(object sender, RoutedEventArgs e) => new CreateTunnelWindow(Model).ShowDialog();
+        private void ButtonCreate_Click(object sender, RoutedEventArgs e)
+        {
+            if (Model.LegacyCreateTunnel)
+            {
+                new CreateTunnelWindow(Model).ShowDialog();
+            }
+            else
+            {
+                new CreateTunnelWindow2(Model).ShowDialog();
+            }
+        }
 
         private void ButtonReload_Click(object sender, RoutedEventArgs e)
         {
@@ -40,6 +50,14 @@ namespace SakuraLauncher.View
                     IsEnabled = false;
                     Model.RequestDeleteTunnelAsync(tunnel.Id).ContinueWith(_ => Dispatcher.Invoke(() => IsEnabled = true));
                 }
+            }
+        }
+
+        private void ButtonEdit_Click(object sender, RoutedEventArgs e)
+        {
+            if ((sender as Button).DataContext is TunnelModel tunnel)
+            {
+                new CreateTunnelWindow2(Model, tunnel.Proto).ShowDialog();
             }
         }
 

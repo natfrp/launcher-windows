@@ -7,7 +7,7 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DataContext="{d:DesignInstance Type=Model:LauncherViewModel}"
-    d:DesignHeight="600"
+    d:DesignHeight="900"
     d:DesignWidth="580"
     mc:Ignorable="d">
     <ScrollViewer
@@ -544,6 +544,72 @@
                     Content="设置密码"
                     IsEnabled="{Binding Connected}"
                     Style="{StaticResource MaterialDesignFlatButton}" />
+            </StackPanel>
+            <StackPanel
+                Height="32"
+                Margin="12,4,16,0"
+                Orientation="Horizontal">
+                <ToggleButton
+                    Checked="Save"
+                    IsChecked="{Binding AdvancedMode}"
+                    Unchecked="Save" />
+                <TextBlock
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
+                    高级用户模式
+                </TextBlock>
+                <TextBlock
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF"
+                    ToolTip="操作不当可能造成【隧道功能异常、数据异常】等一系列使用问题，甚至可能造成您的【设备遭到攻击】，出现财产损失。启用前请确保您已具有【能理解自己到底在做什么】的能力。"
+                    ToolTipService.InitialShowDelay="0"
+                    TouchUp="Hint_TouchUp">
+                    <materialDesign:PackIcon
+                        Foreground="White"
+                        Kind="HelpCircleOutline"
+                        RenderTransformOrigin="0.5,0.1">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                </TextBlock>
+            </StackPanel>
+            <StackPanel
+                Height="32"
+                Margin="12,4,16,0"
+                Orientation="Horizontal">
+                <ToggleButton
+                    Checked="Save"
+                    IsChecked="{Binding LegacyCreateTunnel}"
+                    Unchecked="Save" />
+                <TextBlock
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
+                    传统创建隧道窗口
+                </TextBlock>
+                <TextBlock
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF"
+                    ToolTip="传统创建隧道窗口缺少很多功能和重要提示，只推荐 WebView2 加载异常的用户启用"
+                    ToolTipService.InitialShowDelay="0"
+                    TouchUp="Hint_TouchUp">
+                    <materialDesign:PackIcon
+                        Foreground="White"
+                        Kind="HelpCircleOutline"
+                        RenderTransformOrigin="0.5,0.1">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                </TextBlock>
             </StackPanel>
             <StackPanel
                 Height="32"

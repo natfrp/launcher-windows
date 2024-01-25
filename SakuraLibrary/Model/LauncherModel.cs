@@ -1,4 +1,4 @@
-using Grpc.Core;
+﻿using Grpc.Core;
 using Grpc.Net.Client;
 using SakuraLibrary.Helper;
 using SakuraLibrary.Proto;
@@ -225,23 +225,25 @@ namespace SakuraLibrary.Model
 
         #region Generic RPC
 
-        public async Task RequestReloadNodesAsync() => await RPC.ReloadNodesAsync(RpcEmpty);
+        public async Task RequestReloadNodesAsync(bool force = true) => await RPC.ReloadNodesAsync(new() { Force = force });
 
         public async Task RequestReloadTunnelsAsync() => await RPC.ReloadTunnelsAsync(RpcEmpty);
 
-        public async Task<TunnelUpdate> RequestCreateTunnelAsync(string localIp, int localPort, string name, string note, string type, int remote, int node) => await RPC.UpdateTunnelAsync(new TunnelUpdate()
+        public Task<TunnelUpdate> RequestCreateTunnelAsync(string localIp, int localPort, string name, string note, string type, int remote, int node) => RequestCreateTunnelAsync(new Tunnel()
         {
-            Action = TunnelUpdate.Types.Action.Add,
-            Tunnel = new Tunnel()
-            {
-                Name = name,
-                Note = note,
-                Node = node,
-                Type = type,
-                Remote = remote.ToString(),
-                LocalIp = localIp,
-                LocalPort = localPort,
-            },
+            Name = name,
+            Note = note,
+            Node = node,
+            Type = type,
+            Remote = remote.ToString(),
+            LocalIp = localIp,
+            LocalPort = localPort,
+        });
+
+        public async Task<TunnelUpdate> RequestCreateTunnelAsync(Tunnel payload, TunnelUpdate.Types.Action action = TunnelUpdate.Types.Action.Add) => await RPC.UpdateTunnelAsync(new TunnelUpdate()
+        {
+            Action = action,
+            Tunnel = payload,
         });
 
         public async Task RequestDeleteTunnelAsync(int id)

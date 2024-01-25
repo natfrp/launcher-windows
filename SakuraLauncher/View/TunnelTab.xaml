@@ -215,14 +215,90 @@
                                             Foreground="White"
                                             Opacity="0.8"
                                             Text="{Binding Description, Mode=OneWay}" />
-                                        <TextBlock
-                                            Grid.Row="1"
-                                            Grid.Column="2"
-                                            Margin="0,4,0,0"
-                                            VerticalAlignment="Bottom"
-                                            FontSize="13"
-                                            Foreground="White"
-                                            Text="{Binding Type, Mode=OneWay}" />
+                                        <Grid Grid.Row="1" Grid.Column="2">
+                                            <TextBlock
+                                                Margin="0,4,0,0"
+                                                VerticalAlignment="Bottom"
+                                                FontSize="13"
+                                                Foreground="White"
+                                                Text="{Binding Type, Mode=OneWay}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsMouseOver, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Border}}}" Value="True">
+                                                                <DataTrigger.EnterActions>
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard>
+                                                                            <DoubleAnimation
+                                                                                Storyboard.TargetProperty="Opacity"
+                                                                                To="0"
+                                                                                Duration="00:00:00.2" />
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </DataTrigger.EnterActions>
+                                                                <DataTrigger.ExitActions>
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard>
+                                                                            <DoubleAnimation
+                                                                                Storyboard.TargetProperty="Opacity"
+                                                                                To="1"
+                                                                                Duration="00:00:00.2" />
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </DataTrigger.ExitActions>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                            <Button
+                                                Width="16"
+                                                Height="16"
+                                                Margin="0,4,0,0"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center"
+                                                Click="ButtonEdit_Click"
+                                                Foreground="White"
+                                                Opacity="0">
+                                                <Button.Style>
+                                                    <Style BasedOn="{StaticResource MaterialDesignIconForegroundButton}" TargetType="Button">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsMouseOver, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Border}}}" Value="True">
+                                                                <DataTrigger.EnterActions>
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard>
+                                                                            <DoubleAnimation
+                                                                                Storyboard.TargetProperty="Opacity"
+                                                                                To="1"
+                                                                                Duration="00:00:00.2" />
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </DataTrigger.EnterActions>
+                                                                <DataTrigger.ExitActions>
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard>
+                                                                            <DoubleAnimation
+                                                                                Storyboard.TargetProperty="Opacity"
+                                                                                To="0"
+                                                                                Duration="00:00:00.2" />
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </DataTrigger.ExitActions>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                                <materialDesign:PackIcon
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Kind="Edit"
+                                                    RenderTransformOrigin="0.5,0.5">
+                                                    <materialDesign:PackIcon.RenderTransform>
+                                                        <ScaleTransform ScaleX="0.6" ScaleY="0.6" />
+                                                    </materialDesign:PackIcon.RenderTransform>
+                                                </materialDesign:PackIcon>
+                                            </Button>
+                                        </Grid>
                                     </Grid>
                                 </DockPanel>
                             </Grid>

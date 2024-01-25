@@ -20,10 +20,12 @@ namespace SakuraLauncher.Model
     public class LauncherViewModel : LauncherModel
     {
         public readonly MainWindow View;
+        public readonly SakuraLauncherBridge Bridge;
 
         public LauncherViewModel(MainWindow view) : base(false)
         {
             View = view;
+            Bridge = new SakuraLauncherBridge(this);
             Dispatcher = new DispatcherWrapper(View.Dispatcher.Invoke, a => View.Dispatcher.BeginInvoke(a), View.Dispatcher.CheckAccess);
 
             CurrentTabTester = new TabIndexTester(this);
@@ -42,6 +44,8 @@ namespace SakuraLauncher.Model
             Theme = settings.Theme;
             LogTextWrapping = settings.LogTextWrapping;
             NotificationMode = settings.NotificationMode;
+            AdvancedMode = settings.AdvancedMode;
+            LegacyCreateTunnel = settings.LegacyCreateTunnel;
             AlignWidth = settings.AlignWidth;
 
             LogsView.Filter += e =>
@@ -110,6 +114,8 @@ namespace SakuraLauncher.Model
             settings.Theme = Theme;
             settings.LogTextWrapping = LogTextWrapping;
             settings.NotificationMode = NotificationMode;
+            settings.AdvancedMode = AdvancedMode;
+            settings.LegacyCreateTunnel = LegacyCreateTunnel;
             settings.AlignWidth = AlignWidth;
 
             settings.Save();
@@ -145,6 +151,12 @@ namespace SakuraLauncher.Model
 
         public bool AlignWidth { get => _alignWidth; set => Set(out _alignWidth, value); }
         private bool _alignWidth;
+
+        public bool AdvancedMode { get => _advancedMode; set => Set(out _advancedMode, value); }
+        private bool _advancedMode;
+
+        public bool LegacyCreateTunnel { get => _legacyCreateTunnel; set => Set(out _legacyCreateTunnel, value); }
+        private bool _legacyCreateTunnel;
 
         public ICollectionView TunnelsView => CollectionViewSource.GetDefaultView(Tunnels);
 
