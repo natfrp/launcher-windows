@@ -1,4 +1,4 @@
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
 using Microsoft.Web.WebView2.Core;
 using SakuraLauncher.Helper;
 using SakuraLibrary;
@@ -100,7 +100,16 @@ namespace SakuraLauncher.Model
 
         #region ViewModel Abstraction
 
-        public override IntPtr GetHwnd() => View.Dispatcher.Invoke(() => new System.Windows.Interop.WindowInteropHelper(View).Handle);
+        private Window windowOverride = null;
+
+        public void ShowDialog(Window w)
+        {
+            windowOverride = w;
+            View.Dispatcher.Invoke(() => w.ShowDialog());
+            windowOverride = null;
+        }
+
+        public override IntPtr GetHwnd() => View.Dispatcher.Invoke(() => new System.Windows.Interop.WindowInteropHelper(windowOverride ?? View).Handle);
 
         #endregion
 

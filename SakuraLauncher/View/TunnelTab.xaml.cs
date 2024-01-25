@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 
 using SakuraLibrary.Model;
@@ -25,13 +25,13 @@ namespace SakuraLauncher.View
 
         private void ButtonCreate_Click(object sender, RoutedEventArgs e)
         {
-            if (Model.LegacyCreateTunnel)
+            if (Model.LegacyCreateTunnel || Model.WebView2Environment == null)
             {
-                new CreateTunnelWindow(Model).ShowDialog();
+                Model.ShowDialog(new CreateTunnelWindow(Model));
             }
             else
             {
-                new CreateTunnelWindow2(Model).ShowDialog();
+                Model.ShowDialog(new CreateTunnelWindow2(Model));
             }
         }
 
@@ -62,7 +62,7 @@ namespace SakuraLauncher.View
             }
             if ((sender as Button).DataContext is TunnelModel tunnel)
             {
-                new CreateTunnelWindow2(Model, tunnel.Proto).ShowDialog();
+                Model.ShowDialog(new CreateTunnelWindow2(Model, tunnel.Proto));
             }
         }
 
