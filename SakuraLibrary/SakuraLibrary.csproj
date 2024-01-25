@@ -48,17 +48,20 @@
 		</Protobuf>
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Google.Protobuf" Version="3.23.4" />
-		<PackageReference Include="Grpc.Core.Api" Version="2.55.0" />
-		<PackageReference Include="Grpc.Net.Client" Version="2.55.0" />
-		<PackageReference Include="Grpc.Net.Common" Version="2.55.0" />
-		<PackageReference Include="Grpc.Tools" Version="2.56.2" />
+		<PackageReference Include="Google.Protobuf" Version="3.25.2" />
+		<PackageReference Include="Grpc.Core.Api" Version="2.60.0" />
+		<PackageReference Include="Grpc.Net.Client" Version="2.60.0" />
+		<PackageReference Include="Grpc.Net.Common" Version="2.60.0" />
+		<PackageReference Include="Grpc.Tools" Version="2.60.0">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
 		<PackageReference Include="System.Buffers" Version="4.5.1" />
 		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="7.0.2" />
-		<PackageReference Include="System.Management" Version="7.0.2" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
+		<PackageReference Include="System.Management" Version="8.0.0" />
 		<PackageReference Include="System.Memory" Version="4.5.5" />
 		<PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
 		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />

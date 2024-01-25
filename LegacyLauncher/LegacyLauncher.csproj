@@ -7,11 +7,25 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
 		<ApplicationManifest>Properties\App.manifest</ApplicationManifest>
+		<AppConfig>Properties\App.config</AppConfig>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Include="..\SakuraLibrary\Properties\AssemblyBase.cs">
 			<Link>Properties\AssemblyBase.cs</Link>
 		</Compile>
 		<ProjectReference Include="..\SakuraLibrary\SakuraLibrary.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Update="Properties\Settings.Designer.cs">
+	    <DesignTimeSharedInput>True</DesignTimeSharedInput>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Settings.settings</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="Properties\Settings.settings">
+	    <Generator>SettingsSingleFileGenerator</Generator>
+	    <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+	  </None>
 	</ItemGroup>
 </Project>
