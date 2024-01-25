@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using Grpc.Net.Client;
 using SakuraLibrary.Helper;
 using SakuraLibrary.Proto;
@@ -81,6 +81,7 @@ namespace SakuraLibrary.Model
                             if (u.Nodes != null) Nodes = u.Nodes.Nodes;
                             if (u.Config != null) Config = u.Config;
                             if (u.Update != null) Update = u.Update;
+                            if (u.Notifications != null) Notifications = u.Notifications.Notifications;
                         }, CTS.Token),
                         await RPC.StreamLog(RpcEmpty).InitStream(l =>
                         {
@@ -185,6 +186,9 @@ namespace SakuraLibrary.Model
 
         public IDictionary<int, Node> Nodes { get => _nodes; set => SafeSet(out _nodes, value); }
         private IDictionary<int, Node> _nodes = new Dictionary<int, Node>();
+
+        public IList<Notification> Notifications { get => _notifications; set => SafeSet(out _notifications, value); }
+        private IList<Notification> _notifications = new List<Notification>();
 
         public ObservableCollection<TunnelModel> Tunnels { get; set; } = new ObservableCollection<TunnelModel>();
 
