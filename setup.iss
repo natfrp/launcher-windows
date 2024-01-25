@@ -19,7 +19,7 @@ AppId=SakuraFrpLauncher
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} v{#RealVersion}
-AppCopyright=Copyright © iDea Leaper 2020-2023
+AppCopyright=Copyright © iDea Leaper 2020-2024
 
 AppPublisher=SakuraFrp
 AppPublisherURL=https://www.natfrp.com/
