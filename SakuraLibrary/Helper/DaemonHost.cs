@@ -71,7 +71,7 @@ namespace SakuraLibrary.Helper
 
             WorkerThread = new Thread(() =>
             {
-                var counter = 0;
+                int counter = 0, singletonCounter = 0;
                 var suppress = false;
                 do
                 {
@@ -85,6 +85,10 @@ namespace SakuraLibrary.Helper
                         {
                             Controller.Start();
                             continue;
+                        }
+                        if (StopEvent.WaitOne(1))
+                        {
+                            return;
                         }
                         var p = Process.Start(new ProcessStartInfo(ServicePath, "--daemon")
                         {
@@ -100,7 +104,7 @@ namespace SakuraLibrary.Helper
                                 return;
                             }
                             var msg = p.StandardError.ReadToEnd().Trim();
-                            if (msg == string.Empty)
+                            if (msg == string.Empty || (msg.ToString().Contains("singleton check failed") && singletonCounter++ < 3))
                             {
                                 return;
                             }
@@ -118,7 +122,7 @@ namespace SakuraLibrary.Helper
                     }
                     catch (Exception e)
                     {
-                        if (suppress || counter++ <= 3)
+                        if (suppress || counter++ < 5)
                         {
                             continue;
                         }
