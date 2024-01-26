@@ -24,8 +24,14 @@ namespace SakuraLauncher.Helper
 
         public string GetUser() => JsonNoDefault.Format(model.UserInfo);
 
-        public string GetNodes()
+        public async Task<string> GetNodes()
         {
+            try
+            {
+                await model.RequestReloadNodesAsync(false);
+            }
+            catch { }
+
             var nl = new NodeList();
             foreach (var kv in model.Nodes)
             {

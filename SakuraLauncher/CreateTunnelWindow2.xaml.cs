@@ -1,4 +1,4 @@
-using Microsoft.Web.WebView2.Core;
+﻿using Microsoft.Web.WebView2.Core;
 using SakuraLauncher.Helper;
 using SakuraLauncher.Model;
 using SakuraLibrary.Model;
@@ -25,8 +25,6 @@ namespace SakuraLauncher
             Launcher = launcher;
             DataContext = Model = new(launcher);
             Bridge = new(this, edit);
-
-            _ = Launcher.RequestReloadNodesAsync(false);
 
             Model.ReloadListening();
 
