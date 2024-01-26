@@ -21,6 +21,8 @@ AppVersion={#AppVersion}
 AppVerName={#AppName} v{#RealVersion}
 AppCopyright=Copyright © iDea Leaper 2020-2024
 
+AppMutex=Global\SakuraFrpService
+
 AppPublisher=SakuraFrp
 AppPublisherURL=https://www.natfrp.com/
 AppSupportURL=https://www.natfrp.com/
