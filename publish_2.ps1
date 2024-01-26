@@ -38,6 +38,16 @@ function PackFrpc {
     Remove-Item "frpc" -Recurse
 }
 
+$version = Get-Module Microsoft.PowerShell.Archive -ListAvailable | Select-Object -First 1 -ExpandProperty Version
+if ($version -lt "1.2.5") {
+    Write-Host "Updating Microsoft.PowerShell.Archive..."
+    if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+        Write-Warning "You do not have Administrator rights!"
+        Break
+    }
+    Install-Module Microsoft.PowerShell.Archive -MinimumVersion 1.2.5 -Repository PSGallery -Force -AllowClobber
+}
+
 try {
     Push-Location -Path "_publish"
 
