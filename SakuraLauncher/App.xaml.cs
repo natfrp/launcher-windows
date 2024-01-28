@@ -42,8 +42,8 @@ namespace SakuraLauncher
                 }
             }
 
-            AppMutex = new Mutex(true, "SakuraLauncher_" + Utils.InstallationHash, out bool created);
-            ActivateEventHandle = new EventWaitHandle(false, EventResetMode.AutoReset, "SakuraLauncher_ActivateEvent_" + Utils.InstallationHash);
+            AppMutex = new Mutex(true, "SakuraFrpLauncher3", out bool created);
+            ActivateEventHandle = new EventWaitHandle(false, EventResetMode.AutoReset, "SakuraFrpLauncher3_ActivateEvent");
             if (!created)
             {
                 if (!ActivateEventHandle.Set())

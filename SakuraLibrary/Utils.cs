@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Configuration;
+using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Linq;
 using System.Reflection;
-using System.Diagnostics;
-using System.Configuration;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 
 namespace SakuraLibrary
 {
@@ -16,8 +16,6 @@ namespace SakuraLibrary
 
         public static readonly string LibraryPath = Assembly.GetExecutingAssembly().Location;
         public static readonly string ExecutablePath = Process.GetCurrentProcess().MainModule.FileName;
-
-        public static readonly string InstallationHash = Md5(Assembly.GetExecutingAssembly().Location);
 
         public static string Md5(byte[] data)
         {

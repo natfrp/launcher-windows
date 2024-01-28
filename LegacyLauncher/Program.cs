@@ -36,15 +36,14 @@ namespace LegacyLauncher
                 }
             }
 
-            AppMutex = new Mutex(true, "LegacySakuraLauncher_" + Utils.InstallationHash, out bool created);
-
+            AppMutex = new Mutex(true, "SakuraFrpLauncher3_Legacy", out bool created);
             if (created)
             {
                 Application.Run(new MainForm(minimize));
             }
             else
             {
-                MessageBox.Show(TopMostForm, "请不要重复开启 SakuraFrp 客户端. 如果想运行多个实例请将软件复制到其他目录.", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(TopMostForm, "请不要重复开启 SakuraFrp 客户端", "Oops", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Environment.Exit(0);
             }
 
