@@ -44,8 +44,6 @@ namespace SakuraLauncher
 
         private void ButtonReload_Click(object sender, RoutedEventArgs e) => Model.ReloadListening();
 
-        private void ButtonPingTest_Click(object sender, RoutedEventArgs e) => new PingTestWindow(Model.Launcher).ShowDialog();
-
         private void Listening_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 1 && e.AddedItems[0] is LocalProcessModel l)

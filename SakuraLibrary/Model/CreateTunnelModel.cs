@@ -12,7 +12,7 @@ namespace SakuraLibrary.Model
         public readonly LauncherModel Launcher;
 
         public string Type { get => _type; set => Set(out _type, value); }
-        private string _type = "";
+        private string _type = "TCP";
 
         public string TunnelName { get => _tunnelName; set => Set(out _tunnelName, value); }
         private string _tunnelName = "";
