@@ -54,6 +54,8 @@ namespace SakuraLauncher.Helper
     [ComVisible(true)]
     public class CreateTunnelBridge(CreateTunnelWindow2 view, Tunnel edit)
     {
+        public void CloseWindow() => view.Close();
+
         public string GetEditTunnel() => edit == null ? "" : SakuraLauncherBridge.JsonNoDefault.Format(edit);
 
         public async Task EditTunnel(string payload)
@@ -87,6 +89,20 @@ namespace SakuraLauncher.Helper
             {
                 view.Launcher.ShowError(e);
             }
+        }
+
+        public async Task<bool> AuthTunnel(string payload)
+        {
+            try
+            {
+                await view.Launcher.RPC.AuthTunnelAsync(JsonParser.Default.Parse<TunnelAuthRequest>(payload));
+                return true;
+            }
+            catch (Exception e)
+            {
+                view.Launcher.ShowError(e);
+            }
+            return false;
         }
 
         public string GetListening() => (view.Model.Loading ? "1" : "0") + JsonSerializer.Serialize(view.Model.Listening);
