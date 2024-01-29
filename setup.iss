@@ -169,6 +169,16 @@ begin
 	outputPage.Hide;
 end;
 
+function CompareVersion(const v1, v2: String): Integer;
+var
+    pv1, pv2: Int64;
+begin
+    if not StrToVersion(v1, pv1) then pv1 := 0;
+    if not StrToVersion(v2, pv2) then pv2 := 0;
+
+    Result := ComparePackedVersion(pv1, pv2);
+end;
+
 //// Install Events ///////////////////////////////////////////
 
 procedure InitializeWizard;
@@ -193,7 +203,7 @@ begin
 	if (not verifyWebView2) and (RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv', versionStr)) then
 		verifyWebView2 := true;
 
-	installWebView2 := (not verifyWebView2) or (versionStr = '') or (versionStr = '0.0.0.0');
+	installWebView2 := (not verifyWebView2) or (CompareVersion(versionStr, '104.0.1293.70') < 0)
 end;
 
 function UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
