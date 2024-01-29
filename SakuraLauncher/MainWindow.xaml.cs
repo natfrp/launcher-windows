@@ -103,14 +103,16 @@ namespace SakuraLauncher
 
             try
             {
-                Model.WebView2Environment = CoreWebView2Environment.CreateAsync(null, Path.Combine(Consts.WorkingDirectory, "Temp"), new()
+                var fixedVersionDir = Path.Combine(Consts.WorkingDirectory, "WebView2");
+                Model.WebView2Environment = CoreWebView2Environment.CreateAsync(Directory.Exists(fixedVersionDir) ? fixedVersionDir : null, Path.Combine(Consts.WorkingDirectory, "Temp"), new()
                 {
                     EnableTrackingPrevention = false,
                     AreBrowserExtensionsEnabled = false,
                     AllowSingleSignOnUsingOSPrimaryAccount = false,
                 }).WaitResult();
 
-                const string versionRequired = "120.0.2210.55";
+                // On 103.0.1264.77 async call fails
+                const string versionRequired = "104.0.1293.70";
                 if (CoreWebView2Environment.CompareBrowserVersions(Model.WebView2Environment.BrowserVersionString, versionRequired) < 0)
                 {
                     if (!Model.LegacyCreateTunnel && Model.ShowMessage($"当前 WebView2 版本 {Model.WebView2Environment.BrowserVersionString} 过旧，创建、编辑隧道功能将无法正常工作。\n请升级 WebView2 到 {versionRequired} 或更新版本。\n\n按 \"确定\" 打开 WebView2 安装程序下载页面。", "错误", LauncherModel.MessageMode.OkCancel | LauncherModel.MessageMode.Error) == LauncherModel.MessageResult.Ok)
@@ -128,9 +130,12 @@ namespace SakuraLauncher
             {
                 if (!Model.LegacyCreateTunnel)
                 {
-                    Model.ShowError(ex, "无法初始化 WebView2 运行环境");
+                    if (!(ex is AggregateException ae && ae.InnerExceptions[0] is WebView2RuntimeNotFoundException))
+                    {
+                        Model.ShowError(ex, "无法初始化 WebView2 运行环境");
+                    }
 
-                    if (Model.ShowMessage("无法初始化 WebView2 运行环境，创建、编辑隧道功能将无法正常工作。\n请检查是否已安装 WebView2 运行时。\n\n按 \"确定\" 打开 WebView2 安装程序下载页面。", "错误", LauncherModel.MessageMode.OkCancel | LauncherModel.MessageMode.Error) == LauncherModel.MessageResult.Ok)
+                    if (Model.ShowMessage("无法初始化 WebView2 运行环境，将无法使用创建、编辑隧道功能。\n\n请检查是否已安装 WebView2 运行时。\n\n按 \"确定\" 打开 WebView2 安装程序下载页面，安装后请重启启动器。", "错误", LauncherModel.MessageMode.OkCancel | LauncherModel.MessageMode.Error) == LauncherModel.MessageResult.Ok)
                     {
                         Process.Start("https://go.microsoft.com/fwlink/p/?LinkId=2124703");
                     }

@@ -1,4 +1,4 @@
-﻿using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Core;
 using SakuraLauncher.Helper;
 using SakuraLauncher.Model;
 using SakuraLibrary.Model;
@@ -38,7 +38,14 @@ namespace SakuraLauncher
             });
         }
 
-        private void Window_Closed(object sender, EventArgs e) => webView.Dispose();
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            try
+            {
+                webView.Dispose();
+            }
+            catch { }
+        }
 
         private void WebView_CoreWebView2InitializationCompleted(object sender, CoreWebView2InitializationCompletedEventArgs e)
         {
@@ -46,7 +53,21 @@ namespace SakuraLauncher
 #if !DEBUG
             core.Settings.AreDevToolsEnabled = false;
 #endif
-            core.Settings.IsGeneralAutofillEnabled = core.Settings.IsPasswordAutosaveEnabled = core.Settings.IsReputationCheckingRequired = false;
+            try
+            {
+                core.Settings.IsStatusBarEnabled = false;
+                core.Settings.IsGeneralAutofillEnabled = false;
+                core.Settings.IsPasswordAutosaveEnabled = false;
+
+                if (CoreWebView2Environment.CompareBrowserVersions(Launcher.WebView2Environment.BrowserVersionString, "112.0.1722.45") >= 0)
+                {
+                    core.Settings.IsReputationCheckingRequired = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Launcher.ShowError(ex, "配置 WebView2 时出现错误");
+            }
 
             webView.CoreWebView2.NewWindowRequested += CoreWebView2_NewWindowRequested;
             core.NavigationStarting += CoreWebView2_NavigationStarting;
