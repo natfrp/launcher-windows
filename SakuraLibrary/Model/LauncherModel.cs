@@ -402,6 +402,20 @@ namespace SakuraLibrary.Model
             }
         }
 
+        [SourceBinding(nameof(Config))]
+        public string FrpcLogLevel
+        {
+            get => Config?.FrpcLogLevel ?? "";
+            set
+            {
+                if (Config != null)
+                {
+                    Config.FrpcLogLevel = value;
+                    PushServiceConfig();
+                }
+            }
+        }
+
         public void PushServiceConfig(bool blocking = false)
         {
             if (blocking)

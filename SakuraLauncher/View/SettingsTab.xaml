@@ -453,6 +453,47 @@
                     </StackPanel>
                 </Button>
             </StackPanel>
+            <StackPanel
+                Height="32"
+                Margin="12,4,16,0"
+                Orientation="Horizontal">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
+                    frpc 日志等级:
+                </TextBlock>
+                <ComboBox
+                    MinWidth="150"
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    SelectedValue="{Binding FrpcLogLevel}"
+                    SelectedValuePath="Tag"
+                    SelectionChanged="Save">
+                    <ComboBoxItem Tag="trace">追踪 [Trace]</ComboBoxItem>
+                    <ComboBoxItem Tag="debug">调试 [Debug]</ComboBoxItem>
+                    <ComboBoxItem Tag="info">信息 [Info]</ComboBoxItem>
+                    <ComboBoxItem Tag="warn">警告 [Warn]</ComboBoxItem>
+                    <ComboBoxItem Tag="error">错误 [Error]</ComboBoxItem>
+                </ComboBox>
+                <TextBlock
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF"
+                    ToolTip="调整 frpc 的日志详细程度 (重启隧道后生效)"
+                    ToolTipService.InitialShowDelay="0"
+                    TouchUp="Hint_TouchUp">
+                    <materialDesign:PackIcon
+                        Foreground="White"
+                        Kind="HelpCircleOutline"
+                        RenderTransformOrigin="0.5,0.1">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                </TextBlock>
+            </StackPanel>
             <DockPanel Margin="4,16,8,12">
                 <StackPanel
                     Margin="0,0,16,0"
