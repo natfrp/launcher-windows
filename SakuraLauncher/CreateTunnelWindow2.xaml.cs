@@ -30,11 +30,25 @@ namespace SakuraLauncher
 
             webView.EnsureCoreWebView2Async(Launcher.WebView2Environment).ContinueWith((r) =>
             {
-                if (r.IsFaulted)
+                if (r.IsCompleted)
                 {
-                    Launcher.ShowMessage("WebView2 初始化失败，请检查是否已安装 WebView2 运行时。" + r.Exception.ToString(), "错误", LauncherModel.MessageMode.Error);
-                    Close();
+                    return;
                 }
+
+                // Try to setup WebView2 environment again in case of user updated WebView2 runtime
+                if (!launcher.SetupWebView2Environment())
+                {
+                    Close();
+                    return;
+                }
+                webView.EnsureCoreWebView2Async(Launcher.WebView2Environment).ContinueWith((r) =>
+                {
+                    if (r.IsFaulted)
+                    {
+                        Launcher.ShowMessage("WebView2 初始化失败，请检查是否已安装 WebView2 运行时。" + r.Exception.ToString(), "错误", LauncherModel.MessageMode.Error);
+                        Close();
+                    }
+                });
             });
         }
 
