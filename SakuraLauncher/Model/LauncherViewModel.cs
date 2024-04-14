@@ -1,4 +1,5 @@
-﻿using MaterialDesignThemes.Wpf;
+﻿using H.NotifyIcon.Core;
+using MaterialDesignThemes.Wpf;
 using Microsoft.Web.WebView2.Core;
 using SakuraLauncher.Helper;
 using SakuraLibrary;
@@ -243,7 +244,18 @@ namespace SakuraLauncher.Model
             case Category.Alert:
                 if (NotificationMode == 0 || (NotificationMode == 2 && l.Level > Level.Info))
                 {
-                    View.trayIcon.ShowBalloonTip(entry.Source, entry.Data, (Hardcodet.Wpf.TaskbarNotification.BalloonIcon)Math.Max(Math.Min((int)l.Level, 2), 0));
+                    var icon = NotificationIcon.Info;
+                    switch (l.Level)
+                    {
+                    case Level.Warn:
+                        icon = NotificationIcon.Warning;
+                        break;
+                    case Level.Fatal:
+                    case Level.Error:
+                        icon = NotificationIcon.Error;
+                        break;
+                    }
+                    View.trayIcon.ShowNotification(entry.Source, entry.Data, icon);
                 }
                 return;
             case Category.Frpc:
