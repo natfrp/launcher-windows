@@ -404,15 +404,9 @@
         <materialDesign:Snackbar Grid.ColumnSpan="2" MessageQueue="{Binding SnackMessageQueue}" />
         <tb:TaskbarIcon
             x:Name="trayIcon"
-            ToolTipText="SakuraFrp Launcher 运行中, 点击显示主窗口"
             ContextMenu="{StaticResource TrayMenu}"
             IconSource="Resources/icon.ico"
-            TrayLeftMouseUp="TrayIcon_TrayLeftMouseUp">
-            <tb:TaskbarIcon.TrayToolTip>
-                <ToolTip Placement="Mouse">
-                    <TextBlock>SakuraFrp Launcher 运行中, 点击显示主窗口</TextBlock>
-                </ToolTip>
-            </tb:TaskbarIcon.TrayToolTip>
-        </tb:TaskbarIcon>
+            ToolTipText="SakuraFrp Launcher 运行中, 点击显示主窗口"
+            TrayLeftMouseUp="TrayIcon_TrayLeftMouseUp" />
     </Grid>
 </Window>
