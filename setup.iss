@@ -78,6 +78,8 @@ Name: "launcher_ui"; Description: "用户界面"; Types: default custom
 Name: "launcher_ui\wpf"; Description: "WPF 界面"; Types: default; Flags: exclusive
 Name: "launcher_ui\legacy"; Description: "传统界面 (不推荐)"; Types: custom; Flags: exclusive
 
+Name: "wd_exclusion"; Description: "添加 Windows Defender 排除项"; Types: default; Flags: dontinheritcheck
+
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Components: "launcher_ui"; Flags: checkedonce
 
@@ -128,6 +130,7 @@ Filename: "{sys}\sc.exe"; Description: "启动系统服务"; Components: "launch
 [UninstallRun]
 Filename: "{sys}\sc.exe"; Parameters: "stop SakuraFrpService"; RunOnceId: "RemoveService-Stop"; Flags: runhidden
 Filename: "{app}\SakuraFrpService.exe"; Parameters: "--uninstall"; RunOnceId: "RemoveService-Uninstall"
+Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -Command Remove-MpPreference -ExclusionPath """"""""{app}\frpc.exe"""""""", """"""""$env:ProgramData\SakuraFrpService\Update"""""""""; Flags: runascurrentuser runhidden nowait; Components: "wd_exclusion"
 
 [UninstallDelete]
 ; 2.0 service installation logs
@@ -288,6 +291,8 @@ begin
 end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
+var
+	resultCode: Integer;
 begin
 	if WizardIsComponentSelected('launcher_ui') then
 	begin
@@ -297,6 +302,8 @@ begin
 		if installWebView2 then
 			Result := Result + TryInstall('{#LibraryNameWebView2}', 'MicrosoftEdgeWebview2Setup.exe', '/install', false);
 	end;
+	if WizardIsComponentSelected('wd_exclusion') then
+		Exec('powershell.exe', '-ExecutionPolicy Bypass -Command Add-MpPreference -ExclusionPath """"' + ExpandConstant('{app}\frpc.exe') + '"""", """"$env:ProgramData\SakuraFrpService\Update""""', '', SW_HIDE, ewWaitUntilTerminated, resultCode);
 end;
 
 function NeedRestart(): Boolean;
