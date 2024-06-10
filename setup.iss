@@ -116,8 +116,11 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\SakuraLauncher.exe"; Componen
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\LegacyLauncher.exe"; Components: "launcher_ui\legacy"; Tasks: "desktopicon"
 
 [Run]
+; Fix ACL
+Filename: "{app}\SakuraFrpService.exe"; Parameters: "--fix-acl"; StatusMsg: "正在设置目录权限..."; Flags: runascurrentuser
+
 ; Service
-Filename: "{app}\SakuraFrpService.exe"; Parameters: "--install"; StatusMsg: "正在安装系统服务..."; Components: "launcher\service"
+Filename: "{app}\SakuraFrpService.exe"; Parameters: "--install"; StatusMsg: "正在安装系统服务..."; Components: "launcher\service"; Flags: runascurrentuser
 
 ; Post Install Actions
 Filename: "{app}\SakuraLauncher.exe"; Description: "{cm:LaunchProgram,{#AppName}}"; Components: "launcher_ui\wpf"; Flags: nowait postinstall skipifsilent
