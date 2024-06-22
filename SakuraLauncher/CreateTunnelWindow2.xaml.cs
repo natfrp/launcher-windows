@@ -30,7 +30,7 @@ namespace SakuraLauncher
 
             webView.EnsureCoreWebView2Async(Launcher.WebView2Environment).ContinueWith((r) =>
             {
-                if (r.IsCompleted)
+                if (r.IsCompleted && webView.CoreWebView2 != null && webView.CoreWebView2.Settings != null)
                 {
                     return;
                 }
