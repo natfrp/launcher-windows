@@ -319,14 +319,14 @@ end;
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
 	if (CurUninstallStep = usPostUninstall) and (MsgBox('是否删除启动器配置文件? 下列文件夹将会被删除: '
-		+#13#10+'    %AppData%\SakuraLauncher'
-		+#13#10+'    %AppData%\LegacyLauncher'
-		+#13#10+'    %AppData%\SakuraFrpService'
+		+#13#10+'    %LocalAppData%\SakuraLauncher'
+		+#13#10+'    %LocalAppData%\LegacyLauncher'
+		+#13#10+'    %LocalAppData%\SakuraFrpService'
 		+#13#10+'    %ProgramData%\SakuraFrpService', mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES) then
 	begin
-		DelTree(ExpandConstant('{userappdata}\SakuraLauncher'), True, True, True);
-		DelTree(ExpandConstant('{userappdata}\LegacyLauncher'), True, True, True);
-		DelTree(ExpandConstant('{userappdata}\SakuraFrpService'), True, True, True);
+		DelTree(ExpandConstant('{localappdata}\SakuraLauncher'), True, True, True);
+		DelTree(ExpandConstant('{localappdata}\LegacyLauncher'), True, True, True);
+		DelTree(ExpandConstant('{localappdata}\SakuraFrpService'), True, True, True);
 		DelTree(ExpandConstant('{commonappdata}\SakuraFrpService'), True, True, True);
 	end;
 end;
