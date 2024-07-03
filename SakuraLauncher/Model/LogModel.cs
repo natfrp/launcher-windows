@@ -5,7 +5,7 @@ namespace SakuraLauncher.Model
 {
     public class LogModel
     {
-        public static readonly Regex Pattern = new(@"(?<Time>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) \[(?<Level>[DIWE])\] (?:\[[a-zA-Z0-9\-_\.]+:\d+\] )?(?<Content>.+)", RegexOptions.Compiled | RegexOptions.Singleline);
+        public static readonly Regex Pattern = new(@"(?<Time>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) \[(?<Level>[DIWET])\] (?:\[[a-zA-Z0-9\-_\.]+:\d+\] )?(?<Content>.+)", RegexOptions.Compiled | RegexOptions.Singleline);
 
         public static readonly SolidColorBrush BrushInfo = new(Colors.White),
             BrushWarning = new(Colors.Orange),
