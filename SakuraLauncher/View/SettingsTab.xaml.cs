@@ -83,7 +83,7 @@ namespace SakuraLauncher.View
 
         private void ButtonSwitchMode_Click(object sender, RoutedEventArgs e) => Model.SwitchWorkingMode();
 
-        private void ButtonRemotePassword_Click(object sender, RoutedEventArgs e) => new RemoteConfigWindow(Model).ShowDialog();
+        private void ButtonRemotePassword_Click(object sender, RoutedEventArgs e) => Model.ShowDialog(new RemoteConfigWindow(Model), this);
 
         private void ButtonOpenCWD_Click(object sender, RoutedEventArgs e) => Model.RequestOpenCWD();
 

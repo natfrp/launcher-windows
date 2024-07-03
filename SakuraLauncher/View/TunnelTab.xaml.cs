@@ -27,11 +27,11 @@ namespace SakuraLauncher.View
         {
             if (Model.LegacyCreateTunnel || Model.WebView2Environment == null)
             {
-                Model.ShowDialog(new CreateTunnelWindow(Model));
+                Model.ShowDialog(new CreateTunnelWindow(Model), this);
             }
             else
             {
-                Model.ShowDialog(new CreateTunnelWindow2(Model));
+                Model.ShowDialog(new CreateTunnelWindow2(Model), this);
             }
         }
 
@@ -62,7 +62,7 @@ namespace SakuraLauncher.View
             }
             if ((sender as Button).DataContext is TunnelModel tunnel)
             {
-                Model.ShowDialog(new CreateTunnelWindow2(Model, tunnel.Proto));
+                Model.ShowDialog(new CreateTunnelWindow2(Model, tunnel.Proto), this);
             }
         }
 

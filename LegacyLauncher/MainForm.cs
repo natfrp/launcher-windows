@@ -245,7 +245,7 @@ namespace LegacyLauncher
             _ = Model.LoginOrLogout();
         }
 
-        private void button_create_Click(object sender, EventArgs e) => new CreateTunnelForm(Model).ShowDialog();
+        private void button_create_Click(object sender, EventArgs e) => new CreateTunnelForm(Model) { Owner = this }.ShowDialog();
 
         private void button_clear_Click(object sender, EventArgs e) => Model.RequestClearLog();
 

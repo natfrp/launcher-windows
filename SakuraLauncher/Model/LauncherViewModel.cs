@@ -14,6 +14,7 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using static SakuraLibrary.Proto.Log.Types;
@@ -105,10 +106,14 @@ namespace SakuraLauncher.Model
 
         private Window windowOverride = null;
 
-        public void ShowDialog(Window w)
+        public void ShowDialog(Window w, UserControl owner)
         {
             windowOverride = w;
-            View.Dispatcher.Invoke(() => w.ShowDialog());
+            View.Dispatcher.Invoke(() =>
+            {
+                w.Owner = Window.GetWindow(owner);
+                w.ShowDialog();
+            });
             windowOverride = null;
         }
 
