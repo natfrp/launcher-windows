@@ -5,7 +5,7 @@ namespace SakuraLibrary
 {
     public static class Consts
     {
-        public const string Version = "3.1.0.2";
+        public const string Version = "3.1.1.0";
 
         public const string PipeName = "SakuraFrpService3";
         public const string ServiceName = "SakuraFrpService";
