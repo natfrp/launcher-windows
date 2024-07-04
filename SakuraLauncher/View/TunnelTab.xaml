@@ -79,6 +79,24 @@
                     Style="{StaticResource MaterialDesignIconButton}">
                     <materialDesign:PackIcon Foreground="White" Kind="Refresh" />
                 </Button>
+                <Button
+                    Width="33"
+                    Height="33"
+                    Margin="4,0,0,0"
+                    Click="ButtonSort_Click"
+                    Style="{StaticResource MaterialDesignIconButton}">
+                    <Button.ContextMenu>
+                        <ContextMenu x:Name="sortMenu">
+                            <MenuItem Header="隧道名" Tag="Name" />
+                            <MenuItem Header="创建时间" Tag="Id" />
+                            <MenuItem Header="节点" Tag="Node" />
+                            <MenuItem Header="类型" Tag="Type" />
+                            <Separator />
+                            <MenuItem Header="倒序排序" Tag="_" />
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                    <materialDesign:PackIcon Foreground="White" Kind="Sort" />
+                </Button>
             </StackPanel>
             <ListView
                 Margin="8,0,0,0"

@@ -1,10 +1,9 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-
-using SakuraLibrary.Model;
-
+﻿using SakuraLauncher.Helper;
 using SakuraLauncher.Model;
-using SakuraLauncher.Helper;
+using SakuraLibrary.Model;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace SakuraLauncher.View
 {
@@ -19,6 +18,15 @@ namespace SakuraLauncher.View
         {
             InitializeComponent();
             scrollHelper = new TouchScrollHelper(scrollViewer);
+
+            var sd = main.TunnelsView.SortDescriptions[0];
+            foreach (Control child in sortMenu.Items)
+            {
+                if (child is not MenuItem mi || mi.Tag is not string tag) continue;
+                mi.IsCheckable = true;
+                mi.IsChecked = tag == sd.PropertyName || tag == "_" && sd.Direction == ListSortDirection.Descending;
+                mi.Click += MenuItem_SortClicked;
+            }
 
             DataContext = Model = main;
         }
@@ -64,6 +72,48 @@ namespace SakuraLauncher.View
             {
                 Model.ShowDialog(new CreateTunnelWindow2(Model, tunnel.Proto), this);
             }
+        }
+
+        private void ButtonSort_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button b) b.ContextMenu.IsOpen = true;
+        }
+
+        private void MenuItem_SortClicked(object sender, RoutedEventArgs e)
+        {
+            if (sender is not MenuItem mi || Model == null) return;
+
+            var sd = Model.TunnelsView.SortDescriptions[0];
+            sd = new SortDescription(sd.PropertyName, sd.Direction);
+            if ((string)mi.Tag == "_")
+            {
+                sd.Direction = mi.IsChecked ? ListSortDirection.Descending : ListSortDirection.Ascending;
+
+                // Update direction in other sort descs
+                for (var i = 1; i < Model.TunnelsView.SortDescriptions.Count; i++)
+                {
+                    var sdSec = Model.TunnelsView.SortDescriptions[i];
+                    Model.TunnelsView.SortDescriptions[i] = new SortDescription(sdSec.PropertyName, sd.Direction);
+                }
+            }
+            else if (mi.IsChecked)
+            {
+                sd.PropertyName = (string)mi.Tag;
+                foreach (Control child in sortMenu.Items)
+                {
+                    if (child is MenuItem cmi && (string)cmi.Tag != "_" && cmi != mi)
+                    {
+                        cmi.IsChecked = false;
+                    }
+                }
+            }
+            else
+            {
+                mi.IsChecked = true;
+                return;
+            }
+            Model.TunnelsView.SortDescriptions[0] = sd;
+            Model.Save();
         }
 
         private void ScrollViewer_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)

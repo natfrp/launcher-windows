@@ -504,7 +504,7 @@ namespace SakuraLibrary.Model
             {
                 return;
             }
-            if (ShowMessage("确定要切换运行模式吗?\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n如果您不知道该操作的作用, 请不要切换运行模式\n\n注意事项:\n1. 切换运行模式后不要移动启动器到其他目录, 否则会造成严重错误\n2. 如需移动或卸载启动器, 请先切到 \"守护进程\" 模式来避免文件残留\n3. 切换过程可能需要十余秒, 请耐心等待, 不要做其他操作\n4. 切换操作即为 安装/卸载 系统服务, 需要管理员权限", "提示", MessageMode.OkCancel | MessageMode.Warning) != MessageResult.Ok)
+            if (ShowMessage("确定要切换运行模式吗? 切换运行模式时会安装 / 卸载系统服务, 请在弹出的 UAC 弹窗中点击 \"是\"", "操作确认", MessageMode.OkCancel | MessageMode.Confirm) != MessageResult.Ok)
             {
                 return;
             }
@@ -519,11 +519,6 @@ namespace SakuraLibrary.Model
 
                     Dispatcher.Invoke(() => RaisePropertyChanged(nameof(IsDaemon)));
                     Daemon.Start();
-
-                    if (result)
-                    {
-                        ShowMessage("运行模式已切换, 正在重新初始化 Daemon", "提示", MessageMode.Info);
-                    }
                 }
                 catch (Exception ex)
                 {

@@ -54,12 +54,18 @@ namespace SakuraLauncher.Model
             LegacyCreateTunnel = settings.LegacyCreateTunnel;
             AlignWidth = settings.AlignWidth;
 
+            var sortDirection = settings.SortDesc ? ListSortDirection.Descending : ListSortDirection.Ascending;
+            TunnelsView.SortDescriptions.Add(new SortDescription(settings.SortField, sortDirection));
+            TunnelsView.SortDescriptions.Add(new SortDescription(nameof(TunnelModel.Name), sortDirection));
+            TunnelsView.SortDescriptions.Add(new SortDescription(nameof(TunnelModel.Id), sortDirection));
+
+            Tunnels.CollectionChanged += (sender, e) => TunnelsView.Refresh();
+
             LogsView.Filter += e =>
             {
                 var item = e as LogModel;
                 return LogSourceFilter == "" || item.Source == LogSourceFilter;
             };
-            TunnelsView.SortDescriptions.Add(new SortDescription(nameof(TunnelModel.Name), ListSortDirection.Ascending));
 
             var prevAvatar = "";
             PropertyChanged += (sender, e) =>
@@ -179,6 +185,10 @@ namespace SakuraLauncher.Model
             settings.AdvancedMode = AdvancedMode;
             settings.LegacyCreateTunnel = LegacyCreateTunnel;
             settings.AlignWidth = AlignWidth;
+
+            var sd = TunnelsView.SortDescriptions[0];
+            settings.SortField = sd.PropertyName;
+            settings.SortDesc = sd.Direction == ListSortDirection.Descending;
 
             settings.Save();
         }
