@@ -28,7 +28,7 @@ namespace SakuraLauncher.Model
 
         public CoreWebView2Environment WebView2Environment;
 
-        public LauncherViewModel(MainWindow view) : base(false)
+        public LauncherViewModel(MainWindow view) : base()
         {
             View = view;
             Bridge = new SakuraLauncherBridge(this);

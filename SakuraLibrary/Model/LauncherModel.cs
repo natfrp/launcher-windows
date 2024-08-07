@@ -51,9 +51,9 @@ namespace SakuraLibrary.Model
 
         public readonly CancellationTokenSource CTS = new();
 
-        public LauncherModel(bool forceDaemon = false)
+        public LauncherModel()
         {
-            Daemon = new DaemonHost(this, forceDaemon);
+            Daemon = new DaemonHost(this);
         }
 
         protected async void Run()

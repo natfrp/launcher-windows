@@ -15,7 +15,6 @@ namespace SakuraLibrary.Helper
     {
         public readonly string ServicePath = Path.GetFullPath(Consts.ServiceExecutable);
 
-        public readonly bool ForceDaemon;
         public readonly LauncherModel Launcher;
 
         public bool Daemon;
@@ -26,15 +25,14 @@ namespace SakuraLibrary.Helper
         public Thread WorkerThread = null;
         public ManualResetEvent StopEvent = new(false);
 
-        public DaemonHost(LauncherModel launcher, bool forceDaemon)
+        public DaemonHost(LauncherModel launcher)
         {
-            ForceDaemon = forceDaemon;
             Launcher = launcher;
         }
 
         public void DetectMode()
         {
-            Controller = ForceDaemon ? null : ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == Consts.ServiceName);
+            Controller = ServiceController.GetServices().FirstOrDefault(s => s.ServiceName == Consts.ServiceName);
             Daemon = Controller == null;
 
             if (!Daemon)
@@ -215,7 +213,6 @@ namespace SakuraLibrary.Helper
 
         public bool SwitchMode()
         {
-            if (ForceDaemon) return false;
             try
             {
                 var p = Process.Start(new ProcessStartInfo(ServicePath, Daemon ? "--install" : "--uninstall")
