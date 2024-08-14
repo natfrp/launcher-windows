@@ -39,7 +39,7 @@
 		<PackageReference Include="H.NotifyIcon.Wpf" Version="2.0.124" />
 		<PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
 		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2420.47" />
-		<PackageReference Include="System.Text.Json" Version="8.0.3" />
+		<PackageReference Include="System.Text.Json" Version="8.0.4" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Properties\Settings.Designer.cs">
