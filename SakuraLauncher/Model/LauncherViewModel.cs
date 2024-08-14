@@ -54,6 +54,29 @@ namespace SakuraLauncher.Model
             LegacyCreateTunnel = settings.LegacyCreateTunnel;
             AlignWidth = settings.AlignWidth;
 
+            TunnelsView = CollectionViewSource.GetDefaultView(Tunnels);
+            TunnelsView.Filter = e =>
+            {
+                if (_tunnelFilter == "") return true;
+
+                var f = _tunnelFilter.Trim().ToLower();
+                var t = e as TunnelModel;
+
+                if (f.StartsWith("#"))
+                {
+                    f = f.Substring(1);
+                    return t.Id.ToString().StartsWith(f) ||
+                        t.Node.ToString() == f;
+                }
+                return t.Name.ToLower().Contains(f) ||
+                    t.Note.ToLower().Contains(f) ||
+                    t.Proto.Remote.ToLower().Contains(f) ||
+                    t.Proto.LocalIp.ToLower().Contains(f) ||
+                    t.Proto.LocalPort != 0 && t.Proto.LocalPort.ToString().StartsWith(f) ||
+                    t.Type.ToLower().StartsWith(f) ||
+                    t.NodeName.ToLower().Contains(f);
+            };
+
             var sortDirection = settings.SortDesc ? ListSortDirection.Descending : ListSortDirection.Ascending;
             TunnelsView.SortDescriptions.Add(new SortDescription(settings.SortField, sortDirection));
             TunnelsView.SortDescriptions.Add(new SortDescription(nameof(TunnelModel.Name), sortDirection));
@@ -230,7 +253,18 @@ namespace SakuraLauncher.Model
         public bool LegacyCreateTunnel { get => _legacyCreateTunnel; set => Set(out _legacyCreateTunnel, value); }
         private bool _legacyCreateTunnel;
 
-        public ICollectionView TunnelsView => CollectionViewSource.GetDefaultView(Tunnels);
+        public string TunnelFilter
+        {
+            get => _tunnelFilter;
+            set
+            {
+                Set(out _tunnelFilter, value);
+                TunnelsView.Refresh();
+            }
+        }
+        private string _tunnelFilter = "";
+
+        public ICollectionView TunnelsView { get; }
 
         #endregion
 

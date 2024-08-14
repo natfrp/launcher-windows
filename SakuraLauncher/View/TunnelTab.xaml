@@ -97,6 +97,13 @@
                     </Button.ContextMenu>
                     <materialDesign:PackIcon Foreground="White" Kind="Sort" />
                 </Button>
+                <TextBox
+                    MinWidth="200"
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center"
+                    materialDesign:HintAssist.Hint="过滤..."
+                    FontSize="16"
+                    Text="{Binding TunnelFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=100}" />
             </StackPanel>
             <ListView
                 Margin="8,0,0,0"
