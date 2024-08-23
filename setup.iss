@@ -132,7 +132,7 @@ Filename: "{sys}\sc.exe"; Description: "启动系统服务"; Components: "launch
 [UninstallRun]
 Filename: "{sys}\sc.exe"; Parameters: "stop SakuraFrpService"; RunOnceId: "RemoveService-Stop"; Flags: runhidden
 Filename: "{app}\SakuraFrpService.exe"; Parameters: "--uninstall"; RunOnceId: "RemoveService-Uninstall"
-Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -Command Remove-MpPreference -ExclusionPath """"""""{app}\frpc.exe"""""""", """"""""$env:ProgramData\SakuraFrpService\Update"""""""""; Flags: runascurrentuser runhidden nowait; Components: "wd_exclusion"
+Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -Command Remove-MpPreference -ExclusionPath """"""""{app}"""""""", """"""""{app}\frpc.exe"""""""", """"""""$env:ProgramData\SakuraFrpService\Update"""""""", """"""""$env:ProgramData\SakuraFrpService"""""""""; Flags: runascurrentuser runhidden nowait; Components: "wd_exclusion"
 
 [UninstallDelete]
 ; 2.0 service installation logs
@@ -305,7 +305,7 @@ begin
 			Result := Result + TryInstall('{#LibraryNameWebView2}', 'MicrosoftEdgeWebview2Setup.exe', '/install', false);
 	end;
 	if WizardIsComponentSelected('wd_exclusion') then
-		Exec('powershell.exe', '-ExecutionPolicy Bypass -Command Add-MpPreference -ExclusionPath """"' + ExpandConstant('{app}\frpc.exe') + '"""", """"$env:ProgramData\SakuraFrpService\Update""""', '', SW_HIDE, ewWaitUntilTerminated, resultCode);
+		Exec('powershell.exe', '-ExecutionPolicy Bypass -Command Add-MpPreference -ExclusionPath """"' + ExpandConstant('{app}') + '"""", """"$env:ProgramData\SakuraFrpService""""', '', SW_HIDE, ewWaitUntilTerminated, resultCode);
 end;
 
 function NeedRestart(): Boolean;
