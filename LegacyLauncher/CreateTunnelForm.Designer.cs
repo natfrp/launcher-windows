@@ -52,6 +52,8 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.button_reload = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
+            this.textBox_note = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.createTunnelModelBindingSource)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -138,7 +140,9 @@
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.comboBox_type);
             this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.textBox_note);
             this.groupBox1.Controls.Add(this.textBox_name);
+            this.groupBox1.Controls.Add(this.label7);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.textBox_local_ip);
@@ -146,14 +150,14 @@
             this.groupBox1.Controls.Add(this.textBox_local_port);
             this.groupBox1.Location = new System.Drawing.Point(459, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(296, 160);
+            this.groupBox1.Size = new System.Drawing.Size(296, 183);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "隧道配置";
             // 
             // button_create
             // 
-            this.button_create.Location = new System.Drawing.Point(215, 131);
+            this.button_create.Location = new System.Drawing.Point(215, 153);
             this.button_create.Name = "button_create";
             this.button_create.Size = new System.Drawing.Size(75, 23);
             this.button_create.TabIndex = 5;
@@ -164,17 +168,22 @@
             // comboBox_node
             // 
             this.comboBox_node.DisplayMember = "DisplayName";
+            this.comboBox_node.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.comboBox_node.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_node.FormattingEnabled = true;
-            this.comboBox_node.Location = new System.Drawing.Point(47, 105);
+            this.comboBox_node.Location = new System.Drawing.Point(47, 127);
+            this.comboBox_node.MaxDropDownItems = 16;
             this.comboBox_node.Name = "comboBox_node";
-            this.comboBox_node.Size = new System.Drawing.Size(243, 20);
+            this.comboBox_node.Size = new System.Drawing.Size(243, 22);
             this.comboBox_node.TabIndex = 12;
+            this.comboBox_node.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboBox_node_DrawItem);
+            this.comboBox_node.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.comboBox_node_MeasureItem);
+            this.comboBox_node.SelectedIndexChanged += new System.EventHandler(this.comboBox_node_SelectedIndexChanged);
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 108);
+            this.label6.Location = new System.Drawing.Point(6, 130);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(35, 12);
             this.label6.TabIndex = 11;
@@ -258,6 +267,24 @@
             this.button_reload.UseVisualStyleBackColor = true;
             this.button_reload.Click += new System.EventHandler(this.button_reload_Click);
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(6, 104);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(59, 12);
+            this.label7.TabIndex = 5;
+            this.label7.Text = "隧道备注:";
+            // 
+            // textBox_note
+            // 
+            this.textBox_note.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.createTunnelModelBindingSource, "Note", true));
+            this.textBox_note.Location = new System.Drawing.Point(71, 100);
+            this.textBox_note.MaxLength = 15;
+            this.textBox_note.Name = "textBox_note";
+            this.textBox_note.Size = new System.Drawing.Size(219, 21);
+            this.textBox_note.TabIndex = 6;
+            // 
             // CreateTunnelForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -304,5 +331,7 @@
         private System.Windows.Forms.Button button_create;
         private System.Windows.Forms.Button button_reload;
         private System.Windows.Forms.BindingSource createTunnelModelBindingSource;
+        private System.Windows.Forms.TextBox textBox_note;
+        private System.Windows.Forms.Label label7;
     }
 }
