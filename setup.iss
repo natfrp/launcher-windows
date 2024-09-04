@@ -76,12 +76,12 @@ Name: "launcher\service\webui"; Description: "初始化 Web UI (仅限高级用�
 
 Name: "launcher_ui"; Description: "用户界面"; Types: default custom
 Name: "launcher_ui\wpf"; Description: "WPF 界面"; Types: default; Flags: exclusive
-Name: "launcher_ui\legacy"; Description: "远程管理配置界面 (不推荐)"; Types: custom; Flags: exclusive
+Name: "launcher_ui\legacy"; Description: "传统界面 (不推荐)"; Types: custom; Flags: exclusive
 
 Name: "wd_exclusion"; Description: "添加 Windows Defender 排除项"; Types: default; Flags: dontinheritcheck
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Components: "launcher_ui\wpf"; Flags: checkedonce
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Components: "launcher_ui"; Flags: checkedonce
 
 [Files]
 Source: "_publish\sign\frpc_windows_386_gui.exe"; DestDir: "{app}"; DestName: "frpc.exe"; Flags: ignoreversion; Components: "frpc\x86"
@@ -105,7 +105,7 @@ Source: "_publish\LegacyLauncher\*"; DestDir: "{app}"; Flags: ignoreversion; Com
 [Icons]
 ; Start Menu
 Name: "{group}\{#AppName}"; Filename: "{app}\SakuraLauncher.exe"; Components: "launcher_ui\wpf"
-Name: "{group}\配置 SakuraFrp 远程管理"; Filename: "{app}\LegacyLauncher.exe"; Components: "launcher_ui\legacy"
+Name: "{group}\{#AppName}"; Filename: "{app}\LegacyLauncher.exe"; Components: "launcher_ui\legacy"
 
 Name: "{group}\访问 SakuraFrp 管理面板"; Filename: "https://www.natfrp.com/user/"
 
@@ -113,17 +113,18 @@ Name: "{group}\{cm:UninstallProgram,{#AppName}}"; Filename: "{uninstallexe}"
 
 ; Desktop Icon
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\SakuraLauncher.exe"; Components: "launcher_ui\wpf"; Tasks: "desktopicon"
+Name: "{autodesktop}\{#AppName}"; Filename: "{app}\LegacyLauncher.exe"; Components: "launcher_ui\legacy"; Tasks: "desktopicon"
 
 [Run]
 ; Fix ACL
 Filename: "{app}\SakuraFrpService.exe"; Parameters: "--fix-acl"; StatusMsg: "正在设置目录权限..."; Flags: runascurrentuser
 
 ; Service
-Filename: "{app}\SakuraFrpService.exe"; Parameters: "--install"; StatusMsg: "正在安装系统服务..."; Components: "launcher\service or launcher_ui\legacy"; Flags: runascurrentuser
+Filename: "{app}\SakuraFrpService.exe"; Parameters: "--install"; StatusMsg: "正在安装系统服务..."; Components: "launcher\service"; Flags: runascurrentuser
 
 ; Post Install Actions
 Filename: "{app}\SakuraLauncher.exe"; Description: "{cm:LaunchProgram,{#AppName}}"; Components: "launcher_ui\wpf"; Flags: nowait postinstall skipifsilent
-Filename: "{app}\LegacyLauncher.exe"; Description: "打开远程管理配置界面"; Components: "launcher_ui\legacy"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\LegacyLauncher.exe"; Description: "{cm:LaunchProgram,{#AppName}}"; Components: "launcher_ui\legacy"; Flags: nowait postinstall skipifsilent
 
 ; WebUI
 Filename: "{app}\SakuraFrpService.exe"; Description: "初始化 Web UI"; Components: "launcher\service\webui"; Flags: postinstall; Parameters: "webui --init"
