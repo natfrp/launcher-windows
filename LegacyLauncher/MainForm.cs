@@ -17,11 +17,22 @@ namespace LegacyLauncher
     {
         public readonly LauncherViewModel Model;
 
+        private string[] frpcLogLevels = ["trace", "debug", "info", "warn", "error"];
+        private ToolStripMenuItem[] frpcLogLevelControls;
+
         public MainForm(bool minimize)
         {
             minimized = minimize;
 
             InitializeComponent();
+
+            frpcLogLevelControls = [
+                toolStripMenuItem_frpcLog_trace,
+                toolStripMenuItem_frpcLog_debug,
+                toolStripMenuItem_frpcLog_info,
+                toolStripMenuItem_frpcLog_wann,
+                toolStripMenuItem_frpcLog_error,
+            ];
             launcherModelBindingSource.DataSource = Model = new LauncherViewModel(this);
 
             Model.Tunnels.CollectionChanged += RefresnTunnels;
@@ -29,7 +40,9 @@ namespace LegacyLauncher
 
             notifyIcon_tray.Icon = Icon;
 
-            checkBox_autorun.Checked = File.Exists(Utils.GetAutoRunFile(Consts.LegacyLauncherPrefix));
+            toolStripMenuItem_notificationMode.Checked = Model.NotificationMode == 0;
+            toolStripMenuItem_autoStart.Checked = File.Exists(Utils.GetAutoRunFile(Consts.LegacyLauncherPrefix));
+            toolStripMenuItem_runMode.Text = "运行模式: " + Model.WorkingMode;
         }
 
         public void RefresnTunnels(object s = null, NotifyCollectionChangedEventArgs e = null)
@@ -38,10 +51,9 @@ namespace LegacyLauncher
             listView_tunnels.Items.Clear();
             foreach (var t in Model.Tunnels)
             {
-                var item = new ListViewItem(new string[]
-                {
+                var item = new ListViewItem([
                     t.Id.ToString(), t.Name, "#" + t.Node + " " + t.NodeName, t.Description, t.Note
-                })
+                ])
                 {
                     Checked = t.Enabled
                 };
@@ -98,11 +110,26 @@ namespace LegacyLauncher
             case nameof(Model.LoggedIn):
                 button_login.Text = Model.LoggedIn ? "注销" : "登录";
                 break;
+            case nameof(Model.UserInfo):
+                Text = "SakuraFrp Launcher Classic";
+                if (Model.LoggedIn && Model.UserInfo != null)
+                {
+                    Text += " - #" + Model.UserInfo.Id + " " + Model.UserInfo.Name + " [" + Model.UserInfo.Group?.Name + " / " + Model.UserInfo.Speed + "]";
+                }
+                break;
+            case nameof(Model.NotificationMode):
+                toolStripMenuItem_notificationMode.Checked = Model.NotificationMode == 0;
+                break;
             case nameof(Model.LogTextWrapping):
                 textBox_log.ScrollBars = Model.LogTextWrapping ? ScrollBars.Vertical : ScrollBars.Both;
+                toolStripMenuItem_logWrap.Checked = Model.LogTextWrapping;
                 break;
             case nameof(Model.Connected):
                 label_unconnected.Visible = !Model.Connected;
+                toolStripMenuItem_checkUpdate.Enabled = Model.Connected;
+
+                // This won't be updated on model connection change
+                toolStripMenuItem_logWrap.Checked = Model.LogTextWrapping;
                 break;
             case nameof(Model.HaveUpdate):
                 if (Model.HaveUpdate)
@@ -116,6 +143,33 @@ namespace LegacyLauncher
                     label_update.Visible = false;
                     textBox_log.Height = ClientSize.Height - textBox_log.Top - 12;
                 }
+                break;
+            case nameof(Model.CheckUpdate):
+                toolStripMenuItem_checkUpdate.Checked = Model.CheckUpdate;
+                break;
+            case nameof(Model.RemoteManagement):
+                toolStripMenuItem_remoteMgmtEnable.Checked = Model.RemoteManagement;
+                break;
+            case nameof(Model.CanEnableRemoteManagement):
+                toolStripMenuItem_remoteMgmtEnable.Enabled = Model.CanEnableRemoteManagement;
+                break;
+            case nameof(Model.SwitchingMode):
+                toolStripMenuItem_runMode.Enabled = !Model.SwitchingMode;
+                break;
+            case nameof(Model.EnableTLS):
+                toolStripMenuItem_frpcForceTls.Checked = Model.EnableTLS;
+                break;
+            case nameof(Model.FrpcLogLevel):
+                foreach (var c in frpcLogLevelControls)
+                {
+                    c.Checked = false;
+                }
+                var idx = Array.IndexOf(frpcLogLevels, Model.FrpcLogLevel);
+                if (idx >= 0)
+                {
+                    frpcLogLevelControls[idx].Checked = true;
+                }
+                toolStripMenuItem_frpcLogLevel.Text = "frpc 日志等级 [" + (Model.FrpcLogLevel.Length > 1 ? Model.FrpcLogLevel.Substring(0, 1).ToUpper() + Model.FrpcLogLevel.Substring(1) : Model.FrpcLogLevel) + "]";
                 break;
             }
         }
@@ -154,44 +208,6 @@ namespace LegacyLauncher
         }
 
         private void label_update_Click(object sender, EventArgs e) => Model.ConfirmUpdate();
-
-        private void checkBox_update_CheckedChanged(object sender, EventArgs e)
-        {
-            if (Model.CheckUpdate == checkBox_update.Checked)
-            {
-                return;
-            }
-            Model.CheckUpdate = checkBox_update.Checked;
-            if (Model.CheckUpdate)
-            {
-                Model.RequestCheckUpdateAsync().ContinueWith(r => Invoke(() =>
-                {
-                    if (r.Exception != null)
-                    {
-                        Model.ShowError(r.Exception);
-                    }
-                    else if (r.Result != null)
-                    {
-                        if (r.Result.Status == UpdateStatus.NoUpdate)
-                        {
-                            Model.ShowMessage("当前没有可用更新", "提示", MessageMode.Info);
-                        }
-                        else if (r.Result.Status == UpdateStatus.Failed)
-                        {
-                            Model.ShowMessage("更新检查失败, 请查看日志输出", "错误", MessageMode.Error);
-                        }
-                    }
-                }));
-            }
-        }
-
-        private void checkBox_textwrap_CheckedChanged(object sender, EventArgs e)
-        {
-            Model.LogTextWrapping = checkBox_textwrap.Checked;
-            Model.Save();
-        }
-
-        private void checkBox_autorun_CheckedChanged(object sender, EventArgs e) => Utils.SetAutoRun(checkBox_autorun.Checked, Consts.LegacyLauncherPrefix);
 
         private void listView_tunnels_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
@@ -248,6 +264,107 @@ namespace LegacyLauncher
         private void button_create_Click(object sender, EventArgs e) => new CreateTunnelForm(Model) { Owner = this }.ShowDialog();
 
         private void button_clear_Click(object sender, EventArgs e) => Model.RequestClearLog();
+
+        #endregion
+
+        #region Settings
+
+        private DateTime lastClose = DateTime.MinValue;
+
+        private void button_settings_Click(object sender, EventArgs e)
+        {
+            if (DateTime.Now - lastClose < TimeSpan.FromMilliseconds(100))
+            {
+                return;
+            }
+            if (contextMenuStrip_settings.Visible)
+            {
+                contextMenuStrip_settings.Close();
+                return;
+            }
+
+            toolStripMenuItem_runMode.Text = "运行模式: " + Model.WorkingMode;
+
+            contextMenuStrip_settings.Show(button_settings, 0, button_settings.Height);
+        }
+
+        private void toolStripMenuItem_autoStart_Click(object sender, EventArgs e)
+        {
+            Utils.SetAutoRun(!toolStripMenuItem_autoStart.Checked, Consts.LegacyLauncherPrefix);
+            toolStripMenuItem_autoStart.Checked = File.Exists(Utils.GetAutoRunFile(Consts.LegacyLauncherPrefix));
+        }
+
+        private void contextMenuStrip_settings_Closing(object sender, ToolStripDropDownClosingEventArgs e)
+        {
+            if (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked)
+            {
+                e.Cancel = true;
+                return;
+            }
+            lastClose = DateTime.Now;
+        }
+
+        private void toolStripMenuItem_notificationMode_Click(object sender, EventArgs e)
+        {
+            Model.NotificationMode = Model.NotificationMode == 1 ? 0 : 1;
+            Model.Save();
+        }
+
+        private void toolStripMenuItem_logWrap_Click(object sender, EventArgs e)
+        {
+            Model.LogTextWrapping = !Model.LogTextWrapping;
+            Model.Save();
+        }
+
+        private void toolStripMenuItem_checkUpdate_Click(object sender, EventArgs e)
+        {
+            Model.CheckUpdate = !Model.CheckUpdate;
+            if (Model.CheckUpdate)
+            {
+                Model.RequestCheckUpdateAsync().ContinueWith(r => Invoke(() =>
+                {
+                    if (r.Exception != null)
+                    {
+                        Model.ShowError(r.Exception);
+                    }
+                    else if (r.Result != null)
+                    {
+                        if (r.Result.Status == UpdateStatus.NoUpdate)
+                        {
+                            Model.ShowMessage("当前没有可用更新", "提示", MessageMode.Info);
+                        }
+                        else if (r.Result.Status == UpdateStatus.Failed)
+                        {
+                            Model.ShowMessage("更新检查失败, 请查看日志输出", "错误", MessageMode.Error);
+                        }
+                    }
+                }));
+            }
+        }
+
+        private void toolStripMenuItem_remoteMgmtEnable_Click(object sender, EventArgs e)
+        {
+            Model.RemoteManagement = !Model.RemoteManagement;
+            toolStripMenuItem_remoteMgmtEnable.Checked = Model.RemoteManagement;
+        }
+
+        private void toolStripMenuItem_remoteMgmtPass_Click(object sender, EventArgs e) => new RemoteConfigForm(Model) { Owner = this }.ShowDialog();
+
+        private void toolStripMenuItem_frpcLog_trace_Click(object sender, EventArgs e) => Model.FrpcLogLevel = "trace";
+
+        private void toolStripMenuItem_frpcLog_debug_Click(object sender, EventArgs e) => Model.FrpcLogLevel = "debug";
+
+        private void toolStripMenuItem_frpcLog_info_Click(object sender, EventArgs e) => Model.FrpcLogLevel = "info";
+
+        private void toolStripMenuItem_frpcLog_wann_Click(object sender, EventArgs e) => Model.FrpcLogLevel = "warn";
+
+        private void toolStripMenuItem_frpcLog_error_Click(object sender, EventArgs e) => Model.FrpcLogLevel = "error";
+
+        private void toolStripMenuItem_frpcForceTls_Click(object sender, EventArgs e) => Model.EnableTLS = !Model.EnableTLS;
+
+        private void toolStripMenuItem_runMode_Click(object sender, EventArgs e) => Model.SwitchWorkingMode();
+
+        private void toolStripMenuItem_workDir_Click(object sender, EventArgs e) => Model.RequestOpenCWD();
 
         #endregion
 

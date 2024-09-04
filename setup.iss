@@ -76,7 +76,7 @@ Name: "launcher\service\webui"; Description: "初始化 Web UI (仅限高级用�
 
 Name: "launcher_ui"; Description: "用户界面"; Types: default custom
 Name: "launcher_ui\wpf"; Description: "WPF 界面"; Types: default; Flags: exclusive
-Name: "launcher_ui\legacy"; Description: "传统界面 (不推荐)"; Types: custom; Flags: exclusive
+Name: "launcher_ui\legacy"; Description: "经典界面 (不推荐)"; Types: custom; Flags: exclusive
 
 Name: "wd_exclusion"; Description: "添加 Windows Defender 排除项"; Types: default; Flags: dontinheritcheck
 

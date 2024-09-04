@@ -35,9 +35,9 @@
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.launcherModelBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.textBox_token = new System.Windows.Forms.TextBox();
-            this.checkBox_autorun = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.button_login = new System.Windows.Forms.Button();
             this.button_create = new System.Windows.Forms.Button();
@@ -52,14 +52,32 @@
             this.contextMenuStrip_tunnel = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem_reload = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem_delete = new System.Windows.Forms.ToolStripMenuItem();
-            this.checkBox_textwrap = new System.Windows.Forms.CheckBox();
-            this.checkBox_update = new System.Windows.Forms.CheckBox();
             this.label_update = new System.Windows.Forms.Label();
             this.label_unconnected = new System.Windows.Forms.Label();
-            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.button_settings = new System.Windows.Forms.Button();
+            this.contextMenuStrip_settings = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuItem_autoStart = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_logWrap = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_checkUpdate = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItem_remoteMgmtEnable = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_remoteMgmtPass = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItem_frpcLogLevel = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_frpcLog_trace = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_frpcLog_debug = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_frpcLog_info = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_frpcLog_wann = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_frpcLog_error = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_frpcForceTls = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItem_runMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_workDir = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_notificationMode = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.launcherModelBindingSource)).BeginInit();
             this.contextMenuStrip_tray.SuspendLayout();
             this.contextMenuStrip_tunnel.SuspendLayout();
+            this.contextMenuStrip_settings.SuspendLayout();
             this.SuspendLayout();
             // 
             // listView_tunnels
@@ -111,30 +129,25 @@
             this.columnHeader4.Text = "详情";
             this.columnHeader4.Width = 190;
             // 
+            // columnHeader5
+            // 
+            this.columnHeader5.DisplayIndex = 2;
+            this.columnHeader5.Text = "备注";
+            this.columnHeader5.Width = 110;
+            // 
             // textBox_token
             // 
             this.textBox_token.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.launcherModelBindingSource, "UserToken", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.textBox_token.DataBindings.Add(new System.Windows.Forms.Binding("Enabled", this.launcherModelBindingSource, "TokenEditable", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.textBox_token.Location = new System.Drawing.Point(311, 11);
+            this.textBox_token.Location = new System.Drawing.Point(77, 11);
             this.textBox_token.Name = "textBox_token";
             this.textBox_token.Size = new System.Drawing.Size(129, 21);
             this.textBox_token.TabIndex = 1;
             // 
-            // checkBox_autorun
-            // 
-            this.checkBox_autorun.AutoSize = true;
-            this.checkBox_autorun.Location = new System.Drawing.Point(12, 14);
-            this.checkBox_autorun.Name = "checkBox_autorun";
-            this.checkBox_autorun.Size = new System.Drawing.Size(72, 16);
-            this.checkBox_autorun.TabIndex = 4;
-            this.checkBox_autorun.Text = "开机启动";
-            this.checkBox_autorun.UseVisualStyleBackColor = true;
-            this.checkBox_autorun.CheckedChanged += new System.EventHandler(this.checkBox_autorun_CheckedChanged);
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(246, 15);
+            this.label1.Location = new System.Drawing.Point(12, 15);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(59, 12);
             this.label1.TabIndex = 6;
@@ -142,7 +155,7 @@
             // 
             // button_login
             // 
-            this.button_login.Location = new System.Drawing.Point(446, 10);
+            this.button_login.Location = new System.Drawing.Point(212, 10);
             this.button_login.Name = "button_login";
             this.button_login.Size = new System.Drawing.Size(65, 23);
             this.button_login.TabIndex = 7;
@@ -255,34 +268,6 @@
             this.toolStripMenuItem_delete.Text = "删除";
             this.toolStripMenuItem_delete.Click += new System.EventHandler(this.toolStripMenuItem_delete_Click);
             // 
-            // checkBox_textwrap
-            // 
-            this.checkBox_textwrap.AutoSize = true;
-            this.checkBox_textwrap.Checked = true;
-            this.checkBox_textwrap.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_textwrap.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.launcherModelBindingSource, "LogTextWrapping", true));
-            this.checkBox_textwrap.Location = new System.Drawing.Point(90, 14);
-            this.checkBox_textwrap.Name = "checkBox_textwrap";
-            this.checkBox_textwrap.Size = new System.Drawing.Size(72, 16);
-            this.checkBox_textwrap.TabIndex = 11;
-            this.checkBox_textwrap.Text = "日志换行";
-            this.checkBox_textwrap.UseVisualStyleBackColor = true;
-            this.checkBox_textwrap.CheckedChanged += new System.EventHandler(this.checkBox_textwrap_CheckedChanged);
-            // 
-            // checkBox_update
-            // 
-            this.checkBox_update.AutoSize = true;
-            this.checkBox_update.Checked = true;
-            this.checkBox_update.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_update.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.launcherModelBindingSource, "CheckUpdate", true));
-            this.checkBox_update.Location = new System.Drawing.Point(168, 14);
-            this.checkBox_update.Name = "checkBox_update";
-            this.checkBox_update.Size = new System.Drawing.Size(72, 16);
-            this.checkBox_update.TabIndex = 12;
-            this.checkBox_update.Text = "检查更新";
-            this.checkBox_update.UseVisualStyleBackColor = true;
-            this.checkBox_update.CheckedChanged += new System.EventHandler(this.checkBox_update_CheckedChanged);
-            // 
             // label_update
             // 
             this.label_update.BackColor = System.Drawing.Color.Teal;
@@ -313,38 +298,187 @@
             this.label_unconnected.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label_unconnected.Click += new System.EventHandler(this.label_update_Click);
             // 
-            // columnHeader5
+            // button_settings
             // 
-            this.columnHeader5.DisplayIndex = 2;
-            this.columnHeader5.Text = "备注";
-            this.columnHeader5.Width = 110;
+            this.button_settings.ContextMenuStrip = this.contextMenuStrip_settings;
+            this.button_settings.Location = new System.Drawing.Point(446, 10);
+            this.button_settings.Name = "button_settings";
+            this.button_settings.Size = new System.Drawing.Size(65, 23);
+            this.button_settings.TabIndex = 14;
+            this.button_settings.Text = "设置";
+            this.button_settings.UseVisualStyleBackColor = true;
+            this.button_settings.Click += new System.EventHandler(this.button_settings_Click);
+            // 
+            // contextMenuStrip_settings
+            // 
+            this.contextMenuStrip_settings.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem_autoStart,
+            this.toolStripMenuItem_logWrap,
+            this.toolStripMenuItem_notificationMode,
+            this.toolStripMenuItem_checkUpdate,
+            this.toolStripSeparator1,
+            this.toolStripMenuItem_remoteMgmtEnable,
+            this.toolStripMenuItem_remoteMgmtPass,
+            this.toolStripSeparator2,
+            this.toolStripMenuItem_frpcLogLevel,
+            this.toolStripMenuItem_frpcForceTls,
+            this.toolStripSeparator3,
+            this.toolStripMenuItem_runMode,
+            this.toolStripMenuItem_workDir});
+            this.contextMenuStrip_settings.Name = "contextMenuStrip_settings";
+            this.contextMenuStrip_settings.Size = new System.Drawing.Size(181, 264);
+            this.contextMenuStrip_settings.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.contextMenuStrip_settings_Closing);
+            // 
+            // toolStripMenuItem_autoStart
+            // 
+            this.toolStripMenuItem_autoStart.Name = "toolStripMenuItem_autoStart";
+            this.toolStripMenuItem_autoStart.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem_autoStart.Text = "开机启动";
+            this.toolStripMenuItem_autoStart.Click += new System.EventHandler(this.toolStripMenuItem_autoStart_Click);
+            // 
+            // toolStripMenuItem_logWrap
+            // 
+            this.toolStripMenuItem_logWrap.Name = "toolStripMenuItem_logWrap";
+            this.toolStripMenuItem_logWrap.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem_logWrap.Text = "日志换行";
+            this.toolStripMenuItem_logWrap.Click += new System.EventHandler(this.toolStripMenuItem_logWrap_Click);
+            // 
+            // toolStripMenuItem_checkUpdate
+            // 
+            this.toolStripMenuItem_checkUpdate.Name = "toolStripMenuItem_checkUpdate";
+            this.toolStripMenuItem_checkUpdate.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem_checkUpdate.Text = "检查更新";
+            this.toolStripMenuItem_checkUpdate.Click += new System.EventHandler(this.toolStripMenuItem_checkUpdate_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            // 
+            // toolStripMenuItem_remoteMgmtEnable
+            // 
+            this.toolStripMenuItem_remoteMgmtEnable.Name = "toolStripMenuItem_remoteMgmtEnable";
+            this.toolStripMenuItem_remoteMgmtEnable.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem_remoteMgmtEnable.Text = "远程管理";
+            this.toolStripMenuItem_remoteMgmtEnable.Click += new System.EventHandler(this.toolStripMenuItem_remoteMgmtEnable_Click);
+            // 
+            // toolStripMenuItem_remoteMgmtPass
+            // 
+            this.toolStripMenuItem_remoteMgmtPass.Name = "toolStripMenuItem_remoteMgmtPass";
+            this.toolStripMenuItem_remoteMgmtPass.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem_remoteMgmtPass.Text = "远程管理密码";
+            this.toolStripMenuItem_remoteMgmtPass.Click += new System.EventHandler(this.toolStripMenuItem_remoteMgmtPass_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
+            // 
+            // toolStripMenuItem_frpcLogLevel
+            // 
+            this.toolStripMenuItem_frpcLogLevel.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem_frpcLog_trace,
+            this.toolStripMenuItem_frpcLog_debug,
+            this.toolStripMenuItem_frpcLog_info,
+            this.toolStripMenuItem_frpcLog_wann,
+            this.toolStripMenuItem_frpcLog_error});
+            this.toolStripMenuItem_frpcLogLevel.Name = "toolStripMenuItem_frpcLogLevel";
+            this.toolStripMenuItem_frpcLogLevel.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem_frpcLogLevel.Text = "frpc 日志等级";
+            // 
+            // toolStripMenuItem_frpcLog_trace
+            // 
+            this.toolStripMenuItem_frpcLog_trace.Name = "toolStripMenuItem_frpcLog_trace";
+            this.toolStripMenuItem_frpcLog_trace.Size = new System.Drawing.Size(151, 22);
+            this.toolStripMenuItem_frpcLog_trace.Text = "追踪 [Trace]";
+            this.toolStripMenuItem_frpcLog_trace.Click += new System.EventHandler(this.toolStripMenuItem_frpcLog_trace_Click);
+            // 
+            // toolStripMenuItem_frpcLog_debug
+            // 
+            this.toolStripMenuItem_frpcLog_debug.Name = "toolStripMenuItem_frpcLog_debug";
+            this.toolStripMenuItem_frpcLog_debug.Size = new System.Drawing.Size(151, 22);
+            this.toolStripMenuItem_frpcLog_debug.Text = "调试 [Debug]";
+            this.toolStripMenuItem_frpcLog_debug.Click += new System.EventHandler(this.toolStripMenuItem_frpcLog_debug_Click);
+            // 
+            // toolStripMenuItem_frpcLog_info
+            // 
+            this.toolStripMenuItem_frpcLog_info.Name = "toolStripMenuItem_frpcLog_info";
+            this.toolStripMenuItem_frpcLog_info.Size = new System.Drawing.Size(151, 22);
+            this.toolStripMenuItem_frpcLog_info.Text = "信息 [Info]";
+            this.toolStripMenuItem_frpcLog_info.Click += new System.EventHandler(this.toolStripMenuItem_frpcLog_info_Click);
+            // 
+            // toolStripMenuItem_frpcLog_wann
+            // 
+            this.toolStripMenuItem_frpcLog_wann.Name = "toolStripMenuItem_frpcLog_wann";
+            this.toolStripMenuItem_frpcLog_wann.Size = new System.Drawing.Size(151, 22);
+            this.toolStripMenuItem_frpcLog_wann.Text = "警告 [Warn]";
+            this.toolStripMenuItem_frpcLog_wann.Click += new System.EventHandler(this.toolStripMenuItem_frpcLog_wann_Click);
+            // 
+            // toolStripMenuItem_frpcLog_error
+            // 
+            this.toolStripMenuItem_frpcLog_error.Name = "toolStripMenuItem_frpcLog_error";
+            this.toolStripMenuItem_frpcLog_error.Size = new System.Drawing.Size(151, 22);
+            this.toolStripMenuItem_frpcLog_error.Text = "错误 [Error]";
+            this.toolStripMenuItem_frpcLog_error.Click += new System.EventHandler(this.toolStripMenuItem_frpcLog_error_Click);
+            // 
+            // toolStripMenuItem_frpcForceTls
+            // 
+            this.toolStripMenuItem_frpcForceTls.Name = "toolStripMenuItem_frpcForceTls";
+            this.toolStripMenuItem_frpcForceTls.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem_frpcForceTls.Text = "强制 frpc TLS";
+            this.toolStripMenuItem_frpcForceTls.Click += new System.EventHandler(this.toolStripMenuItem_frpcForceTls_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
+            // 
+            // toolStripMenuItem_runMode
+            // 
+            this.toolStripMenuItem_runMode.Name = "toolStripMenuItem_runMode";
+            this.toolStripMenuItem_runMode.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem_runMode.Text = "运行模式: -";
+            this.toolStripMenuItem_runMode.Click += new System.EventHandler(this.toolStripMenuItem_runMode_Click);
+            // 
+            // toolStripMenuItem_workDir
+            // 
+            this.toolStripMenuItem_workDir.Name = "toolStripMenuItem_workDir";
+            this.toolStripMenuItem_workDir.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem_workDir.Text = "工作目录";
+            this.toolStripMenuItem_workDir.Click += new System.EventHandler(this.toolStripMenuItem_workDir_Click);
+            // 
+            // toolStripMenuItem_notificationMode
+            // 
+            this.toolStripMenuItem_notificationMode.Name = "toolStripMenuItem_notificationMode";
+            this.toolStripMenuItem_notificationMode.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem_notificationMode.Text = "状态通知";
+            this.toolStripMenuItem_notificationMode.Click += new System.EventHandler(this.toolStripMenuItem_notificationMode_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(708, 523);
+            this.Controls.Add(this.button_settings);
             this.Controls.Add(this.label_unconnected);
             this.Controls.Add(this.label_update);
-            this.Controls.Add(this.checkBox_update);
-            this.Controls.Add(this.checkBox_textwrap);
             this.Controls.Add(this.button_clear);
             this.Controls.Add(this.textBox_log);
             this.Controls.Add(this.button_create);
             this.Controls.Add(this.button_login);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.checkBox_autorun);
             this.Controls.Add(this.textBox_token);
             this.Controls.Add(this.listView_tunnels);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(724, 562);
             this.Name = "MainForm";
-            this.Text = "SakuraFrp Launcher - Legacy";
+            this.Text = "SakuraFrp Launcher Classic";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.launcherModelBindingSource)).EndInit();
             this.contextMenuStrip_tray.ResumeLayout(false);
             this.contextMenuStrip_tunnel.ResumeLayout(false);
+            this.contextMenuStrip_settings.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -357,7 +491,6 @@
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.TextBox textBox_token;
-        private System.Windows.Forms.CheckBox checkBox_autorun;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button_login;
         private System.Windows.Forms.ColumnHeader columnHeader4;
@@ -368,8 +501,6 @@
         private System.Windows.Forms.Button button_clear;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip_tunnel;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_delete;
-        private System.Windows.Forms.CheckBox checkBox_textwrap;
-        private System.Windows.Forms.CheckBox checkBox_update;
         private System.Windows.Forms.BindingSource launcherModelBindingSource;
         public System.Windows.Forms.TextBox textBox_log;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
@@ -379,6 +510,26 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_reload;
         internal System.Windows.Forms.NotifyIcon notifyIcon_tray;
         private System.Windows.Forms.ColumnHeader columnHeader5;
+        private System.Windows.Forms.Button button_settings;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip_settings;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_autoStart;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_logWrap;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_checkUpdate;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_remoteMgmtEnable;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_remoteMgmtPass;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_runMode;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_frpcForceTls;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_workDir;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_frpcLogLevel;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_frpcLog_trace;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_frpcLog_debug;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_frpcLog_info;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_frpcLog_wann;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_frpcLog_error;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_notificationMode;
     }
 }
 

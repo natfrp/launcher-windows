@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("SakuraFrp Legacy Launcher")]
-[assembly: AssemblyDescription("SakuraFrp 传统启动器")]
+[assembly: AssemblyTitle("SakuraFrp Launcher Classic")]
+[assembly: AssemblyDescription("SakuraFrp Windows 启动器经典界面")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SakuraFrp Legacy Launcher")]
+[assembly: AssemblyProduct("SakuraFrp Launcher Classic")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
