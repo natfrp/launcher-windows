@@ -64,6 +64,7 @@ namespace SakuraLibrary.Model
             {
                 try
                 {
+                    var connCTS = CancellationTokenSource.CreateLinkedTokenSource(CTS.Token);
                     var tasks = new Task[]
                     {
                         await RPC.StreamUpdate(RpcEmpty).InitStream(u =>
@@ -82,14 +83,14 @@ namespace SakuraLibrary.Model
                             if (u.Config != null) Config = u.Config;
                             if (u.Update != null) Update = u.Update;
                             if (u.Notifications != null) Notifications = u.Notifications.Notifications;
-                        }, CTS.Token),
+                        }, connCTS.Token),
                         await RPC.StreamLog(RpcEmpty).InitStream(l =>
                         {
                             if (l.Category != Proto.Log.Types.Category.Unknown)
                             {
                                  Dispatcher.Invoke(() => Log(l));
                             }
-                        }, CTS.Token),
+                        }, connCTS.Token),
                         await RPC.StreamTunnels(RpcEmpty).InitStream(t => Dispatcher.Invoke(() =>
                         {
                             switch(t.Action)
@@ -113,11 +114,13 @@ namespace SakuraLibrary.Model
                                 Tunnels.Clear();
                                 break;
                             }
-                        }), CTS.Token),
+                        }), connCTS.Token),
                     };
 
                     Connected = true;
 
+                    await Task.WhenAny(tasks);
+                    connCTS.Cancel();
                     await Task.WhenAll(tasks);
                 }
                 catch (Exception ex)
