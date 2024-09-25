@@ -17,6 +17,8 @@ namespace SakuraLauncher
         public readonly CreateTunnelModel Model;
         public readonly CreateTunnelBridge Bridge;
 
+        private int webViewInitAttempt = 0;
+
         public CreateTunnelWindow2(LauncherViewModel launcher, Tunnel edit = null)
         {
             InitializeComponent();
@@ -28,28 +30,26 @@ namespace SakuraLauncher
 
             Model.ReloadListening();
 
-            webView.EnsureCoreWebView2Async(Launcher.WebView2Environment).ContinueWith((r) =>
-            {
-                if (r.IsCompleted && webView.CoreWebView2 != null && webView.CoreWebView2.Settings != null)
-                {
-                    return;
-                }
+            attemptWebViewInit(null);
+        }
 
-                // Try to setup WebView2 environment again in case of user updated WebView2 runtime
-                if (!launcher.SetupWebView2Environment())
-                {
-                    Close();
-                    return;
-                }
-                webView.EnsureCoreWebView2Async(Launcher.WebView2Environment).ContinueWith((r) =>
-                {
-                    if (r.IsFaulted)
-                    {
-                        Launcher.ShowMessage("WebView2 初始化失败，请检查是否已安装 WebView2 运行时。" + r.Exception.ToString(), "错误", LauncherModel.MessageMode.Error);
-                        Close();
-                    }
-                });
-            });
+        private void attemptWebViewInit(Exception ex)
+        {
+            webViewInitAttempt++;
+            if (webViewInitAttempt > 2)
+            {
+                Launcher.ShowMessage("WebView2 初始化失败，请检查是否已安装 WebView2 运行时。您可以尝试重启启动器。" + (ex == null ? "" : "\n" + ex.ToString()), "错误", LauncherModel.MessageMode.Error);
+                Close();
+                return;
+            }
+
+            // Try to setup WebView2 environment again in case of user updated WebView2 runtime
+            if (Launcher.WebView2Environment == null && !Launcher.SetupWebView2Environment())
+            {
+                Close();
+                return;
+            }
+            webView.EnsureCoreWebView2Async(Launcher.WebView2Environment);
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -63,6 +63,13 @@ namespace SakuraLauncher
 
         private void WebView_CoreWebView2InitializationCompleted(object sender, CoreWebView2InitializationCompletedEventArgs e)
         {
+            if (!e.IsSuccess)
+            {
+                Launcher.WebView2Environment = null;
+                attemptWebViewInit(e.InitializationException);
+                return;
+            }
+
             var core = webView.CoreWebView2;
 #if !DEBUG
             core.Settings.AreDevToolsEnabled = false;
