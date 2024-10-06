@@ -23,6 +23,11 @@ namespace SakuraLauncher
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            Application.Current.DispatcherUnhandledException += (s, e) =>
+            {
+                MessageBox.Show(e.Exception.ToString(), "出现错误，请加入反馈群联系管理员检查", MessageBoxButton.OK, MessageBoxImage.Error);
+            };
+
             Environment.CurrentDirectory = Path.GetDirectoryName(Utils.ExecutablePath);
 
             Utils.VerifySignature(Utils.LibraryPath, Utils.ExecutablePath, Path.GetFullPath(Consts.ServiceExecutable));
