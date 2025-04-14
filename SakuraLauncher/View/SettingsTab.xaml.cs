@@ -96,5 +96,13 @@ namespace SakuraLauncher.View
         }
 
         private void Save(object sender, RoutedEventArgs e) => Model.Save();
+
+        private void SaveTheme(object sender, SelectionChangedEventArgs e)
+        {
+            if (Model.Theme == Properties.Settings.Default.Theme) return;
+
+            Model.Save();
+            (Application.Current as App).RefreshTheme();
+        }
     }
 }

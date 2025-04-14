@@ -52,7 +52,7 @@
         <Border
             Margin="16,8,16,16"
             Padding="8"
-            Background="#33000000"
+            Background="{StaticResource LogBackground}"
             BorderBrush="#FFAAAAAA"
             BorderThickness="2">
             <ItemsControl ItemsSource="{Binding LogsView, Mode=OneWay}">

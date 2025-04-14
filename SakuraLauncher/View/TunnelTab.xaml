@@ -116,7 +116,7 @@
                         <Border
                             Width="256"
                             Height="128"
-                            Background="{StaticResource Background_Tunnel}"
+                            Background="{DynamicResource Background_Tunnel}"
                             CornerRadius="2">
                             <Border.Effect>
                                 <DropShadowEffect

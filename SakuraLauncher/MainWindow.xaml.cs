@@ -1,4 +1,5 @@
-﻿using SakuraLauncher.Model;
+﻿using SakuraLauncher.Helper;
+using SakuraLauncher.Model;
 using SakuraLauncher.View;
 using SakuraLibrary;
 using System;
@@ -32,12 +33,12 @@ namespace SakuraLauncher
 
             DataContext = Model = new LauncherViewModel(this);
 
-            Tabs = new UserControl[] {
+            Tabs = [
                 new TunnelTab(Model),
                 new LogTab(Model),
                 new SettingsTab(Model),
                 new AboutTab(Model)
-            };
+            ];
             Model.SwitchTab(2);
         }
 
@@ -153,6 +154,14 @@ namespace SakuraLauncher
         {
             tabContents.Child = Tabs[Model.CurrentTab];
             BeginTabStoryboard("TabShowAnimation");
+        }
+
+        public void RefreshTheme()
+        {
+            foreach (var el in tabButtons.Children)
+            {
+                if (el is TabButton tb) tb.RefreshTheme();
+            }
         }
 
         #endregion

@@ -18,4 +18,6 @@
     <Color x:Key="TabGradient_End">#5e90c1</Color>
     <Color x:Key="TabGradient_EndMiddle">#ee5e90c1</Color>
     <Color x:Key="TabGradient_EndTransparent">#005e90c1</Color>
+
+    <SolidColorBrush x:Key="LogBackground">#70000000</SolidColorBrush>
 </ResourceDictionary>

@@ -14,7 +14,9 @@
 
     <Color x:Key="TabGradient_Start">#fee26d</Color>
     <Color x:Key="TabGradient_Middle">#e6a72c</Color>
-    <Color x:Key="TabGradient_End">#66fee26d</Color>
-    <Color x:Key="TabGradient_EndMiddle">#eefee26d</Color>
-    <Color x:Key="TabGradient_EndTransparent">#00fee26d</Color>
+    <Color x:Key="TabGradient_End">#8B783C</Color>
+    <Color x:Key="TabGradient_EndMiddle">#ee8B783C</Color>
+    <Color x:Key="TabGradient_EndTransparent">#008B783C</Color>
+
+    <SolidColorBrush x:Key="LogBackground">#33000000</SolidColorBrush>
 </ResourceDictionary>

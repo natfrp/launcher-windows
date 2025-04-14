@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows;
 using System.Threading;
+using System.Resources;
 
 using MaterialDesignThemes.Wpf;
 
@@ -82,8 +83,19 @@ namespace SakuraLauncher
                 settings.Save();
             }
 
+            RefreshTheme();
+
+            MainWindow = new MainWindow();
+            if (!minimize)
+            {
+                MainWindow.Show();
+            }
+        }
+
+        public void RefreshTheme()
+        {
             string color = "Teal", materialColor = "Teal";
-            switch (settings.Theme)
+            switch (SakuraLauncher.Properties.Settings.Default.Theme)
             {
             case 1:
                 color = "Gold";
@@ -113,11 +125,7 @@ namespace SakuraLauncher
 
             Resources.MergedDictionaries[1].Source = new Uri("/Theme/" + color + ".xaml", UriKind.Relative);
 
-            MainWindow = new MainWindow();
-            if (!minimize)
-            {
-                MainWindow.Show();
-            }
+            (MainWindow as MainWindow)?.RefreshTheme();
         }
 
         private void TrayMenu_Show(object sender, RoutedEventArgs e) => MainWindow.Show();
