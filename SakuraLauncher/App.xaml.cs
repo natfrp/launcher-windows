@@ -29,6 +29,7 @@ namespace SakuraLauncher
             };
 
             Environment.CurrentDirectory = Path.GetDirectoryName(Utils.ExecutablePath);
+            Utils.FixInvalidCulture();
 
             Utils.VerifySignature(Utils.LibraryPath, Utils.ExecutablePath, Path.GetFullPath(Consts.ServiceExecutable));
             Utils.ValidateSettings();

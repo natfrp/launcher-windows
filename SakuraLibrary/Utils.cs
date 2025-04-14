@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Configuration;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
 
 namespace SakuraLibrary
 {
@@ -79,6 +81,36 @@ namespace SakuraLibrary
         }).ToArray();
 
         public static DateTime ParseTimestamp(long seconds) => UtcTimeBase.AddSeconds(seconds).ToLocalTime();
+
+        // https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-lcid/926e694f-1797-4418-a922-343d1c5e91a6
+        private static readonly int[] brokenLCID = [
+            0x0C00,
+            0x2000, 0x2400, 0x2800, 0x2C00, 0x3000,
+            0x3400, 0x3800, 0x3C00, 0x4000, 0x4400,
+            0x4800, 0x4C00,
+            0x1000,
+        ];
+
+        public static void FixInvalidCulture()
+        {
+            try
+            {
+                if (brokenLCID.Contains(CultureInfo.CurrentCulture.LCID)) throw new Exception();
+                new CultureInfo(CultureInfo.CurrentCulture.LCID);
+                return;
+            }
+            catch { }
+
+            try
+            {
+                var fallback = CultureInfo.CreateSpecificCulture("zh-CN");
+                Thread.CurrentThread.CurrentCulture = fallback;
+                Thread.CurrentThread.CurrentUICulture = fallback;
+                CultureInfo.DefaultThreadCurrentCulture = fallback;
+                CultureInfo.DefaultThreadCurrentUICulture = fallback;
+            }
+            catch { }
+        }
 
         public static void VerifySignature(params string[] files)
         {

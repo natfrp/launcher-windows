@@ -19,6 +19,7 @@ namespace LegacyLauncher
         static void Main(string[] args)
         {
             Environment.CurrentDirectory = Path.GetDirectoryName(Utils.ExecutablePath);
+            Utils.FixInvalidCulture();
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
