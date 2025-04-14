@@ -1,5 +1,6 @@
 ﻿using SakuraLauncher.Model;
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -70,8 +71,17 @@ namespace SakuraLauncher.Helper
             var lastIndex = 0;
             foreach (Match match in HighLightRegex.Matches(log.Data))
             {
-                var startIndex = match.Index + 2;
-                var length = match.Length - 4;
+                var startIndex = match.Index;
+                var length = match.Length;
+
+                var text = match.Groups[1].Value;
+                var isLink = text.StartsWith("http://") || text.StartsWith("https://");
+
+                if (!isLink)
+                {
+                    startIndex += 2;
+                    length -= 4;
+                }
 
                 if (startIndex > lastIndex)
                 {
@@ -79,9 +89,10 @@ namespace SakuraLauncher.Helper
                 }
                 Inlines.Add(new ClickCopyRun()
                 {
+                    isLink = isLink,
                     Text = match.Groups[1].Value,
                     FontWeight = FontWeights.ExtraBold,
-                    Foreground = Brushes.Khaki,
+                    Foreground = isLink ? Brushes.PowderBlue : Brushes.Khaki,
                     TextDecorations = TextDecorationsCol.Underline
                 });
 
@@ -105,6 +116,8 @@ namespace SakuraLauncher.Helper
 
         private bool isHover = false;
         private Brush originalBackground = null;
+
+        public bool isLink = false;
 
         public ClickCopyRun() : base()
         {
@@ -142,6 +155,11 @@ namespace SakuraLauncher.Helper
         private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (string.IsNullOrEmpty(Text)) return;
+            if (isLink)
+            {
+                Process.Start(Text);
+                return;
+            }
             try
             {
                 Clipboard.SetText(Text);
