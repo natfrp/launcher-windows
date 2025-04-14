@@ -24,7 +24,7 @@
                 <Run Text="{Binding FrpcVersion, Mode=OneWay}" />
                 <LineBreak />
                 <LineBreak />
-                <Run FontSize="15" Text="版权所有 © 2020-2024 iDea Leaper" />
+                <Run FontSize="15" Text="版权所有 © 2020-2025 iDea Leaper" />
                 <LineBreak />
                 <Run FontSize="15">https://github.com/natfrp/launcher-windows</Run>
             </TextBlock>
@@ -36,8 +36,9 @@
             BorderBrush="#FFAAAAAA"
             BorderThickness="2">
             <ScrollViewer x:Name="scrollViewer" VerticalScrollBarVisibility="Auto">
-                <Helper:SelectableTextBlock
+                <Helper:LogTextBlock
                     FontFamily="Consolas"
+                    HighlightConn="False"
                     Text="{Binding License, Mode=OneTime}"
                     TextWrapping="WrapWithOverflow" />
             </ScrollViewer>

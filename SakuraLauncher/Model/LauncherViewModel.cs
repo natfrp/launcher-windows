@@ -23,6 +23,8 @@ namespace SakuraLauncher.Model
 {
     public class LauncherViewModel : LauncherModel
     {
+        public static LauncherViewModel Instance;
+
         public readonly MainWindow View;
         public readonly SakuraLauncherBridge Bridge;
 
@@ -30,6 +32,8 @@ namespace SakuraLauncher.Model
 
         public LauncherViewModel(MainWindow view) : base()
         {
+            Instance = this;
+
             View = view;
             Bridge = new SakuraLauncherBridge(this);
             Dispatcher = new DispatcherWrapper(View.Dispatcher.Invoke, a => View.Dispatcher.BeginInvoke(a), View.Dispatcher.CheckAccess);
@@ -53,6 +57,7 @@ namespace SakuraLauncher.Model
             AdvancedMode = settings.AdvancedMode;
             LegacyCreateTunnel = settings.LegacyCreateTunnel;
             AlignWidth = settings.AlignWidth;
+            LogConnHighlight = settings.LogConnHighlight;
 
             TunnelsView = CollectionViewSource.GetDefaultView(Tunnels);
             TunnelsView.Filter = e =>
@@ -208,6 +213,7 @@ namespace SakuraLauncher.Model
             settings.AdvancedMode = AdvancedMode;
             settings.LegacyCreateTunnel = LegacyCreateTunnel;
             settings.AlignWidth = AlignWidth;
+            settings.LogConnHighlight = LogConnHighlight;
 
             var sd = TunnelsView.SortDescriptions[0];
             settings.SortField = sd.PropertyName;
@@ -246,6 +252,9 @@ namespace SakuraLauncher.Model
 
         public bool AlignWidth { get => _alignWidth; set => Set(out _alignWidth, value); }
         private bool _alignWidth;
+
+        public bool LogConnHighlight { get => _logConnHighlight; set => Set(out _logConnHighlight, value); }
+        private bool _logConnHighlight;
 
         public bool AdvancedMode { get => _advancedMode; set => Set(out _advancedMode, value); }
         private bool _advancedMode;

@@ -66,9 +66,12 @@
                         <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
                     </Style>
                     <DataTemplate DataType="{x:Type Model:LogModel}">
-                        <Helper:SelectableTextBlock FontFamily="Consolas">
-                            <Helper:SelectableTextBlock.Style>
-                                <Style TargetType="Helper:SelectableTextBlock">
+                        <Helper:LogTextBlock
+                            FontFamily="Consolas"
+                            HighlightConn="{Binding DataContext.LogConnHighlight, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type local:LogTab}}}"
+                            Log="{Binding Mode=OneTime}">
+                            <Helper:LogTextBlock.Style>
+                                <Style TargetType="Helper:LogTextBlock">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding DataContext.LogTextWrapping, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type local:LogTab}}}" Value="True">
                                             <Setter Property="TextWrapping" Value="WrapWithOverflow" />
@@ -76,14 +79,8 @@
                                     </Style.Triggers>
                                     <Setter Property="TextWrapping" Value="NoWrap" />
                                 </Style>
-                            </Helper:SelectableTextBlock.Style>
-                            <Helper:SelectableTextBlock.Inlines>
-                                <Run Foreground="#508ddc" Text="{Binding Time, Mode=OneTime}" />
-                                <Run Foreground="{Binding LevelColor, Mode=OneTime}" Text="{Binding Level, Mode=OneTime}" />
-                                <Run Foreground="Wheat" Text="{Binding Source, Mode=OneTime}" />
-                                <Run Foreground="Silver" Text="{Binding Data, Mode=OneTime}" />
-                            </Helper:SelectableTextBlock.Inlines>
-                        </Helper:SelectableTextBlock>
+                            </Helper:LogTextBlock.Style>
+                        </Helper:LogTextBlock>
                     </DataTemplate>
                 </ItemsControl.Resources>
                 <ItemsControl.Template>
