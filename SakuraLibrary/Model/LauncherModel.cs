@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO.Pipes;
 using System.Linq;
 using System.Net.Http;
@@ -59,6 +60,8 @@ namespace SakuraLibrary.Model
         protected async void Run()
         {
             Daemon.Start();
+
+            _ = Task.Delay(5000).ContinueWith(t => ConnectionError = true);
 
             while (!CTS.IsCancellationRequested)
             {
@@ -118,6 +121,7 @@ namespace SakuraLibrary.Model
                     };
 
                     Connected = true;
+                    ConnectionError = true;
 
                     await Task.WhenAny(tasks);
                     connCTS.Cancel();
@@ -183,6 +187,12 @@ namespace SakuraLibrary.Model
 
         public bool Connected { get => _connected; set => Set(out _connected, value); }
         private bool _connected = false;
+
+        public bool ConnectionError { get => _connectionError; set => SafeSet(out _connectionError, value); }
+        private bool _connectionError = false;
+
+        [SourceBinding(nameof(ConnectionError))]
+        public string ConnectionWarningText => ConnectionError ? "无法连接到守护进程, 请检查是否有杀软拦截, 并尝试重启启动器" : "正在启动守护进程, 请稍等...";
 
         public User UserInfo { get => _userInfo; set => SafeSet(out _userInfo, value ?? new User()); }
         private User _userInfo = new();

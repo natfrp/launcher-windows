@@ -381,23 +381,26 @@
                         Text="{Binding UpdateText}"
                         TextAlignment="Center" />
                 </Border>
-                <Border Grid.Row="1" Background="OrangeRed">
+                <Border Grid.Row="1">
                     <Border.Style>
                         <Style TargetType="Border">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Connected}" Value="False">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding ConnectionError}" Value="True">
+                                    <Setter Property="Background" Value="OrangeRed" />
+                                </DataTrigger>
                             </Style.Triggers>
                             <Setter Property="Visibility" Value="Collapsed" />
+                            <Setter Property="Background" Value="Teal" />
                         </Style>
                     </Border.Style>
                     <TextBlock
                         VerticalAlignment="Center"
                         FontSize="18"
-                        TextAlignment="Center">
-                        未连接到守护进程, 大部分功能将不可用, 请尝试重启启动器
-                    </TextBlock>
+                        Text="{Binding ConnectionWarningText}"
+                        TextAlignment="Center" />
                 </Border>
             </Grid>
         </Border>

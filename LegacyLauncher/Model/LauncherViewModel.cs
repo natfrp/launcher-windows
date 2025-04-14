@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 using SakuraLibrary;
@@ -70,6 +71,9 @@ namespace LegacyLauncher.Model
         public override IntPtr GetHwnd() => (IntPtr)View.Invoke(() => View.Handle);
 
         #endregion
+
+        [SourceBinding(nameof(ConnectionError))]
+        public Color ConnectionWarningColor => ConnectionError ? Color.OrangeRed : Color.Teal;
 
         public void Save()
         {

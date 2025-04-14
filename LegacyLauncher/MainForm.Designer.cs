@@ -287,6 +287,8 @@
             // label_unconnected
             // 
             this.label_unconnected.BackColor = System.Drawing.Color.OrangeRed;
+            this.label_unconnected.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.launcherModelBindingSource, "ConnectionWarningText", true));
+            this.label_unconnected.DataBindings.Add(new System.Windows.Forms.Binding("BackColor", this.launcherModelBindingSource, "ConnectionWarningColor", true));
             this.label_unconnected.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.label_unconnected.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label_unconnected.ForeColor = System.Drawing.Color.White;
@@ -294,7 +296,6 @@
             this.label_unconnected.Name = "label_unconnected";
             this.label_unconnected.Size = new System.Drawing.Size(708, 31);
             this.label_unconnected.TabIndex = 13;
-            this.label_unconnected.Text = "未连接到守护进程, 大部分功能将不可用, 请尝试重启启动器";
             this.label_unconnected.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label_unconnected.Click += new System.EventHandler(this.label_update_Click);
             // 
