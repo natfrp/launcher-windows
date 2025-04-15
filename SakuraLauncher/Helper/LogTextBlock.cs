@@ -162,8 +162,8 @@ namespace SakuraLauncher.Helper
             }
             try
             {
-                Clipboard.SetText(Text);
-                LauncherViewModel.Instance?.SnackMessageQueue.Enqueue("已复制 " + Text, null, null, null, false, false, TimeSpan.FromSeconds(1.5));
+                Clipboard.SetDataObject(Text);
+                LauncherViewModel.Instance?.SnackMessageQueue.Enqueue("已复制 " + Text, null, null, null, false, false, TimeSpan.FromSeconds(1));
             }
             catch
             {
