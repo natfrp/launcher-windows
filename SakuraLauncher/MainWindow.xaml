@@ -319,7 +319,11 @@
                 </Border>
             </Grid>
         </Border>
-        <materialDesign:Snackbar Grid.ColumnSpan="2" MessageQueue="{Binding SnackMessageQueue}" />
+        <materialDesign:Snackbar
+            Grid.ColumnSpan="2"
+            Background="{DynamicResource MaterialDesignPaper}"
+            Foreground="{DynamicResource MaterialDesignBody}"
+            MessageQueue="{Binding SnackMessageQueue}" />
         <tb:TaskbarIcon
             x:Name="trayIcon"
             ContextMenu="{StaticResource TrayMenu}"

@@ -61,7 +61,7 @@
                 </StackPanel>
             </Button>
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <materialDesign:Card Margin="0,0,8,0">
+                <materialDesign:Card Margin="0,0,8,0" materialDesign:ElevationAssist.Elevation="Dp4">
                     <StackPanel>
                         <ListView
                             Name="listening"
@@ -84,7 +84,10 @@
             </ScrollViewer>
         </DockPanel>
         <StackPanel Grid.Column="1">
-            <materialDesign:Card Margin="8,16,16,16" Padding="8">
+            <materialDesign:Card
+                Margin="8,16,16,16"
+                Padding="8"
+                materialDesign:ElevationAssist.Elevation="Dp4">
                 <StackPanel>
                     <Grid>
                         <Grid.ColumnDefinitions>

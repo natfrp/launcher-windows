@@ -37,7 +37,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="H.NotifyIcon.Wpf" Version="2.3.0" />
-		<PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
+		<PackageReference Include="MaterialDesignThemes" Version="5.2.1" />
 		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3179.45" />
 		<PackageReference Include="System.Text.Json" Version="9.0.4" />
 	</ItemGroup>
