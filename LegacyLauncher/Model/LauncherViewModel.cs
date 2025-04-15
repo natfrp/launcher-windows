@@ -31,7 +31,7 @@ namespace LegacyLauncher.Model
             LogTextWrapping = settings.LogTextWrapping;
             NotificationMode = settings.SuppressInfo ? 1 : 0;
 
-            Task.Run(Run);
+            Run();
         }
 
         #region ViewModel Abstraction

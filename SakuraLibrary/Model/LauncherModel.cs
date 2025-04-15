@@ -120,7 +120,7 @@ namespace SakuraLibrary.Model
                     };
 
                     Connected = true;
-                    _ = Task.Delay(200).ContinueWith(t => ConnectionError = true);
+                    ConnectionError = true;
 
                     await Task.WhenAny(tasks);
                     connCTS.Cancel();

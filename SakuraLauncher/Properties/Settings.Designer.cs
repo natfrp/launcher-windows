@@ -190,5 +190,17 @@ namespace SakuraLauncher.Properties {
                 this["LogFontSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string CachedAvatar {
+            get {
+                return ((string)(this["CachedAvatar"]));
+            }
+            set {
+                this["CachedAvatar"] = value;
+            }
+        }
     }
 }

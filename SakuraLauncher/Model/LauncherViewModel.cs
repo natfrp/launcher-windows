@@ -111,30 +111,42 @@ namespace SakuraLauncher.Model
                         prevAvatar = "";
                         return;
                     }
-                    if (UserInfo.Avatar == prevAvatar)
+                    var current = UserInfo.Avatar;
+
+                    if (current == prevAvatar) return;
+                    prevAvatar = current;
+
+                    var cache = Path.Combine(Consts.WorkingDirectory, "Temp", "avatar.jpg");
+                    if (Properties.Settings.Default.CachedAvatar == current)
                     {
+                        Avatar = new BitmapImage(new Uri(cache));
                         return;
                     }
-
-                    var uri = new Uri(UserInfo.Avatar);
-                    var cache = Path.Combine(Consts.WorkingDirectory, "Temp", "avatar.jpg");
-                    try
+                    Task.Run(() =>
                     {
-                        using (var client = new WebClient())
+                        try
                         {
-                            client.DownloadFile(uri, cache);
+                            using (var client = new WebClient())
+                            {
+                                client.DownloadFile(new Uri(current), cache);
+                            }
+                            Dispatcher.Invoke(() =>
+                            {
+                                if (current == prevAvatar)
+                                {
+                                    Avatar = new BitmapImage(new Uri(cache));
+
+                                    Properties.Settings.Default.CachedAvatar = current;
+                                    Properties.Settings.Default.Save();
+                                }
+                            });
                         }
-                        Avatar = new BitmapImage(new Uri(cache));
-                        prevAvatar = UserInfo.Avatar;
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex);
-                    }
+                        catch { }
+                    });
                 }
             };
 
-            Task.Run(Run);
+            Run();
         }
 
         #region ViewModel Abstraction
