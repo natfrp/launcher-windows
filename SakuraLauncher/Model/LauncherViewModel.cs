@@ -134,7 +134,7 @@ namespace SakuraLauncher.Model
                 }
             };
 
-            Run();
+            Task.Run(Run);
         }
 
         #region ViewModel Abstraction

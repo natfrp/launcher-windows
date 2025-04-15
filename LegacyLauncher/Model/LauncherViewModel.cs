@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Threading.Tasks;
 
 using SakuraLibrary;
 using SakuraLibrary.Model;
@@ -30,7 +31,7 @@ namespace LegacyLauncher.Model
             LogTextWrapping = settings.LogTextWrapping;
             NotificationMode = settings.SuppressInfo ? 1 : 0;
 
-            Run();
+            Task.Run(Run);
         }
 
         #region ViewModel Abstraction
