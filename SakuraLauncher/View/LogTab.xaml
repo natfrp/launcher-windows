@@ -55,7 +55,7 @@
             Background="{StaticResource LogBackground}"
             BorderBrush="#FFAAAAAA"
             BorderThickness="2">
-            <ItemsControl ItemsSource="{Binding LogsView, Mode=OneWay}">
+            <ItemsControl FontSize="{Binding LogFontSize, Mode=OneWay}" ItemsSource="{Binding LogsView, Mode=OneWay}">
                 <ItemsControl.Resources>
                     <Style TargetType="ScrollViewer">
                         <Style.Triggers>

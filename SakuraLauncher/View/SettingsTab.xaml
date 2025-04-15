@@ -301,7 +301,7 @@
             </StackPanel>
             <StackPanel
                 Height="32"
-                Margin="12,4,16,0"
+                Margin="12,8,16,0"
                 Orientation="Horizontal">
                 <TextBlock
                     VerticalAlignment="Center"
@@ -340,7 +340,7 @@
             </StackPanel>
             <StackPanel
                 Height="32"
-                Margin="12,4,16,0"
+                Margin="12,8,16,0"
                 Orientation="Horizontal">
                 <TextBlock
                     VerticalAlignment="Center"
@@ -362,6 +362,32 @@
                     <ComboBoxItem Tag="4">丰 收 时 节</ComboBoxItem>
                     <ComboBoxItem Tag="5">前 途 光 明</ComboBoxItem>
                 </ComboBox>
+            </StackPanel>
+            <StackPanel
+                Height="32"
+                Margin="12,8,16,0"
+                Orientation="Horizontal">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
+                    日志字号:
+                </TextBlock>
+                <Slider
+                    Width="200"
+                    Margin="12,0,12,0"
+                    VerticalAlignment="Center"
+                    materialDesign:SliderAssist.HideActiveTrack="True"
+                    Maximum="20"
+                    Minimum="10"
+                    Value="{Binding LogFontSize}" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="{Binding LogFontSize}"
+                    Foreground="#DDFFFFFF">
+                    <Run Text="{Binding LogFontSize}" />
+                    <Run>px</Run>
+                </TextBlock>
             </StackPanel>
             <DockPanel Margin="4,16,8,12">
                 <TextBlock
@@ -471,7 +497,7 @@
             </StackPanel>
             <StackPanel
                 Height="32"
-                Margin="12,4,16,0"
+                Margin="12,8,16,0"
                 Orientation="Horizontal">
                 <TextBlock
                     VerticalAlignment="Center"

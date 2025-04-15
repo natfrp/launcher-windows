@@ -58,6 +58,7 @@ namespace SakuraLauncher.Model
             LegacyCreateTunnel = settings.LegacyCreateTunnel;
             AlignWidth = settings.AlignWidth;
             LogConnHighlight = settings.LogConnHighlight;
+            LogFontSize = settings.LogFontSize;
 
             TunnelsView = CollectionViewSource.GetDefaultView(Tunnels);
             TunnelsView.Filter = e =>
@@ -214,6 +215,7 @@ namespace SakuraLauncher.Model
             settings.LegacyCreateTunnel = LegacyCreateTunnel;
             settings.AlignWidth = AlignWidth;
             settings.LogConnHighlight = LogConnHighlight;
+            settings.LogFontSize = LogFontSize;
 
             var sd = TunnelsView.SortDescriptions[0];
             settings.SortField = sd.PropertyName;
@@ -249,6 +251,9 @@ namespace SakuraLauncher.Model
 
         public int Theme { get => _theme; set => Set(out _theme, value); }
         private int _theme;
+
+        public int LogFontSize { get => _logFontSize; set => Set(out _logFontSize, value); }
+        private int _logFontSize;
 
         public bool AlignWidth { get => _alignWidth; set => Set(out _alignWidth, value); }
         private bool _alignWidth;
