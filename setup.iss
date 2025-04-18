@@ -13,7 +13,7 @@ AppId=SakuraFrpLauncher
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} v{#RealVersion}
-AppCopyright=Copyright © iDea Leaper 2020-2024
+AppCopyright=Copyright © iDea Leaper 2020-2025
 
 AppMutex=Global\SakuraFrpService,SakuraFrpLauncher3,SakuraFrpLauncher3_Legacy
 
@@ -96,7 +96,7 @@ Source: "_publish\SakuraLibrary\*"; DestDir: "{app}"; Flags: ignoreversion; Comp
 Source: "_publish\SakuraLauncher\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs; Components: "launcher_ui\wpf"
 Source: "_publish\LegacyLauncher\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui\legacy"
 
-Source: "_publish\cpuid.dll"; DestDir: "{tmp}"; Flags: dontcopy ignoreversion
+Source: "cpuid\cpuid.dll"; DestDir: "{tmp}"; Flags: dontcopy ignoreversion
 
 [Icons]
 ; Start Menu
@@ -210,6 +210,11 @@ var
 	versionStr: String;
 	verifyWebView2: Boolean;
 begin
+    if IsX64() and not IsAMD64V2() then
+    begin
+		SuppressibleMsgBox('当前设备的 CPU 不支持 AMD64-v2 指令集，我们将为您安装 32 位版本以确保软件能正常运行'+#13#10+'建议您升级到 Intel Nehalem 架构、AMD 推土机架构或更新的 CPU 以确保流畅体验', mbInformation, MB_OK, IDOK);
+    end;
+
 	downloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
 
 	installNet := (not RegQueryDWordValue(HKLM, 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full', 'Release', version)) or (version < 528040);
