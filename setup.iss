@@ -57,13 +57,13 @@ Name: "custom"; Description: "自定义"; Flags: iscustom;
 
 [Components]
 Name: "frpc"; Description: "frpc"; Types: default custom; Flags: fixed
-Name: "frpc\x86"; Description: "frpc (32 位)"; Check: IsX86; Types: default custom; Flags: exclusive fixed
-Name: "frpc\x64"; Description: "frpc (64 位)"; Check: IsX64; Types: default custom; Flags: exclusive fixed
+Name: "frpc\x86"; Description: "frpc (32 位)"; Check: UseX86; Types: default custom; Flags: exclusive fixed
+Name: "frpc\x64"; Description: "frpc (64 位)"; Check: UseX64; Types: default custom; Flags: exclusive fixed
 Name: "frpc\arm64"; Description: "frpc (ARM64)"; Check: IsARM64; Types: default custom; Flags: exclusive fixed
 
 Name: "launcher"; Description: "核心服务"; Types: default custom; Flags: fixed
-Name: "launcher\x86"; Description: "核心服务 (32 位)"; Check: IsX86; Types: default custom; Flags: exclusive fixed
-Name: "launcher\x64"; Description: "核心服务 (64 位)"; Check: IsX64; Types: default custom; Flags: exclusive fixed
+Name: "launcher\x86"; Description: "核心服务 (32 位)"; Check: UseX86; Types: default custom; Flags: exclusive fixed
+Name: "launcher\x64"; Description: "核心服务 (64 位)"; Check: UseX64; Types: default custom; Flags: exclusive fixed
 Name: "launcher\arm64"; Description: "核心服务 (ARM64)"; Check: IsARM64; Types: default custom; Flags: exclusive fixed
 Name: "launcher\service"; Description: "安装为系统服务"; Flags: dontinheritcheck
 Name: "launcher\service\webui"; Description: "初始化 Web UI (仅限高级用户)"; Flags: dontinheritcheck
@@ -95,6 +95,8 @@ Source: "_publish\sign\SakuraFrpService_arm64.exe.sig"; DestDir: "{app}"; DestNa
 Source: "_publish\SakuraLibrary\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui"
 Source: "_publish\SakuraLauncher\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs; Components: "launcher_ui\wpf"
 Source: "_publish\LegacyLauncher\*"; DestDir: "{app}"; Flags: ignoreversion; Components: "launcher_ui\legacy"
+
+Source: "_publish\cpuid.dll"; DestDir: "{tmp}"; Flags: dontcopy ignoreversion
 
 [Icons]
 ; Start Menu
@@ -177,6 +179,27 @@ begin
 	if not StrToVersion(v2, pv2) then pv2 := 0;
 
 	Result := ComparePackedVersion(pv1, pv2);
+end;
+
+function CPUIDECX(): Cardinal;
+  external 'ECX@files:cpuid.dll stdcall setuponly delayload';
+
+function IsAMD64V2(): Boolean;
+var
+	FeaturesECX: Cardinal;
+begin
+	FeaturesECX := CPUIDECX();
+	Result := (FeaturesECX and $00982201) = $00982201;
+end;
+
+function UseX86(): Boolean;
+begin
+	Result := IsX86() or (IsX64() and not IsAMD64V2());
+end;
+
+function UseX64(): Boolean;
+begin
+	Result := IsX64() and IsAMD64V2();
 end;
 
 //// Install Events ///////////////////////////////////////////
