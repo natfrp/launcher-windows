@@ -32,6 +32,21 @@ mkdir $tmpDir | Out-Null
 
 $wd = 0
 try {
+    if ((Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender" -Name "DisableLocalAdminMerge" -ErrorAction SilentlyContinue).DisableLocalAdminMerge -eq 1) {
+        Write-Host "[*] 检测到 WD 被错误配置为不允许排除, 正在修复..."
+        Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender" -Name "DisableLocalAdminMerge" -Value 0
+        Write-Host "[+] 已修复 WD 排除项配置" -ForegroundColor Green
+    }
+
+    if ((Get-MpComputerStatus).AntivirusEnabled -and ((Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\SecurityHealthService" -Name "Start") -eq 4)) {
+        Write-Host "[*] 检测到安全中心服务被错误禁用, 正在修复..."
+        Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\SecurityHealthService" -Name "Start" -Value 2
+        Write-Host "[+] 已修复安全中心服务被错误禁用" -ForegroundColor Green
+        Write-Host "[*] 正在重新启动安全中心服务..."
+        Restart-Service -Name "SecurityHealthService"
+        Write-Host "[+] 已重新启动安全中心服务, 如出现问题请尝试重新启动设备" -ForegroundColor Green
+    }
+
     Add-MpPreference -ExclusionPath $tmpDir
     $wd = 1
     Write-Host "[+] 已添加 WD 临时排除项" -ForegroundColor Green
