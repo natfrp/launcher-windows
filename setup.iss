@@ -51,6 +51,10 @@ LZMAUseSeparateProcess=yes
 [Languages]
 Name: "ChineseSimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
 
+[Messages]
+SetupAppRunningError=安装程序发现 %1 当前正在运行。%n%n请先彻底退出启动器，然后点击“确定”继续，或按“取消”退出。%n%n如果任务栏中没有启动器图标，请在任务管理器中寻找并结束 SakuraFrpService.exe、SakuraLauncher.exe、LegacyLauncher.exe 三个进程。
+UninstallAppRunningError=卸载程序发现 %1 当前正在运行。%n%n请先彻底退出启动器，然后点击“确定”继续，或按“取消”退出。%n%n如果任务栏中没有启动器图标，请在任务管理器中寻找并结束 SakuraFrpService.exe、SakuraLauncher.exe、LegacyLauncher.exe 三个进程。
+
 [Types]
 Name: "default"; Description: "默认设置";
 Name: "custom"; Description: "自定义"; Flags: iscustom;
