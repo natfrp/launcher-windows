@@ -151,6 +151,7 @@ var
 	downloadPage: TDownloadWizardPage;
 
 	installNet: Boolean;
+	missingWebView2: Boolean;
 	installWebView2: Boolean;
 
 function TryInstall(const Name, File, Args: String; const CheckResult: Boolean): String;
@@ -235,12 +236,14 @@ begin
 	if (not verifyWebView2) and (RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv', versionStr)) then
 		verifyWebView2 := true;
 
-	installWebView2 := (not verifyWebView2) or (CompareVersion(versionStr, '104.0.1293.70') < 0)
+	missingWebView2 := (not verifyWebView2) or (CompareVersion(versionStr, '104.0.1293.70') < 0)
 end;
 
 function UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
 begin
 	Result := '';
+
+	installWebView2 := missingWebView2 and WizardIsComponentSelected('launcher_ui\wpf');
 
 	if WizardIsComponentSelected('launcher_ui') and (installNet or installWebView2) then
 	begin
