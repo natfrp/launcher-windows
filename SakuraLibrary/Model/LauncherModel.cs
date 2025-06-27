@@ -428,6 +428,20 @@ namespace SakuraLibrary.Model
             }
         }
 
+        [SourceBinding(nameof(Config))]
+        public int FrpcTrafficOpt
+        {
+            get => Config?.FrpcTrafficOpt ?? 0;
+            set
+            {
+                if (Config != null)
+                {
+                    Config.FrpcTrafficOpt = value;
+                    PushServiceConfig();
+                }
+            }
+        }
+
         public void PushServiceConfig(bool blocking = false)
         {
             if (blocking)

@@ -641,7 +641,7 @@
                     VerticalAlignment="Center"
                     FontSize="16"
                     Foreground="#DDFFFFFF">
-                    高级用户模式
+                    专家用户模式
                 </TextBlock>
                 <TextBlock
                     Margin="8,0,0,0"
@@ -696,7 +696,54 @@
             </StackPanel>
             <StackPanel
                 Height="32"
-                Margin="12,4,16,0"
+                Margin="12,8,16,0"
+                Orientation="Horizontal">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF">
+                    连接优化策略:
+                </TextBlock>
+                <ComboBox
+                    MinWidth="150"
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    SelectedValue="{Binding FrpcTrafficOpt}"
+                    SelectedValuePath="Tag"
+                    SelectionChanged="Save">
+                    <ComboBoxItem Tag="0">自动</ComboBoxItem>
+                    <ComboBoxItem Tag="1">模式1</ComboBoxItem>
+                    <ComboBoxItem Tag="2">模式2</ComboBoxItem>
+                    <ComboBoxItem Tag="3">模式3</ComboBoxItem>
+                    <ComboBoxItem Tag="4">模式4</ComboBoxItem>
+                    <ComboBoxItem Tag="5">模式5</ComboBoxItem>
+                    <ComboBoxItem Tag="6">模式6</ComboBoxItem>
+                    <ComboBoxItem Tag="7">模式7</ComboBoxItem>
+                    <ComboBoxItem Tag="8">模式8</ComboBoxItem>
+                    <ComboBoxItem Tag="9">模式9</ComboBoxItem>
+                    <ComboBoxItem Tag="10">模式10</ComboBoxItem>
+                </ComboBox>
+                <TextBlock
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#DDFFFFFF"
+                    ToolTip="仅供故障排除用，请勿随意修改。随意修改可能导致隧道无法启动或工作异常"
+                    ToolTipService.InitialShowDelay="0"
+                    TouchUp="Hint_TouchUp">
+                    <materialDesign:PackIcon
+                        Foreground="White"
+                        Kind="HelpCircleOutline"
+                        RenderTransformOrigin="0.5,0.1">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                </TextBlock>
+            </StackPanel>
+            <StackPanel
+                Height="32"
+                Margin="12,8,16,0"
                 Orientation="Horizontal">
                 <TextBlock
                     VerticalAlignment="Center"
